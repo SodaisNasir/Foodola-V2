@@ -1,0 +1,28 @@
+<?php 
+
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+include("connection.php");
+
+header('Content-Type: application/json');
+
+if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC'){
+    
+    $sql = "SELECT * FROM `system_setting`";
+    $execute = mysqli_query($conn, $sql);
+
+    if($execute && mysqli_num_rows($execute) > 0){
+        
+        while($row = mysqli_fetch_assoc($execute)){
+      
+        echo json_encode($row);
+        }
+    } else {
+        echo json_encode(['status' => false, 'message' => 'No row found']);
+    }
+
+} else {
+    echo json_encode(['status' => false, 'message' => 'Unauthorized']);
+}
+
+?>
