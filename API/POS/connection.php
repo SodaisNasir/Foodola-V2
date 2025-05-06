@@ -1,10 +1,12 @@
 <?php
 
 
+
 $Host = 'localhost';
-$DB_DATABASE='u772850971_foodola';
-$DB_USERNAME='u772850971_foodola';
-$DB_PASSWORD=']f0Hy^78Uf0s';
+$DB_DATABASE='u772850971_daynight';
+$DB_USERNAME='u772850971_daynight';
+$DB_PASSWORD='K*@7g0^g$3x0';
+
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
 

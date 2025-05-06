@@ -285,7 +285,7 @@ if ($order_result) {
 
 
                     $fields = array(
-                        'app_id' => "2de883ec-be41-4820-a517-558beee8b0ac",
+                        'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
                         'include_player_ids' => $playerId,
                         'data' => array("foo" => "NewMassage", "Id" => $taskid),
                         'large_icon' => "ic_launcher_round.png",
@@ -299,7 +299,7 @@ if ($order_result) {
                     curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
                     curl_setopt($ch, CURLOPT_HTTPHEADER, array(
                         'Content-Type: application/json; charset=utf-8',
-                        'Authorization: Basic os_v2_app_fxuih3f6ifecbjixkwf652fqvth5cvjs6zyu6x45bxrdyqx6thsko5tkpievvqngjhhkpn6l3n53whqh5xextgwkut3dbjnai26xili'
+                        'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'
                     ));
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
                     curl_setopt($ch, CURLOPT_HEADER, FALSE);
@@ -646,7 +646,7 @@ if ($order_result) {
             );
 
                 $fields = array(
-                    'app_id' => "2de883ec-be41-4820-a517-558beee8b0ac",
+                    'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
                     'include_player_ids' => $playerId,
                     'data' => array("foo" => "NewMassage", "Id" => $taskid),
                     'large_icon' => "ic_launcher_round.png",
@@ -660,7 +660,7 @@ if ($order_result) {
                 curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
                 curl_setopt($ch, CURLOPT_HTTPHEADER, array(
                     'Content-Type: application/json; charset=utf-8',
-                    'Authorization: Basic os_v2_app_fxuih3f6ifecbjixkwf652fqvth5cvjs6zyu6x45bxrdyqx6thsko5tkpievvqngjhhkpn6l3n53whqh5xextgwkut3dbjnai26xili'
+                    'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'
                 ));
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
                 curl_setopt($ch, CURLOPT_HEADER, FALSE);
