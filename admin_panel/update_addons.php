@@ -222,57 +222,60 @@ td[name="price"]::before {
 		</div>
 	</div>
 </section>
+
 <section id="basic-datatable">
     <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Manage Addon</h4>
+                     <button type="button" class="btn btn-success mt-2" onclick="openMergeModal()">Merge Addons</button>
                 </div>
-        
                 <div class="card-content">
                     <div class="card-body card-dashboard">
-                        <p class="card-text"></p>
                         <div class="table-responsive">
                             <table id="example" class="table">
                                 <thead>
                                     <tr>
+                                        <th>Select</th>
                                         <th>S no.</th>
                                         <th>Addon ID</th>
                                         <th>Addon Name</th>
                                         <th>Addon Price</th>
                                         <th>Action</th>
-                                         <th>Action</th>
+              
                                     </tr>
                                 </thead>
                                 <tbody>
-                                      <?php
-                                      include_once('connection.php');
-                                      $sql="SELECT * FROM `addon_sublist` WHERE `ao_id` = ".$_GET['id'];
-                                      $result = mysqli_query($conn,$sql);
-                                      $index = 0;
-                                      while($row = mysqli_fetch_array($result)){
-                                          $sn = $index+1;
-                                          echo "<tr>";
-                                            echo "<td>{$sn}</td>";
-                                            echo "<td>{$row['as_id']}</td>";
-                                            echo "<td name='cost'>{$row['as_name']}</td>";
-                                            echo "<td name='price'>{$row['as_price']}</td>";
-
-                                          echo '<td><button class="btn btn-primary"  onclick="openAddMore(\''. $row['as_id'] .'\' ,\''.$row['as_name'].'\' ,\''.$row['as_price'].'\')">Update</button>';"
-                                             </td>";
-                                            echo '<td><button class="btn btn-danger" onclick="deleteRow(\''. $row['as_id'] .'\')">Delete</button></td>';     
-                                          echo "</tr>";
-                                          $index++;
-                                      }
+                                  <?php
+                                  include_once('connection.php');
+                                  $sql="SELECT * FROM `addon_sublist` WHERE `ao_id` = ".$_GET['id'];
+                                  $result = mysqli_query($conn,$sql);
+                                  $index = 0;
+                                  while($row = mysqli_fetch_array($result)){
+                                      $sn = $index+1;
+                                      echo "<tr data-id='{$row['as_id']}'>";
+                                      echo "<td><input type='checkbox' name='selected_addons[]' value='{$row['as_id']}'></td>";
+                                      echo "<td>{$sn}</td>";
+                                      echo "<td>{$row['as_id']}</td>";
+                                      echo "<td class='editable' contenteditable='true' data-field='as_name' name='cost'>{$row['as_name']}</td>";
+                                      echo "<td class='editable' contenteditable='true' data-field='as_price' name='price'>{$row['as_price']}</td>";
                                       
-                                      ?>
-                                    
+                                    //   echo "<td><button class='btn btn-primary' onclick=\"openAddMore('{$row['as_id']}', '{$row['as_name']}', '{$row['as_price']}')\">Update</button></td>";
+                            
+                                      echo "<td>
+                                      <button class='btn btn-success save-btn' style='display:none;'>Save</button>
+                                      <button class='btn btn-danger mt-1' onclick=\"deleteRow('{$row['as_id']}')\">Delete</button>
+                                      </td>";
+                                      echo "</tr>";
+                                      $index++;
+                                  }
+                                  ?>
                                 </tbody>
-                                <tfoot>
-                                   
-                                </tfoot>
                             </table>
+                    
+                          
+
                         </div>
                     </div>
                 </div>
@@ -280,6 +283,7 @@ td[name="price"]::before {
         </div>
     </div>
 </section>
+
 <!--/ Zero configuration table -->
 <div id="myModal" class="modal">
 
@@ -311,10 +315,7 @@ td[name="price"]::before {
       </div>
     
     </div>
-
-
-
-    <div id="myModal_Add" class="modal">
+<div id="myModal_Add" class="modal">
 
       <!-- Modal content -->
       <div class="modal-content-Updated">
@@ -361,6 +362,33 @@ td[name="price"]::before {
       </div>
     
     </div>
+<!-- Merge Addons Modal -->
+<div class="modal fade" id="mergeAddonsModal" tabindex="-1" role="dialog" aria-labelledby="mergeAddonsModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="mergeAddonsForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="mergeAddonsModalLabel">Merge Selected Addons</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="merged_name">New Addon Name</label>
+            <input type="text" class="form-control" id="merged_name" name="merged_name" placeholder="Enter merged addon name" required>
+          </div>
+          <input type="hidden" name="selected_addons" id="selected_addons_input">
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Merge</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+    
+    
 
 
 
@@ -572,7 +600,7 @@ $(document).ready(function() {
     formData.append('csv_file', file);
 
     $.ajax({
-        url: 'https://foodola.foodola.shop/API/update_bulk_addons.php', // Or pass this via argument
+        url: '../API/update_bulk_addons.php', // Or pass this via argument
         type: 'POST',
         data: formData,
         contentType: false,
@@ -606,6 +634,95 @@ $(document).ready(function() {
     });
 }
 
+</script>
+<script>
+function openMergeModal() {
+    let selected = [];
+    $("input[name='selected_addons[]']:checked").each(function() {
+        selected.push($(this).val());
+    });
+
+    if (selected.length === 0) {
+        alert("Please select at least one addon to merge.");
+        return;
+    }
+
+    // Put selected addon IDs in hidden input
+    $('#selected_addons_input').val(selected.join(','));
+
+    // Open the modal
+    $('#mergeAddonsModal').modal('show');
+}
+
+$('#mergeAddonsForm').on('submit', function(e) {
+    e.preventDefault();
+
+    const merged_name = $('#merged_name').val();
+    const selected_addons = $('#selected_addons_input').val();
+    
+    // Log the data to the console for debugging
+    console.log('Data :', {
+        new_ao_title: merged_name,
+        selected_ao_ids: selected_addons
+    });
+
+    $.ajax({
+        url: '../API/merge_addons.php', // your backend merge logic file
+        type: 'POST',
+        data: {
+            new_ao_title: merged_name,
+            selected_ao_ids: selected_addons
+        },
+        success: function(response) {
+            alert("Addons merged successfully!");
+            location.reload(); // Refresh the page to show updates
+        },
+        error: function() {
+            alert("An error occurred while merging.");
+        }
+    });
+});
+</script>
+
+
+<script>
+$(document).ready(function () {
+    // Show Save button when title is edited
+    $('.editable').on('input', function () {
+        $(this).closest('tr').find('.save-btn').show();
+    });
+
+    // Save updated title
+    $('.save-btn').on('click', function () {
+        const row = $(this).closest('tr');
+        const id = row.data('id');
+        const as_name = row.find('[data-field="as_name"]').text().trim();
+        const as_price = row.find('[data-field="as_price"]').text().trim();
+
+        $.ajax({
+            url: '../API/update_inline_addons.php',
+            method: 'POST',
+            dataType: 'json',
+            data: {
+                id: id,
+                as_name: as_name,
+                as_price : as_price
+
+            },
+            success: function (response) {
+                if (response.status) {
+                    alert(response.message);
+                    row.find('.save-btn').hide();
+                } else {
+                    alert("Error: " + response.message);
+                }
+            },
+            error: function (xhr) {
+                alert("Request failed: " + xhr.responseText);
+            }
+        });
+    });
+});
 </script>
 
 

@@ -225,6 +225,8 @@ if(isset($_GET['Massage'])){
                             </div>
                         </div>
                         
+                        
+                        
                         <div class="col-sm-6">
                           <div class="form-group">
                             <div class="controls">
@@ -243,6 +245,22 @@ if(isset($_GET['Massage'])){
                           </div>
                         </div>
 
+
+
+                        
+    <div class="col-sm-6">
+  <div class="form-group">
+    <div class="controls">
+
+  <select name="for_deal_only" id="for_deal_only" class="form-control" required>
+        <option value="0">Select Visibility</option>  
+    <option value="0">Regular Product</option>
+    <option value="1">Only for Deals</option>
+  </select>
+    </div>
+  </div>
+</div>
+
     			    	
     			    
                 
@@ -255,24 +273,24 @@ if(isset($_GET['Massage'])){
                             	<h4 class="card-title"> </h4>
                         </div>
                         
-                  <div class="col-sm-6">
-                      <h6 class="card-content">Select Addon</h6>
-                      <div class="form-group">
-                        <div class="controls">
-                          <select name="addonCat" id="addonSelect" class="form-control">
-                            <option value="-1">None</option>
-                            <?php 
-                            include('/assets/connection.php');
-                            $sql = "SELECT `ao_id`, `ao_title` FROM `addon_list`";
-                            $execute = mysqli_query($conn, $sql);
-                            while($row = mysqli_fetch_array($execute)){
-                                        echo "<option value='{$row['ao_id']}'>{$row['ao_title']} --- {$row['ao_id']}</option>"; 
-                            }
-                            ?>  
-                          </select>
-                        </div>
-                      </div>
-                    </div>
+                          <div class="col-sm-6">
+                              <h6 class="card-content">Select Addon</h6>
+                              <div class="form-group">
+                                <div class="controls">
+                                  <select name="addonCat" id="addonSelect" class="form-control">
+                                    <option value="-1">None</option>
+                                    <?php 
+                                    include('/assets/connection.php');
+                                    $sql = "SELECT `ao_id`, `ao_title` FROM `addon_list`";
+                                    $execute = mysqli_query($conn, $sql);
+                                    while($row = mysqli_fetch_array($execute)){
+                                                echo "<option value='{$row['ao_id']}'>{$row['ao_title']} --- {$row['ao_id']}</option>"; 
+                                    }
+                                    ?>  
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
 
                   
                   
@@ -314,6 +332,11 @@ if(isset($_GET['Massage'])){
     </div>
   </div>
 </div>
+
+
+
+
+
  
                   
                   

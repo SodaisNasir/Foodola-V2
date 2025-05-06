@@ -175,7 +175,7 @@
                             <table id="example" class="table">
                                 <thead>
                                     <tr>
-                                        <th>S No.</th>
+                                        <!--<th>S No.</th>-->
                                         <th>Order ID</th>
                                         <th>Name</th>
                                         <th>Order Type</th>
@@ -232,12 +232,12 @@ if (isset($_SESSION['branch_id'])) {
 
         // Prepare and display the order row
         echo "<tr>";
-        echo "<td>{$sn}</td>";
+        // echo "<td>{$sn}</td>";
         echo "<td>{$row['id']}</td>";
         echo "<td>" . ($user_name ?? '-') . "</td>";  // Show name or "-" if not available
         echo "<td>{$row['order_type']}</td>";
-        echo "<td>€ {$row['order_total_price']}</td>";
-        echo "<td>{$row['created_at']}</td>";
+        echo "<td style='min-width:100px;'>€ {$row['order_total_price']}</td>";
+        echo "<td style='min-width:200px;' >{$row['created_at']}</td>";
         echo "<td>€ {$row['Shipping_Cost']}</td>";
         echo "<td>{$row['payment_type']}</td>";
         echo "<td>{$row['addtional_notes']}</td>";
@@ -255,7 +255,7 @@ if (isset($_SESSION['branch_id'])) {
 
                                 <tfoot>
                                     <tr>
-                                        <th>S No.</th>
+                                        <!--<th>S No.</th>-->
                                         <th>Order ID</th>
                                         <th>Name</th>
                                         <th>Address</th>

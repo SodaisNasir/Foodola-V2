@@ -48,6 +48,7 @@ if (isset($_GET['Massage'])) {
     <link rel="stylesheet" type="text/css" href="assets/css/style.css">
     <!-- END: Custom CSS-->
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
 </head>
 
 <!-- BEGIN: Body-->
@@ -108,31 +109,31 @@ if (isset($_GET['Massage'])) {
                                             </thead>
                                             <tbody>
                                                    <?php
-include_once('connection.php');
-$sql = "SELECT `id`, `name`, `img`, `created_at`, `updated_at` FROM `categories`";
-$result = mysqli_query($conn, $sql);
-$index = 0;
-
-while ($row = mysqli_fetch_array($result)) {
-    $sn = $index + 1;
-    $name = $row['name'];
-    $created_at = $row['created_at'];
-    $id = $row['id'];
-
-    echo "<tr>";
-    echo "<td>{$sn}</td>";
-    echo "<td>{$row['id']}</td>";
-    echo "<td name='tittlename'>{$row['name']}</td>";
-    echo "<td name='subname'>{$row['created_at']}</td>";
-    echo '<td>
-            <button class="btn btn-primary" onclick="openAddMore(' . $id . ', \'' . addslashes($name) . '\')">Update</button>
-            <button class="btn btn-secondary" onclick="openimagemodel(' . $id . ')">Update Image</button>
-        </td>';
-    echo "</tr>";
-
-    $index++;
-}
-?>
+                                                    include_once('connection.php');
+                                                    $sql = "SELECT `id`, `name`, `img`, `created_at`, `updated_at` FROM `categories`";
+                                                    $result = mysqli_query($conn, $sql);
+                                                    $index = 0;
+                                                    
+                                                    while ($row = mysqli_fetch_array($result)) {
+                                                        $sn = $index + 1;
+                                                        $name = $row['name'];
+                                                        $created_at = $row['created_at'];
+                                                        $id = $row['id'];
+                                                    
+                                                        echo "<tr>";
+                                                        echo "<td>{$sn}</td>";
+                                                        echo "<td>{$row['id']}</td>";
+                                                        echo "<td name='tittlename'>{$row['name']}</td>";
+                                                        echo "<td name='subname'>{$row['created_at']}</td>";
+                                                        echo '<td>
+                                                                <button class="btn btn-primary" onclick="openAddMore(' . $id . ', \'' . addslashes($name) . '\')">Update</button>
+                                                                <button class="btn btn-secondary" onclick="openimagemodel(' . $id . ', \'' . addslashes($name) . '\')">Update Image</button>
+                                                            </td>';
+                                                        echo "</tr>";
+                                                    
+                                                        $index++;
+                                                    }
+                                                    ?>
 
                                             </tbody>
                                             <tfoot>
@@ -158,7 +159,7 @@ while ($row = mysqli_fetch_array($result)) {
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="updateImageModalLabel">Update Image</h5>
+                            <h5 class="modal-title" id="updateImageModalLabel"> </h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
@@ -180,7 +181,7 @@ while ($row = mysqli_fetch_array($result)) {
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="updateCategoryModalLabel">Update Category</h5>
+                            <h5 class="modal-title" id="updateCategoryModalLabel"></h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
@@ -202,26 +203,42 @@ while ($row = mysqli_fetch_array($result)) {
 </div>
 <!-- END: Content-->
 
-<script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha384-T9D0A/2jqEKbZ2dH1s5+6wsdPrjIYdeFbFSpYkYmD5E4bveQu6cD3fWAcDoJi6dg" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-OeIR/68Kfy87eI8Qq9NTtAgvsngF74+O7/EMqaXBdWq1s64Vcmz5+SUsp5cGdtmx" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-GMFRYcANlsF1pyLQqD7bfz91IBhRyrdsVtJLBKHVxYvftoqxMJJmXCEpsGEL+zs1" crossorigin="anonymous"></script>
+<!--<script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha384-T9D0A/2jqEKbZ2dH1s5+6wsdPrjIYdeFbFSpYkYmD5E4bveQu6cD3fWAcDoJi6dg" crossorigin="anonymous"></script>-->
+<!--<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-OeIR/68Kfy87eI8Qq9NTtAgvsngF74+O7/EMqaXBdWq1s64Vcmz5+SUsp5cGdtmx" crossorigin="anonymous"></script>-->
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-GMFRYcANlsF1pyLQqD7bfz91IBhRyrdsVtJLBKHVxYvftoqxMJJmXCEpsGEL+zs1" crossorigin="anonymous"></script>-->
 <script src="app-assets/vendors/js/vendors.min.js"></script>
 <script src="app-assets/vendors/js/forms/validation/jqBootstrapValidation.js"></script>
 <script src="app-assets/js/core/app-menu.min.js"></script>
 <script src="app-assets/js/core/app.min.js"></script>
 <script src="app-assets/js/scripts/forms/validation/form-validation.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
 <script>
 function openAddMore(id, name, created_at) {
     $('#updateCategoryModal').modal('show');
     $('#product_id').val(id);
     $('#ProName').val(name);
+    $('#updateCategoryModalLabel').text(`Update Category: ${name}`);
+    
 }
 
-function openimagemodel(id) {
+function openimagemodel(id,name) {
     $('#updateImageModal').modal('show');
     $('#CatID').val(id);
+      $('#updateImageModalLabel').text(`Update Image: ${name}`);
 }
 </script>
+<script>
+    $(document).ready(function() {
+    $('#example').DataTable( {
+        dom: 'Bfrtip',
+        buttons: [
+            'copyHtml5',
+            'excelHtml5',
+            'csvHtml5',
+            'pdfHtml5'
+        ]
+    } );
+} );</script>
 </body>
 </html>

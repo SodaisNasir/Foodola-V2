@@ -195,9 +195,12 @@
                                             echo "<tr data-id='{$row['dressing_id']}'>";
                                             echo "<td>{$sn}</td>";
                                             echo "<td  data-field='dressing_id'>{$row['dressing_id']}</td>";
-                                            echo "<td class='editable' contenteditable='false' data-field='dressing_title'>{$row['dressing_title']}</td>";
-                                            echo "<td><button class='btn btn-success save-btn' style='display:none;'>Save</button></td>";    
-                                            echo "<td><a href='update_dressing.php?id={$row['dressing_id']}' ><button class='btn btn-primary'>Update</button></a></td>";
+                                            echo "<td class='editable' contenteditable='true' data-field='dressing_title'>{$row['dressing_title']}</td>";
+               
+                                            echo "<td>
+                                            <button class='btn btn-success save-btn' style='display:none;'>Save</button>
+                                            <a href='update_dressing.php?id={$row['dressing_id']}' ><button class='btn btn-primary'>Update Dressing Sublist</button></a>
+                                            </td>";
                                             echo "</tr>";
                                           $index++;
                                       }
@@ -437,7 +440,6 @@ function toggle(status,id){
     } );
 } );</script>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     // Show Save button on edit
     $('.editable').on('input', function () {
@@ -453,7 +455,7 @@ function toggle(status,id){
     console.log('Sending:', { original_id: id, dressing_title: title }); // debug log
 
     $.ajax({
-        url: 'https://foodola.foodola.shop/API/update_dressing_inline.php',
+        url: '../API/update_dressing_inline.php',
         method: 'POST',
         data: {
             original_id: id,

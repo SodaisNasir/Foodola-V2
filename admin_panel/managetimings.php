@@ -75,6 +75,9 @@ if(isset($_GET['Massage'])){
     <!-- BEGIN: Custom CSS-->
     <link rel="stylesheet" type="text/css" href="assets/css/style.css">
     <!-- END: Custom CSS-->
+    <!-- Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
 
   </head>
   <!-- END: Head-->
@@ -101,12 +104,12 @@ if(isset($_GET['Massage'])){
           <div class="content-header-left col-md-9 col-12 mb-2">
             <div class="row breadcrumbs-top">
               <div class="col-12">
-                <h2 class="content-header-title float-left mb-0">Add Areas</h2>
+                <h2 class="content-header-title float-left mb-0">Manage Shedule</h2>
                 <div class="breadcrumb-wrapper col-12">
                   <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="index.php">Home</a>
                     </li>
-                    <li class="breadcrumb-item active">Add New Areas
+                    <li class="breadcrumb-item active">Manage Shedule
                     </li>
                   </ol>
                 </div>
@@ -178,36 +181,49 @@ while ($row = mysqli_fetch_assoc($query)) {
                                         <th>From - To (Shift 2)</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <?php
-                                    $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Holiday'];
-                                    foreach ($days as $day) {
-                                        $dayKey = strtolower(substr($day, 0, 3));
-                                        $timing = isset($data[$dayKey]) ? $data[$dayKey] : ['start_time_1' => '', 'end_time_1' => '', 'start_time_2' => '', 'end_time_2' => ''];
-                                        ?>
-                                        <tr>
-                                            <td><?php echo $day; ?></td>
-                                            <td>
-                                                <div class="d-flex align-items-center gap-1">
-                                                    <input type="time" name="<?php echo $dayKey; ?>_from1" class="form-control" value="<?php echo $timing['start_time_1']; ?>" >
-                                                    <span>-</span>
-                                                    <input type="time" name="<?php echo $dayKey; ?>_to1" class="form-control" value="<?php echo $timing['end_time_1']; ?>" >
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex align-items-center gap-1">
-                                                    <input type="time" name="<?php echo $dayKey; ?>_from2" class="form-control" value="<?php echo $timing['start_time_2']; ?>" >
-                                                    <span>-</span>
-                                                    <input type="time" name="<?php echo $dayKey; ?>_to2" class="form-control" value="<?php echo $timing['end_time_2']; ?>" >
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <?php
-                                    }
-                                    ?>
-                                </tbody>
+                            <tbody>
+<?php
+$days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+foreach ($days as $day) {
+    $dayKey = strtolower(substr($day, 0, 3));
+    $timing = isset($data[$dayKey]) ? $data[$dayKey] : [
+        'start_time_1' => '', 'end_time_1' => '', 
+        'start_time_2' => '', 'end_time_2' => '', 
+        'is_holiday' => 0
+    ];
+    ?>
+    <tr>
+        <td>
+            <?php echo $day; ?><br>
+            <div class="form-check mt-1">
+                <input type="checkbox" name="<?php echo $dayKey; ?>_holiday" class="form-check-input" value="1" 
+                    <?php echo ($timing['is_holiday'] ?? 0) ? 'checked' : ''; ?>>
+                <label class="form-check-label">Mark as Holiday</label>
+            </div>
+        </td>
+        <td>
+            <div class="d-flex align-items-center gap-1">
+                <input type="time" name="<?php echo $dayKey; ?>_from1" class="form-control" value="<?php echo $timing['start_time_1']; ?>">
+                <span>-</span>
+                <input type="time" name="<?php echo $dayKey; ?>_to1" class="form-control" value="<?php echo $timing['end_time_1']; ?>">
+            </div>
+        </td>
+        <td>
+            <div class="d-flex align-items-center gap-1">
+                <input type="time" name="<?php echo $dayKey; ?>_from2" class="form-control" value="<?php echo $timing['start_time_2']; ?>">
+                <span>-</span>
+                <input type="time" name="<?php echo $dayKey; ?>_to2" class="form-control" value="<?php echo $timing['end_time_2']; ?>">
+            </div>
+        </td>
+    </tr>
+    <?php
+}
+?>
+</tbody>
+
                             </table>
                         </div>
+
 
                         <div class="form-group mt-3 text-center">
                             <button type="submit" name="btnSubmit_insertTimings" class="btn btn-success">Save Timings</button>

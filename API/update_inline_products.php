@@ -1,4 +1,7 @@
 <?php
+header("Access-Control-Allow-Origin: *"); 
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS"); 
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header('Content-Type: application/json');
 include('connection.php');
 
@@ -16,6 +19,7 @@ $addon_id = mysqli_real_escape_string($conn, $_POST['addon_id'] ?? '');
 $type_id = mysqli_real_escape_string($conn, $_POST['type_id'] ?? '');
 $dressing_id = mysqli_real_escape_string($conn, $_POST['dressing_id'] ?? '');
 $sub_category_id = mysqli_real_escape_string($conn, $_POST['sub_category_id'] ?? '');
+$for_deal_only = mysqli_real_escape_string($conn, $_POST['for_deal_only'] ?? '');
 
 $image_path = '';
 
@@ -64,7 +68,8 @@ $sql = "UPDATE `products` SET
     `addon_id`='$addon_id',
     `type_id`='$type_id',
     `dressing_id`='$dressing_id',
-    `sub_category_id`='$sub_category_id'";
+    `sub_category_id`='$sub_category_id',
+    `for_deal_only`='$for_deal_only'";
 
 
 if ($image_path !== '') {

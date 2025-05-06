@@ -140,6 +140,7 @@ if(isset($_GET['Massage'])){
 							<div class="form-group">
 								<div class="controls">
                                    <div class="controls">
+                                               <label for="product_id">Alternate Name</label>
                                    <input type="text" name="CatName" class="form-control" placeholder="Alternate name" required="">
                                     </div>
     							</div>
@@ -150,6 +151,7 @@ if(isset($_GET['Massage'])){
 							<div class="form-group">
 								<div class="controls">
                                    <div class="controls">
+                                               <label for="product_id">Slider Image</label>
                                    <input type="file" name="CatImage" class="form-control" placeholder="Category Image" required="">
                                     </div>
     							</div>
@@ -159,20 +161,74 @@ if(isset($_GET['Massage'])){
                           
                           
                  
-                  <div class="form-group">
-                    <div class="controls">
-                      <select name="MainCat" class="form-control" >
-                         <option value='slider'>Main slider</option>
-                         <option value='discount'>Discount slider</option>
-                      </select>
-                    </div>
-                  </div>
+   
+                      <div class="form-group">
+                                <div class="controls">
+                                            <label for="product_id">Select Type</label>
+                                  <select name="MainCat" class="form-control" >
+                                     <option value='slider'>Main slider</option>
+                                     <option value='discount'>Discount slider</option>
+                                  </select>
+                                </div>
+                              </div>
+                  
+            
+                  
+                  
+              
+                 
+              
+                   
               
 
+    
                           
+                     </div>     
+                      <div class=" col-lg-6 col-sm-12">
+                 
+                    <div class="form-group">
+                            <label for="product_id">Select Product</label>
+                            <select name="product_id" id="product_id" class="form-control">
+                                <option value="">-- Select a Product --</option>
+                                <?php
+                                    include("connection.php");
+                                
+                                    $sql_products = "SELECT id, name FROM products";
+                                    $execute_products = mysqli_query($conn, $sql_products);
+                                
+                                    // Store product options in an array
+                                    $product_options = [];
+                                    if (mysqli_num_rows($execute_products) > 0) {
+                                        while ($row = mysqli_fetch_assoc($execute_products)) {
+                                            $product_options[] = $row; // Store each product row
+                                        }
+                                    }
+                                    // Populate product options from the database
+                                    foreach ($product_options as $product) {
+                                        echo "<option value='{$product['id']}'>{$product['name']}</option>";
+                                    }
+                                ?>
+                            </select>
+                        </div>
+            
+                  
+                  
+              
+                 
+              
+                   
+              
+
+    
                           
-                          
-                     </div>            
+                     </div>     
+                     
+                     
+                     
+                     
+                     
+                     
+                     
                             <div class="col-12">
 							<button type="Submit" name="btnSubmit_insertSliders"  class="btn btn-primary">Submit</button>
                                 

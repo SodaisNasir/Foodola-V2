@@ -60,6 +60,26 @@
         cursor: pointer;
 
     }
+    
+    
+.percentage-wrapper {
+    position: relative;
+}
+
+.percentage-wrapper input {
+    padding-right: 30px; /* space for the % sign */
+}
+
+.percentage-wrapper::after {
+    content: '%';
+    position: absolute;
+    right: 10px;
+    top: 28px; /* adjust to align vertically depending on your layout */
+    color: #6c757d;
+    pointer-events: none;
+}
+
+
 </style>
 
 <head>
@@ -159,30 +179,30 @@
                                 <div class="card-content">
                                    <div class="card-body card-dashboard">
                                          <!-- Cashback Form -->
-                                        <div class="col-lg-6">
-                                            <form method="POST" action="phpfiles/insertions.php">
-                                                <?php
-                                                include("connection.php");
-                                                $sql = "SELECT * FROM cash_back";
-                                                $execute = mysqli_query($conn, $sql);
-                                                $row = mysqli_fetch_assoc($execute);
-                                                $isChecked = isset($row['status']) && $row['status'] == 1 ? "checked" : "";
-                                                ?>
-                                    
-                                                <div class="mb-2">
-                                                    <label for="cashback_percenatge" class="form-label">Cashback Amount</label>
-                                                    <input type="number" id="cashback_percenatge" name="cashback_percenatge" value="<?php echo $row['cashback_percenatge'] ?>" class="form-control">
-                                                </div>
-                                    
-                                                <div class="form-check form-switch mb-2">
-                                                    <input class="form-check-input" type="checkbox" id="status" name="status" <?php echo $isChecked; ?>>
-                                                    <label class="form-check-label" for="status">Enable Cashback</label>
-                                                </div>
-                                    
-                                                <button type="submit" name="btn_setcashback" class="btn btn-primary">Set Cashback</button>
-                                            </form>
-                                        </div>
-                                    </div>
+                                       <div class="col-lg-6">
+    <form method="POST" action="phpfiles/insertions.php">
+        <?php
+        include("connection.php");
+        $sql = "SELECT * FROM cash_back";
+        $execute = mysqli_query($conn, $sql);
+        $row = mysqli_fetch_assoc($execute);
+        $isChecked = isset($row['status']) && $row['status'] == 1 ? "checked" : "";
+        ?>
+        
+        <div class="mb-2 percentage-wrapper">
+            <label for="cashback_percenatge" class="form-label">Cashback Amount</label>
+            <input type="number" id="cashback_percenatge" name="cashback_percenatge" value="<?php echo $row['cashback_percenatge']; ?>" class="form-control">
+        </div>
+
+        <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" id="status" name="status" <?php echo $isChecked; ?>>
+            <label class="form-check-label" for="status">Enable Cashback</label>
+        </div>
+
+        <button type="submit" name="btn_setcashback" class="btn btn-primary">Set Cashback</button>
+    </form>
+</div>
+
 
                                 </div>
                             </div>

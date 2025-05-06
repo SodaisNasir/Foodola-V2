@@ -234,18 +234,21 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">Manage Type</h4>
+                <div class="card-header my-0">
+                    <h4 class="card-title" >Manage Type</h4>
+                    
+                        <button type="button" class="btn btn-success mt-2" onclick="openMergeModal()">Merge Type</button>
                 </div>
         
                 <div class="card-content">
                     <div class="card-body card-dashboard">
                         <p class="card-text"></p>
                         <div class="table-responsive">
-                            <div class="mb-3" id="example_wrapper"></div>
+                            <div class="" id="example_wrapper"></div>
                             <table id="example" class="table">
                                 <thead>
                                     <tr>
+                                        <th>Select</th>
                                         <th>S no.</th>
                                         <th>Type ID</th>
                                         <th>Type Name</th>
@@ -263,7 +266,8 @@
                                       $index = 0;
                                       while($row = mysqli_fetch_array($result)){
                                           $sn = $index+1;
-                                          echo "<tr data-id='{$row['ts_id']}'>>";
+                                          echo "<tr data-id='{$row['ts_id']}'>";
+                                          echo "<td><input type='checkbox' name='selected_types[]' value='{$row['ts_id']}'></td>";
                                           echo "<td>{$sn}</td>";
                                           echo "<td>{$row['ts_id']}</td>";
                                           echo "<td class='editable' contenteditable='true' data-field='ts_name' ts_name='cost'>{$row['ts_name']}</td>";
@@ -281,6 +285,7 @@
                                 </tbody>
                                 <tfoot>
                                      <tr>
+                                        <th>Select</th>
                                         <th>S no.</th>
                                         <th>Type ID</th>
                                         <th>Type Name</th>
@@ -387,6 +392,34 @@
 
 <!--/ Scroll - horizontal and vertical table -->
 
+<!-- Merge Types Modal -->
+<div class="modal fade" id="mergeTypeModal" tabindex="-1" role="dialog" aria-labelledby="mergeTypeModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="mergeTypeForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="mergeTypeModalLabel">Merge Selected Types</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="merged_type_name">New Type Name</label>
+            <input type="text" class="form-control" id="merged_type_name" name="merged_type_name" placeholder="Enter merged type name" required>
+          </div>
+          <input type="hidden" name="selected_type_ids" id="selected_type_input">
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Merge</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+        
+
         </div>
       </div>
     </div>
@@ -455,7 +488,8 @@ $(document).ready(function() {
 
 var modal = document.getElementById("myModal");
 var modal_Add = document.getElementById("myModal_Add");
- function openModal(id){
+
+function openModal(id){
         document.getElementsByName('userID')[0].value = id;
         modal.style.display = "block";
  }
@@ -469,7 +503,7 @@ function openAddMore(id,cost, proname){
      
 
  }
-  function openimagemodel(id,index){
+function openimagemodel(id,index){
      
 
       modal.style.display = "block";
@@ -477,7 +511,7 @@ function openAddMore(id,cost, proname){
      
 
  }
- var span = document.getElementsByClassName("close")[0];
+var span = document.getElementsByClassName("close")[0];
 window.onclick = function(event) {
   if (event.target == modal) {
     modal.style.display = "none";
@@ -486,7 +520,7 @@ window.onclick = function(event) {
      modal_Add.style.display = "none";
   }
 }
- function closeModel(id) {
+function closeModel(id) {
   if(id == 1){
       modal.style.display = "none";
   }else{
@@ -494,7 +528,6 @@ window.onclick = function(event) {
   }
   
 }
-
 function deleteRow(id){
     var req = new XMLHttpRequest();
       req.open("get","assets/Actions.php?FunctionName=DeleteAddonType&id="+id,true);
@@ -507,7 +540,6 @@ function deleteRow(id){
           }
       };
 }
-
 function toggle(status,id){
       var req = new XMLHttpRequest();
       req.open("get","assets/Actions.php?FunctionName=ToggleCampaignPro&id="+id+"&status="+status,true);
@@ -538,7 +570,7 @@ $(document).ready(function () {
         const type_title = row.find('[data-field="type_title"]').text().trim();
 
         $.ajax({
-            url: 'https://foodola.foodola.shop/API/update_inline_subtypes.php',
+            url: '../API/update_inline_subtypes.php',
             method: 'POST',
             dataType: 'json',
             data: {
@@ -622,7 +654,7 @@ function uploadCsv() {
     formData.append('csv_file', file);
 
     $.ajax({
-        url: 'https://foodola.foodola.shop/API/update_bulk_types.php', // Or pass this via argument
+        url: '../API/update_bulk_types.php', // Or pass this via argument
         type: 'POST',
         data: formData,
         contentType: false,
@@ -657,8 +689,56 @@ function uploadCsv() {
 }
 
 
+
 </script>
 
+
+<script>
+function openMergeModal() {
+    let selected = [];
+    $("input[name='selected_types[]']:checked").each(function() {
+        selected.push($(this).val());
+    });
+
+    if (selected.length === 0) {
+        alert("Please select at least one type to merge.");
+        return;
+    }
+
+    $('#selected_type_input').val(selected.join(','));
+
+    $('#mergeTypeModal').modal('show');
+}
+
+$('#mergeTypeForm').on('submit', function(e) {
+    e.preventDefault();
+
+    const mergedName = $('#merged_type_name').val();
+    const selectedTypeIds = $('#selected_type_input').val();
+
+    console.log("Sending to API:", {
+        new_type_title: mergedName,
+        selected_type_ids: selectedTypeIds
+    });
+
+    $.ajax({
+        url: '../API/merge_types.php', // adjust path as needed
+        type: 'POST',
+        data: {
+            new_type_title: mergedName,
+            selected_type_ids: selectedTypeIds
+        },
+        success: function(response) {
+            alert("Types merged successfully!");
+            location.reload(); // Refresh to show updates
+        },
+        error: function(xhr, status, error) {
+            console.error(xhr.responseText);
+            alert("An error occurred while merging types.");
+        }
+    });
+});
+</script>
 
 
   </body>

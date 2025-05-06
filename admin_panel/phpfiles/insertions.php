@@ -787,9 +787,12 @@ function handleImageUpload($file, $target_dir, $prefix) {
 
 
 if (isset($_POST['btnSubmit_insertSliders'])) {
+//                 error_reporting(E_ALL);
+// ini_set('display_errors', 1);
   include('../assets/connection.php');
-  include('../assets/config.php'); 
   session_start();
+  
+  
   $cat_name = $_POST['CatName'];
   $main_cat = $_POST['MainCat'];
   $product_id = $_POST['product_id'];
@@ -797,8 +800,12 @@ if (isset($_POST['btnSubmit_insertSliders'])) {
   $target_file = $target_dir . basename($_FILES["CatImage"]["name"]);
   $uploadOk = 1;
   $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+  $cat_name = mysqli_real_escape_string($con, $cat_name);
+$main_cat = mysqli_real_escape_string($con, $main_cat);
+$filewithnewname = mysqli_real_escape_string($con, $filewithnewname);
+$product_id = mysqli_real_escape_string($con, $product_id);
 
-  if ($_FILES["CatImage"]["size"] > 50000000) {
+  if ($_FILES["CatImage"]["size"] > 500000000) {
     echo "<script>alert('Sorry, your file is too large.')</script>";
     $uploadOk = 0;
   }
@@ -815,6 +822,8 @@ if (isset($_POST['btnSubmit_insertSliders'])) {
     $filewithnewname =  date("Ymdis") . "_Slider." . $imageFileType;
     if (move_uploaded_file($_FILES["CatImage"]["tmp_name"], $target_dir . $filewithnewname)) {
       "The file " . htmlspecialchars(basename($_FILES["CatImage"]["name"])) . " has been uploaded.";
+      
+      
       $sql = "INSERT INTO `sliders`(`alt_name`, `type`, `img`, `product_id`) VALUES ('$cat_name','$main_cat','$filewithnewname', '$product_id')";
       $result = mysqli_query($con, $sql);
 
@@ -1128,6 +1137,10 @@ if(isset($_POST['btnSubmit_insertDeal'])){
 
 
 if(isset($_POST['btnSubmit_insertNewProductZ'])){
+    
+//             error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+    
 include('../assets/connection.php');
 include('../assets/config.php'); 
 
@@ -1147,6 +1160,7 @@ include('../assets/config.php');
   $dressingCat = $_POST['dressingCat'];
   $sku_id = $_POST['sku_id'];
   $tax = $_POST['tax'];
+  $for_deal_only = $_POST['for_deal_only'];
   
   
   
@@ -1175,8 +1189,8 @@ include('../assets/config.php');
          "The file ". htmlspecialchars( basename( $_FILES["ProImage"]["name"])). " has been uploaded.";
          
          
-        $sql = "INSERT INTO `products`(`addon_id`,`type_id`,`dressing_id`, `sub_category_id`,`name`, `sku_id`, `description`, `cost`, `price`, `discount`, `qty`,`img`, `tax`) VALUES 
-                                        ($addonCat,$typeCat,$dressingCat,'$MainCat','$ProName','$sku_id','$ProDes',$ProCost,$ProPrice,$ProDiscount,$ProQty,'$filewithnewname', '$tax')";
+        $sql = "INSERT INTO `products`(`addon_id`,`type_id`,`dressing_id`, `sub_category_id`,`name`, `sku_id`, `description`, `cost`, `price`, `discount`, `qty`,`img`, `tax`, `for_deal_only`) VALUES 
+                                        ($addonCat,$typeCat,$dressingCat,'$MainCat','$ProName','$sku_id','$ProDes',$ProCost,$ProPrice,$ProDiscount,$ProQty,'$filewithnewname', '$tax', '$for_deal_only')";
                                         
         $result = mysqli_query($con,$sql);
             if($result){
@@ -1270,35 +1284,42 @@ include('../assets/connection.php');
 
 // for addon_dressing
 
-if(isset($_POST['btnSubmit_insertMoreAddonDressing'])){
-include('../assets/connection.php');
-  session_start();
-  $addon_name = $_POST['addon_name'];
-  $addon_id = $_POST['addon_id'];
-  
-           
-           foreach($addon_name as $addtype_name) {
-                $insert_addontype = "INSERT INTO `dressing_sublist`(`dressing_id`, `dressing_name`) VALUES ('$addon_id','$addtype_name')";
-                $result_addon = mysqli_query($con,$insert_addontype);
-            } 
-            
-           
-            
-            if($result_addon){
-                 header("Location:../update_dressing.php?id=$addon_id&Massage=Sucessfully updated Dressing.");
-            }else{
-            echo "<script>alert('Sorry, there was an error while adding addon.');window.location.href='../update_dressing.php?id='$addon_id';</script>";
-                
-            }
-            
-            
-       
-       
 
+if (isset($_POST['btnSubmit_insertMoreAddonDressing'])) {
+    include('../assets/connection.php');
+    session_start();
+
+    $addon_name = $_POST['addon_name'];
+    $addon_id = $_POST['addon_id'];
+
+    // Fetch dressing details once
+    $sql = "SELECT * FROM `dressing_list` WHERE `dressing_id`= '$addon_id'";
+    $exec = mysqli_query($con, $sql);
+
+    if (mysqli_num_rows($exec) > 0) {
+        $data = mysqli_fetch_assoc($exec);
+        $dressing_title = $data['dressing_title'];
+        $dressing_title_user = $data['dressing_title_user'];
+
+        foreach ($addon_name as $addtype_name) {
+            $addtype_name_safe = mysqli_real_escape_string($con, $addtype_name);
+
+            $insert_addontype = "INSERT INTO `dressing_sublist`(`dressing_id`, `dressing_title`, `dressing_title_user`, `dressing_name`) 
+                VALUES ('$addon_id','$dressing_title', '$dressing_title_user', '$addtype_name_safe')";
+            $result_addon = mysqli_query($con, $insert_addontype);
+        }
+
+        if ($result_addon) {
+            header("Location: ../update_dressing.php?id=$addon_id&Massage=Sucessfully updated Dressing.");
+            exit();
+        } else {
+            echo "<script>alert('Sorry, there was an error while adding addon.'); window.location.href='../update_dressing.php?id=$addon_id';</script>";
+        }
+    } else {
+        echo "<script>alert('Invalid dressing ID.'); window.location.href='../update_dressing.php';</script>";
+    }
 }
 
-
-// end addon_dressing
 
 
 
@@ -2444,53 +2465,47 @@ if(isset($_POST['btnSubmit_privacypolicy'])){
 
 
 if (isset($_POST['btnSubmit_insertTimings'])) {
-    error_reporting(E_ALL);
-ini_set('display_errors', 1);
     include('../assets/connection.php');
-    
-    
+
     // Get is_open status
     $is_open = isset($_POST['is_open']) ? 1 : 0;
 
     // Update or insert into your settings table
     $check = mysqli_query($con, "SELECT * FROM `system_setting` LIMIT 1");
-
     if (mysqli_num_rows($check) > 0) {
         mysqli_query($con, "UPDATE `system_setting` SET `is_open` = $is_open");
     } else {
         mysqli_query($con, "INSERT INTO `system_setting` (`is_open`) VALUES ($is_open)");
     }
 
-    
-
-    $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Holiday'];
+    // Days list
+    $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
     foreach ($days as $day) {
-        $dayKey = strtolower(substr($day, 0, 3)); // mon, tue, wed...
+        $dayKey = strtolower(substr($day, 0, 3)); // mon, tue, etc.
 
-        $from1 = $_POST[$dayKey . '_from1'];
-        $to1   = $_POST[$dayKey . '_to1'];
-        $from2 = $_POST[$dayKey . '_from2'];
-        $to2   = $_POST[$dayKey . '_to2'];
+        $from1 = $_POST[$dayKey . '_from1'] ?? '00:00:00';
+        $to1   = $_POST[$dayKey . '_to1'] ?? '00:00:00';
+        $from2 = $_POST[$dayKey . '_from2'] ?? '00:00:00';
+        $to2   = $_POST[$dayKey . '_to2'] ?? '00:00:00';
+
+        $is_holiday = isset($_POST[$dayKey . '_holiday']) ? 1 : 0;
 
         // Check if record exists
         $check = mysqli_query($con, "SELECT id FROM tbl_working_hours WHERE day = '$day'");
         if (mysqli_num_rows($check) > 0) {
             // Update
-            $update = mysqli_query($con, "UPDATE tbl_working_hours SET start_time_1 = '$from1', end_time_1 = '$to1', start_time_2 = '$from2',end_time_2 = '$to2' WHERE day = '$day'
-            ");
-        } else {
-            // Insert
-            $insert = mysqli_query($con, "INSERT INTO tbl_working_hours 
-                (day, start_time_1, end_time_1, start_time_2, end_time_2) 
-                VALUES 
-                ('$day', '$from1', '$to1', '$from2', '$to2')
+            $update = mysqli_query($con, "
+                UPDATE tbl_working_hours 
+                SET start_time_1 = '$from1', end_time_1 = '$to1',
+                    start_time_2 = '$from2', end_time_2 = '$to2',
+                    is_holiday = '$is_holiday'
+                WHERE day = '$day'
             ");
         }
     }
 
-
-            header("Location:../managetimings.php?Massage=Sucessfully updated timings."); 
+  header("Location:../managetimings.php?Massage=Sucessfully updated timings."); 
 }
 
 

@@ -2,7 +2,7 @@
 
 
 if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC'){
-     $sql = "SELECT `id`, `area_name`,`min_order_amount`, `branch_id`, `created_at` FROM `tbl_areas`";
+     $sql = "SELECT `id`, `area_name`,`min_order_amount`, `branch_id`, `is_disable` `created_at` FROM `tbl_areas`";
      include('connection.php');
      $execute = mysqli_query($conn,$sql);
      if(mysqli_num_rows($execute) > 0){
@@ -14,6 +14,7 @@ if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbq
                         "min_order_price"=>$row['min_order_amount'],
                         "created_at"=>$row['created_at'],
                         "branch_id" => $row['branch_id'],
+                        "is_disable" => $row['is_disable'],
                     ];
             array_push($product_array,$temp);
          

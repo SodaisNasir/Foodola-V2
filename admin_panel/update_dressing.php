@@ -146,6 +146,8 @@
                     <li class="breadcrumb-item"><a href="index.html">Home</a>
                     </li>
                     <li class="breadcrumb-item active">Manage Dressing
+                    
+
                     </li>
                   </ol>
                 </div>
@@ -178,20 +180,10 @@
 					<div class="card-body">
 					<form class="form-horizontal" action="phpfiles/insertions.php" method="POST" enctype="multipart/form-data">
 							<div class="row">
-							   <!-- 	<div class="col-sm-6">
-									<div class="form-group">
-										<div class="controls">
-											<input type="Number" name="" class="form-control" placeholder="Quiz title" >
-
-										</div>
-									</div>
-								</div> -->
 					<?php $idz =  $_GET['id']; ?>
     			    	
     		            <Input hidden type="text" name="addon_id" value="<?php echo $idz; ?>"></input>      
     			    
-                
-                          
                         <div id="dynamic_fields" class="col-md-12">
                             
                         </div>
@@ -199,10 +191,6 @@
 							<button type="button" name="add" id="add"    class="btn btn-primary mb-2">Add More Addon Dressing</button>
     			    	</div>
                  
-               
-             
-           
-                
 							<button type="Submit" name="btnSubmit_insertMoreAddonDressing"  class="btn btn-primary ml-2">Submit</button>
 							
 						</form>
@@ -242,6 +230,7 @@
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Manage Dressing</h4>
+                                                             <button type="button" class="btn btn-success mt-2" onclick="openMergeModal()">Merge Dressing</button>
                 </div>
         
                 <div class="card-content">
@@ -254,6 +243,8 @@
                             <table id="example" class="table">
                                 <thead>
                                    <tr>
+                                       
+                                        <th>Select</th>
                                         <th>S no.</th>
                                         <th>Dressing ID</th>
                                         <th>Dressing Title</th>
@@ -273,6 +264,7 @@
                                       while($row = mysqli_fetch_array($result)){
                                           $sn = $index+1;
                                           echo "<tr data-id='{$row['ds_id']}'>";
+                                            echo "<td><input type='checkbox' name='selected_dressing[]' value='{$row['ds_id']}'></td>";
                                             echo "<td>{$sn}</td>";
                                             echo "<td>{$row['ds_id']}</td>";
                                             echo "<td class='editable' contenteditable='false' name='dressing_title' data-field='dressing_title' >{$row['dressing_title']}</td>";
@@ -294,6 +286,7 @@
                                 </tbody>
                                 <tfoot>
   <tr>
+    <th>Select</th>
     <th>S no.</th>
     <th>Dressing ID</th>
     <th>Dressing Title</th>
@@ -394,6 +387,33 @@
       </div>
     
     </div>
+    
+<!-- Merge Addons Modal -->
+<div class="modal fade" id="mergeDressingModal" tabindex="-1" role="dialog" aria-labelledby="mergeDressingModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="mergeDressingForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="mergeDressingModalLabel">Merge Selected Addons</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="merged_name">New Dressing Name</label>
+            <input type="text" class="form-control" id="merged_name" name="merged_name" placeholder="Enter merged dressing name" required>
+          </div>
+          <input type="hidden" name="selected_dressing" id="selected_dressing_input">
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Merge</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+        
 
 
 
@@ -447,21 +467,28 @@
 <script>
 
 
-$(document).ready(function() {
+$(document).ready(function () {
   var i = 1;
-  $('#add').click(function() {
-   
-      $('#dynamic_fields').append('<div class="row"><div class="col-sm-6" ><div class="form-group"><input type="text" name="addon_name[]" class="form-control" placeholder="Add On" required ></div></div></div></div></div>')
-      i++;
 
+  $('#add').click(function () {
+    $('#dynamic_fields').append(`
+      <div id='row-hgj-${i}' class="row">
+        <div class="col-sm-6">
+          <div class="form-group d-flex">
+            <input type="text" name="addon_name[]" class="form-control" placeholder="Add On" required>
+            <button type='button' class='btn btn-danger btn_remove ml-1' data-id='row-hgj-${i}'>Close</button>
+          </div>
+        </div>
+      </div>
+    `);
+    i++;
   });
-  $(document).on('click', '.btn_remove', function() {
-    var button_id = $(this).attr("id");
-    i--;
-    $('#row' + button_id + '').remove();
+
+  $(document).on('click', '.btn_remove', function () {
+    var rowId = $(this).data('id');
+    $('#' + rowId).remove();
   });
 });
-
 
 
 
@@ -552,7 +579,7 @@ $(document).ready(function () {
   console.log('Sending:', { id: id, dressing_title: title, dressing_title_user: dressing_title_user, dressing_name: dressing_name })
 
         $.ajax({
-            url: 'https://foodola.foodola.shop/API/update_subdressing_inline.php',
+            url: '../API/update_subdressing_inline.php',
             method: 'POST',
             dataType: 'json',
             data: {
@@ -640,7 +667,7 @@ $(document).ready(function () {
     formData.append('csv_file', file);
 
     $.ajax({
-        url: 'https://foodola.foodola.shop/API/update_bulk_dressing.php', // Or pass this via argument
+        url: '../API/update_bulk_dressing.php', // Or pass this via argument
         type: 'POST',
         data: formData,
         contentType: false,
@@ -674,6 +701,52 @@ $(document).ready(function () {
     });
 }
 </script>
+<script>
+function openMergeModal() {
+    let selected = [];
+    $("input[name='selected_dressing[]']:checked").each(function() {
+        selected.push($(this).val());
+    });
+
+    if (selected.length === 0) {
+        alert("Please select at least one dressing to merge.");
+        return;
+    }
+
+    $('#selected_dressing_input').val(selected.join(','));
+
+    $('#mergeDressingModal').modal('show');
+}
+
+$('#mergeDressingForm').on('submit', function(e) {
+    e.preventDefault();
+
+    const merged_name = $('#merged_name').val();
+    const selected_dressing = $('#selected_dressing_input').val();
+
+    console.log('Data :', {
+        new_dressing_title: merged_name,
+        selected_dressing_ids: selected_dressing
+    });
+
+    $.ajax({
+        url: '../API/merge_dressing.php', // your backend merge logic file
+        type: 'POST',
+        data: {
+            new_dressing_title: merged_name,
+            selected_dressing_ids: selected_dressing
+        },
+        success: function(response) {
+            alert("Dressing merged successfully!");
+            location.reload(); // Refresh the page to show updates
+        },
+        error: function() {
+            alert("An error occurred while merging.");
+        }
+    });
+});
+</script>
+
 
 
 

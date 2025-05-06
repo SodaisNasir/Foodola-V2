@@ -252,10 +252,7 @@
       </div>
     
     </div>
-
-
-
-    <div id="myModal_Add" class="modal">
+<div id="myModal_Add" class="modal">
 
       <!-- Modal content -->
       <div class="modal-content-Updated">
@@ -438,7 +435,6 @@ function toggle(status,id){
 } );</script>
 
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function () {
     // Show Save button when title is edited
@@ -453,7 +449,7 @@ $(document).ready(function () {
         const type_title = row.find('[data-field="type_title"]').text().trim();
 
         $.ajax({
-            url: 'https://foodola.foodola.shop/API/update_inline_types.php',
+            url: '../API/update_inline_types.php',
             method: 'POST',
             dataType: 'json',
             data: {

@@ -432,7 +432,13 @@
             <?php } ?>  
             
             
-        
+                
+        <?php if($currentFile == "manage_messages.php") {?>
+            <li class="active nav-item"><a href="manage_messages.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Manage Messages</span></a></li
+        <?php }else{ ?>
+                   <li class="nav-item"><a href="manage_messages.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Manage Messages</span></a>
+            <?php } ?>  
+            
              
         </ul>
       </div>

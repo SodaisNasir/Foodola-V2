@@ -95,8 +95,7 @@
 
     <!-- BEGIN: Custom CSS-->
     <link rel="stylesheet" type="text/css" href="assets/css/style.css">
-    <!-- END: Custom CSS-->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
   </head>
   <!-- END: Head-->
 
@@ -167,9 +166,10 @@
                                                 <th>Sno</th>
                                                 <th>Id</th>
                                                 <th>Title</th>
-                                                <th>created_at</th>
-                                                <th>Update</th>
-                                                <th>Action</th>
+                                                <th>created_at</th> 
+                                                <th>Save</th>
+                                                <th>View</th>
+                                                <th>Delete</th>
                                             </tr>
                                         </thead>
                                      <tbody>
@@ -182,14 +182,15 @@
                                     
                                     while ($row = mysqli_fetch_array($result)) {
                                         $sn = $index + 1;
-                                        echo "<tr>";
+                                        echo "<tr data-id='{$row['id']}'>";
                                         echo "<td>{$sn}</td>";
                                         echo "<td name='tittlename'>{$row['id']}</td>";
-                                        echo "<td name='subname'>{$row['title']}</td>";
+                                        echo "<td class='editable' contenteditable='true' data-field='title' name='subname'>{$row['title']}</td>";
                                         echo "<td>{$row['created_at']}</td>";
                                         
-                                        echo '<td><button class="btn btn-primary" onclick="openAddMore(\'' . $row['id'] . '\' ,\'' . $row['title'] . '\')">Update</button></td>';
-                                        echo "<td><a href='update_variation.php?id={$row['id']}'><button class='btn btn-primary'>View</button></a></td>";
+                                        // echo '<td><button class="btn btn-primary" onclick="openAddMore(\'' . $row['id'] . '\' ,\'' . $row['title'] . '\')">Update</button></td>';
+                                        echo "<td><button class='btn btn-success save-btn' style='display:none;'>Save</button></td>";  
+                                        echo "<td><a href='update_variation.php?id={$row['id']}'><button class='btn btn-primary'>View Products</button></a></td>";
                                         
                                         echo '<td>
                                                 <form action="deletevariation.php" method="POST" onsubmit="return confirm(\'Are you sure you want to delete this variation?\');">
@@ -211,8 +212,9 @@
                                         <th>Id</th>
                                         <th>Title</th>
                                         <th>created_at</th>
-                                        <th>Update</th>
-                                        <th>Action</th>
+                                        <th>Save</th>
+                                        <th>View</th>
+                                        <th>Delete</th>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -302,11 +304,9 @@
     <!-- Buynow Button-->
     <!--<div class="buy-now"><a href="../../../../../../external.html?link=https://1.envato.market/vuexy_admin" target="_blank" class="btn btn-danger">Buy Now</a>-->
 
-    <!--</div>-->
-    <div class="sidenav-overlay"></div>
+ <div class="sidenav-overlay"></div>
     <div class="drag-target"></div>
 
-  
 
 
     <!-- BEGIN: Vendor JS-->
@@ -320,10 +320,10 @@
     <script src="app-assets/vendors/js/tables/datatable/datatables.buttons.min.js"></script>
     <script src="app-assets/vendors/js/tables/datatable/buttons.html5.min.js"></script>
     <script src="app-assets/vendors/js/tables/datatable/buttons.print.min.js"></script>
-
+    <script src="app-assets/vendors/js/tables/datatable/buttons.bootstrap.min.js"></script>
+    <script src="app-assets/vendors/js/tables/datatable/datatables.bootstrap4.min.js"></script>
     <!-- END: Page Vendor JS-->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+
     <!-- BEGIN: Theme JS-->
     <script src="app-assets/js/core/app-menu.min.js"></script>
     <script src="app-assets/js/core/app.min.js"></script>
@@ -407,6 +407,46 @@ function toggle(status,id){
         ]
     } );
 } );</script>
+
+
+
+<script>
+$(document).ready(function () {
+    // Show Save button when title is edited
+    $('.editable').on('input', function () {
+        $(this).closest('tr').find('.save-btn').show();
+    });
+
+    // Save updated title
+    $('.save-btn').on('click', function () {
+        const row = $(this).closest('tr');
+        const id = row.data('id');
+        const title = row.find('[data-field="title"]').text().trim();
+
+        $.ajax({
+            url: '../API/update_inline_variation.php',
+            method: 'POST',
+            dataType: 'json',
+            data: {
+                id: id,
+                title: title,
+
+            },
+            success: function (response) {
+                if (response.status) {
+                    alert(response.message);
+                    row.find('.save-btn').hide();
+                } else {
+                    alert("Error: " + response.message);
+                }
+            },
+            error: function (xhr) {
+                alert("Request failed: " + xhr.responseText);
+            }
+        });
+    });
+});
+</script>
   </body>
   <!-- END: Body-->
 

@@ -132,7 +132,9 @@ else if(isset($_POST['btnUpdateRiderStatus'])){
       $areaid=  $_POST['areaid'];
       $areaname =  $_POST['areaname'];
       $minprice =  $_POST['minprice'];
-      $sql =  "UPDATE `tbl_areas` SET `area_name` =  '$areaname' , `min_order_amount` = $minprice WHERE `id` = $areaid";
+      $branch_id =  $_POST['branch_id'];
+      $status =  $_POST['is_disable'];
+      $sql =  "UPDATE `tbl_areas` SET `area_name` =  '$areaname' , `min_order_amount` = $minprice, `branch_id` = '$branch_id', `is_disable`= '$status' WHERE `id` = $areaid";
       $result = mysqli_query($con,$sql);
       header('Location: ../manageAreas.php?Message=Sucessfully updated status');
 } 

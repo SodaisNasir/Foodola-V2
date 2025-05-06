@@ -240,6 +240,7 @@ if (isset($_GET['Massage'])) {
                                                         <th>Addon</th>
                                                         <th>Type</th>
                                                         <th>Dressing</th>
+                                                        <th>Product Visibility</th>
                                                         <th>Image</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -281,7 +282,7 @@ $sql = "
         sc.name AS subname,
         p.features, p.name AS proname, p.sku_id,
         p.description, p.cost, p.img, p.price,
-        p.status, p.discount, p.qty, p.tax,
+        p.status, p.discount, p.qty, p.tax,p.for_deal_only,
         p.addon_id, p.type_id, p.dressing_id,
         al.ao_title, tl.type_title, dl.dressing_title
     FROM products p
@@ -308,6 +309,7 @@ if (isset($conn)) {
             $description = htmlspecialchars($row['description']);
             $status = htmlspecialchars($row['status']);
             $imgurl = htmlspecialchars($row['img']);
+            $for_deal_only = htmlspecialchars($row['for_deal_only']);
             $imagePath = "Uploads/" . $imgurl;
 
             echo "<tr data-id='{$productId}'>";
@@ -380,6 +382,19 @@ if (isset($conn)) {
                 echo "<option value='{$option['dressing_id']}' $selected>{$option['dressing_title']}</option>";
             }
             echo "</select></td>";
+            
+            
+            
+                  echo "<td class='border border-5' style='min-width: 200px;' data-field='for_deal_only'>
+          <select class='form-control status-select'  >
+            <option value='0'" . ($for_deal_only == '0' ? ' selected' : '') . ">Regular Product</option>
+            <option value='1'" . ($for_deal_only == '1' ? ' selected' : '') . ">Only for Deals</option>
+          </select>
+        </td>";
+            
+            
+            
+            
 
             // Image
             echo "<td class='border border-5'>
@@ -393,8 +408,10 @@ if (isset($conn)) {
             // Actions
             echo "<td>
                     <button class='btn btn-success save-btn' style='display:none; margin-bottom: 5px;'>Save</button>
-                    <button class='btn btn-primary' onclick=\"openAddMore('{$productId}', '{$productName}', '{$row['subname']}', '{$cost}', '{$price}', '{$discount}', '{$description}', '{$skuId}')\">Update</button>
+               
                   </td>";
+
+                //  <button class='btn btn-primary' onclick=\"openAddMore('{$productId}', '{$productName}', '{$row['subname']}', '{$cost}', '{$price}', '{$discount}', '{$description}', '{$skuId}')\">Update</button>
 
             echo "</tr>";
             $index++;
@@ -425,6 +442,7 @@ if (isset($conn)) {
                                                         <th>Addon</th>
                                                         <th>Type</th>
                                                         <th>Dressing</th>
+                                                        <th>Product Visibility</th>
                                                         <th>Image</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -842,6 +860,7 @@ $(document).ready(function () {
         const type_id = row.find('[data-field="type_id"] select').val();
         const dressing_id = row.find('[data-field="dressing_id"] select').val();
         const sub_category_id = row.find('[data-field="sub_category_id"] select').val();
+        const for_deal_only = row.find('[data-field="for_deal_only"] select').val();
 
         if (!id || pro_name === '') {
             alert('Product ID or Name is missing.');
@@ -863,13 +882,14 @@ $(document).ready(function () {
         formData.append('type_id', type_id);
         formData.append('dressing_id', dressing_id);
         formData.append('sub_category_id', sub_category_id);
+        formData.append('for_deal_only', for_deal_only);
 
         if (selectedFiles[id]) {
             formData.append('product_image', selectedFiles[id]);
         }
 
         $.ajax({
-            url: 'https://foodola.foodola.shop/API/update_inline_products.php',
+            url: '../API/update_inline_products.php',
             method: 'POST',
             data: formData,
             processData: false,
