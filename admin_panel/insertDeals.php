@@ -301,7 +301,7 @@ if(isset($_GET['Massage'])){
                     // Optional: If you are using select2 somewhere
                     $('.product-select').select2({
                         ajax: {
-                            url: 'https://foodola.foodola.shop/API/search_products.php',
+                            url: '../API/search_products.php',
                             dataType: 'json',
                             delay: 250,
                             data: function (params) {

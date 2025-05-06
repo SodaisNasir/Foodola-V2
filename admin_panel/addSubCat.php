@@ -306,7 +306,7 @@ if (isset($_GET['Massage'])) {
     formData.append('csv_file', file);
 
     $.ajax({
-        url: 'https://foodola.foodola.shop/API/upload_bulk_subcategories.php', // Or pass this via argument
+        url: '../API/upload_bulk_subcategories.php', // Or pass this via argument
         type: 'POST',
         data: formData,
         contentType: false,

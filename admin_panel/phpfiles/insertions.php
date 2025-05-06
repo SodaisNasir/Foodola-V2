@@ -321,7 +321,7 @@ $filewithnewname = mysqli_real_escape_string($con, $filewithnewname);
 
       if ($result) {
         $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                            VALUES ('pizzabroadway', '1' ,NOW(),NOW())";
+                            VALUES ('burgerpoint', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {
@@ -593,7 +593,7 @@ if(isset($_POST['BtnSendpush']))
                     
 
                 $fields = array(
-                    'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
+                    'app_id' => "2de883ec-be41-4820-a517-558beee8b0ac",
                      'include_player_ids' => $playerId,
                     'data' => array("foo" => "NewMassage","Id" => 1),
                     'large_icon' =>"ic_launcher_round.png",
@@ -604,7 +604,7 @@ if(isset($_POST['BtnSendpush']))
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
                 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8',
-                                                              'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'));
+                                                              'Authorization: Basic os_v2_app_fxuih3f6ifecbjixkwf652fqvth5cvjs6zyu6x45bxrdyqx6thsko5tkpievvqngjhhkpn6l3n53whqh5xextgwkut3dbjnai26xili'));
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
                 curl_setopt($ch, CURLOPT_HEADER, FALSE);
                 curl_setopt($ch, CURLOPT_POST, TRUE);
@@ -829,7 +829,7 @@ $product_id = mysqli_real_escape_string($con, $product_id);
 
       if ($result) {
         $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                     VALUES ('pizzabroadway', '1' ,NOW(),NOW())";
+                     VALUES ('burgerpoint', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {
@@ -1195,7 +1195,7 @@ include('../assets/config.php');
         $result = mysqli_query($con,$sql);
             if($result){
                  $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                                VALUES ('pizzabroadway', '1' ,NOW(),NOW())";
+                                VALUES ('burgerpoint', '1' ,NOW(),NOW())";
                 $monitor_update = mysqli_query($con, $monitor_sql);
         
                 if ($monitor_update) {
@@ -1588,7 +1588,7 @@ if(isset($_POST['updatePoints'])){
                 
                         
                 $fields = array(
-                     'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
+                     'app_id' => "2de883ec-be41-4820-a517-558beee8b0ac",
                      'include_player_ids' => $playerIdx,
                     'data' => array("foo" => "NewMassage","Id" => $taskid),
                     'large_icon' =>"ic_launcher_round.png",
@@ -1601,7 +1601,7 @@ if(isset($_POST['updatePoints'])){
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
                 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8',
-                                                              'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'));
+                                                              'Authorization: Basic os_v2_app_fxuih3f6ifecbjixkwf652fqvth5cvjs6zyu6x45bxrdyqx6thsko5tkpievvqngjhhkpn6l3n53whqh5xextgwkut3dbjnai26xili'));
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
                 curl_setopt($ch, CURLOPT_HEADER, FALSE);
                 curl_setopt($ch, CURLOPT_POST, TRUE);
@@ -1665,7 +1665,7 @@ if(isset($_POST['updatePoints'])){
     //                     $app_id = $data['one_signal_appid'] ?? '2de883ec-be41-4820-a517-558beee8b0ac';  
                     
                 $fields = array(
-                       'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
+                       'app_id' => "2de883ec-be41-4820-a517-558beee8b0ac",
                     //  'app_id' => $app_id,
                      'include_player_ids' => $playerIdx,
                     'data' => array("foo" => "NewMassage","Id" => $taskid),
@@ -1679,7 +1679,7 @@ if(isset($_POST['updatePoints'])){
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
      curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8',
-                                                              'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'));
+                                                              'Authorization: Basic os_v2_app_fxuih3f6ifecbjixkwf652fqvth5cvjs6zyu6x45bxrdyqx6thsko5tkpievvqngjhhkpn6l3n53whqh5xextgwkut3dbjnai26xili'));
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
                 curl_setopt($ch, CURLOPT_HEADER, FALSE);
                 curl_setopt($ch, CURLOPT_POST, TRUE);
@@ -2015,7 +2015,7 @@ if (isset($_POST['btnSubmit_Action'])) {
             ];
 
             $fields = [
-                        'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
+                        'app_id' => "2de883ec-be41-4820-a517-558beee8b0ac",
                         'include_player_ids' => [$token], 
                         'data' => ["foo" => "NewMessage"],
                         'large_icon' => "ic_launcher_round.png",
@@ -2028,7 +2028,7 @@ if (isset($_POST['btnSubmit_Action'])) {
             curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json; charset=utf-8',
-            'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'
+            'Authorization: Basic os_v2_app_fxuih3f6ifecbjixkwf652fqvth5cvjs6zyu6x45bxrdyqx6thsko5tkpievvqngjhhkpn6l3n53whqh5xextgwkut3dbjnai26xili'
             ]);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
             curl_setopt($ch, CURLOPT_HEADER, FALSE);
@@ -2068,7 +2068,7 @@ if (isset($_POST['btnSubmit_Action'])) {
         mysqli_query($con, $insert_noti_details);
 
         $fields = json_encode([
-            'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
+            'app_id' => "2de883ec-be41-4820-a517-558beee8b0ac",
             'include_player_ids' => $playerIdx,
             'data' => ["foo" => "NewMassage", "Id" => $order_id],
             'large_icon' => "ic_launcher_round.png",
@@ -2079,7 +2079,7 @@ if (isset($_POST['btnSubmit_Action'])) {
         curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json; charset=utf-8',
-            'Authorization: Basic ODU5ZDhiZjAtOWRkZS00NDIyLWI0ZWItOTYxMDc5YzQzMGIz'
+            'Authorization: Basic os_v2_app_fxuih3f6ifecbjixkwf652fqvth5cvjs6zyu6x45bxrdyqx6thsko5tkpievvqngjhhkpn6l3n53whqh5xextgwkut3dbjnai26xili'
         ]);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
@@ -2215,7 +2215,7 @@ if(isset($_POST['updateProduct'])){
     
     if($update){
          $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                        VALUES ('pizzabroadway', '1' ,NOW(),NOW())";
+                        VALUES ('burgerpoint', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {

@@ -420,7 +420,7 @@ if (isset($_GET['Massage'])) {
         console.log('Sending inline update data:', dataToSend); // Debug log
 
         $.ajax({
-            url: 'https://foodola.foodola.shop/API/update_inline_deals.php',
+            url: '../API/update_inline_deals.php',
             method: 'POST',
             dataType: 'json',
             data: dataToSend,
