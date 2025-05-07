@@ -304,14 +304,14 @@ if ($data && isset($data['created_at'])) {
 
 <body>
   <div class="receipt-container print">
-   <div class="header-logo">
+    <div class="header-logo">
       <img src="images/logo.png" alt="Firmenlogo" class="logo">
-      <h3 class="company-name">Pizza Day Night</h3>
+      <h3 class="company-name">Pizza Late Night</h3>
     </div>
 
-       <div class="company-details">
-      <h3>Pizza Day Night</h3>
-      <h3>Karlsruhe Tel: 0721 8601726</h3>
+      <div class="company-details">
+      <h3>Pizza Late Night</h3>
+      <h3>Karlsruhe Tel: 0721 621122</h3>
       <h3>Bestellnummer: <?php echo $order_id ?></h3>
     </div>
 
