@@ -17,7 +17,7 @@ if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqa
          $products = array();
         while($row = mysqli_fetch_array($execute_restuarant)){  
             
-                $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/admin_panel/Uploads/' . $row['img'];
+                $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/BurgerPoint/admin_panel/Uploads/' . $row['img'];
                 if (file_exists($imagePath)) {
                     $finalImage = $row['img'];
                 } else {

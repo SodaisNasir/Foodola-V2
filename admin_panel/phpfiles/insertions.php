@@ -1678,7 +1678,7 @@ if(isset($_POST['updatePoints'])){
 
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
-     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8',
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8',
                                                               'Authorization: Basic os_v2_app_fxuih3f6ifecbjixkwf652fqvth5cvjs6zyu6x45bxrdyqx6thsko5tkpievvqngjhhkpn6l3n53whqh5xextgwkut3dbjnai26xili'));
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
                 curl_setopt($ch, CURLOPT_HEADER, FALSE);
@@ -1953,7 +1953,7 @@ if (isset($_POST['btnSubmit_Action'])) {
             $execute = mysqli_query($con, $checkcashback);
             $row = mysqli_fetch_assoc($execute);
             
-            if ($row) { // Check if cashback is active
+            if ($row) { 
                 $cashback_percentage = $row['cashback_percenatge'];
             
                 // Check if cashback_status is already 1
@@ -2008,6 +2008,9 @@ if (isset($_POST['btnSubmit_Action'])) {
                     
                 }
             }
+            
+                     $sql = "UPDATE `orders_zee` SET `status` = '$status' WHERE `id` = $order_id";
+                $update = mysqli_query($con, $sql);
 
                 
          $content = [
@@ -2089,10 +2092,11 @@ if (isset($_POST['btnSubmit_Action'])) {
         curl_close($ch);
     }
 
-    if ($update){ 
+if($update){
+    
         header("Location: ../order_details.php?order_id=$order_id&Massage=Sucessfully updated order.");
+}
         
-    }
 }
 
 

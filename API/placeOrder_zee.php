@@ -114,10 +114,16 @@ if ($order_result) {
                                     $add_oon = json_encode($addons_array);
                                     $tyy_pes = json_encode($types_array);
                                     $dress_ing = json_encode($dressing_array);
+                                    
+                                       $sql_getpro = "SELECT * FROM `products` WHERE `id` = '$product_id'";
+                                $ex_get_pro = mysqli_query($conn,$sql_getpro);
+                                $product = mysqli_fetch_array($ex_get_pro);
+                                $pro_name = $product['name'];
+                                $pro_decs = $product['description'];
                                    
                                      //print_r($tyy_pes); 
-                                      $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`, `addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`)
-                                                  VALUES ('$last_id','$deal_id','$item_id','$product_id','$add_oon','$tyy_pes','$dress_ing' , $cost , $price , $discount  , $no_of_deal, '$datetime')";
+                                      $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`, `product_description`, `addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`)
+                                                  VALUES ('$last_id','$deal_id','$item_id','$product_id', '$pro_name', '$pro_decs', '$add_oon','$tyy_pes','$dress_ing' , $cost , $price , $discount  , $no_of_deal, '$datetime')";
                                                   $exec_sql_deal = mysqli_query($conn,$sql_deal);
                                     
                                 }
@@ -161,10 +167,17 @@ if ($order_result) {
                                     $dress_ing = json_encode($dressing_array);
                                     $add_oon = json_encode($addonarray,JSON_UNESCAPED_UNICODE);
                                     
+                                    
+                            $sql_getpro = "SELECT * FROM `products` WHERE `id` = '$product_id'";
+                            $ex_get_pro = mysqli_query($conn,$sql_getpro);
+                            $product = mysqli_fetch_array($ex_get_pro);
+                            $pro_name = $product['name'];
+                              $pro_decs = $product['description'];
+                                    
                             //  print_r($dress_ing);
                             
-                            $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `product_id`, `qty` ,`addons`,`types`, `dressing` , `cost` , `price` , `discount_percent`)
-                                VALUES ('$last_id','$product_id','$quantity','$add_oon','$tyy_pes','$dress_ing' , $cost , $price , $discount )";
+                            $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`, `product_description`, `qty` ,`addons`,`types`, `dressing` , `cost` , `price` , `discount_percent`)
+                                VALUES ('$last_id','$product_id', '$pro_name', '$pro_decs' ,'$quantity','$add_oon','$tyy_pes','$dress_ing' , $cost , $price , $discount )";
                                                   $exec_sql_deal = mysqli_query($conn,$sql_deal);
                            
                             
@@ -362,10 +375,17 @@ if ($order_result) {
                                     $tyy_pes = json_encode($types_array);
                                     $dress_ing = json_encode($dressing_array);
                                     
+                                    
+                                       $sql_getpro = "SELECT * FROM `products` WHERE `id` = '$product_id'";
+                                $ex_get_pro = mysqli_query($conn,$sql_getpro);
+                                $product = mysqli_fetch_array($ex_get_pro);
+                                $pro_name = $product['name'];
+                                $pro_decs = $product['description'];
+                                    
                                    
                                      //print_r($tyy_pes); 
-                                      $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`, `addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`)
-                                                  VALUES ('$last_id','$deal_id','$item_id','$product_id','$add_oon','$tyy_pes','$dress_ing' , $cost , $price , $discount  , $no_of_deal, '$datetime')";
+                                      $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`, `product_description`, `addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`)
+                                                  VALUES ('$last_id','$deal_id','$item_id','$product_id', '$pro_name', '$pro_decs', $add_oon','$tyy_pes','$dress_ing' , $cost , $price , $discount  , $no_of_deal, '$datetime')";
                                                   $exec_sql_deal = mysqli_query($conn,$sql_deal);
                                     
                                 }
@@ -408,11 +428,18 @@ if ($order_result) {
                                     $tyy_pes = json_encode($types_array);
                                     $dress_ing = json_encode($dressing_array);
                                    $add_oon = json_encode($addonarray,JSON_UNESCAPED_UNICODE);
+                                   
+                                   
+                            $sql_getpro = "SELECT * FROM `products` WHERE `id` = '$product_id'";
+                            $ex_get_pro = mysqli_query($conn,$sql_getpro);
+                            $product = mysqli_fetch_array($ex_get_pro);
+                            $pro_name = $product['name'];
+                              $pro_decs = $product['description'];
                                     
                             //  print_r($dress_ing);
                             
-                            $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `product_id`, `qty` ,`addons`,`types`, `dressing` , `cost` , `price` , `discount_percent`)
-                                VALUES ('$last_id','$product_id','$quantity','$add_oon','$tyy_pes','$dress_ing' , $cost , $price , $discount )";
+                            $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `product_id`, `product_name`, `product_description`, `qty` ,`addons`,`types`, `dressing` , `cost` , `price` , `discount_percent`)
+                                VALUES ('$last_id','$product_id','$pro_name', '$pro_decs', $quantity','$add_oon','$tyy_pes','$dress_ing' , $cost , $price , $discount )";
                                                   $exec_sql_deal = mysqli_query($conn,$sql_deal);
                            
                             
