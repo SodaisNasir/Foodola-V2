@@ -98,7 +98,7 @@ if (mysqli_query($conn, $update_sql)) {
             sendPushNotification($notification_token, $promo_value, $promo_code);
         }
         
-              $transaction_message = "You have received €$promo_value from promo code $promo_code";
+              $transaction_message = "Sie haben €$promo_value vom Promo-Code $promo_code erhalten.";
         $rand_id  = rand(000000,10000000);
 
         $sql = "INSERT INTO `tbl_transaction`(`user_id`, `transaction_id`, `amount`, `type`, `message`) VALUES ('$user_id','$rand_id','$promo_value','credit','$transaction_message')";
@@ -114,7 +114,7 @@ if (mysqli_query($conn, $update_sql)) {
 
 // Function to send push notification via OneSignal
 function sendPushNotification($notification_token, $promo_value, $promo_code) {
-    $content = "You have received $$promo_value in your account from promo code $promo_code!";
+        $content = "Sie haben $$promo_value auf Ihr Konto aus dem Promo-Code $promo_code erhalten!";
     
     $fields = json_encode([
         'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",

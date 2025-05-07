@@ -11,7 +11,7 @@ if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbq
  
  
  
-   $check_email_phone = "SELECT `id`, `role_id`, `ref_amount`,`name`, `phone`, `email`, `referal_code`, `profilepic`, `email_verified_at`, `password`, `notification_token`, `remember_token`, `rewards_token`, `card_number`, `cvc_code`, `amount`, `created_at`, `updated_at` FROM `users` WHERE `id` = $user_id";
+   $check_email_phone = "SELECT `id`, `role_id`, `ref_amount`,`name`, `phone`, `email`, `referal_code`, `profilepic`, `email_verified_at`, `password`, `notification_token`, `remember_token`, `rewards_token`, `card_number`, `cvc_code`, `amount`, `created_at`, `updated_at`, `country_code` FROM `users` WHERE `id` = $user_id";
  
 
      $execute_check_email_phone = mysqli_query($conn,$check_email_phone);
@@ -35,6 +35,7 @@ if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbq
                         "ref_amount"=>$Data['ref_amount'],
                         "password"=>$Data['password'],
                         "created_at"=>$Data['created_at'],
+                        "country_code"=>$Data['country_code'],
                         
                     ];
 

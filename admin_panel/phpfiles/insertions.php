@@ -2008,6 +2008,9 @@ if (isset($_POST['btnSubmit_Action'])) {
                     
                 }
             }
+            
+              $sql = "UPDATE `orders_zee` SET `status` = '$status' WHERE `id` = $order_id";
+                $update = mysqli_query($con, $sql);
 
                 
          $content = [

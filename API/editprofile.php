@@ -1,4 +1,7 @@
 <?php
+
+//     error_reporting(E_ALL);
+// ini_set('display_errors', 1);
 if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC'){
     
     include('connection.php');
@@ -6,7 +9,8 @@ if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbq
     
  $user_id  = $_POST['user_id'];    
  $name = $_POST['name'];  
- $phone = str_replace("+47","+49",$_POST['phone']); 
+ $phone = $_POST['phone'];
+  $country_code = $_POST['country_code'];
  $email= $_POST['email'];
 
  $password= $_POST['password'];
@@ -14,7 +18,6 @@ if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbq
 $target_dir = "uploads/";
 $fileName = rand()."_".basename($_FILES["avatar"]["name"]);
 $target_file = $target_dir . $fileName;
-
 $uploadOk = 1;
 $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
 
@@ -37,7 +40,7 @@ $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
       
       $user_data = mysqli_fetch_array($execute);
       $user_id = $user_data['id'];
-      $sql_update = "UPDATE `users` SET `name` = '$name', `phone` = '$phone', `email`='$email', `password`='$password',`profilepic` = '$fileName' WHERE `id` = '$user_id'";
+      $sql_update = "UPDATE `users` SET `name` = '$name', `phone` = '$phone', `email`='$email', `password`='$password',`profilepic` = '$fileName', `country_code`= '$country_code' WHERE `id` = '$user_id'";
       $execute_update = mysqli_query($conn,$sql_update);
       if($execute_update){
             $temp = [
@@ -47,6 +50,7 @@ $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
                    "phone"=>$phone,
                   "avatar" => $fileName,
                   "password"=>$password,
+                  "country_code"=>$country_code,
                 //   "url" => $upload_url,
                     ];
           $data = ["status"=>true,
@@ -86,6 +90,7 @@ $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
                   "name"=>$name,
                   "email"=>$email,
                   "phone" =>$phone,
+                   "country_code"=>$country_code,
                 //   "url" => $upload_url,
                     ];
           $data = ["status"=>true,
