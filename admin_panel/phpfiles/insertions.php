@@ -829,7 +829,7 @@ $product_id = mysqli_real_escape_string($con, $product_id);
 
       if ($result) {
         $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                     VALUES ('daynight', '1' ,NOW(),NOW())";
+                     VALUES ('broadway', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {
@@ -1195,7 +1195,7 @@ include('../assets/config.php');
         $result = mysqli_query($con,$sql);
             if($result){
                  $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                                VALUES ('daynight', '1' ,NOW(),NOW())";
+                                VALUES ('broadway', '1' ,NOW(),NOW())";
                 $monitor_update = mysqli_query($con, $monitor_sql);
         
                 if ($monitor_update) {
@@ -1659,14 +1659,10 @@ if(isset($_POST['updatePoints'])){
                     $execute_insert_noti = mysqli_query($con,$insert_noti_details);
                     
                 
-    //  $sql_get_appid = "SELECT  * FROM `enviroments`";
-    //                     $sql = mysqli_query($con,$sql_get_appid);
-    //                     $data = mysqli_fetch_array($sql);
-    //                     $app_id = $data['one_signal_appid'] ?? '2de883ec-be41-4820-a517-558beee8b0ac';  
+
                     
                 $fields = array(
                        'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
-                    //  'app_id' => $app_id,
                      'include_player_ids' => $playerIdx,
                     'data' => array("foo" => "NewMassage","Id" => $taskid),
                     'large_icon' =>"ic_launcher_round.png",
@@ -2218,7 +2214,7 @@ if(isset($_POST['updateProduct'])){
     
     if($update){
          $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                        VALUES ('daynight', '1' ,NOW(),NOW())";
+                        VALUES ('broadway', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {

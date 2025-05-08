@@ -5,108 +5,107 @@ $pageName = basename($_SERVER['PHP_SELF'], ".php");
 
 switch ($pageName) {
     case 'index':
-        $pageTitle = "Analytics | pizzalatenight";
+        $pageTitle = "Analytics | pizzabroadway";
         break;
     case 'addareas':
-        $pageTitle = "Addareas | pizzalatenight";
+        $pageTitle = "Addareas | pizzabroadway";
         break;
     case 'addriders':
-        $pageTitle = "Addriders | pizzalatenight";
+        $pageTitle = "Addriders | pizzabroadway";
         break;
     case 'addmaincat':
-        $pageTitle = "Maincategories | pizzalatenight";
+        $pageTitle = "Maincategories | pizzabroadway";
         break;
     case 'addSubCat':
-        $pageTitle = "Subcategories | pizzalatenight";
+        $pageTitle = "Subcategories | pizzabroadway";
         break;
     case 'insertNewProduct':
-        $pageTitle = "Newproduct | pizzalatenight";
+        $pageTitle = "Newproduct | pizzabroadway";
         break;
     case 'addVariation':
-        $pageTitle = "Variation | pizzalatenight";
+        $pageTitle = "Variation | pizzabroadway";
         break;
     case 'addAddons':
-        $pageTitle = "Addons | pizzalatenight";
+        $pageTitle = "Addons | pizzabroadway";
         break;    
     case 'addDressing':
-        $pageTitle = "Dressing | pizzalatenight";
+        $pageTitle = "Dressing | pizzabroadway";
         break;
     case 'addTypes':
-        $pageTitle = "Types | pizzalatenight";
+        $pageTitle = "Types | pizzabroadway";
         break;
     case 'insertDeals':
-        $pageTitle = "Deals | pizzalatenight";
+        $pageTitle = "Deals | pizzabroadway";
         break;    
     case 'addslider':
-        $pageTitle = "Sliders | pizzalatenight";
+        $pageTitle = "Sliders | pizzabroadway";
         break;  
-        
      case 'addprivacypolicy':
-        $pageTitle = "Add-Privacy-Policy | pizzalatenight";
+        $pageTitle = "Add-Privacy-Policy | pizzabroadway";
         break;    
     case 'addterms_condition':
-        $pageTitle = "Terms-Conditions | pizzalatenight";
+        $pageTitle = "Terms-Conditions | pizzabroadway";
         break;
     case 'manage_pos':
-        $pageTitle = "Manage-Pos | pizzalatenight";
+        $pageTitle = "Manage-Pos | pizzabroadway";
         break;
     case 'manageriders':
-        $pageTitle = "Manage-Riders | pizzalatenight";
+        $pageTitle = "Manage-Riders | pizzabroadway";
         break;    
     case 'manageusers':
-        $pageTitle = "Manage-Users | pizzalatenight";
+        $pageTitle = "Manage-Users | pizzabroadway";
         break;  
         
     case 'managetimings':
-        $pageTitle = "Manage-Timings | pizzalatenight";
+        $pageTitle = "Manage-Timings | pizzabroadway";
         break;      
     case 'neworders':
-        $pageTitle = "New-Orders | pizzalatenight";
+        $pageTitle = "New-Orders | pizzabroadway";
         break;      
     case 'orders':
-        $pageTitle = "Orders | pizzalatenight";
+        $pageTitle = "Orders | pizzabroadway";
         break;      
     case 'manageinventory':
-        $pageTitle = "Manage-Inventory | pizzalatenight";
+        $pageTitle = "Manage-Inventory | pizzabroadway";
         break;      
     case 'manageAreas':
-        $pageTitle = "Manage-Areas | pizzalatenight";
+        $pageTitle = "Manage-Areas | pizzabroadway";
         break;      
     case 'manageproducts':
-        $pageTitle = "Manage-Products | pizzalatenight";
+        $pageTitle = "Manage-Products | pizzabroadway";
         break;      
     case 'managevariations':
-        $pageTitle = "Manage-Variations | pizzalatenight";
+        $pageTitle = "Manage-Variations | pizzabroadway";
         break;      
     case 'view_dressing':
-        $pageTitle = "Manage-Dressing | pizzalatenight";
+        $pageTitle = "Manage-Dressing | pizzabroadway";
         break;
     case 'view_types':
-        $pageTitle = "Manage-Types | pizzalatenight";
+        $pageTitle = "Manage-Types | pizzabroadway";
         break;
     case 'view_deals':
-        $pageTitle = "Manage-Deals | pizzalatenight";
+        $pageTitle = "Manage-Deals | pizzabroadway";
         break;
     case 'viewcategories':
-        $pageTitle = "Manage-Catagories | pizzalatenight";
+        $pageTitle = "Manage-Catagories | pizzabroadway";
         break;       
     case 'SubCat':
-        $pageTitle = "Manage-Sub-Catagories | pizzalatenight";
+        $pageTitle = "Manage-Sub-Catagories | pizzabroadway";
         break;                                      
     case 'manageSliders':
-        $pageTitle = "Manage-Sliders | pizzalatenight";
+        $pageTitle = "Manage-Sliders | pizzabroadway";
         break;
     case 'managePoints':
-        $pageTitle = "Manage-Points | pizzalatenight";
+        $pageTitle = "Manage-Points | pizzabroadway";
         break;
     case 'SendNotifications':
-        $pageTitle = "Notifications | pizzalatenight";
+        $pageTitle = "Notifications | pizzabroadway";
         break;   
     case 'view_addons':
-        $pageTitle = "Manage-Addons | pizzalatenight";
+        $pageTitle = "Manage-Addons | pizzabroadway";
         break;     
     default:
-        $pageTitle = "pizzalatenight";
+        $pageTitle = "pizzabroadway";
 }
 
 

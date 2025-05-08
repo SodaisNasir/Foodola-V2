@@ -22,11 +22,11 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
         $OTP = rand(1000, 9999);  
 
         // Email Content with Template
-        $subject = 'Your OTP for Pizza Late Night';
+        $subject = 'Your OTP for Broad Way Pizza';
       $message = '
 <html>
 <head>
-    <title>Your OTP for Pizza Late Night</title>
+    <title>Your OTP for Broad Way Pizza</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
@@ -68,23 +68,23 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
     </style>
 </head>
 <body>
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://pizzalatenight-ka.de/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://broadwaypizza.de/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
         <tr>
             <td align="center">
                 <table class="content">
                     <tr>
                         <td align="center">
-                            <img src="https://pizzalatenight-ka.de/admin_panel/images/logo.png" alt="Pizza Late Night" style="width: 100px; margin-bottom: 20px;">
+                            <img src="https://broadwaypizza.de/admin_panel/images/logo.png" alt="Broad Way Pizza" style="width: 100px; margin-bottom: 20px;">
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <h1>Your OTP for Pizza Late Night</h1>
+                            <h1>Your OTP for Broad Way Pizza</h1>
                             <p>Your One-Time Password (OTP) for accessing your account is:</p>
                             <h2>' . htmlspecialchars($OTP) . '</h2>
                             <p>Please use this OTP to complete your login.</p>
                             <p>If you did not request this, please ignore this email.</p>
-                            <p class="footer">Best regards,<br>The Pizza Late Night Team</p>
+                            <p class="footer">Best regards,<br>The Broad Way Pizza Team</p>
                         </td>
                     </tr>
                 </table>
@@ -95,8 +95,8 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
 </html>';
 
 
-        $headers = "From: support@pizzalatenight.de\r\n";
-        $headers .= "Reply-To: support@pizzalatenight.de\r\n";
+        $headers = "From: support@broadwaypizza.de\r\n";
+        $headers .= "Reply-To: support@broadwaypizza.de\r\n";
         $headers .= "Content-type: text/html; charset=UTF-8\r\n";
 
         if (mail($email, $subject, $message, $headers)) {
