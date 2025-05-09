@@ -13,7 +13,7 @@ include('connection.php');
 
 if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC'){
 
-    $select_deal = "SELECT `deal_id`, `deal_name`, `deal_description`, `deal_cost`, `deal_price`, `deal_image`, `deal_items_number`, `tax`     FROM `deals`";
+    $select_deal = "SELECT `deal_id`, `deal_name`, `deal_description`, `deal_cost`, `deal_price`, `deal_image`, `deal_items_number`, `tax`     FROM `deals` where `status` = 'Active'";
     $execute_select_deal = mysqli_query($conn,$select_deal);
 
 

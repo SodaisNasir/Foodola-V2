@@ -306,12 +306,12 @@ if ($data && isset($data['created_at'])) {
   <div class="receipt-container print">
     <div class="header-logo">
       <img src="images/logo.png" alt="Firmenlogo" class="logo">
-      <h3 class="company-name">Pizza Late Night</h3>
+      <h3 class="company-name">Pizza Red Peppers</h3>
     </div>
 
       <div class="company-details">
-      <h3>Pizza Late Night</h3>
-      <h3>Karlsruhe Tel: 0721 621122</h3>
+      <h3>Pizza Red Peppers</h3>
+      <h3>Liebfrauenstraße Tel: +4917684908138 </h3>
       <h3>Bestellnummer: <?php echo $order_id ?></h3>
     </div>
 

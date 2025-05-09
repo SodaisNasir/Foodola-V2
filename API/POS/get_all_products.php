@@ -5,7 +5,7 @@ header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Allow sp
 header("Content-Type: application/json"); 
 include('connection.php'); 
 
-$product_query = "SELECT * FROM products";
+$product_query = "SELECT * FROM products where `status` = 'Active'";
 $product_result = mysqli_query($conn, $product_query);
 
 if (mysqli_num_rows($product_result) > 0) {

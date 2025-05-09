@@ -321,7 +321,7 @@ $filewithnewname = mysqli_real_escape_string($con, $filewithnewname);
 
       if ($result) {
         $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                            VALUES ('daynight', '1' ,NOW(),NOW())";
+                            VALUES ('redpepper', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {
@@ -829,7 +829,7 @@ $product_id = mysqli_real_escape_string($con, $product_id);
 
       if ($result) {
         $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                     VALUES ('broadway', '1' ,NOW(),NOW())";
+                     VALUES ('redpepper', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {
@@ -1195,7 +1195,7 @@ include('../assets/config.php');
         $result = mysqli_query($con,$sql);
             if($result){
                  $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                                VALUES ('broadway', '1' ,NOW(),NOW())";
+                                VALUES ('redpepper', '1' ,NOW(),NOW())";
                 $monitor_update = mysqli_query($con, $monitor_sql);
         
                 if ($monitor_update) {
@@ -2214,7 +2214,7 @@ if(isset($_POST['updateProduct'])){
     
     if($update){
          $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                        VALUES ('broadway', '1' ,NOW(),NOW())";
+                        VALUES ('redpepper', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {
