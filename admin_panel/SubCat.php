@@ -4,9 +4,9 @@
 <?php
 
 if (isset($_GET['Massage'])) {
-    if ($_GET['Massage'] == 'Successfully updated sub category') {
+    if ($_GET['Massage'] == 'Sucessfully updated sub category.') {
         header("Refresh: 3; url='SubCat.php'");
-        echo "<script>alert('Successfully updated sub category')</script>";
+        echo "<script>alert('Sucessfully updated sub category.')</script>";
     } else {
         echo "<script>alert('The was some error occured!')</script>";
     }
@@ -393,8 +393,6 @@ if (isset($_GET['Massage'])) {
 
     <script>
         $(document).ready(function() {
-            
-            
             // Update subcategory image
             $("#updateImageForm").submit(function(e) {
                 e.preventDefault();

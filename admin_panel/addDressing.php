@@ -257,13 +257,13 @@ $('#dynamic_fields').append(`
 
 
  function downloadSampleCSV() {
-    const headers = ["dressing_title", "dressing_title_user", "dressing_name"];
+    const headers = ["dressing_title", "dressing_title_user", "dressing_name", "price"];
     const sampleData = [
-        ["Dressing for pasta", "Dressing for pasta", "Cheese-gratinated"],
-        ["Dressing for pasta", "Dressing for pasta", "Yogurt"],
-        ["Dressing for pasta", "Dressing for pasta", "Garlic"],
-        ["Dressing for pasta", "Dressing for pasta", "Ice and Oil"],
-        ["Dressing for pasta", "Dressing for pasta", "Without Dressing"]
+        ["Dressing for pasta", "Dressing for pasta", "Cheese-gratinated", "2.50"],
+        ["Dressing for pasta", "Dressing for pasta", "Yogurt", "2.50"],
+        ["Dressing for pasta", "Dressing for pasta", "Garlic", "2.50"],
+        ["Dressing for pasta", "Dressing for pasta", "Ice and Oil", "2.50"],
+        ["Dressing for pasta", "Dressing for pasta", "Without Dressing", "2.50"]
     ];
 
     // Convert to CSV string

@@ -284,7 +284,8 @@ $sql = "INSERT INTO `tables`(`table_name`, `seats`, `table_image`, `branch_id`,`
 if (isset($_POST['btnSubmit_insertCategories'])) {
   include('../assets/connection.php');
 //   include('../assets/config.php');
-
+        error_reporting(E_ALL);
+ini_set('display_errors', 1);
   $cat_name = $_POST['CatName'];
   $target_dir = "../Uploads/";
   $target_file = $target_dir . basename($_FILES["CatImage"]["name"]);
@@ -320,7 +321,7 @@ $filewithnewname = mysqli_real_escape_string($con, $filewithnewname);
 
       if ($result) {
         $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                            VALUES ('latenight', '1' ,NOW(),NOW())";
+                            VALUES ('burgerplanet', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {
@@ -517,8 +518,6 @@ if (isset($_POST['btnUpdateImage'])) {
 
 
 if (isset($_POST['btnUpdateSubCatImage'])) {
-            error_reporting(E_ALL);
-ini_set('display_errors', 1);
     include('../assets/connection.php');
     session_start();
 
@@ -528,8 +527,9 @@ ini_set('display_errors', 1);
     $imageFileType = strtolower(pathinfo($_FILES["updatedImage"]["name"], PATHINFO_EXTENSION));
 
     // Validate file size
-    if ($_FILES["updatedImage"]["size"] > 500000000) {
+    if ($_FILES["updatedImage"]["size"] > 5000000) {
         echo "<script>alert('Sorry, your file is too large.')</script>";
+
     }
 
     // Allow only specific file types
@@ -541,11 +541,15 @@ ini_set('display_errors', 1);
     $new_image_name = $timestamp . "_Sub_Cat." . $imageFileType;
     $target_file = $target_dir . $new_image_name;
 
+    // Fetch existing image name
+    $get_file_name = "SELECT `img` FROM `sub_categories` WHERE `id` = $CatID";
+    $ex_file_name = mysqli_query($con, $get_file_name);
+
 
         if (move_uploaded_file($_FILES["updatedImage"]["tmp_name"], $target_file)) {
             $update_query = "UPDATE `sub_categories` SET `img` = '$new_image_name' WHERE `id` = $CatID";
             if (mysqli_query($con, $update_query)) {
-                header("Location: ../SubCat.php?Message=Successfully updated sub category");
+                header("Location: ../SubCat.php?Message=Successfully updated sub category.");
             } else {
                 echo "<script>alert('Database update failed.')</script>";
             }
@@ -822,7 +826,7 @@ $product_id = mysqli_real_escape_string($con, $product_id);
 
       if ($result) {
         $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                     VALUES ('latenight', '1' ,NOW(),NOW())";
+                     VALUES ('burgerplanet', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {
@@ -1188,7 +1192,7 @@ include('../assets/config.php');
         $result = mysqli_query($con,$sql);
             if($result){
                  $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                                VALUES ('latenight', '1' ,NOW(),NOW())";
+                                VALUES ('burgerplanet', '1' ,NOW(),NOW())";
                 $monitor_update = mysqli_query($con, $monitor_sql);
         
                 if ($monitor_update) {
@@ -2248,7 +2252,7 @@ if(isset($_POST['updateProduct'])){
     
     if($update){
          $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                        VALUES ('latenight', '1' ,NOW(),NOW())";
+                        VALUES ('burgerplanet', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {

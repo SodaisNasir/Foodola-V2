@@ -5,107 +5,107 @@ $pageName = basename($_SERVER['PHP_SELF'], ".php");
 
 switch ($pageName) {
     case 'index':
-        $pageTitle = "Analytics | Food Vibe";
+        $pageTitle = "Analytics | Burger Planet";
         break;
     case 'addareas':
-        $pageTitle = "Addareas | Food Vibe";
+        $pageTitle = "Addareas | Burger Planet";
         break;
     case 'addriders':
-        $pageTitle = "Addriders | Food Vibe";
+        $pageTitle = "Addriders | Burger Planet";
         break;
     case 'addmaincat':
-        $pageTitle = "Maincategories | Food Vibe";
+        $pageTitle = "Maincategories | Burger Planet";
         break;
     case 'addSubCat':
-        $pageTitle = "Subcategories | Food Vibe";
+        $pageTitle = "Subcategories | Burger Planet";
         break;
     case 'insertNewProduct':
-        $pageTitle = "Newproduct | Food Vibe";
+        $pageTitle = "Newproduct | Burger Planet";
         break;
     case 'addVariation':
-        $pageTitle = "Variation | Food Vibe";
+        $pageTitle = "Variation | Burger Planet";
         break;
     case 'addAddons':
-        $pageTitle = "Addons | Food Vibe";
+        $pageTitle = "Addons | Burger Planet";
         break;    
     case 'addDressing':
-        $pageTitle = "Dressing | Food Vibe";
+        $pageTitle = "Dressing | Burger Planet";
         break;
     case 'addTypes':
-        $pageTitle = "Types | Food Vibe";
+        $pageTitle = "Types | Burger Planet";
         break;
     case 'insertDeals':
-        $pageTitle = "Deals | Food Vibe";
+        $pageTitle = "Deals | Burger Planet";
         break;    
     case 'addslider':
-        $pageTitle = "Sliders | Food Vibe";
+        $pageTitle = "Sliders | Burger Planet";
         break;  
      case 'addprivacypolicy':
-        $pageTitle = "Add-Privacy-Policy | Food Vibe";
+        $pageTitle = "Add-Privacy-Policy | Burger Planet";
         break;    
     case 'addterms_condition':
-        $pageTitle = "Terms-Conditions | Food Vibe";
+        $pageTitle = "Terms-Conditions | Burger Planet";
         break;
     case 'manage_pos':
-        $pageTitle = "Manage-Pos | Food Vibe";
+        $pageTitle = "Manage-Pos | Burger Planet";
         break;
     case 'manageriders':
-        $pageTitle = "Manage-Riders | Food Vibe";
+        $pageTitle = "Manage-Riders | Burger Planet";
         break;    
     case 'manageusers':
-        $pageTitle = "Manage-Users | Food Vibe";
+        $pageTitle = "Manage-Users | Burger Planet";
         break;  
         
     case 'managetimings':
-        $pageTitle = "Manage-Timings | Food Vibe";
+        $pageTitle = "Manage-Timings | Burger Planet";
         break;      
     case 'neworders':
-        $pageTitle = "New-Orders | Food Vibe";
+        $pageTitle = "New-Orders | Burger Planet";
         break;      
     case 'orders':
-        $pageTitle = "Orders | Food Vibe";
+        $pageTitle = "Orders | Burger Planet";
         break;      
     case 'manageinventory':
-        $pageTitle = "Manage-Inventory | Food Vibe";
+        $pageTitle = "Manage-Inventory | Burger Planet";
         break;      
     case 'manageAreas':
-        $pageTitle = "Manage-Areas | Food Vibe";
+        $pageTitle = "Manage-Areas | Burger Planet";
         break;      
     case 'manageproducts':
-        $pageTitle = "Manage-Products | Food Vibe";
+        $pageTitle = "Manage-Products | Burger Planet";
         break;      
     case 'managevariations':
-        $pageTitle = "Manage-Variations | Food Vibe";
+        $pageTitle = "Manage-Variations | Burger Planet";
         break;      
     case 'view_dressing':
-        $pageTitle = "Manage-Dressing | Food Vibe";
+        $pageTitle = "Manage-Dressing | Burger Planet";
         break;
     case 'view_types':
-        $pageTitle = "Manage-Types | Food Vibe";
+        $pageTitle = "Manage-Types | Burger Planet";
         break;
     case 'view_deals':
-        $pageTitle = "Manage-Deals | Food Vibe";
+        $pageTitle = "Manage-Deals | Burger Planet";
         break;
     case 'viewcategories':
-        $pageTitle = "Manage-Catagories | Food Vibe";
+        $pageTitle = "Manage-Catagories | Burger Planet";
         break;       
     case 'SubCat':
-        $pageTitle = "Manage-Sub-Catagories | Food Vibe";
+        $pageTitle = "Manage-Sub-Catagories | Burger Planet";
         break;                                      
     case 'manageSliders':
-        $pageTitle = "Manage-Sliders | Food Vibe";
+        $pageTitle = "Manage-Sliders | Burger Planet";
         break;
     case 'managePoints':
-        $pageTitle = "Manage-Points | Food Vibe";
+        $pageTitle = "Manage-Points | Burger Planet";
         break;
     case 'SendNotifications':
-        $pageTitle = "Notifications | Food Vibe";
+        $pageTitle = "Notifications | Burger Planet";
         break;   
     case 'view_addons':
-        $pageTitle = "Manage-Addons | Food Vibe";
+        $pageTitle = "Manage-Addons | Burger Planet";
         break;     
     default:
-        $pageTitle = "Food Vibe";
+        $pageTitle = "Burger Planet";
 }
 
 

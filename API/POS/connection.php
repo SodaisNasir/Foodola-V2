@@ -1,9 +1,10 @@
 <?php
 
 $Host = 'localhost';
-$DB_DATABASE='u772850971_foodvibe';
-$DB_USERNAME='u772850971_foodvibe';
-$DB_PASSWORD='O[1J;o$Nx5';
+$DB_DATABASE='u772850971_burgerplanet';
+$DB_USERNAME='u772850971_burgerplanet';
+$DB_PASSWORD='>c6Ly*27w/#';
+
 
 
 
