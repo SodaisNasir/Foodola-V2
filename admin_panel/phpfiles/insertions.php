@@ -12,11 +12,11 @@ if(isset($_POST['btn_insert_code'])){
     $value = mysqli_real_escape_string($con, $_POST['value']);
     $usage_limit = mysqli_real_escape_string($con, $_POST['usage_limit']);
     // $used_count = mysqli_real_escape_string($con, $_POST['used_count']);
-    $min_order = mysqli_real_escape_string($con, $_POST['min_order']);
     $start_date = mysqli_real_escape_string($con, $_POST['start_date']);
     $end_date = mysqli_real_escape_string($con, $_POST['end_date']);
     $status = mysqli_real_escape_string($con, $_POST['status']); 
-    $eligible_users_date = mysqli_real_escape_string($con, $_POST['eligible_users_date']); 
+    $eligible_users_date = mysqli_real_escape_string($con, $_POST['eligible_users_date']);
+    $min_order = mysqli_real_escape_string($con, $_POST['min_order']);
     $start_date_order = mysqli_real_escape_string($con, $_POST['start_date_order']); 
     $end_date_order = mysqli_real_escape_string($con, $_POST['end_date_order']); 
     
@@ -321,7 +321,7 @@ $filewithnewname = mysqli_real_escape_string($con, $filewithnewname);
 
       if ($result) {
         $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                            VALUES ('daynight', '1' ,NOW(),NOW())";
+                            VALUES ('latenight', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {
@@ -355,49 +355,60 @@ if(isset($_POST['updateAddonTitle'])){
 }
 
 
-if(isset($_POST['btnUpdateImage'])){
-include('../assets/connection.php');
-  
-  $CatID = $_POST['CatID'];
-  $target_dir = "../Uploads/";
-  $target_file = $target_dir . basename($_FILES["updatedImage"]["name"]);
-  $uploadOk = 1;
-  $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
-  
-  if ($_FILES["updatedImage"]["size"] > 500000) {
-  echo "<script>alert('Sorry, your file is too large.')</script>";
-    $uploadOk = 0;
-  }
-  
-  if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
-    && $imageFileType != "gif" ) {
-      
-       echo "<script>alert('Sorry, only JPG, JPEG, PNG & GIF files are allowed.')</script>";
-      $uploadOk = 0;
+
+
+
+if (isset($_POST['btnUpdateImage'])) {
+    include('../assets/connection.php');
+
+    $CatID = $_POST['CatID'];
+    $target_dir = "../Uploads/";
+
+    $imageFileType = strtolower(pathinfo($_FILES["updatedImage"]["name"], PATHINFO_EXTENSION));
+    $newFileName = uniqid("cat_") . "." . $imageFileType;
+    $target_file = $target_dir . $newFileName;
+    $uploadOk = 1;
+
+    // Validate file size
+    if ($_FILES["updatedImage"]["size"] > 500000) {
+        echo "<script>alert('Sorry, your file is too large.')</script>";
+        $uploadOk = 0;
     }
-    
-   if ($uploadOk == 0) {
-       echo "<script>alert('Sorry, your file was not uploaded.')</script>";
+
+    // Validate file type
+    if (!in_array($imageFileType, ["jpg", "jpeg", "png", "gif"])) {
+        echo "<script>alert('Sorry, only JPG, JPEG, PNG & GIF files are allowed.')</script>";
+        $uploadOk = 0;
+    }
+
+    if ($uploadOk == 0) {
+        echo "<script>alert('Sorry, your file was not uploaded.')</script>";
     } else {
-      $get_file_name = "SELECT  `img`  FROM `categories` WHERE `id` = $CatID";
-      $ex_file_name = mysqli_query($con,$get_file_name);
-      if(mysqli_num_rows($ex_file_name)>0){
-          $Data = mysqli_fetch_array($ex_file_name);
-           $image_name = $Data['img'];
-          if (move_uploaded_file($_FILES["updatedImage"]["tmp_name"], $target_dir.$image_name)) {
-            // echo "The file ". htmlspecialchars( basename( $_FILES["CatImage"]["name"])). " has been updated.";
-          
-               header("Location:../viewcategories.php?Massage=Sucessfully updated category.");
+        $get_file_name = "SELECT `img` FROM `categories` WHERE `id` = $CatID";
+        $ex_file_name = mysqli_query($con, $get_file_name);
+
+        if (mysqli_num_rows($ex_file_name) > 0) {
+            $Data = mysqli_fetch_array($ex_file_name);
+            if (move_uploaded_file($_FILES["updatedImage"]["tmp_name"], $target_file)) {
             
-          } else {
-           
-            echo "<script>alert('Sorry, there was an error uploading your file.')</script>";
-          }
-      }
-      
-   }
-   
+                $update_sql = "UPDATE `categories` SET `img`='$newFileName' WHERE `id` = '$CatID'";
+                $exec_update_sql = mysqli_query($con, $update_sql);
+
+                if ($exec_update_sql) {
+                    header("Location: ../viewcategories.php?Massage=Category Updated Successfully");
+                } else {
+                    echo "<script>alert('Failed to update database.')</script>";
+                }
+
+            } else {
+                echo "<script>alert('Sorry, there was an error uploading your file.')</script>";
+            }
+        } else {
+            echo "<script>alert('Category not found.')</script>";
+        }
+    }
 }
+
 
 
 // if(isset($_POST['btnUpdateProdImage'])){
@@ -516,15 +527,14 @@ if (isset($_POST['btnUpdateSubCatImage'])) {
     $imageFileType = strtolower(pathinfo($_FILES["updatedImage"]["name"], PATHINFO_EXTENSION));
 
     // Validate file size
-    if ($_FILES["updatedImage"]["size"] > 500000) {
+    if ($_FILES["updatedImage"]["size"] > 5000000) {
         echo "<script>alert('Sorry, your file is too large.')</script>";
-        exit;
+
     }
 
     // Allow only specific file types
     if (!in_array($imageFileType, ["jpg", "jpeg", "png", "gif"])) {
         echo "<script>alert('Sorry, only JPG, JPEG, PNG & GIF files are allowed.')</script>";
-        exit;
     }
 
     // Generate the new file name: 202502282924_Sub_Cat.jpg
@@ -535,30 +545,18 @@ if (isset($_POST['btnUpdateSubCatImage'])) {
     $get_file_name = "SELECT `img` FROM `sub_categories` WHERE `id` = $CatID";
     $ex_file_name = mysqli_query($con, $get_file_name);
 
-    if (mysqli_num_rows($ex_file_name) > 0) {
-        $Data = mysqli_fetch_array($ex_file_name);
-        $old_image_name = $Data['img']; // Existing image name
-
 
         if (move_uploaded_file($_FILES["updatedImage"]["tmp_name"], $target_file)) {
             $update_query = "UPDATE `sub_categories` SET `img` = '$new_image_name' WHERE `id` = $CatID";
             if (mysqli_query($con, $update_query)) {
-                // Delete old image (optional)
-                if (!empty($old_image_name) && file_exists($target_dir . $old_image_name)) {
-                    unlink($target_dir . $old_image_name);
-                }
-
                 header("Location: ../SubCat.php?Message=Successfully updated sub category.");
-                exit;
             } else {
                 echo "<script>alert('Database update failed.')</script>";
             }
         } else {
             echo "<script>alert('Sorry, there was an error uploading your file.')</script>";
         }
-    } else {
-        echo "<script>alert('Subcategory not found.')</script>";
-    }
+   
 }
 
 
@@ -829,7 +827,7 @@ $product_id = mysqli_real_escape_string($con, $product_id);
 
       if ($result) {
         $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                     VALUES ('daynight', '1' ,NOW(),NOW())";
+                     VALUES ('latenight', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {
@@ -1195,7 +1193,7 @@ include('../assets/config.php');
         $result = mysqli_query($con,$sql);
             if($result){
                  $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                                VALUES ('daynight', '1' ,NOW(),NOW())";
+                                VALUES ('latenight', '1' ,NOW(),NOW())";
                 $monitor_update = mysqli_query($con, $monitor_sql);
         
                 if ($monitor_update) {
@@ -1248,33 +1246,51 @@ include('../assets/connection.php');
 
 // for addon_type
 
-if(isset($_POST['btnSubmit_insertMoreAddonType'])){
-include('../assets/connection.php');
-  session_start();
-  $addon_name = $_POST['addon_name'];
-  $addon_id = $_POST['addon_id'];
-  
-           
-           foreach($addon_name as $add_name) {
-                $insert_addontype = "INSERT INTO `types_sublist`(`type_id`, `ts_name`) VALUES ('$addon_id','$add_name')";
-                $result_addon = mysqli_query($con,$insert_addontype);
-            } 
-            
-           
-            
-            if($result_addon){
-                 header("Location:../update_types.php?id='$addon_id'&Massage=Sucessfully updated Type.");
-            }else{
-            echo "<script>alert('Sorry, there was an error while adding addon.');window.location.href='../update_types.php?id='$addon_id'';</script>";
-                // header("Location:../update_types.php?id='$addon_id');
-                
-            }
-            
-            
-       
-       
 
+
+if (isset($_POST['btnSubmit_insertMoreAddonType'])) {
+    include('../assets/connection.php');
+    session_start();
+
+    $addon_names = $_POST['addon_name'] ?? [];
+    $addon_prices = $_POST['addon_price'] ?? [];
+    $addon_id = $_POST['addon_id'] ?? null;
+
+        $get_type_sql = "SELECT * FROM types_list WHERE type_id = '$addon_id'";
+        $exec_type = mysqli_query($con, $get_type_sql);
+        $type_data = mysqli_fetch_assoc($exec_type);
+
+        if (!$type_data) {
+            echo "<script>alert('Invalid Type ID.'); window.location.href='../update_types.php';</script>";
+            exit();
+        }
+
+        $type_title = mysqli_real_escape_string($con, $type_data['type_title']);
+        $type_title_user = mysqli_real_escape_string($con, $type_data['type_title_user']);
+
+        foreach ($addon_names as $index => $add_name) {
+            $price = $addon_prices[$index];
+
+            // Escape each value
+            $add_name_safe = mysqli_real_escape_string($con, $add_name);
+            $price_safe = mysqli_real_escape_string($con, $price);
+
+            $insert_addontype = "INSERT INTO `types_sublist`(`type_id`, `ts_name`, `price`, `type_title`, `type_title_user`) 
+                                 VALUES ('$addon_id', '$add_name_safe', '$price_safe', '$type_title', '$type_title_user')";
+            $result_addon = mysqli_query($con, $insert_addontype);
+
+            if (!$result_addon) {
+                echo "<script>alert('Error while inserting: " . mysqli_error($con) . "'); 
+                      window.location.href='../update_types.php?id=$addon_id';</script>";
+                exit();
+            }
+        }
+        header("Location: ../update_types.php?id=$addon_id&Massage=Successfully updated Type.");
+
+  
 }
+
+
 
 
 // end addon_type
@@ -1286,6 +1302,8 @@ include('../assets/connection.php');
 
 
 if (isset($_POST['btnSubmit_insertMoreAddonDressing'])) {
+    error_reporting(E_ALL);
+ini_set('display_errors', 1);
     include('../assets/connection.php');
     session_start();
 
@@ -1301,13 +1319,16 @@ if (isset($_POST['btnSubmit_insertMoreAddonDressing'])) {
         $dressing_title = $data['dressing_title'];
         $dressing_title_user = $data['dressing_title_user'];
 
-        foreach ($addon_name as $addtype_name) {
-            $addtype_name_safe = mysqli_real_escape_string($con, $addtype_name);
+       foreach ($addon_name as $addtype_name) {
+    $addtype_name_safe = mysqli_real_escape_string($con, $addtype_name);
+    $dressing_title_safe = mysqli_real_escape_string($con, $dressing_title);
+    $dressing_title_user_safe = mysqli_real_escape_string($con, $dressing_title_user);
 
-            $insert_addontype = "INSERT INTO `dressing_sublist`(`dressing_id`, `dressing_title`, `dressing_title_user`, `dressing_name`) 
-                VALUES ('$addon_id','$dressing_title', '$dressing_title_user', '$addtype_name_safe')";
-            $result_addon = mysqli_query($con, $insert_addontype);
-        }
+    $insert_addontype = "INSERT INTO `dressing_sublist`(`dressing_id`, `dressing_title`, `dressing_title_user`, `dressing_name`) 
+        VALUES ('$addon_id', '$dressing_title_safe', '$dressing_title_user_safe', '$addtype_name_safe')";
+    
+    $result_addon = mysqli_query($con, $insert_addontype);
+}
 
         if ($result_addon) {
             header("Location: ../update_dressing.php?id=$addon_id&Massage=Sucessfully updated Dressing.");
@@ -1421,12 +1442,14 @@ if(isset($_POST['btnSubmit_Variation']))
 
 
 
+
 if(isset($_POST['btnSubmit_insertType'])){
 include('../assets/connection.php');
   session_start();
   $type_title = mysqli_real_escape_string($con,$_POST['type_title']);
     $type_title_user = mysqli_real_escape_string($con,$_POST['type_title_user']);
   $add_type = $_POST['add_type'];
+  $add_price = $_POST['add_price'];
 
   
         if($type_title && $type_title_user){
@@ -1437,9 +1460,10 @@ include('../assets/connection.php');
         if($result){
           // $combined = array_combine($add_type);
            
-           foreach($add_type as $at) {
+           foreach($add_type as $index => $at) {
+                   $price = $add_price[$index];
                $add_TYPE_NAME =  mysqli_real_escape_string($con,$at);
-                $insert_types = "INSERT INTO `types_sublist`(`type_id`, `type_title`, `type_title_user`, `ts_name`) VALUES ('$last_inserted_id','$type_title','$type_title_user','$add_TYPE_NAME')";
+                $insert_types = "INSERT INTO `types_sublist`(`type_id`, `type_title`, `type_title_user`, `ts_name`,`price`) VALUES ('$last_inserted_id','$type_title','$type_title_user','$add_TYPE_NAME', '$price')";
                 $result_types = mysqli_query($con,$insert_types);
             } 
             
@@ -1456,7 +1480,6 @@ include('../assets/connection.php');
 
 }
 
-
 //btnSubmit_insertDressing
 
 
@@ -1464,8 +1487,9 @@ if(isset($_POST['btnSubmit_insertDressing'])){
 include('../assets/connection.php');
   session_start();
   $type_title = mysqli_real_escape_string($con,$_POST['dressing_title']);
-    $type_title_user = mysqli_real_escape_string($con,$_POST['dressing_title_user']);
+  $type_title_user = mysqli_real_escape_string($con,$_POST['dressing_title_user']);
   $add_type = $_POST['add_dressing'];
+  $add_price = $_POST['add_price'];
 
   
         if($type_title && $type_title_user){
@@ -1476,9 +1500,10 @@ include('../assets/connection.php');
         if($result){
           // $combined = array_combine($add_type);
            
-           foreach($add_type as $at) {
+           foreach($add_type as $index =>  $at) {
+                   $price = $add_price[$index];
                $dressing_NAME = mysqli_real_escape_string($con,$at);
-                $insert_types = "INSERT INTO `dressing_sublist`(`dressing_id`, `dressing_title`, `dressing_title_user`, `dressing_name`) VALUES ('$last_inserted_id','$type_title','$type_title_user','$dressing_NAME')";
+                $insert_types = "INSERT INTO `dressing_sublist`(`dressing_id`, `dressing_title`, `dressing_title_user`, `dressing_name`, `price`) VALUES ('$last_inserted_id','$type_title','$type_title_user','$dressing_NAME', '$price')";
                 $result_types = mysqli_query($con,$insert_types);
             } 
             
@@ -1659,14 +1684,10 @@ if(isset($_POST['updatePoints'])){
                     $execute_insert_noti = mysqli_query($con,$insert_noti_details);
                     
                 
-    //  $sql_get_appid = "SELECT  * FROM `enviroments`";
-    //                     $sql = mysqli_query($con,$sql_get_appid);
-    //                     $data = mysqli_fetch_array($sql);
-    //                     $app_id = $data['one_signal_appid'] ?? '2de883ec-be41-4820-a517-558beee8b0ac';  
+
                     
                 $fields = array(
                        'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
-                    //  'app_id' => $app_id,
                      'include_player_ids' => $playerIdx,
                     'data' => array("foo" => "NewMassage","Id" => $taskid),
                     'large_icon' =>"ic_launcher_round.png",
@@ -1993,10 +2014,12 @@ if (isset($_POST['btnSubmit_Action'])) {
                     // Insert transaction record
                     if ($amount_added) {
                         $transaction_message = $cashback_amount . ' Cashback erhalten für (Bestell-ID: ' . $order_id . ')';
+                        $english_message = $cashback_amount . ' Receive cashback for (order ID: ' . $order_id . ')';
+       
                         $transaction_id = rand(100000, 999999);
             
-                        $sql = "INSERT INTO `tbl_transaction`(`user_id`, `transaction_id`, `amount`, `type`, `message`) 
-                                VALUES ('$user_id','$transaction_id','$cashback_amount','credit','$transaction_message')";
+                        $sql = "INSERT INTO `tbl_transaction`(`user_id`, `transaction_id`, `amount`, `type`, `message`, `english_message`) 
+                                VALUES ('$user_id','$transaction_id','$cashback_amount','credit','$transaction_message', '$english_message')";
                         $ex_sql = mysqli_query($con, $sql);
                     }
             
@@ -2061,13 +2084,26 @@ if (isset($_POST['btnSubmit_Action'])) {
             array_push($playerIdx, $row['notification_token']);
         }
 
-        $order_content = match ($status) {
-            'pending' => "Ihre Bestellung Nr: $order_id wurde angenommen. Die voraussichtliche Lieferzeit beträgt $datetime.",
-            'shipped' => "Ihre Bestellung Nr: $order_id wurde versandt.",
-            default => "Ihre Bestellung Nr: $order_id ist jetzt $status."
-        };
+     $order_content = match ($status) {
+    'pending' => [
+        'de' => "Ihre Bestellung Nr: $order_id wurde angenommen. Die voraussichtliche Lieferzeit ist $datetime.",
+        'en' => "Your order no: $order_id has been accepted. The estimated delivery time is $datetime."
+    ],
+    'shipped' => [
+        'de' => "Ihre Bestellung Nr: $order_id wurde versandt.",
+        'en' => "Your order no: $order_id has been shipped."
+    ],
+    default => [
+        'de' => "Ihre Bestellung Nr: $order_id ist jetzt $status.",
+        'en' => "Your order no: $order_id is now $status."
+    ]
+};
 
-        $insert_noti_details = "INSERT INTO `notification` (`user_id`, `content`, `purpose`) VALUES ('$get_user_id', '$order_content', 'order')";
+// Escape values for safe SQL insertion
+$de_content = mysqli_real_escape_string($con, $order_content['de']);
+$en_content = mysqli_real_escape_string($con, $order_content['en']);
+
+        $insert_noti_details = "INSERT INTO `notification` (`user_id`, `content`, `german_content`,`purpose`) VALUES ('$get_user_id', '$en_content', '$de_content', 'order')";
         mysqli_query($con, $insert_noti_details);
 
         $fields = json_encode([
@@ -2218,7 +2254,7 @@ if(isset($_POST['updateProduct'])){
     
     if($update){
          $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                        VALUES ('daynight', '1' ,NOW(),NOW())";
+                        VALUES ('latenight', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {
@@ -2641,7 +2677,7 @@ if (isset($_POST['updateDeals'])) {
 
         if (move_uploaded_file($_FILES['deal_image']['tmp_name'], $filepath)) {
             // Save relative path only
-            $image_path = "/Uploads/" . $filename;
+            $image_path =  $filename;
         }
     }
 

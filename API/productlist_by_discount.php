@@ -6,7 +6,7 @@ if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqa
     
     $select_product = "SELECT `id`, `addon_id`, `type_id`, `dressing_id`, `sub_category_id`, `name`, `description`, `cost`, 
     `price`, `discount`, `qty`, `img`, `features`,`tax`, `created_at`, `updated_at` FROM 
-    `products` WHERE  `discount` > 0  ORDER BY RAND() limit 6";   
+    `products` WHERE  `discount` > 0  AND `status` = 'Active' ORDER BY RAND() limit 6";   
      $execute_products = mysqli_query($conn,$select_product);
     
 

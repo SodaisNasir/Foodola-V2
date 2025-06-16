@@ -40,7 +40,6 @@ switch ($pageName) {
     case 'addslider':
         $pageTitle = "Sliders | pizzalatenight";
         break;  
-        
      case 'addprivacypolicy':
         $pageTitle = "Add-Privacy-Policy | pizzalatenight";
         break;    

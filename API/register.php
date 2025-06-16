@@ -34,8 +34,8 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'faracecut@gmail.com';
-        $mail->Password = 'ohvjrjlpxkjfvujd'; 
+            $mail->Username = 'boundedsocial@gmail.com'; 
+        $mail->Password = 'iwumjedakkbledwe';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
@@ -167,7 +167,7 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                                                         <h3>Get Started Now!</h3>
                                                         <p>Here’s what you can do next:</p>
                                                         <ul>
-                                                            <li>👀 <a href="https://pizzalatenight-ka.de/menu">Browse our Menu</a> and find your favorites.</li>
+                                                            <li>👀 <a href="https://pizzalatenight-ka.de">Browse our Menu</a> and find your favorites.</li>
                                                             <li>🛒 Place your first order and experience the convenience and quality we’re known for!</li>
                                                         </ul>
                                                         <p>If you have any questions, feel free to reach out to our support team. We’re here to make sure you have the best experience possible.</p>

@@ -21,14 +21,18 @@ if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbq
         }
         $data = ["status"=>true,
             "Response_code"=>200,
-            "Message"=>"Found the areas.",
+            "Message"=>"Habe die Gebiete gefunden.",
+            "english_message" => "Found the areas.",
             "Data"=>$product_array,
             ];
         echo json_encode($data);   
      }else{
           $data = ["status"=>false,
             "Response_code"=>202,
-            "Message"=>"Not found!"];
+            "Message"=>"Nicht gefunden!",
+            "english_message" => "Not found!"
+            
+            ];
              echo json_encode($data);   
      }
 }else{

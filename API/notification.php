@@ -15,6 +15,7 @@ if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbq
                         "user_id"=>$row['user_id'],
                         "purpose"=>$row['purpose'],
                         "content"=>$row['content'],
+                        "german_content" => $row['german_content']
                     ];
             array_push($product_array,$temp);
          

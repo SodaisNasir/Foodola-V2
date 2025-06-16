@@ -10,18 +10,22 @@ if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbq
     if($Data['sbscription_status'] == 1){
      $data = ["status"=>true,
             "Response_code"=>200,
-            "Message"=>"Account is activated"];
+            "Message"=>"Konto ist aktiviert",
+            "english_message" => "Account is activated"];
      echo json_encode($data); 
      }else if($Data['sbscription_status'] == 0){
          $data = ["status"=>false,
                 "Response_code"=>200,
-                "Message"=>"Account is inactive"];
+                "Message"=>"Konto ist inaktiv",
+                "english_message" => "Account is inactive"];
          echo json_encode($data);  
      } 
  }else{
      $data = ["status"=>false,
             "Response_code"=>203,
-            "Message"=>"User not found"];
+            "english_message" => "User not found",
+            "Message"=>"Benutzer nicht gefunden"];
+            
      echo json_encode($data); 
  }
  
