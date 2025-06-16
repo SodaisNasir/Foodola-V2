@@ -395,48 +395,48 @@
            
            
         <?php if($currentFile == "enviroment.php") {?>
-            <li class="active nav-item"><a href="enviroment.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Enviroment</span></a></li
+            <li class="active nav-item"><a href="enviroment.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Enviroment</span></a></li>
         <?php }else{ ?>
-                   <li class="nav-item"><a href="enviroment.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Enviroment</span></a>
+                   <li class="nav-item"><a href="enviroment.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Enviroment</span></a></li>
             <?php } ?>
           
           
            <?php if($currentFile == "manage_tables.php") {?>
-            <li class="active nav-item"><a href="manage_tables.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Manage Tables</span></a></li
+            <li class="active nav-item"><a href="manage_tables.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Manage Tables</span></a></li>
         <?php }else{ ?>
-                   <li class="nav-item"><a href="manage_tables.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Manage Tables</span></a>
+                   <li class="nav-item"><a href="manage_tables.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Manage Tables</span></a></li>
             <?php } ?>  
             
             
             
                   <?php if($currentFile == "manage_cashback.php") {?>
-            <li class="active nav-item"><a href="manage_cashback.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Manage Cashbacks</span></a></li
+            <li class="active nav-item"><a href="manage_cashback.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Manage Cashbacks</span></a></li>
         <?php }else{ ?>
-                   <li class="nav-item"><a href="manage_cashback.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Manage Cashbacks</span></a>
+                   <li class="nav-item"><a href="manage_cashback.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Manage Cashbacks</span></a></li>
             <?php } ?>  
             
             
             
-                   <?php if($currentFile == "manage_promocode.php") {?>
-            <li class="active nav-item"><a href="manage_promocode.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Manage Promocodes</span></a></li
+        <?php if($currentFile == "manage_promocode.php") {?>
+            <li class="active nav-item"><a href="manage_promocode.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Manage Promocodes</span></a></li>
         <?php }else{ ?>
-                   <li class="nav-item"><a href="manage_promocode.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Manage Promocodes</span></a>
+            <li class="nav-item"><a href="manage_promocode.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Manage Promocodes</span></a></li>
             <?php } ?>  
             
             
             
                    <?php if($currentFile == "upload_images.php") {?>
-            <li class="active nav-item"><a href="upload_images.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Upload Images</span></a></li
+            <li class="active nav-item"><a href="upload_images.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Upload Images</span></a></li>
         <?php }else{ ?>
-                   <li class="nav-item"><a href="upload_images.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Upload Images</span></a>
+                   <li class="nav-item"><a href="upload_images.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Upload Images</span></a></li>
             <?php } ?>  
             
             
                 
         <?php if($currentFile == "manage_messages.php") {?>
-            <li class="active nav-item"><a href="manage_messages.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Manage Messages</span></a></li
+            <li class="active nav-item"><a href="manage_messages.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Manage Messages</span></a></li>
         <?php }else{ ?>
-                   <li class="nav-item"><a href="manage_messages.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Manage Messages</span></a>
+                   <li class="nav-item"><a href="manage_messages.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Manage Messages</span></a></li>
             <?php } ?>  
             
              

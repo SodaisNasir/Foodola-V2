@@ -272,7 +272,7 @@ if (isset($_GET['Massage'])) {
                     <input type="number" class="form-control" id="Value" name="value" required>
                   </div>
                   <div class="form-group">
-                    <label for="usage_limit">Usage Limit</label>
+                    <label for="usage_limit">Per User Usage Limit</label>
                     <input type="number" class="form-control" id="UsageLimit" name="usage_limit" required>
                   </div>
 
@@ -340,7 +340,7 @@ if (isset($_GET['Massage'])) {
 
                   <div class="form-group">
                     <label for="Status">Status</label>
-                    <select class="form-control" id="Status" name="status" required>
+                    <select class="form-control" id="Status" name="status" >
                       <option value="active">Active</option>
                       <option value="expired">Expired</option>
                     </select>
@@ -374,7 +374,7 @@ if (isset($_GET['Massage'])) {
                     <input type="number" class="form-control" id="Value" name="value" required>
                   </div>
                   <div class="form-group">
-                    <label for="usage_limit">Usage Limit</label>
+                    <label for="usage_limit">Per User Usage Limit</label>
                     <input type="number" class="form-control" id="UsageLimit" name="usage_limit" required>
                   </div>
                   <div class="row">
@@ -416,7 +416,7 @@ if (isset($_GET['Massage'])) {
                         <div class="col-md-12">
                         <div class="form-group">
                         <label for="min_order">Minimum Order</label>
-                        <input type="number" class="form-control" id="minOrder" name="min_order" required>
+                        <input type="number" class="form-control" id="minOrder" name="min_order">
                       </div>
                         </div>  
                     </div>
@@ -510,6 +510,27 @@ if (isset($_GET['Massage'])) {
       $('#eligible_users_date').val(eligible_users_date);
       $('#start_date_order').val(start_date_order);
       $('#end_date_order').val(end_date_order);
+     
+      
+      
+           if (start_date_order != '0000-00-00' || end_date_order != '0000-00-00' || min_order != '0') {
+               console.log(start_date_order, end_date_order,min_order)
+            $('#toggleDateFieldss').prop('checked', true);
+            $('#orderBetweenFieldss').show();
+        } else {
+            $('#toggleDateFieldss').prop('checked', false);
+            $('#orderBetweenFieldss').hide();
+        }
+        
+        if (eligible_users_date != '0000-00-00') {
+            $('#toggleEligibleUserr').prop('checked', true);
+            $('#eligibleUserFieldd').show();
+        } else {
+            $('#toggleEligibleUserr').prop('checked', false);
+            $('#eligibleUserFieldd').hide();
+        }
+
+     
     }
   </script>
   <script>

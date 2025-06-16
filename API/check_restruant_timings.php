@@ -74,7 +74,8 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
             echo json_encode([
                 "status" => false,
                 "Response_code" => 204,
-                "Message" => "Restaurant is currently closed."
+                "Message" => "Das Restaurant ist derzeit geschlossen.",
+                "english_message" => "Restaurant is currently closed."
             ]);
             exit;
         }
@@ -109,16 +110,18 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
             $data = [
                 "status" => true,
                 "Response_code" => 200,
-                "Message" => "Restaurant is open right now."
+                "Message" => "Das Restaurant ist gerade geöffnet.",
+                "english_message" => "Restaurant is open right now."
             ];
         } else {
             // Check if restaurant will open later today
             if ($current_time < $start_time_1) {
                 $nextOpen = $start_time_1;
-                $msg = "Restaurant shall be opened today at $nextOpen.";
+                $msg = "Das Restaurant soll heute um eröffnet werden. $nextOpen";
+                $english_msg = "Restaurant shall be opened today at . $nextOpen";
             } elseif ($current_time > $end_time_1 && $current_time < $start_time_2) {
                 $nextOpen = $start_time_2;
-                $msg = "Restaurant shall be opened later today at $nextOpen.";
+                $english_msg = "Das Restaurant wird später heute geöffnet um. $nextOpen";
             } else {
                 // Get next day's timing
                 $next_day = date('l', strtotime(' +1 day'));
@@ -126,13 +129,15 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                 $next_exe = mysqli_query($conn, $next_sql);
                 $next_data = mysqli_fetch_array($next_exe);
                 $nextOpen = $next_data['start_time_1'];
-                $msg = "Restaurant shall be opened tomorrow at $nextOpen.";
+                $msg = "Das Restaurant wird morgen um $nextOpen.";
+                $english_msg = "Restaurant shall be opened tomorrow at $nextOpen.";
             }
 
             $data = [
                 "status" => false,
                 "Response_code" => 203,
-                "Message" => $msg
+                "Message" => $msg,
+                "english_message" => $english_msg
             ];
         }
 

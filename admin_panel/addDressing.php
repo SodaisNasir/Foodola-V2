@@ -231,7 +231,20 @@ $(document).ready(function() {
   var i = 1;
   $('#add').click(function() {
     if (i <= 20) {
-      $('#dynamic_fields').append('<div class="row"><div class="col-sm-6" ><div class="form-group"><input type="text" name="add_dressing[]" class="form-control" placeholder="Add Dressing" required ></div></div></div>')
+$('#dynamic_fields').append(`
+  <div class="row mb-2" id="row-${i}">
+    <div class="col-sm-6">
+      <div class="form-group">
+        <input type="text" name="add_dressing[]" class="form-control" placeholder="Add Dressing" required>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="form-group">
+        <input type="text" name="add_price[]" class="form-control" placeholder="Add Dressing Price" required>
+      </div>
+    </div>
+  </div>
+`);
       i++;
     }
   });

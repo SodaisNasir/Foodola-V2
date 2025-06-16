@@ -54,20 +54,25 @@ $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
                 //   "url" => $upload_url,
                     ];
           $data = ["status"=>true,
-                    "message"=>"your profile has been updated successfully.",
+                    "message"=>"Ihr Profil wurde erfolgreich aktualisiert.",
+                    "english_message" => "your profile has been updated successfully.",
                     "data"=>$temp];
           echo json_encode($data);  
 
       }else{
             $data = ["status"=>false,
-            "message"=>"cannot update your profile"];
+            "message"=>"Ihr Profil kann nicht aktualisiert werden",
+            "english_message" => "cannot update your profile"
+            ];
             echo json_encode($data);   
       }
       
       
   }else{
       $data = ["status"=>false,
-                "message"=>"there was a problem while updating profile"];
+                "message"=>"Beim Aktualisieren des Profils ist ein Problem aufgetreten",
+                "english_message" => "there was a problem while updating profile"
+                ];
       echo json_encode($data);   
   }
   
@@ -94,20 +99,25 @@ $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
                 //   "url" => $upload_url,
                     ];
           $data = ["status"=>true,
-                    "message"=>"your profile has been updated successfully.",
+                    "message"=>"Ihr Profil wurde erfolgreich aktualisiert.",
+                    "english_message" => "your profile has been updated successfully.",
                     "data"=>$temp];
           echo json_encode($data);  
 
       }else{
             $data = ["status"=>false,
-            "message"=>"cannot update your profile"];
+            "message"=>"Ihr Profil kann nicht aktualisiert werden",
+            "english_message" => "cannot update your profile"
+            ];
             echo json_encode($data);   
       }
       
       
   }else{
       $data = ["status"=>false,
-                "message"=>"there was a problem while updating profile"];
+                "message"=>"Beim Aktualisieren des Profils ist ein Problem aufgetreten",
+                "english_message" => "there was a problem while updating profile"
+                ];
       echo json_encode($data);   
   }
      

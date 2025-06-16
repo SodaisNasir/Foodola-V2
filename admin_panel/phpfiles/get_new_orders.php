@@ -48,13 +48,15 @@ if (isset($_SESSION['branch_id'])) {
         }
 
         // Prepare data for the order, including user details (if available)
+        
+        $shipping_cost = number_format((float)$row['Shipping_Cost'], 2, '.', '');
         $temp = [
             "index" => $index,
             "sn" => $index + 1,
             "id" => $row['id'],
             "address" => $address,
             "order_total_price" => $row['order_total_price'],
-            "Shipping_Cost" => $row['Shipping_Cost'],
+            "Shipping_Cost" => $shipping_cost,
             "payment_type" => $row['payment_type'],
             "addtional_notes" => $row['addtional_notes'],
             "branch_id" => $row['branch_id'], // Add branch_id here

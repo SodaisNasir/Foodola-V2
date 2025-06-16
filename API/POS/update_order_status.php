@@ -39,48 +39,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sql = "UPDATE `orders_zee` SET `status` = '$status', `delivered_at` = '$delivered_at' WHERE `id` = $order_id";
     } else if($status == 'delivered') {
         
-            $sql = "UPDATE `orders_zee` SET `status` = '$status' WHERE `id` = '$order_id'";
-            $update = mysqli_query($conn, $sql);
-        
-        
-            $checkcashback = "SELECT * FROM cash_back WHERE status= 1";
+               $checkcashback = "SELECT * FROM cash_back WHERE status = 1";
             $execute = mysqli_query($conn, $checkcashback);
             $row = mysqli_fetch_assoc($execute);
-            $cashback_percentage = $row['cashback_percenatge'];
             
-
-            $order_details = "SELECT SUM(price * qty) AS total_amount FROM order_details_zee WHERE order_id = '$order_id'";
-            $execute_order = mysqli_query($conn, $order_details);
-            $order_row = mysqli_fetch_assoc($execute_order);
-            $total_order_amount =$order_row['total_amount'];
+            if ($row) { // Check if cashback is active
+                $cashback_percentage = $row['cashback_percenatge'];
             
-            $cashback_amount = $total_order_amount * ($cashback_percentage) / 100;
-
-            $sql_user = "SELECT `user_id` FROM `orders_zee` WHERE `id` = '$order_id'";
-            $execute_user = mysqli_query($conn, $sql_user);
-            $row_user = mysqli_fetch_assoc($execute_user);
-            $user_id = $row_user['user_id'];
-            $sqlUpdated = "UPDATE `users` SET `amount` = `amount` + $cashback_amount WHERE `id` = '$user_id'";
-            $amount_added = mysqli_query($conn, $sqlUpdated);
-              
-            $transaction_message = $cashback_amount.'credit to your account ';
-
-            $sql = "INSERT INTO `tbl_transaction`(`user_id`, `transaction_id`, `amount`, `type`, `message`) VALUES ($user_id,NULL,$cashback_amount,'cashback','$transaction_message')";
-            $ex_sql = mysqli_query($conn,$sql);
-
+                // Check if cashback_status is already 1
+                $check_order_status = "SELECT `cashback_status` FROM `orders_zee` WHERE `id` = '$order_id'";
+                $execute_status = mysqli_query($conn, $check_order_status);
+                $order_status_row = mysqli_fetch_assoc($execute_status);
             
             
-            $sql_get_user_token = "SELECT `notification_token` FROM `users` WHERE `id` = '$user_id'";
-            $result = mysqli_query($conn, $sql_get_user_token);
-            $row = mysqli_fetch_assoc($result);
-            $token = $row['notification_token'];
+                // Update order status and set cashback_status to 1
+                $sql = "UPDATE `orders_zee` SET `status` = '$status', `cashback_status` = 1 WHERE `id` = $order_id";
+                $update = mysqli_query($conn, $sql);
+            
+                if ($update) {
+                    // Fetch order total price
+                    $order_details = "SELECT order_total_price FROM orders_zee WHERE `id` = '$order_id'";
+                    $execute_order = mysqli_query($conn, $order_details);
+                    $order_row = mysqli_fetch_assoc($execute_order);
+                    $total_order_amount = $order_row['order_total_price'];
+            
+                    // Calculate cashback amount
+                    $cashback_amount = $total_order_amount * ($cashback_percentage / 100);
+            
+                    // Fetch user ID
+                    $sql_user = "SELECT `user_id` FROM `orders_zee` WHERE `id` = '$order_id'";
+                    $execute_user = mysqli_query($conn, $sql_user);
+                    $row_user = mysqli_fetch_assoc($execute_user);
+                    $user_id = $row_user['user_id'];
+            
+                    // Add cashback to user wallet
+                    $sqlUpdated = "UPDATE `users` SET `amount` = `amount` + $cashback_amount WHERE `id` = '$user_id'";
+                    $amount_added = mysqli_query($conn, $sqlUpdated);
+            
+                    // Insert transaction record
+                    if ($amount_added) {
+                        $transaction_message = $cashback_amount . ' Cashback erhalten für (Bestell-ID: ' . $order_id . ')';
+                        $english_message = $cashback_amount . ' Receive cashback for (order ID: ' . $order_id . ')';
+       
+                        $transaction_id = rand(100000, 999999);
+            
+                        $sql = "INSERT INTO `tbl_transaction`(`user_id`, `transaction_id`, `amount`, `type`, `message`, `english_message`) 
+                                VALUES ('$user_id','$transaction_id','$cashback_amount','credit','$transaction_message', '$english_message')";
+                        $ex_sql = mysqli_query($conn, $sql);
+                    }
+            
+                    // Fetch user's notification token
+                    $sql_get_user_token = "SELECT `notification_token` FROM `users` WHERE `id` = '$user_id'";
+                    $result = mysqli_query($conn, $sql_get_user_token);
+                    $row = mysqli_fetch_assoc($result);
+                    $token = $row['notification_token'];
+                    
+                }
+            }
+            
+              $sql = "UPDATE `orders_zee` SET `status` = '$status' WHERE `id` = $order_id";
+                $update = mysqli_query($conn, $sql);
+
                 
             $content = [
                         "en" => "Sie haben $cashback_amount€ Cashback erhalten! Ihr Guthaben wurde aktualisiert."
                     ];
                     
             $fields = [
-                        'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
+                        'app_id' => "2de883ec-be41-4820-a517-558beee8b0ac",
                         'include_player_ids' => [$token], 
                         'data' => ["foo" => "NewMessage"],
                         'large_icon' => "ic_launcher_round.png",
@@ -93,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json; charset=utf-8',
-            'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'
+            'Authorization: Basic os_v2_app_fxuih3f6ifecbjixkwf652fqvth5cvjs6zyu6x45bxrdyqx6thsko5tkpievvqngjhhkpn6l3n53whqh5xextgwkut3dbjnai26xili'
             ]);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
             curl_setopt($ch, CURLOPT_HEADER, FALSE);
@@ -129,10 +155,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $order_content = getOrderContentMessage($status, $order_id, $delivered_at, $ryder_name);
-        $contentx = ["en" => $order_content];
-        sendNotification($playerIdx, $contentx);
+        $en_content = mysqli_real_escape_string($conn, $order_content['en']);
+        $de_content = mysqli_real_escape_string($conn, $order_content['de']);
+        
+        sendNotification($playerIdx, $de_content);
 
-        $insert_noti_details = "INSERT INTO `notification` (`user_id`, `content`, `purpose`) VALUES ('$get_user_id', '$order_content', 'order')";
+        $insert_noti_details = "INSERT INTO `notification` (`user_id`, `content`,`german_content`,  `purpose`) VALUES ('$get_user_id', '$en_content','$de_content', 'order')";
         mysqli_query($conn, $insert_noti_details);
         
     
@@ -145,7 +173,7 @@ echo json_encode($response);
 
 function sendNotification($playerIds, $content) {
     $fields = [
-        'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
+        'app_id' => "2de883ec-be41-4820-a517-558beee8b0ac",
         'include_player_ids' => $playerIds,
         'data' => ["foo" => "NewMessage", "Id" => "taskid"],
         'large_icon' => "ic_launcher_round.png",
@@ -158,7 +186,7 @@ function sendNotification($playerIds, $content) {
     curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Content-Type: application/json; charset=utf-8',
-        'Authorization: Basic ODU5ZDhiZjAtOWRkZS00NDIyLWI0ZWItOTYxMDc5YzQzMGIz'
+        'Authorization: Basic os_v2_app_fxuih3f6ifecbjixkwf652fqvth5cvjs6zyu6x45bxrdyqx6thsko5tkpievvqngjhhkpn6l3n53whqh5xextgwkut3dbjnai26xili'
     ]);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
     curl_setopt($ch, CURLOPT_HEADER, FALSE);
@@ -172,10 +200,20 @@ function sendNotification($playerIds, $content) {
 
 function getOrderContentMessage($status, $order_id, $delivered_at, $ryder_name) {
     if ($status === 'pending') {
-        return "Ihre Bestellung Nr: $order_id wurde angenommen. Die voraussichtliche Lieferzeit für Ihre Bestellung beträgt $delivered_at.";
+        // return "Ihre Bestellung Nr: $order_id wurde angenommen. Die voraussichtliche Lieferzeit für Ihre Bestellung istgt $delivered_at.";
+         return [
+            "en" => "Your order no: $order_id has been accepted. The expected delivery time is $delivered_at.",
+            "de" => "Ihre Bestellung Nr: $order_id wurde angenommen. Die voraussichtliche Lieferzeit für Ihre Bestellung ist $delivered_at."
+        ];
     } else if ($status === 'shipped') {
-        return "Ihre Bestellung Nr: $order_id ist gewesen $status zum Reiter $ryder_name.";
+        return [
+            "en" => "Your order no: $order_id has been $status to rider $ryder_name.",
+            "de" => "Ihre Bestellung Nr: $order_id ist $status zum Reiter $ryder_name."
+        ];
     } else {
-        return "Ihre Bestellung Nr: $order_id ist gewesen $status.";
+        return [
+            "en" => "Your order no: $order_id has been $status.",
+            "de" => "Ihre Bestellung Nr: $order_id ist $status."
+        ];
     }
 }

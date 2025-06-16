@@ -10,7 +10,7 @@ if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqa
  
     $category_id = $_POST['category_id'];
     
-    $select_user_restuarant = "SELECT * FROM `products` WHERE `sub_category_id` = '$category_id'";   
+$select_user_restuarant = "SELECT * FROM `products` WHERE `sub_category_id` = '$category_id' AND `status` = 'Active' AND `for_deal_only` = '0' ORDER BY `sort_order` ASC";
     $execute_restuarant = mysqli_query($conn,$select_user_restuarant);
     
     if(mysqli_num_rows($execute_restuarant) > 0){

@@ -231,10 +231,10 @@ if (isset($_GET['Massage'])) {
                     </div>
                     <div class="d-flex justify-content-between">
                       <p><strong>Customer Name:</strong> <?php echo htmlspecialchars($customer_name); ?></p>
-                      <p><strong>Total Discount:</strong> <?php echo '€' . $total_discount; ?></p>
+                      <p><strong>Total Discount:</strong> <?php echo '€' . number_format($total_discount, 2); ?></p>
                     </div>
                     <div class="d-flex justify-content-between">
-                      <p><strong>Customer Address:</strong> <?php echo $address_1 . ', ' . $address_2 . ', ' . $postal_code . ', ' . $shipping_area . ', ' . $shipping_city . ', ' . $shipping_state; ?></p>
+                      <p class="w-50"><strong>Customer Address:</strong> <?php echo  $address_2 . ', ' . $postal_code . ', ' . $shipping_area . ', ' . $shipping_city . ', ' . $shipping_state; ?></p>
                       <p><strong>Order Total:</strong> <?php echo '€' . $order_total; ?></p>
                     </div>
                     <div>
@@ -288,7 +288,7 @@ if (isset($_GET['Massage'])) {
                 include_once('connection.php');
                 $order_id = $_GET['order_id'];
 
-                $sql = "SELECT o.id, o.order_total_price, o.addtional_notes, od.id AS order_detail_id, od.order_id, od.deal_id, od.deal_item_id,
+                $sql = "SELECT o.id, o.order_total_price, od.additional_notes, od.id AS order_detail_id, od.order_id, od.deal_id, od.deal_item_id,
                         od.product_id, od.qty, od.addons, od.types, od.dressing, od.product_name, od.price, p.description, p.cost, p.img  
                         FROM `orders_zee` o 
                         INNER JOIN `order_details_zee` od ON od.order_id = o.id 
@@ -361,13 +361,13 @@ if (isset($_GET['Massage'])) {
                             echo "<tr>
                                     <td>" . $index++ . "</td>
                                     <td>" . htmlspecialchars($row['product_name']) . "</td>
-                                    <td>" . (!empty($row['addtional_notes']) ? htmlspecialchars($row['addtional_notes']) : '-') . "</td>
+                                    <td>" . (!empty($row['additional_notes']) ? htmlspecialchars($row['additional_notes']) : '-') . "</td>
                                     <td>" . htmlspecialchars($row['qty']) . "</td>
                                     <td>€" . htmlspecialchars($row['cost']) . "</td>
                                     <td>€" . htmlspecialchars($row['price']) . "</td>
                                     <td>";
 
-                            if (count($addons) > 0) {
+                            if (count($addons) > 0 && !empty($addons)) {
                                 foreach ($addons as $addon) {
                                     echo htmlspecialchars($addon->as_name) . " X " . htmlspecialchars($addon->quantity) . " €" . htmlspecialchars($addon->as_price) . "<br>";
                                 }
@@ -383,13 +383,21 @@ if (isset($_GET['Massage'])) {
                             }
                             echo '€' . htmlspecialchars($total_addon) . "</td><td>";
 
-                            if (is_array($types) && count($types) > 0) {
-                                foreach ($types as $type) {
-                                    echo htmlspecialchars($type->ts_name) . " ";
-                                }
-                            } else {
-                                echo "No types available.";
-                            }
+                         if (is_array($types) && !empty($types)) {
+    $hasValidType = false;
+    foreach ($types as $type) {
+        if (!empty($type->ts_name)) {
+            echo htmlspecialchars($type->ts_name) . " ";
+            $hasValidType = true;
+        }
+    }
+
+    if (!$hasValidType) {
+        echo "No types available.";
+    }
+} else {
+    echo "No types available.";
+}
 
                             echo "</td><td>";
 
@@ -417,6 +425,7 @@ if (isset($_GET['Massage'])) {
                                                 <tr>
                                                     <th>S No.</th>
                                                     <th>Deal Name</th>
+                                                    <th>Additional Notes</th>
                                                     <th>Deal Item Name</th>
                                                     <th>Product Name</th>
                                                     <th>Cost</th>
@@ -448,13 +457,14 @@ if (isset($_GET['Massage'])) {
                             echo "<tr>
                                     <td>" . $index++ . "</td>
                                     <td>" . htmlspecialchars($deal_d['deal_name']) . "</td>
+                                    <td>" . (!empty($row['additional_notes']) ? htmlspecialchars($row['additional_notes']) : '-') . "</td>
                                     <td>" . htmlspecialchars($deal_item['di_title']) . "</td>
                                     <td>" . htmlspecialchars($row['product_name']) . "</td>
                                     <td>€" . htmlspecialchars($deal_d['deal_cost']) . "</td>
                                     <td>€" . htmlspecialchars($deal_d['deal_price']) . "</td>
                                     <td>";
 
-                            if (is_array($addons)) {
+                            if (is_array($addons) && !empty($addons)) {
                                 foreach ($addons as $addon) {
                                     echo htmlspecialchars($addon->as_name) . " X " . htmlspecialchars($addon->quantity) . " €" . htmlspecialchars($addon->as_price) . "<br>";
                                 }
@@ -473,7 +483,7 @@ if (isset($_GET['Massage'])) {
                             }
                             echo '€' . htmlspecialchars($val_addon_total) . "</td><td>";
 
-                            if (is_array($types)) {
+                            if (is_array($types) && !empty($types)) {
                                 foreach ($types as $type) {
                                     echo htmlspecialchars($type->ts_name);
                                 }
@@ -483,7 +493,7 @@ if (isset($_GET['Massage'])) {
 
                             echo "</td><td>";
 
-                            if (is_array($dressings)) {
+                            if (is_array($dressings) && !empty($dressings)) {
                                 foreach ($dressings as $dressing) {
                                     echo htmlspecialchars($dressing->dressing_name);
                                 }

@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   $user_id = $_POST['user_id'];
   $name = $_POST['name'];
+  $username = $_POST['user_name'];
   $phone = $_POST['phone'];
   $Shipping_address = $_POST['Shipping_address'];
   $Shipping_address_2 = $_POST['Shipping_address_2'];
@@ -44,14 +45,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $total_metto_tax = $_POST['total_metto_tax'];
   $order_status = $_POST['order_status'] ?? 'neworder';
   $order_type = $_POST['order_type'];
-  $wallet_balance = $_POST['total_discount'];
-  $total_discount = $_POST['wallet_balance'];
-
-
+  $total_discount = $_POST['total_discount'];
+  $wallet_balance = $_POST['wallet_balance'];
+  $payment_method = $_POST['payment_method'];
+  $transaction_id = $_POST['transaction_id'];
+  $platform = $_POST['platform'];
+$ordersheduletype = $_POST['ordersheduletype'];
+$sheduletime = $_POST['sheduletime'] . ":00";
+  
+  
+    date_default_timezone_set('Europe/Berlin');
+    $datetime = date('Y-m-d H:i:s', time());
 
   if ($tbl_id) {
-    $sql_order = "INSERT INTO `orders_zee`(`table_id`, `status`, `payment_type`, `order_total_price`, `payment_status`, `branch_id`, `total_netto_tax`,`total_metto_tax`, `order_type` ) 
-                  VALUES ('$tbl_id', '$order_status', '$payment_type', '$total_amount', '$paymentstatus', '$branch_id', '$total_netto_tax', '$total_metto_tax', '$order_type')";
+    $sql_order = "INSERT INTO `orders_zee`(`table_id`, `status`, `payment_type`, `order_total_price`, `payment_status`, `branch_id`, `total_netto_tax`,`total_metto_tax`, `order_type`, `platform` ) 
+                  VALUES ('$tbl_id', '$order_status', '$payment_type', '$total_amount', '$paymentstatus', '$branch_id', '$total_netto_tax', '$total_metto_tax', '$order_type', '$platform')";
     $result_order = mysqli_query($conn, $sql_order);
 
     if ($result_order) {
@@ -85,8 +93,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $sql_getpro = "SELECT * FROM `products` WHERE `id` = '$product_id'";
                 $ex_get_pro = mysqli_query($conn,$sql_getpro);
                 $product = mysqli_fetch_array($ex_get_pro);
-                $pro_name = $product['name'];
-                  $pro_decs = $product['description'];
+                $pro_name = mysqli_real_escape_string($conn, $product['name']);
+                $pro_decs = mysqli_real_escape_string($conn, $product['description']);
 
                 $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`, `product_name`,`product_description`,  `qty`, `cost`, `price`, `addons`, `types`, `dressing`, `no_of_deal`) 
                                                      VALUES ('$last_order_id', '$deal_id', '$item_id', '$product_id', '$pro_name','$pro_decs', '$deal_qty', '$cost', '$price', '$addons', '$types', '$dressing', '$no_of_deal')";
@@ -123,8 +131,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sql_getpro = "SELECT * FROM `products` WHERE `id` = '$product_id'";
             $ex_get_pro = mysqli_query($conn,$sql_getpro);
             $product = mysqli_fetch_array($ex_get_pro);
-            $pro_name = $product['name'];
-              $pro_decs = $product['description'];
+            $pro_name = mysqli_real_escape_string($conn, $product['name']);
+            $pro_decs = mysqli_real_escape_string($conn, $product['description']);
 
             $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`, `product_description` ,`qty`, `cost`, `price`, `addons`, `types`, `dressing`) 
                                              VALUES ('$last_order_id', '$product_id', '$pro_name','$pro_decs','$product_qty', '$cost', '$price', '$product_addons', '$product_types', '$product_dressing')";
@@ -167,11 +175,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       echo json_encode(["statusCode" => 201, "message" => "Failed to create order", "error" => mysqli_error($conn)]);
     }
   } elseif (!empty($name)) {
-
-
     // Check if the user already exists
     $check_user = "SELECT `id`, `phone` FROM `users` WHERE `phone` = '$phone'";
     $result_check_user = mysqli_query($conn, $check_user);
+    
+    
     if (mysqli_num_rows($result_check_user) > 0) {
       echo json_encode(array("statusCode" => 201, "message" => "User already exists"));
     } else {
@@ -182,24 +190,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       if ($result_user) {
         $last_user_id = $conn->insert_id;
-
-        $check_address_sql = "SELECT COUNT(*) AS address_count FROM `user_addresses` 
-            WHERE `user_id` = '$last_user_id' 
-            AND `address` = '$newaddress' 
-            AND `Shipping_address` = '$Shipping_address'
-            AND `Shipping_address_2` = '$Shipping_address_2'
-            AND `Shipping_city` = '$Shipping_city'
-            AND `Shipping_area` = '$Shipping_area'
-            AND `Shipping_postal_code` = '$Shipping_postal_code'
-            AND `Shipping_state` = '$Shipping_state'";
-
-        $check_address_result = mysqli_query($conn, $check_address_sql);
-        $address_exists = mysqli_fetch_assoc($check_address_result)['address_count'] > 0;
-
-        if (!$address_exists) {
-          $sql_address = "INSERT INTO `user_addresses`(`user_id`, `address`, `Shipping_address`,`Shipping_address_2`, `Shipping_city`,`Shipping_area`, `Shipping_postal_code`, `Shipping_state`,`created_at`, `updated_at`) VALUES ('$user_id', '$newaddress','$Shipping_address', '$Shipping_address_2', '$Shipping_city','$Shipping_area', '$Shipping_postal_code', '$Shipping_state', 'NOW()', 'NOW()')";
-          $execute = mysqli_query($conn, $sql_address);
-        }
 
         if ($wallet_balance) {
           $sql_check_wallet = "SELECT `amount` FROM `users` WHERE `id` = '$user_id'";
@@ -243,56 +233,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Insert order details
         $sql_order = "INSERT INTO `orders_zee`(`user_id`, `status`, `payment_type`, `order_total_price`, `payment_status`, `Shipping_address`, `Shipping_address_2`, 
-                            `Shipping_city`, `Shipping_postal_code`, `Shipping_Cost`, `branch_id`, `addtional_notes`, `total_netto_tax`, `total_metto_tax`, `total_discount`) 
-                          VALUES ($last_user_id, '$order_status', '$payment_type', '$total_amount', 
-                            '$paymentstatus', '$Shipping_address', '$Shipping_address_2', 
-                            '$Shipping_city', '$Shipping_postal_code', '$shipping_cost', '$branch_id', '$additional_notes', '$total_netto_tax', '$total_metto_tax', '$total_discount')";
+                            `Shipping_city`, `Shipping_postal_code`, `Shipping_Cost`, `branch_id`, `addtional_notes`, `total_netto_tax`, `total_metto_tax`, `total_discount`,`payment_method`, `transaction_id`, `platform`, `ordersheduletype`, `sheduletime`) 
+                          VALUES ($last_user_id, '$order_status', '$payment_type', '$total_amount', '$paymentstatus', '$Shipping_address', '$Shipping_address_2', 
+                            '$Shipping_city', '$Shipping_postal_code', '$shipping_cost', '$branch_id', '$additional_notes', '$total_netto_tax', '$total_metto_tax', '$total_discount', '$payment_method', '$transaction_id', '$platform','$ordersheduletype', '$sheduletime')";
 
         $result_order = mysqli_query($conn, $sql_order);
 
         if ($result_order) {
 
-          $last_order_id = $conn->insert_id;
-          
-          
-                $order_sql = "
-    SELECT orders.id, orders.user_id, orders.Shipping_address, orders.Shipping_address_2, orders.Shipping_city, 
-           orders.Shipping_area, orders.payment_type, orders.Shipping_state, orders.Shipping_postal_code, 
-           orders.order_total_price, orders.Shipping_Cost, orders.created_at, orders.addtional_notes, orders.status, 
-           users.name AS user_name, users.email AS user_email, users.phone AS user_phone
-    FROM `orders_zee` AS orders
-    INNER JOIN users AS users ON orders.user_id = users.id
-    WHERE orders.id = '$last_order_id'
-";
-$order_result = mysqli_query($conn, $order_sql);
-
-
-$order_info = [];
-
-// Check if the query was successful
-if ($order_result) {
-    $order_Data = mysqli_fetch_assoc($order_result);
-
-    // Optional: If you want to format the address
-    $address = $order_Data['Shipping_address'] . " " . $order_Data['Shipping_address_2'] . " " . $order_Data['Shipping_city'] . " " . 
-               $order_Data['Shipping_area'] . " " . $order_Data['Shipping_state'] . " " . $order_Data['Shipping_postal_code'];
-
-    // Prepare final data structure
-    $order_info = [
-        'id' => $order_Data['id'],
-        'order_total_price' => $order_Data['order_total_price'],
-        'Shipping_Cost' => $order_Data['Shipping_Cost'],
-        'created_at' => $order_Data['created_at'],
-        'status' => $order_Data['status'],
-        'address' => $address,
-        'name' => $order_Data['user_name'],
-        'additional_notes' => $order_Data['addtional_notes'],
-        'payment_type' => $order_Data['payment_type']
-    ];
-
-    
-} 
-  
+            $last_order_id = $conn->insert_id;
           
           $no_of_deal = 1;
 
@@ -322,8 +271,8 @@ if ($order_result) {
                      $sql_getpro = "SELECT * FROM `products` WHERE `id` = '$product_id'";
                                 $ex_get_pro = mysqli_query($conn,$sql_getpro);
                                 $product = mysqli_fetch_array($ex_get_pro);
-                                $pro_name = $product['name'];
-                                $pro_decs = $product['description'];
+                             $pro_name = mysqli_real_escape_string($conn, $product['name']);
+                                $pro_decs = mysqli_real_escape_string($conn, $product['description']);
 
                     $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`, `product_description`, `qty`, `cost`, `price`, `addons`, `types`, `dressing`, `no_of_deal`) 
                                                              VALUES ('$last_order_id', '$deal_id', '$item_id', '$product_id', '$pro_name', '$pro_decs', '$deal_qty', '$cost', '$price', '$addons', '$types', '$dressing', '$no_of_deal')";
@@ -358,8 +307,8 @@ if ($order_result) {
                 $sql_getpro = "SELECT * FROM `products` WHERE `id` = '$product_id'";
                 $ex_get_pro = mysqli_query($conn,$sql_getpro);
                 $product = mysqli_fetch_array($ex_get_pro);
-                $pro_name = $product['name'];
-                $pro_decs = $product['description'];
+                $pro_name = mysqli_real_escape_string($conn, $product['name']);
+                $pro_decs = mysqli_real_escape_string($conn, $product['description']);
 
                 $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`,`product_description`, `qty`, `cost`, `price`, `addons`, `types`, `dressing`) 
                                                      VALUES ('$last_order_id', '$product_id', '$pro_name','$pro_decs', '$product_qty', '$cost', '$price', '$product_addons', '$product_types', '$product_dressing')";
@@ -375,9 +324,36 @@ if ($order_result) {
               }
             }
           }
+          
+         
+          
           echo json_encode(array("statusCode" => 200, "message" => "Order created successfully", "order_id" => $last_order_id));
           
+             $sql_user = "SELECT * FROM `users` WHERE `id` = '$user_id'";
+            $exec_sql_user = mysqli_query($conn, $sql_user);
+            
+            if ($exec_sql_user && mysqli_num_rows($exec_sql_user) > 0) {
+                $user = mysqli_fetch_array($exec_sql_user, MYSQLI_ASSOC);
+            }
+
+        
           
+            $address = $Shipping_address . " " . $Shipping_address_2 . " " . $Shipping_city . " " . $Shipping_area . " " . $Shipping_state . " " . $Shipping_postal_code;
+
+            $order_info = [
+                'id' => $last_order_id,
+                'order_total_price' => $total_amount,
+                'Shipping_Cost' => $shipping_cost,
+                'address' => $address,
+                'additional_notes' => $additionalNotes,
+                'payment_type' => $payment_type,
+                'status' => "neworder",
+                'created_at' => $datetime,
+                'name' => $user['name'],
+                "order_type" => $order_type
+            ];
+
+  
              try {
                     // configure Pusher
                     $options = [
@@ -393,7 +369,7 @@ if ($order_result) {
                     );
                 
                     // prepare notification
-                    $channel = 'orders'; // Channel name dynamically based on user ID
+                    $channel = 'burgerpoint_orders'; // Channel name dynamically based on user ID
                     $event   = 'new_order';
                     $data    = [
                         'order_id' => $last_order_id,
@@ -475,85 +451,24 @@ if ($order_result) {
 
     $sql_update_user = "UPDATE `users` SET `street` = '$street', `postal_code` = '$Shipping_postal_code', `city` = '$Shipping_city', `house_no` = '$House_number'WHERE `id` = $user_id";
     $result_user = mysqli_query($conn, $sql_update_user);
-    if ($result_user) {
-
-      $check_address_sql = "SELECT COUNT(*) AS address_count FROM `user_addresses` 
-      WHERE `user_id` = '$user_id' 
-      AND `address` = '$newaddress' 
-      AND `Shipping_address` = '$Shipping_address'
-      AND `Shipping_address_2` = '$Shipping_address_2'
-      AND `Shipping_city` = '$Shipping_city'
-      AND `Shipping_area` = '$Shipping_area'
-      AND `Shipping_postal_code` = '$Shipping_postal_code'
-      AND `Shipping_state` = '$Shipping_state'";
-
-      $check_address_result = mysqli_query($conn, $check_address_sql);
-      $address_exists = mysqli_fetch_assoc($check_address_result)['address_count'] > 0;
-
-      if (!$address_exists) {
-        $sql_address = "INSERT INTO `user_addresses`(`user_id`, `address`, `Shipping_address`,`Shipping_address_2`, `Shipping_city`,`Shipping_area`, `Shipping_postal_code`, `Shipping_state`,`created_at`, `updated_at`) VALUES ('$user_id', '$newaddress','$Shipping_address', '$Shipping_address_2', '$Shipping_city','$Shipping_area', '$Shipping_postal_code', '$Shipping_state', 'NOW()', 'NOW()')";
-        $execute = mysqli_query($conn, $sql_address);
-      }
-    } else {
-      echo json_encode(array("statusCode" => 201, "message" => "Failed to update user", "error" => mysqli_error($conn)));
-      exit;
+    
+    if (!$result_user) {
+         echo json_encode(array("statusCode" => 201, "message" => "Failed to update user", "error" => mysqli_error($conn)));
     }
 
 
     $sql = "INSERT INTO `orders_zee`(`user_id`, `status`, `payment_type`, `order_total_price`, 
                     `payment_status`, `Shipping_address`, `Shipping_address_2`, 
-                    `Shipping_city`, `Shipping_postal_code`, `Shipping_Cost`,`branch_id`, `addtional_notes`, `total_netto_tax`, `total_metto_tax`, `order_type`, `total_discount`) 
+                    `Shipping_city`, `Shipping_postal_code`, `Shipping_Cost`,`branch_id`, `addtional_notes`, `total_netto_tax`, `total_metto_tax`, `order_type`, `total_discount`, `payment_method`, `transaction_id`, `platform`, `ordersheduletype`, `sheduletime`) 
             VALUES ($user_id, '$order_status', '$payment_type', '$total_amount', 
                     '$paymentstatus', '$Shipping_address', '$Shipping_address_2', 
-                    '$Shipping_city', '$Shipping_postal_code', '$shipping_cost', '$branch_id', '$additional_notes', '$total_netto_tax', '$total_metto_tax', '$order_type', '$total_discount')";
+                    '$Shipping_city', '$Shipping_postal_code', '$shipping_cost', '$branch_id', '$additional_notes', '$total_netto_tax', '$total_metto_tax', '$order_type', '$total_discount', '$payment_method', '$transaction_id', '$platform','$ordersheduletype', '$sheduletime')";
+                    
     $result = mysqli_query($conn, $sql);
 
     if ($result) {
-
-
       $last_order_id = $conn->insert_id;
-      
-            $order_sql = "
-    SELECT orders.id, orders.user_id, orders.Shipping_address, orders.Shipping_address_2, orders.Shipping_city, 
-           orders.Shipping_area, orders.payment_type, orders.Shipping_state, orders.Shipping_postal_code, 
-           orders.order_total_price, orders.Shipping_Cost, orders.created_at, orders.addtional_notes, orders.status, 
-           users.name AS user_name, users.email AS user_email, users.phone AS user_phone
-    FROM `orders_zee` AS orders
-    INNER JOIN users AS users ON orders.user_id = users.id
-    WHERE orders.id = '$last_order_id'
-";
-$order_result = mysqli_query($conn, $order_sql);
 
-
-$order_info = [];
-
-// Check if the query was successful
-if ($order_result) {
-    $order_Data = mysqli_fetch_assoc($order_result);
-
-    // Optional: If you want to format the address
-    $address = $order_Data['Shipping_address'] . " " . $order_Data['Shipping_address_2'] . " " . $order_Data['Shipping_city'] . " " . 
-               $order_Data['Shipping_area'] . " " . $order_Data['Shipping_state'] . " " . $order_Data['Shipping_postal_code'];
-
-    // Prepare final data structure
-    $order_info = [
-        'id' => $order_Data['id'],
-        'order_total_price' => $order_Data['order_total_price'],
-        'Shipping_Cost' => $order_Data['Shipping_Cost'],
-        'created_at' => $order_Data['created_at'],
-        'status' => $order_Data['status'],
-        'address' => $address,
-        'name' => $order_Data['user_name'],
-        'additional_notes' => $order_Data['addtional_notes'],
-        'payment_type' => $order_Data['payment_type']
-    ];
-
-    
-} 
-  
-      
-      
-      
       $no_of_deal = 1;
       foreach ($order_details as $details) {
         if ($details['is_deal'] == "yes") {
@@ -582,8 +497,8 @@ if ($order_result) {
                 $sql_getpro = "SELECT * FROM `products` WHERE `id` = '$product_id'";
                 $ex_get_pro = mysqli_query($conn,$sql_getpro);
                 $product = mysqli_fetch_array($ex_get_pro);
-                $pro_name = $product['name'];
-                $pro_decs = $product['description'];
+                $pro_name = mysqli_real_escape_string($conn, $product['name']);
+                $pro_decs = mysqli_real_escape_string($conn, $product['description']);
 
                 $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`, `product_name`,`product_description`, `qty`, `cost`, `price`, `addons`, `types`, `dressing`, `no_of_deal`) 
                                                              VALUES ('$last_order_id', '$deal_id', '$item_id', '$product_id','$pro_name','$pro_decs', '$deal_qty', '$cost', '$price', '$addons', '$types', '$dressing', '$no_of_deal')";
@@ -619,8 +534,8 @@ if ($order_result) {
             $sql_getpro = "SELECT * FROM `products` WHERE `id` = '$product_id'";
             $ex_get_pro = mysqli_query($conn,$sql_getpro);
             $product = mysqli_fetch_array($ex_get_pro);
-            $pro_name = $product['name'];
-            $pro_decs = $product['description'];
+            $pro_name = mysqli_real_escape_string($conn, $product['name']);
+            $pro_decs = mysqli_real_escape_string($conn, $product['description']);
 
 
             $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`,`product_description`, `qty`, `cost`, `price`, `addons`, `types`, `dressing`) 
@@ -638,11 +553,37 @@ if ($order_result) {
           }
         }
       }
+      
+     echo json_encode(array("statusCode" => 200, "message" => "Order created successfully", "order_id" => $last_order_id));
+      
 
-      echo json_encode(array("statusCode" => 200, "message" => "Order created successfully", "order_id" => $last_order_id));
-      
-      
-      
+    $address = $Shipping_address . " " . $Shipping_address_2 . " " . $Shipping_city . " " . $Shipping_area . " " . $Shipping_state . " " . $Shipping_postal_code;
+    
+    
+              $sql_user = "SELECT * FROM `users` WHERE `id` = '$user_id'";
+            $exec_sql_user = mysqli_query($conn, $sql_user);
+            
+            if ($exec_sql_user && mysqli_num_rows($exec_sql_user) > 0) {
+                $user = mysqli_fetch_array($exec_sql_user, MYSQLI_ASSOC);
+            }
+
+        
+
+            $order_info = [
+                'id' => $last_order_id,
+                'order_total_price' => $total_amount,
+                'Shipping_Cost' => $shipping_cost,
+                'address' => $address,
+                'additional_notes' => $additionalNotes,
+                'payment_type' => $payment_type,
+                'status' => "neworder",
+                'created_at' => $datetime,
+                'name' => $user['name'],
+                "order_type" => $order_type
+            ];
+            
+            
+            
          try {
                     // configure Pusher
                     $options = [
@@ -651,14 +592,14 @@ if ($order_result) {
                     ];
                 
                     $pusher = new Pusher(
-                        'a1964c3ac950c1a0cdf5',    // App key from Pusher dashboard
-                        'a711ec3a4b827eb6bcc5', // App secret from Pusher dashboard
-                        '1982652',     // App ID from Pusher dashboard
+                        'a1964c3ac950c1a0cdf5',    // App key 
+                        'a711ec3a4b827eb6bcc5', // App secret 
+                        '1982652',     // App ID from Pusher 
                         $options
                     );
                 
                     // prepare notification
-                    $channel = 'orders'; // Channel name dynamically based on user ID
+                    $channel = 'burgerpoint_orders'; // Channel name 
                     $event   = 'new_order';
                     $data    = [
                         'order_id' => $last_order_id,
@@ -674,16 +615,12 @@ if ($order_result) {
                     //     echo "Failed to trigger notification.";
                     // }
                     
-                } catch (Exception $e) {
+        } catch (Exception $e) {
                     // Handle Pusher error
-                    error_log("Pusher error: " . $e->getMessage());
+                    // error_log("Pusher error: " . $e->getMessage());
                     echo "Error triggering notification: " . $e->getMessage();
-                }
+        }
                     
-     
-        
-      
-      
     } else {
       echo json_encode(array("statusCode" => 201, "message" => "Failed to create order", "error" => mysqli_error($conn)));
     }

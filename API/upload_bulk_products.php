@@ -43,36 +43,9 @@ while (($data = fgetcsv($handle, 1000, ',')) !== false) {
     $features        = mysqli_real_escape_string($conn, $row['features']);
     $img             = mysqli_real_escape_string($conn, $row['img']);
 
-    // Check if addon_id exists to decide insert or update
-    $checkQuery = "SELECT id FROM products WHERE addon_id = '$addon_id'";
-    $checkResult = mysqli_query($conn, $checkQuery);
 
-    if (mysqli_num_rows($checkResult) > 0) {
-        // Update existing
-        $updateQuery = "UPDATE products SET 
-            type_id = '$type_id',
-            dressing_id = '$dressing_id',
-            sub_category_id = '$sub_category_id',
-            name = '$name',
-            sku_id = '$sku_id',
-            description = '$description',
-            cost = '$cost',
-            price = '$price',
-            discount = '$discount',
-            qty = '$qty',
-            tax = '$tax',
-            features = '$features',
-            img = '$img'
-            WHERE addon_id = '$addon_id'";
-
-        if (mysqli_query($conn, $updateQuery)) {
-            $updated++;
-        }
-    } else {
         // Insert new
-        $insertQuery = "INSERT INTO products (
-            addon_id, type_id, dressing_id, sub_category_id, name, sku_id,
-            description, cost, price, discount, qty, tax, features, img
+        $insertQuery = "INSERT INTO products (addon_id, type_id, dressing_id, sub_category_id, name, sku_id,description, cost, price, discount, qty, tax, features, img
         ) VALUES (
             '$addon_id', '$type_id', '$dressing_id', '$sub_category_id', '$name', '$sku_id',
             '$description', '$cost', '$price', '$discount', '$qty', '$tax', '$features', '$img'
@@ -81,14 +54,14 @@ while (($data = fgetcsv($handle, 1000, ',')) !== false) {
         if (mysqli_query($conn, $insertQuery)) {
             $inserted++;
         }
-    }
+    
 }
 
 fclose($handle);
 
 echo json_encode([
     'status' => 'success',
-    'message' => "Upload completed. Inserted: $inserted, Updated: $updated."
+    'message' => "products added successfully",
 ]);
 exit;
 ?>

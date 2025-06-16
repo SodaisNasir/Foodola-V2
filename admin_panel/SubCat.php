@@ -4,9 +4,9 @@
 <?php
 
 if (isset($_GET['Massage'])) {
-    if ($_GET['Massage'] == 'Sucessfully updated sub category.') {
+    if ($_GET['Massage'] == 'Successfully updated sub category') {
         header("Refresh: 3; url='SubCat.php'");
-        echo "<script>alert('Sucessfully updated sub category.')</script>";
+        echo "<script>alert('Successfully updated sub category')</script>";
     } else {
         echo "<script>alert('The was some error occured!')</script>";
     }
@@ -74,6 +74,18 @@ if (isset($_GET['Massage'])) {
         cursor: pointer;
 
     }
+    
+      #sortableBody tr {
+    cursor: move;
+  }
+  .drag-handle {
+    cursor: grab;
+    font-size: 18px;
+    user-select: none;
+  }
+  .drag-handle:active {
+    cursor: grabbing;
+  }
 </style>
 
 <head>
@@ -174,9 +186,31 @@ if (isset($_GET['Massage'])) {
                     <div class="row">
                         <div class="col-12">
                             <div class="card">
-                                <div class="card-header">
+                              <div class="card-header">
                                     <h4 class="card-title">Manage Sub Category</h4>
+                                
+                                 <?php 
+                                    include("connection.php");
+                                    
+                                    $sql = "SELECT * FROM categories";
+                                    $exec_sql = mysqli_query($conn, $sql);
+                                    
+                                    echo "<div class='mb-2'>";
+                                    echo "<label><strong>Select Category</strong></label>"; 
+                                    echo "<select id='categorySelect' class='form-control status-select' style='width: 200px; display: inline-block; margin-left: 10px;'>";
+                                    echo "<option value=''>-- Select Category --</option>";
+                                    
+                                    while ($row = mysqli_fetch_array($exec_sql)) {
+                                        echo "<option value='{$row['id']}'>{$row['name']}</option>";
+                                    }
+                                    
+                                    echo "</select>";
+                                    echo "</div>";
+                                ?>
+
+
                                 </div>
+
 
                                 <div class="card-content">
                                     <div class="card-body card-dashboard">
@@ -184,7 +218,8 @@ if (isset($_GET['Massage'])) {
                                         <div class="table-responsive">
                                             <table id="example" class="table">
                                                 <thead>
-                                                    <tr>
+                                                    <tr data-id='{$id}'>
+                                                        <th>☰</th>
                                                         <th>S no.</th>
                                                         <th>Cateogry ID</th>
                                                         <th>Category Name</th>
@@ -192,19 +227,21 @@ if (isset($_GET['Massage'])) {
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
+                                                <tbody id="sortableBody">
                                                     <?php
                                                     include_once('connection.php');
-                                                    $sql = "SELECT `id`, `category_id`, `name`, `img`, `created_at`, `updated_at` FROM `sub_categories`";
+                                                    $sql = "SELECT `id`, `category_id`, `name`, `img`, `created_at`, `updated_at`, `sort_order` FROM `sub_categories` ORDER BY `sort_order` ASC  ";
                                                     $result = mysqli_query($conn, $sql);
+                                                    
                                                     $index = 0;
                                                     while ($row = mysqli_fetch_array($result)) {
+                                                         $id  = $row['id'];
                                                         $sn = $index + 1;
-                                                        echo "<tr>";
+                                                        echo "<tr data-id='{$id}'>";
+                                                        echo "<td class='drag-handle'>☰</td>";
                                                         echo "<td>{$sn}</td>";
                                                         echo "<td>{$row['id']}</td>";
                                                         echo "<td name='tittlename'>{$row['name']}</td>";
-
                                                         echo "<td name='subname'>{$row['created_at']}</td>";
 
                                                         echo '<td><button class="btn btn-primary m-1" onclick="openAddMore(\'' . $row['id'] . '\' ,\'' . $row['name'] . '\' ,\'' . $row['created_at'] . '\')">Update</button>';
@@ -352,9 +389,12 @@ if (isset($_GET['Massage'])) {
     <script src="app-assets/js/scripts/datatables/datatable.min.js"></script>
     <!-- END: Page JS-->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
     <script>
         $(document).ready(function() {
+            
+            
             // Update subcategory image
             $("#updateImageForm").submit(function(e) {
                 e.preventDefault();
@@ -466,6 +506,47 @@ if (isset($_GET['Massage'])) {
                 }
             };
         }
+        
+        
+        
+        
+        
+        
+document.addEventListener('DOMContentLoaded', () => {
+  const tbody = document.getElementById('sortableBody');
+
+    Sortable.create(document.getElementById('sortableBody'), {
+  animation: 150,
+  handle: '.drag-handle', // restrict drag to handle only
+  onEnd: function (evt) {
+    const newOrder = [];
+    document.querySelectorAll('#sortableBody tr').forEach((row, index) => {
+      newOrder.push({ id: row.dataset.id, position: index + 1 });
+    });
+
+    // Optionally send to server:
+    sendOrderToServer(newOrder);
+  }
+});
+});
+
+
+function sendOrderToServer(orderArray) {
+  fetch('../API/update_sub_category_order.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ order: orderArray })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert(data.message);
+    } else {
+      alert('Failed to update order');
+    }
+  });
+}
+
     </script>
     <script>
         $(document).ready(function() {
@@ -480,6 +561,55 @@ if (isset($_GET['Massage'])) {
             });
         });
     </script>
+    <script>
+        $('#categorySelect').on('change', function () {
+    const categoryId = $(this).val();
+
+    if (categoryId) {
+        $.ajax({
+            url: '../API/sub_categories.php',
+            method: 'POST',
+            data: {
+                token: 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC',
+                main_category_id: categoryId
+            },
+            success: function (response) {
+                const res = JSON.parse(response);
+
+                if (res.status && res.Data.length > 0) {
+                    let html = '';
+                    res.Data.forEach((item, index) => {
+                        html += `
+                            <tr data-id="${item.id}">
+                                <td class="drag-handle">☰</td>
+                                <td>${index + 1}</td>
+                                <td>${item.category_id}</td>
+                                <td name='tittlename'>${item.name}</td>
+                                <td name='subname'>${item.created_at}</td>
+                                <td>
+                                    <button class="btn btn-primary m-1" onclick="openAddMore('${item.id}', '${item.name}', '${item.created_at}')">Update</button>
+                                    <button class="btn btn-light" onclick="openimagemodel(${item.id}, ${index})">Update Image</button>
+                                </td>
+                            </tr>`;
+                    });
+                    $('#sortableBody').html(html);
+                } else {
+                    $('#sortableBody').html('<tr><td colspan="6">No subcategories found.</td></tr>');
+                }
+            },
+            error: function () {
+                alert("Failed to fetch subcategories.");
+            }
+        });
+    } else {
+        $('#sortableBody').html('');
+    }
+});
+
+    </script>
+
+
+
 </body>
 <!-- END: Body-->
 

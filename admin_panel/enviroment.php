@@ -2,42 +2,89 @@
 
 <?php 
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
 
  include_once('connection.php');
- $sql = "SELECT key_name, key_value FROM enviroments";
- $result = mysqli_query($conn,$sql);
+//  $sql = "SELECT key_name, key_value, mode FROM enviroments";
+//  $result = mysqli_query($conn,$sql);
 
-  $apiKeys = [];
-  if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-      $apiKeys[] = $row;
-    }
-  }
+//   $apiKeys = [];
+//   if ($result->num_rows > 0) {
+//     while ($row = $result->fetch_assoc()) {
+//       $apiKeys[] = $row;
+//     }
+//   }
   
   
   
-   if (isset($_POST['submit'])) {
-    foreach ($_POST as $key => $value) {
-      if ($key !== 'submit') {
+//   if (isset($_POST['submit'])) {
+//     foreach ($_POST as $key => $value) {
+//       if ($key !== 'submit') {
 
-        $key = $conn->real_escape_string($key);
-        $value = $conn->real_escape_string($value);
+//         $key = $conn->real_escape_string($key);
+//         $value = $conn->real_escape_string($value);
         
-        $updateSql = "UPDATE enviroments SET key_value = '$value' WHERE key_name = '$key'";
-        $result  = mysqli_query($conn,$updateSql);
-        if ($result === true) {
-            header('location:enviroment.php');
-        } else {
-              echo "Error updating record: " . $conn->error;
+//         $updateSql = "UPDATE enviroments SET key_value = '$value' WHERE key_name = '$key'";
+//         $result  = mysqli_query($conn,$updateSql);
+//         if ($result === true) {
+//             header('location:enviroment.php');
+//         } else {
+//               echo "Error updating record: " . $conn->error;
+//         }
+//       }
+//     }
+//   }
+  
+  
+  $currentMode = 0;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $currentMode = isset($_POST['mode']) && $_POST['mode'] === '1' ? 1 : 0;
+
+    // Update all key values
+    foreach ($_POST as $key => $value) {
+        if ($key !== 'submit' && $key !== 'mode') {
+            $safeKey = mysqli_real_escape_string($conn, $key);
+            $safeValue = mysqli_real_escape_string($conn, $value);
+            $query = "UPDATE enviroments SET key_value = '$safeValue' WHERE key_name = '$safeKey' AND mode = $currentMode";
+            mysqli_query($conn, $query);
         }
-      }
     }
-  }
-  
-  
-  
+
+    // Optionally: update all rows' mode if you want to switch mode globally
+    mysqli_query($conn, "UPDATE enviroments SET mode = $currentMode");
+}
+
+// Load data from DB
+// $sql = "SELECT key_name, key_value, mode FROM enviroments";
+// $result = mysqli_query($conn, $sql);
+
+// $apiKeys = [];
+// if ($result && mysqli_num_rows($result) > 0) {
+//     while ($row = mysqli_fetch_assoc($result)) {
+//         $apiKeys[] = $row;
+//         $currentMode = $row['mode']; // override with latest mode found
+//     }
+// }
+
+
+$sql = "SELECT key_name, key_value, mode FROM enviroments";
+$result = mysqli_query($conn, $sql);
+
+$apiKeys = [];
+$currentMode = 0; // default to Sandbox
+
+if ($result && mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $apiKeys[] = $row;
+        if (isset($row['mode'])) {
+            $currentMode = $row['mode']; // assuming mode is same for all rows
+        }
+    }
+}
+
+
+
 if (isset($_POST['update_auth_token'])) {
     $token = $_POST['auth_token'];
     $authTokenId = $_POST['auth_token_id']; 
@@ -97,6 +144,56 @@ if (isset($_POST['update_auth_token'])) {
     <!-- BEGIN: Custom CSS-->
     <link rel="stylesheet" type="text/css" href="assets/css/style.css">
     <!-- END: Custom CSS-->
+
+<style>
+    .switch-toggle {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 30px;
+    }
+
+    .switch-toggle input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0; left: 0;
+        right: 0; bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 34px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 22px;
+        width: 22px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: #0d6efd;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(30px);
+    }
+
+    .mode-label {
+        margin-left: 15px;
+        font-weight: 500;
+    }
+</style>
 
   </head>
 
@@ -169,20 +266,31 @@ if (isset($_POST['update_auth_token'])) {
                     
                     
                     <form method="POST">
-                        <div class="row d-flex flex-column ">
-                            <?php
-                                foreach ($apiKeys as $apiKey) {
-                                    echo '<div class="col-md-6 d-flex flex-column justify-content-center align-items-center">';
-                                    echo '<div class="form-group w-100">';
-                                    echo '<label for="'.$apiKey['key_name'].'">'.ucwords(str_replace('_', ' ', $apiKey['key_name'])).'</label>';
-                                    echo '<input type="text" class="form-control" id="'.$apiKey['key_name'].'" name="'.$apiKey['key_name'].'" value="'.htmlspecialchars($apiKey['key_value']).'" required>';
-                                    echo '</div>';
-                                    echo '</div>'; // Close column
-                                }
-                            ?>
-                        </div>
-                        <button type="submit" name="submit" class="btn btn-primary">Update Keys</button>
-                    </form>
+    <div class="row d-flex flex-column ">
+
+        <?php
+        foreach ($apiKeys as $apiKey) {
+            echo '<div class="col-md-6 d-flex flex-column justify-content-center align-items-center">';
+            echo '<div class="form-group w-100">';
+            echo '<label for="' . $apiKey['key_name'] . '">' . ucwords(str_replace('_', ' ', $apiKey['key_name'])) . '</label>';
+            echo '<input type="text" class="form-control" id="' . $apiKey['key_name'] . '" name="' . $apiKey['key_name'] . '" value="' . htmlspecialchars($apiKey['key_value']) . '" required>';
+            echo '</div>';
+            echo '</div>';
+        }
+        ?>
+
+        <!-- Toggle Switch -->
+        <div class="mb-4 d-flex align-items-center">
+            <label class="switch-toggle">
+                <input type="checkbox" id="modeSwitch" name="mode" value="1" <?= $currentMode == 1 ? 'checked' : '' ?>>
+                <span class="slider"></span>
+            </label>
+            <span class="mode-label" id="modeLabel"><?= $currentMode == 1 ? 'Live Mode' : 'Sandbox Mode' ?></span>
+        </div>
+
+    </div>
+    <button type="submit" name="submit" class="btn btn-primary">Update Keys</button>
+</form>
 
                     
                     
@@ -242,6 +350,13 @@ function generatePassword() {
     }
     document.getElementById('auth_token').value = password;
 }
+</script>
+
+
+<script>
+    document.getElementById('modeSwitch').addEventListener('change', function () {
+        document.getElementById('modeLabel').textContent = this.checked ? 'Live Mode' : 'Sandbox Mode';
+    });
 </script>
 
   </body>

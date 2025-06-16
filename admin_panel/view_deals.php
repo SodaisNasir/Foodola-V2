@@ -154,8 +154,7 @@ if (isset($_GET['Massage'])) {
                                                     
                                                             $imagePath = $row['deal_image'];
                                                             if (!empty($imagePath)) {
-                                                     
-                                                                  $imgSrc = "Uploads/" . $imagePath;
+                                                                $imgSrc = '/admin_panel/Uploads/'.$imagePath;
                                                             } 
                                                             
                                                         $itemsQuery = "SELECT `di_id`, `deal_id`, `di_title`, `di_num_free_items`, `deal_subdata` FROM `deal_items` WHERE `deal_id` = '$dealId'";
