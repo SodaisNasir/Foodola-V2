@@ -321,7 +321,7 @@ $filewithnewname = mysqli_real_escape_string($con, $filewithnewname);
 
       if ($result) {
         $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                            VALUES ('latenight', '1' ,NOW(),NOW())";
+                            VALUES ('pizzapazza', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {
@@ -395,7 +395,7 @@ if (isset($_POST['btnUpdateImage'])) {
                 $exec_update_sql = mysqli_query($con, $update_sql);
 
                 if ($exec_update_sql) {
-                    header("Location: ../viewcategories.php?Massage=Category Updated Successfully");
+                     header("Location: ../viewcategories.php?Massage=Category Updated Successfully");
                 } else {
                     echo "<script>alert('Failed to update database.')</script>";
                 }
@@ -515,7 +515,6 @@ if (isset($_POST['btnUpdateImage'])) {
 //   }
    
 // }
-
 
 if (isset($_POST['btnUpdateSubCatImage'])) {
     include('../assets/connection.php');
@@ -827,7 +826,7 @@ $product_id = mysqli_real_escape_string($con, $product_id);
 
       if ($result) {
         $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                     VALUES ('latenight', '1' ,NOW(),NOW())";
+                     VALUES ('pizzapazza', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {
@@ -1193,7 +1192,7 @@ include('../assets/config.php');
         $result = mysqli_query($con,$sql);
             if($result){
                  $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                                VALUES ('latenight', '1' ,NOW(),NOW())";
+                                VALUES ('pizzapazza', '1' ,NOW(),NOW())";
                 $monitor_update = mysqli_query($con, $monitor_sql);
         
                 if ($monitor_update) {
@@ -2254,7 +2253,7 @@ if(isset($_POST['updateProduct'])){
     
     if($update){
          $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                        VALUES ('latenight', '1' ,NOW(),NOW())";
+                        VALUES ('pizzapazza', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {

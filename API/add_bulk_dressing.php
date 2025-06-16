@@ -23,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $dressing_title = mysqli_real_escape_string($conn, trim($record['dressing_title']));
             $dressing_title_user = mysqli_real_escape_string($conn, trim($record['dressing_title_user']));
             $dressing_name = mysqli_real_escape_string($conn, trim($record['dressing_name']));
+            $price = mysqli_real_escape_string($conn, trim($record['price']));
 
             // Check if dressing_list record already exists
             $checkListSql = "SELECT dressing_id FROM dressing_list WHERE dressing_title = '$dressing_title' AND dressing_title_user = '$dressing_title_user' LIMIT 1";
@@ -41,13 +42,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $resultSub = mysqli_query($conn, $checkSubSql);
 
             if (!mysqli_fetch_assoc($resultSub)) {
-                $insertSubSql = "INSERT INTO dressing_sublist (dressing_id, dressing_title, dressing_title_user, dressing_name) VALUES ($dressing_id, '$dressing_title', '$dressing_title_user', '$dressing_name')";
+                $insertSubSql = "INSERT INTO dressing_sublist (dressing_id, dressing_title, dressing_title_user, dressing_name, price) VALUES ($dressing_id, '$dressing_title', '$dressing_title_user', '$dressing_name', '$price')";
                 mysqli_query($conn, $insertSubSql);
         
             }
             
-            fclose($handle);
         }
+            fclose($handle);
 
         
         echo json_encode(['message' => 'Dressing imported successfully']);

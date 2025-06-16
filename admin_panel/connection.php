@@ -1,10 +1,11 @@
 <?php
 
 
+
 $Host = 'localhost';
-$DB_DATABASE='u772850971_latenight';
-$DB_USERNAME='u772850971_latenight';
-$DB_PASSWORD='s!dJxdhy5A';
+$DB_DATABASE='u772850971_pizzapazza';
+$DB_USERNAME='u772850971_pizzapazza';
+$DB_PASSWORD='j[uF8W=q';
 
 
 

@@ -8,7 +8,7 @@ if (isset($_GET['Massage'])) {
         header("Refresh: 1; url='viewcategories.php'");
     } else {
         echo "<script>alert('New Category Added Successfully')</script>";
-              header("Refresh: 1; url='viewcategories.php'");
+        header("Refresh: 1; url='viewcategories.php'");
     }
 }
 

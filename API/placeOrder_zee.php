@@ -134,8 +134,10 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                 $sql_getpro = "SELECT * FROM `products` WHERE `id` = '$product_id'";
                                 $ex_get_pro = mysqli_query($conn, $sql_getpro);
                                 $product = mysqli_fetch_array($ex_get_pro);
+                                
                                 $pro_name = mysqli_real_escape_string($conn, $product['name']);
                                 $pro_decs = mysqli_real_escape_string($conn, $product['description']);
+              
 
                                 //print_r($tyy_pes); 
                                 $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`,`product_description`,`additional_notes`, `addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`)
@@ -154,7 +156,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         $discount = $Data['discount'];
                         $pro_name = mysqli_real_escape_string($conn, $Data['name']);
                         $pro_decs = mysqli_real_escape_string($conn, $Data['description']);
-            
+              
 
                         $quantity = $details->quantity;
                         $addons_array = $details->addons;
@@ -278,7 +280,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                             $options
                         );
 
-                        $channel = 'latenight_orders'; // Channel name dynamically based on user ID
+                        $channel = 'pizzapazza_orders'; // Channel name dynamically based on user ID
                         $event   = 'new_order';
                         $data    = [
                             'order_id' => $last_id,
@@ -405,9 +407,10 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                             $sql_getpro = "SELECT * FROM `products` WHERE `id` = '$product_id'";
                             $ex_get_pro = mysqli_query($conn, $sql_getpro);
                             $product = mysqli_fetch_array($ex_get_pro);
+                         
                             $pro_name = mysqli_real_escape_string($conn, $product['name']);
                             $pro_decs = mysqli_real_escape_string($conn, $product['description']);
-             
+              
 
                             //print_r($tyy_pes); 
                             $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`,`product_description`,`additional_notes`, `addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`)
@@ -426,12 +429,14 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     $discount = $Data['discount'];
                     $pro_name = mysqli_real_escape_string($conn, $Data['name']);
                     $pro_decs = mysqli_real_escape_string($conn, $Data['description']);
-                    $additionalNotes = mysqli_real_escape_string($conn, $details->additionalNotes);
+              
 
                     $quantity = $details->quantity;
                     $addons_array = $details->addons;
                     $types_array = $details->types;
                     $dressing_array = $details->dressing;
+                 
+                    $additionalNotes = mysqli_real_escape_string($conn, $details->additionalNotes);
 
                     $add_oons = (json_encode(($addons_array)));
                     $addonarray = array();
@@ -549,7 +554,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         $options
                     );
 
-                    $channel = 'latenight_orders'; // Channel name dynamically based on user ID
+                    $channel = 'pizzapazza_orders'; // Channel name dynamically based on user ID
                     $event   = 'new_order';
                     $data    = [
                         'order_id' => $last_id,
