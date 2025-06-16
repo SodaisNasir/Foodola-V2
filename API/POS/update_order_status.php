@@ -160,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         sendNotification($playerIdx, $de_content);
 
-        $insert_noti_details = "INSERT INTO `notification` (`user_id`, `content`,`german_content`, `purpose`) VALUES ('$get_user_id', '$en_content','$de_content', 'order')";
+        $insert_noti_details = "INSERT INTO `notification` (`user_id`, `content`,`german_content`,  `purpose`) VALUES ('$get_user_id', '$en_content','$de_content', 'order')";
         mysqli_query($conn, $insert_noti_details);
         
     

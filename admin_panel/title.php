@@ -5,107 +5,107 @@ $pageName = basename($_SERVER['PHP_SELF'], ".php");
 
 switch ($pageName) {
     case 'index':
-        $pageTitle = "Analytics | pizzapazza";
+        $pageTitle = "Analytics | Food Vibe";
         break;
     case 'addareas':
-        $pageTitle = "Addareas | pizzapazza";
+        $pageTitle = "Addareas | Food Vibe";
         break;
     case 'addriders':
-        $pageTitle = "Addriders | pizzapazza";
+        $pageTitle = "Addriders | Food Vibe";
         break;
     case 'addmaincat':
-        $pageTitle = "Maincategories | pizzapazza";
+        $pageTitle = "Maincategories | Food Vibe";
         break;
     case 'addSubCat':
-        $pageTitle = "Subcategories | pizzapazza";
+        $pageTitle = "Subcategories | Food Vibe";
         break;
     case 'insertNewProduct':
-        $pageTitle = "Newproduct | pizzapazza";
+        $pageTitle = "Newproduct | Food Vibe";
         break;
     case 'addVariation':
-        $pageTitle = "Variation | pizzapazza";
+        $pageTitle = "Variation | Food Vibe";
         break;
     case 'addAddons':
-        $pageTitle = "Addons | pizzapazza";
+        $pageTitle = "Addons | Food Vibe";
         break;    
     case 'addDressing':
-        $pageTitle = "Dressing | pizzapazza";
+        $pageTitle = "Dressing | Food Vibe";
         break;
     case 'addTypes':
-        $pageTitle = "Types | pizzapazza";
+        $pageTitle = "Types | Food Vibe";
         break;
     case 'insertDeals':
-        $pageTitle = "Deals | pizzapazza";
+        $pageTitle = "Deals | Food Vibe";
         break;    
     case 'addslider':
-        $pageTitle = "Sliders | pizzapazza";
+        $pageTitle = "Sliders | Food Vibe";
         break;  
      case 'addprivacypolicy':
-        $pageTitle = "Add-Privacy-Policy | pizzapazza";
+        $pageTitle = "Add-Privacy-Policy | Food Vibe";
         break;    
     case 'addterms_condition':
-        $pageTitle = "Terms-Conditions | pizzapazza";
+        $pageTitle = "Terms-Conditions | Food Vibe";
         break;
     case 'manage_pos':
-        $pageTitle = "Manage-Pos | pizzapazza";
+        $pageTitle = "Manage-Pos | Food Vibe";
         break;
     case 'manageriders':
-        $pageTitle = "Manage-Riders | pizzapazza";
+        $pageTitle = "Manage-Riders | Food Vibe";
         break;    
     case 'manageusers':
-        $pageTitle = "Manage-Users | pizzapazza";
+        $pageTitle = "Manage-Users | Food Vibe";
         break;  
         
     case 'managetimings':
-        $pageTitle = "Manage-Timings | pizzapazza";
+        $pageTitle = "Manage-Timings | Food Vibe";
         break;      
     case 'neworders':
-        $pageTitle = "New-Orders | pizzapazza";
+        $pageTitle = "New-Orders | Food Vibe";
         break;      
     case 'orders':
-        $pageTitle = "Orders | pizzapazza";
+        $pageTitle = "Orders | Food Vibe";
         break;      
     case 'manageinventory':
-        $pageTitle = "Manage-Inventory | pizzapazza";
+        $pageTitle = "Manage-Inventory | Food Vibe";
         break;      
     case 'manageAreas':
-        $pageTitle = "Manage-Areas | pizzapazza";
+        $pageTitle = "Manage-Areas | Food Vibe";
         break;      
     case 'manageproducts':
-        $pageTitle = "Manage-Products | pizzapazza";
+        $pageTitle = "Manage-Products | Food Vibe";
         break;      
     case 'managevariations':
-        $pageTitle = "Manage-Variations | pizzapazza";
+        $pageTitle = "Manage-Variations | Food Vibe";
         break;      
     case 'view_dressing':
-        $pageTitle = "Manage-Dressing | pizzapazza";
+        $pageTitle = "Manage-Dressing | Food Vibe";
         break;
     case 'view_types':
-        $pageTitle = "Manage-Types | pizzapazza";
+        $pageTitle = "Manage-Types | Food Vibe";
         break;
     case 'view_deals':
-        $pageTitle = "Manage-Deals | pizzapazza";
+        $pageTitle = "Manage-Deals | Food Vibe";
         break;
     case 'viewcategories':
-        $pageTitle = "Manage-Catagories | pizzapazza";
+        $pageTitle = "Manage-Catagories | Food Vibe";
         break;       
     case 'SubCat':
-        $pageTitle = "Manage-Sub-Catagories | pizzapazza";
+        $pageTitle = "Manage-Sub-Catagories | Food Vibe";
         break;                                      
     case 'manageSliders':
-        $pageTitle = "Manage-Sliders | pizzapazza";
+        $pageTitle = "Manage-Sliders | Food Vibe";
         break;
     case 'managePoints':
-        $pageTitle = "Manage-Points | pizzapazza";
+        $pageTitle = "Manage-Points | Food Vibe";
         break;
     case 'SendNotifications':
-        $pageTitle = "Notifications | pizzapazza";
+        $pageTitle = "Notifications | Food Vibe";
         break;   
     case 'view_addons':
-        $pageTitle = "Manage-Addons | pizzapazza";
+        $pageTitle = "Manage-Addons | Food Vibe";
         break;     
     default:
-        $pageTitle = "pizzapazza";
+        $pageTitle = "Food Vibe";
 }
 
 

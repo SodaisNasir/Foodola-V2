@@ -319,14 +319,14 @@ body {
 
 <body>
   <div class="receipt-container print">
-            <div class="header-logo">
+    <div class="header-logo">
       <img src="images/logo.png" alt="Firmenlogo" class="logo">
-      <h3 class="company-name">Pizza Pazza</h3>
+      <h3 class="company-name">Food Vibe</h3>
     </div>
 
-    <div class="company-details">
-      <h3>Neckarstraße 32, Karlsruhe</h3>
-      <h3>Karlsruhe , Tell: 0721 49088816</h3>
+      <div class="company-details">
+      <h3>Schilier 35 76135 Karlsruhe</h3>
+      <h3>Karlsruhe Tel: 0721-9851993</h3>
       <h3>Bestellnummer: <?php echo $order_id ?></h3>
     </div>
 
@@ -409,7 +409,7 @@ body {
           $addons = json_decode($value['addons']);
           $dressing = json_decode($value['dressing']);
           $types = json_decode($value['types']);
-          $basePrice = $value['price'];
+          $basePrice =  $value['price'] ;
           $totalAmount += $basePrice * $value['qty'];
 
           $addonforinner = 0;

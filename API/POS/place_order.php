@@ -369,7 +369,7 @@ $sheduletime = $_POST['sheduletime'] . ":00";
                     );
                 
                     // prepare notification
-                    $channel = 'pizzapazza_orders'; // Channel name dynamically based on user ID
+                    $channel = 'foodvibe_orders'; // Channel name dynamically based on user ID
                     $event   = 'new_order';
                     $data    = [
                         'order_id' => $last_order_id,
@@ -599,7 +599,7 @@ $sheduletime = $_POST['sheduletime'] . ":00";
                     );
                 
                     // prepare notification
-                    $channel = 'pizzapazza_orders'; // Channel name 
+                    $channel = 'foodvibe_orders'; // Channel name 
                     $event   = 'new_order';
                     $data    = [
                         'order_id' => $last_order_id,

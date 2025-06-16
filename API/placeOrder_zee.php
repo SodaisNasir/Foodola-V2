@@ -134,7 +134,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                 $sql_getpro = "SELECT * FROM `products` WHERE `id` = '$product_id'";
                                 $ex_get_pro = mysqli_query($conn, $sql_getpro);
                                 $product = mysqli_fetch_array($ex_get_pro);
-                                
+                     
                                 $pro_name = mysqli_real_escape_string($conn, $product['name']);
                                 $pro_decs = mysqli_real_escape_string($conn, $product['description']);
               
@@ -280,7 +280,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                             $options
                         );
 
-                        $channel = 'pizzapazza_orders'; // Channel name dynamically based on user ID
+                        $channel = 'foodvibe_orders'; // Channel name dynamically based on user ID
                         $event   = 'new_order';
                         $data    = [
                             'order_id' => $last_id,
@@ -407,7 +407,6 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                             $sql_getpro = "SELECT * FROM `products` WHERE `id` = '$product_id'";
                             $ex_get_pro = mysqli_query($conn, $sql_getpro);
                             $product = mysqli_fetch_array($ex_get_pro);
-                         
                             $pro_name = mysqli_real_escape_string($conn, $product['name']);
                             $pro_decs = mysqli_real_escape_string($conn, $product['description']);
               
@@ -435,7 +434,6 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     $addons_array = $details->addons;
                     $types_array = $details->types;
                     $dressing_array = $details->dressing;
-                 
                     $additionalNotes = mysqli_real_escape_string($conn, $details->additionalNotes);
 
                     $add_oons = (json_encode(($addons_array)));
@@ -554,7 +552,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         $options
                     );
 
-                    $channel = 'pizzapazza_orders'; // Channel name dynamically based on user ID
+                    $channel = 'foodvibe_orders'; // Channel name dynamically based on user ID
                     $event   = 'new_order';
                     $data    = [
                         'order_id' => $last_id,
