@@ -33,7 +33,7 @@ while (($data = fgetcsv($handle, 1000, ',')) !== false) {
     $type_title   = mysqli_real_escape_string($conn, $row['type_title']);
 
 
-    $query = "UPDATE types_sublist SET ts_name = '$ts_name' WHERE ts_id = '$ts_id'";
+    $query = "UPDATE types_sublist SET ts_name = '$ts_name', type_title = '$type_title' WHERE ts_id = '$ts_id'";
     if (mysqli_query($conn, $query)) {
         $updated++;
     }

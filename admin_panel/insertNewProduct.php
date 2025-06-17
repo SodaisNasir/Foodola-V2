@@ -441,7 +441,7 @@ function downloadSampleCSV() {
 
     const sampleData = [
         ["101", "1", "12", "5", "Cheese Burst", "SKU001", "Extra cheesy addon", "20", "30", "5", "100", "18", "Yes","cheese.png"],
-        ["102", "2", "13", "6", "Spicy Mayo", "SKU002", "Spicy addon for sandwiches", "10", "15", "2", "50", "No","mayo.png"],
+        ["102", "2", "13", "6", "Spicy Mayo", "SKU002", "Spicy addon for sandwiches", "10", "15", "2", "50", "No", "Spicy","mayo.png"],
         ["103", "1", "14", "7", "BBQ Sauce", "SKU003", "Smoky barbecue flavor", "15", "22", "3", "70", "12", "Yes", "bbq.png"]
     ];
 

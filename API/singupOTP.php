@@ -25,11 +25,11 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;  
         $mail->Port = 587;  
 
-        $mail->setFrom('support@burgerplanet.de', 'Burger Planet');
+        $mail->setFrom('support@pizzatime.de', 'Pizza Time');
         $mail->addAddress($to);
 
         $mail->isHTML(true);
-        $mail->Subject = "Your OTP for Burger Planet";
+        $mail->Subject = "Your OTP for Pizza Time";
 
         $sql = "SELECT `id`  FROM `users` WHERE `email` = '$to'";
         $execute = mysqli_query($conn, $sql);
@@ -41,7 +41,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
             $mail->Body = '
             <html>
             <head>
-                <title>Your OTP for Burger Planet</title>
+                <title>Your OTP for Pizza Time</title>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
                 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
                 <style>
@@ -89,13 +89,13 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                 </style>
             </head>
             <body>
-                <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://burgerplanet-ka.de/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://pizzatime.foodola.shop/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
                     <tr>
                         <td align="center">
                             <table width="100%" class="content" style="max-width: 600px;">
                                 <tr>
                                     <td align="center">
-                                        <img src="https://burgerplanet-ka.de/admin_panel/images/logo.png" alt="Burger Planet Logo" style="width: 100px; margin-bottom: 20px;">
+                                        <img src="https://pizzatime.foodola.shop/admin_panel/images/logo.png" alt="Pizza Time Logo" style="width: 100px; margin-bottom: 20px;">
                                     </td>
                                 </tr>
                                 <tr>
@@ -105,7 +105,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                         <p>Please use this OTP to complete your registration.</p>
                                         <p>If you did not request this, please ignore this email.</p>
                               
-                                        <p>Best regards,<br>The Burger Planet Team</p>
+                                        <p>Best regards,<br>The Pizza Time Team</p>
                                     </td>
                                 </tr>
                             </table>

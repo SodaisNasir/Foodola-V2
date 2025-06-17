@@ -321,12 +321,12 @@ body {
   <div class="receipt-container print">
       <div class="header-logo">
       <img src="images/logo.png" alt="Firmenlogo" class="logo">
-      <h3 class="company-name"> Burger Planet </h3>
+      <h3 class="company-name"> Pizza Time Bruchsal</h3>
     </div>
 
     <div class="company-details">
-      <h3>Breite Str. 58 a76135 Karlsruhe</h3>
-      <h3>Karlsruhe Tel: 0721 840 88 40 </h3>
+      <h3>Durlacher Str. 54, 76646 Bruchsal</h3>
+      <h3>Bruchsal Tel: 07251 2351</h3>
       <h3>Bestellnummer: <?php echo $order_id ?></h3>
     </div>
 

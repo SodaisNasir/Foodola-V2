@@ -39,11 +39,11 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
-        $mail->setFrom('support@burgerplanet.de', 'Burger Planet');
+        $mail->setFrom('support@pizzatime.de', 'Pizza Time');
         $mail->addAddress($email); 
 
         $mail->isHTML(true);
-        $mail->Subject = "Welcome to Burger Planet";
+        $mail->Subject = "Welcome to Pizza Time";
 
         $digits = 8;
         $referal_code = rand(pow(10, $digits - 1), pow(10, $digits) - 1);
@@ -72,7 +72,7 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                             $template = '
                             <html>
                             <head>
-                                <title>Welcome to Burger Planet !</title>
+                                <title>Welcome to Pizza Time !</title>
 
                                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
                                 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -145,21 +145,21 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                                 </style>
                             </head>
                             <body>
-                                <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://burgerplanet-ka.de/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                                <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://pizzatime.foodola.shop/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
                                     <tr>
                                         <td align="center">
                                             <table width="100%" class="content" style="max-width: 600px;">
                                                 <tr>
                                                     <td align="center">
                                                         <!-- Logo Section -->
-                                                        <img src="https://burgerplanet-ka.de/admin_panel/images/logo.png" alt="Pizza Pizza Time Logo" style="width: 100px; margin-bottom: 20px;">
+                                                        <img src="https://pizzatime.foodola.shop/admin_panel/images/logo.png" alt="Pizza Pizza Time Logo" style="width: 100px; margin-bottom: 20px;">
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td>
                                                          <h1>Welcome, ' . htmlspecialchars($name) . '!</h1>
-                                                        <p>Thank you for joining Burger Planet! We’re thrilled to welcome you to our community of pizza and burger lovers.</p>
-                                                        <h3>Why You’ll Love Pizza Burger Planet:</h3>
+                                                        <p>Thank you for joining Pizza Pizza Time! We’re thrilled to welcome you to our community of pizza and burger lovers.</p>
+                                                        <h3>Why You’ll Love Pizza Pizza Time:</h3>
                                                         <ul>
                                                             <li>🍕 <strong>Authentic Flavors:</strong> Indulge in our chef-crafted pizzas and burgers made with the finest ingredients.</li>
                                                             <li>🚀 <strong>Fast Delivery:</strong> Enjoy hot and fresh meals at your doorstep in no time.</li>
@@ -167,25 +167,25 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                                                         <h3>Get Started Now!</h3>
                                                         <p>Here’s what you can do next:</p>
                                                         <ul>
-                                                            <li>👀 <a href="https://burgerplanet.foodola.shop/">Browse our Menu</a> and find your favorites.</li>
+                                                            <li>👀 <a href="https://pizzatime.de/menu">Browse our Menu</a> and find your favorites.</li>
                                                             <li>🛒 Place your first order and experience the convenience and quality we’re known for!</li>
                                                         </ul>
                                                         <p>If you have any questions, feel free to reach out to our support team. We’re here to make sure you have the best experience possible.</p>
                                                         <h4>Stay Connected:</h4>
                                                         <p>Follow us on social media for the latest updates, promotions, and delicious inspiration!</p>
                                                         <div class="social-icons">
-                                                            <a href="https://facebook.com/BurgerPlanet" target="_blank">
-                                                                <img src="https://burgerplanet-ka.de/API/uploads/facebook_logo.png" alt="Facebook">
+                                                            <a href="https://facebook.com/pizzatime" target="_blank">
+                                                                <img src="https://pizzatime.foodola.shop/API/uploads/facebook_logo.png" alt="Facebook">
                                                             </a>
-                                                            <a href="https://instagram.com/BurgerPlanet" target="_blank">
-                                                                <img src="https://burgerplanet-ka.de/API/uploads/instagram_logo.png" alt="Instagram">
+                                                            <a href="https://instagram.com/pizzatime" target="_blank">
+                                                                <img src="https://pizzatime.foodola.shop/API/uploads/instagram_logo.png" alt="Instagram">
                                                             </a>
-                                                            <a href="https://twitter.com/BurgerPlanet" target="_blank">
-                                                                <img src="https://burgerplanet-ka.de/API/uploads/twitter_logo.png" alt="Twitter">
+                                                            <a href="https://twitter.com/pizzatime" target="_blank">
+                                                                <img src="https://pizzatime.foodola.shop/API/uploads/twitter_logo.png" alt="Twitter">
                                                             </a>
                                                         </div>
                                                         <p>Enjoy every bite!</p>
-                                                        <p>Warm regards,<br><strong>The Burger Planet Team</strong></p>
+                                                        <p>Warm regards,<br><strong>The Pizza Time Team</strong></p>
                                                     </td>
                                                 </tr>
                                             </table>

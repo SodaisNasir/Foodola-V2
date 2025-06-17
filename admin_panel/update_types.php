@@ -633,14 +633,14 @@ $(document).ready(function () {
                 filename: 'types_csv',
                 bom: true,
                 exportOptions: {
-                    columns: [2,3,4], 
+                    columns: [1,2,3], 
                     format: {
                         header: function (data, columnIdx) {
                             switch(columnIdx) {
             
-                                case 2: return 'ts_id';
-                                case 3: return 'ts_name';
-                                case 4: return 'ts_title';
+                                case 1: return 'ts_id';
+                                case 2: return 'ts_name';
+                                case 3: return 'ts_title';
                                 default: return data;
                             }
                         }
