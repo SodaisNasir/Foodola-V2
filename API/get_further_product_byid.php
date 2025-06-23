@@ -18,7 +18,7 @@ if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqa
               while($rows = mysqli_fetch_array($execute_products)){
                   
                   
-                 $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/admin_panel/Uploads/' . $rows['img'];
+                 $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/pizza_blitz/admin_panel/Uploads/' . $rows['img'];
                 if (file_exists($imagePath)) {
                     $finalImage = $rows['img'];
                 } else {

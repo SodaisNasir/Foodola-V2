@@ -319,17 +319,16 @@ body {
 
 <body>
   <div class="receipt-container print">
-      <div class="header-logo">
+    <div class="header-logo">
       <img src="images/logo.png" alt="Firmenlogo" class="logo">
-      <h3 class="company-name"> Pizza Time Bruchsal</h3>
+      <h3 class="company-name">Pizzablitzöstringen.de</h3>
     </div>
 
     <div class="company-details">
-      <h3>Durlacher Str. 54, 76646 Bruchsal</h3>
-      <h3>Bruchsal Tel: 07251 2351</h3>
+      <h3>Kuhngasse 1, 76684 Östringen</h3>
+      <h3>Östringen, Tell:0725326560-61</h3>
       <h3>Bestellnummer: <?php echo $order_id ?></h3>
     </div>
-
 
 
 

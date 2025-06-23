@@ -17,7 +17,7 @@ $select_user_restuarant = "SELECT * FROM `products` WHERE `sub_category_id` = '$
          $products = array();
         while($row = mysqli_fetch_array($execute_restuarant)){  
             
-                $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/admin_panel/Uploads/' . $row['img'];
+                $imagePath = $_SERVER['DOCUMENT_ROOT'] . '/pizza_blitz/admin_panel/Uploads/' . $row['img'];
                 if (file_exists($imagePath)) {
                     $finalImage = $row['img'];
                 } else {
@@ -26,7 +26,8 @@ $select_user_restuarant = "SELECT * FROM `products` WHERE `sub_category_id` = '$
 
             
                     // ADDONS
-                       $select_addon_title = 'SELECT * FROM `addon_list` WHERE `ao_id` ='.$row['addon_id'];
+                    $addon_id =$row['addon_id'];
+                       $select_addon_title = "SELECT * FROM `addon_list` WHERE `ao_id` = '$addon_id'";
                         $execute_addon_title  = mysqli_query($conn,$select_addon_title);   
                       if(mysqli_num_rows($execute_addon_title) > 0){
                           $addon = array();
@@ -61,8 +62,9 @@ $select_user_restuarant = "SELECT * FROM `products` WHERE `sub_category_id` = '$
                     
                     
                     ////TYPE
+                    $type_id = $row['type_id'];
                     
-                                $select_type_title = 'SELECT `type_id`, `type_title`, `type_title_user` FROM `types_list` WHERE `type_id` = '.$row['type_id'];
+                                $select_type_title = "SELECT `type_id`, `type_title`, `type_title_user` FROM `types_list` WHERE `type_id` = '$type_id' ";
                                 $execute_type_title  = mysqli_query($conn,$select_type_title);  
                                  if(mysqli_num_rows($execute_type_title) > 0){
                                   $type = array();

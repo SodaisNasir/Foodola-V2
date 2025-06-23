@@ -2,9 +2,9 @@
 
 
 $Host = 'localhost';
-$DB_DATABASE='u772850971_pizzatime';
-$DB_USERNAME='u772850971_pizzatime';
-$DB_PASSWORD='$YNtQQ3Lw6Ho';
+$DB_DATABASE='u772850971_pizza_blitz';
+$DB_USERNAME='u772850971_zee';
+$DB_PASSWORD='I8hGVk6o^';
 
 
 

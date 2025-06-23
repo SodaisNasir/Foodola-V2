@@ -336,16 +336,41 @@ if(isset($_GET["Message"])){
                       ?>
                     </select>
                   </div>
-
-                  <div class="form-group col-md-6">
-                    <label for="statusSelect">Select Status</label>
-                    <select name="status" id="is_disable"  class="form-control">
-                      <option value="">Select Status</option>
-                      <option value="0">Active</option>
-                      <option value="1">Inactive</option>
-                    </select>
-                  </div>
                 </div>
+                
+                
+                
+                
+                  <?php
+                    include("connection.php"); // your DB connection
+                    
+                    
+                    $current_status = ''; // default if nothing found
+                    
+                    
+                        $query = "SELECT is_disable FROM tbl_areas";
+                        $result = mysqli_query($conn, $query);
+                    
+                        if ($result && mysqli_num_rows($result) > 0) {
+                            $row = mysqli_fetch_assoc($result);
+                            $current_status = $row['is_disable'];
+                        }
+                    
+                    ?>
+
+                    <div class="form-row">
+                      <div class="form-group col-md-6">
+                        <label for="is_disable">Select Status</label>
+                       <select name="is_disable" id="is_disable" class="form-control" data-field="is_disable">
+  <option value="">Select status</option>
+  <option value="0" <?= $current_status === '0' ? 'selected' : '' ?>>Active</option>
+  <option value="1" <?= $current_status === '1' ? 'selected' : '' ?>>Inactive</option>
+</select>
+
+                      </div>
+                    </div>
+
+                
 
                 <div class="modal-footer">
 
@@ -433,9 +458,9 @@ if(isset($_GET["Message"])){
     }
   }
 
+}
   // Set Status
   document.getElementById('is_disable').value = status === 'Inactive' ? '1' : '0';
-}
     var span = document.getElementsByClassName("close")[0];
     window.onclick = function(event) {
       if (event.target == modal) {
@@ -495,30 +520,25 @@ if(isset($_GET["Message"])){
     });
   </script>
   
-      <script>
-        
-        
-        $(document).ready(function () {
-    // Show Save button when title is edited
-    $('.editable').on('input', function () {
+ <script>
+$(document).ready(function () {
+
+    // Event delegation for dynamically loaded content
+    $(document).on('input', '.editable', function () {
         $(this).closest('tr').find('.save-btn').show();
     });
-    
+
     $(document).on('change', '.status-select', function () {
         $(this).closest('tr').find('.save-btn').show();
     });
 
-    // Save updated title
-    $('.save-btn').on('click', function () {
+    $(document).on('click', '.save-btn', function () {
         const row = $(this).closest('tr');
         const id = row.data('id');
         const area_name = row.find('[data-field="area_name"]').text().trim();
         const min_order_amount = row.find('[data-field="min_order_amount"]').text().trim();
-        const is_disable = row.find('[data-field="is_disable"]').text().trim();
         const branch_id = row.find('[data-field="branch_id"]').text().trim();
-
-
-
+        const is_disable = row.find('[data-field="is_disable"]').val();
 
         const dataToSend = {
             id: id,
@@ -526,7 +546,6 @@ if(isset($_GET["Message"])){
             min_order_amount: min_order_amount,
             is_disable: is_disable,
             branch_id: branch_id,
-
         };
 
         console.log('Sending inline update data:', dataToSend); // Debug log
@@ -549,12 +568,10 @@ if(isset($_GET["Message"])){
             }
         });
     });
+
 });
-        
-        
-        
-  
-    </script>
+</script>
+
   
   
   

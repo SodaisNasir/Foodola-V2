@@ -95,10 +95,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
         $end_time_2 = $data['end_time_2'];
 
         // Check if selected time is within either shift
-        if (
-            ($current_time >= $start_time_1 && $current_time <= $end_time_1) ||
-            ($current_time >= $start_time_2 && $current_time <= $end_time_2)
-        ) {
+        if (($current_time >= $start_time_1 && $current_time <= $end_time_1) ||($current_time >= $start_time_2 && $current_time <= $end_time_2)) {
             echo json_encode([
                 "status" => true,
                 "Response_code" => 200,

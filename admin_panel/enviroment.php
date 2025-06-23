@@ -265,32 +265,33 @@ if (isset($_POST['update_auth_token'])) {
                     </form>
                     
                     
-                    <form method="POST">
-    <div class="row d-flex flex-column ">
-
-        <?php
-        foreach ($apiKeys as $apiKey) {
-            echo '<div class="col-md-6 d-flex flex-column justify-content-center align-items-center">';
-            echo '<div class="form-group w-100">';
-            echo '<label for="' . $apiKey['key_name'] . '">' . ucwords(str_replace('_', ' ', $apiKey['key_name'])) . '</label>';
-            echo '<input type="text" class="form-control" id="' . $apiKey['key_name'] . '" name="' . $apiKey['key_name'] . '" value="' . htmlspecialchars($apiKey['key_value']) . '" required>';
-            echo '</div>';
-            echo '</div>';
-        }
-        ?>
-
-        <!-- Toggle Switch -->
-        <div class="mb-4 d-flex align-items-center">
-            <label class="switch-toggle">
-                <input type="checkbox" id="modeSwitch" name="mode" value="1" <?= $currentMode == 1 ? 'checked' : '' ?>>
-                <span class="slider"></span>
-            </label>
-            <span class="mode-label" id="modeLabel"><?= $currentMode == 1 ? 'Live Mode' : 'Sandbox Mode' ?></span>
-        </div>
-
-    </div>
-    <button type="submit" name="submit" class="btn btn-primary">Update Keys</button>
-</form>
+                    <form method="POST" id="apiKeyForm">
+                        <div class="row d-flex flex-column ">
+                    
+                            <?php
+                            foreach ($apiKeys as $apiKey) {
+                                echo '<div class="col-md-6 d-flex flex-column justify-content-center align-items-center">';
+                                echo '<div class="form-group w-100">';
+                                echo '<label for="' . $apiKey['key_name'] . '">' . ucwords(str_replace('_', ' ', $apiKey['key_name'])) . '</label>';
+                                echo '<input type="text" class="form-control" id="' . $apiKey['key_name'] . '" name="' . $apiKey['key_name'] . '" value="' . htmlspecialchars($apiKey['key_value']) . '" required>';
+                                echo '</div>';
+                                echo '</div>';
+                            }
+                            ?>
+                    
+                            <!-- Toggle Switch -->
+                            <div class="mb-4 d-flex align-items-center">
+                                <label class="switch-toggle">
+                                    <input type="checkbox" id="modeSwitch" name="mode" value="1" <?= $currentMode == 1 ? 'checked' : '' ?>>
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="mode-label" id="modeLabel"><?= $currentMode == 1 ? 'Live Mode' : 'Sandbox Mode' ?></span>
+                            </div>
+                    
+                        </div>
+                      <button type="button" id="startOtpProcess" class="btn btn-primary">Update Keys</button>
+                    
+                    </form>
 
                     
                     
@@ -306,6 +307,30 @@ if (isset($_POST['update_auth_token'])) {
         </div>
     </div>
 </section>
+
+<!-- OTP Modal -->
+<div class="modal fade" id="otpModal" tabindex="-1" role="dialog" aria-labelledby="otpModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <form id="otpForm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Enter OTP</h5>
+        </div>
+        <div class="modal-body">
+          <p>An OTP has been sent to the admin's email.</p>
+          <input type="text" class="form-control" name="entered_otp" id="entered_otp" placeholder="Enter OTP" required>
+          <input type="hidden" name="actual_otp" id="actual_otp">
+          <input type="hidden" name="api_data" id="api_data">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Verify & Update</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
     
     
     <div class="sidenav-overlay"></div>
@@ -353,10 +378,62 @@ function generatePassword() {
 </script>
 
 
+
 <script>
     document.getElementById('modeSwitch').addEventListener('change', function () {
         document.getElementById('modeLabel').textContent = this.checked ? 'Live Mode' : 'Sandbox Mode';
     });
+</script>
+
+
+<script>
+document.getElementById('startOtpProcess').addEventListener('click', function () {
+   const form = document.getElementById('apiKeyForm'); // ✅ This ensures correct form
+    const formData = new FormData(form);
+
+    fetch('../API/send_otp.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show OTP modal
+            document.getElementById('actual_otp').value = data.otp;
+            document.getElementById('api_data').value = JSON.stringify(Object.fromEntries(formData));
+            $('#otpModal').modal('show');
+        } else {
+            alert('Failed to send OTP.');
+        }
+    });
+});
+
+document.getElementById('otpForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const enteredOtp = document.getElementById('entered_otp').value;
+    const actualOtp = document.getElementById('actual_otp').value;
+    const formDataJson = JSON.parse(document.getElementById('api_data').value);
+
+    if (enteredOtp === actualOtp) {
+        // Create form and submit
+        const tempForm = document.createElement('form');
+        tempForm.method = 'POST';
+
+        for (const key in formDataJson) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = formDataJson[key];
+            tempForm.appendChild(input);
+        }
+
+        document.body.appendChild(tempForm);
+        tempForm.submit();
+    } else {
+        alert('Invalid OTP. Please try again.');
+    }
+});
 </script>
 
   </body>
