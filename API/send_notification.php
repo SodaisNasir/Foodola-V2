@@ -19,7 +19,7 @@ function sendNotification($notification_token)
     //                     $data = mysqli_fetch_array($sql);
     //                     $app_id = $data['one_signal_appid'];
     $fields = array(
-        'app_id' => '2de883ec-be41-4820-a517-558beee8b0ac', // Ensure this is correct
+        'app_id' => '04869310-bf7c-4e9d-9ec9-faf58aac8168', // Ensure this is correct
         // 'app_id' => $app_id, // Ensure this is correct
         'include_player_ids' => $playerIds,
         'data' => array("foo" => "NewMessage"),
@@ -36,7 +36,7 @@ function sendNotification($notification_token)
     //     'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebndohgjidlvpeo7en2ev5vls473qc26gslgf4tvpouj6t4in75jdztefftz5c52matdxdsstnomodc3a'
     // ));
      curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8',
-                                                              'Authorization: Basic os_v2_app_fxuih3f6ifecbjixkwf652fqvth5cvjs6zyu6x45bxrdyqx6thsko5tkpievvqngjhhkpn6l3n53whqh5xextgwkut3dbjnai26xili'));
+                                                              'Authorization: Basic  os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
     curl_setopt($ch, CURLOPT_HEADER, FALSE);
     curl_setopt($ch, CURLOPT_POST, TRUE);

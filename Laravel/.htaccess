@@ -5,6 +5,9 @@
 
     RewriteEngine On
 
+    # Set the RewriteBase
+    RewriteBase /Laravel/
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
@@ -17,5 +20,5 @@
     # Send Requests To Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^ /out/index.html [L]
+    RewriteRule ^ index.php [L]
 </IfModule>

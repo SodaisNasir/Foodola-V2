@@ -9,6 +9,15 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Content-Type: application/json"); 
 
+
+require '../PHPMailer-master/src/PHPMailer.php';
+require '../PHPMailer-master/src/SMTP.php';
+require '../PHPMailer-master/src/Exception.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+
 include('connection.php');
 
 $response = ["status" => "error", "message" => "An unexpected error occurred"];
@@ -37,6 +46,128 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $time->add(new DateInterval("PT{$minutesToAdd}M")); 
     $delivered_at = $time->format('Y-m-d g:i A'); 
     $sql = "UPDATE `orders_zee` SET `status` = '$status', `delivered_at` = '$delivered_at' WHERE `id` = $order_id";
+    
+    
+        $get_user_query = "SELECT user_id FROM orders_zee WHERE id = '$order_id'";
+        $result_user = mysqli_query($conn, $get_user_query);
+        $row_user = mysqli_fetch_assoc($result_user);
+        
+        if ($row_user) {
+            $user_id = $row_user['user_id'];
+        
+            $get_email_query = "SELECT email, name FROM users WHERE id = '$user_id'";
+            $result_email = mysqli_query($conn, $get_email_query);
+            $row_email = mysqli_fetch_assoc($result_email);
+        
+            if ($row_email) {
+                $email = $row_email['email'];
+                $name = $row_email['name'];
+                
+                $mail = new PHPMailer(true);
+        
+                   try {
+                        $mail->isSMTP();
+                        $mail->Host = 'smtp.gmail.com';
+                        $mail->SMTPAuth = true;
+                        $mail->Username = 'boundedsocial@gmail.com'; 
+                        $mail->Password = 'iwumjedakkbledwe';
+                        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                        $mail->Port = 587;
+                    
+                        $mail->setFrom('support@burgerpoint.de', 'Pizza Burger Point');
+                        $mail->addAddress($email); 
+                    
+                        $mail->isHTML(true);
+                                  $mail->Subject = "Ihre Bestellung wurde angenommen";
+
+                        $mail->Body = '
+                        <html>
+                        <head>
+                            <title>Ihre Bestellung wurde angenommen – Pizza Burger Point</title>
+                            <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+                            <style>
+                                body {
+                                    font-family: "Poppins", Arial, sans-serif;
+                                    line-height: 1.6;
+                                    color: #333;
+                                    padding: 20px;
+                                    background-color: #f7f7f7;
+                                }
+                                .content {
+                                    background-color: rgba(255, 255, 255, 0.95);
+                                    padding: 20px;
+                                    border-radius: 8px;
+                                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                                }
+                                h1 {
+                                    color: #2B2B29;
+                                    font-size: 28px;
+                                    margin-bottom: 10px;
+                                }
+                                h3 {
+                                    color: #2B2B29;
+                                    font-size: 20px;
+                                    margin-top: 20px;
+                                }
+                                p, li {
+                                    color: #555;
+                                    font-size: 16px;
+                                    margin: 8px 0;
+                                }
+                                a {
+                                    color: #F2AF34;
+                                    text-decoration: none;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://burgerpoint.shop/BurgerPoint/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                                <tr>
+                                    <td align="center">
+                                        <table width="100%" class="content" style="max-width: 600px;">
+                                            <tr>
+                                                <td align="center">
+                                                    <img src="https://burgerpoint.shop/BurgerPoint/admin_panel/images/logo.png" alt="Pizza Burger Point" style="width: 100px; margin-bottom: 20px;">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <h1>Ihre Bestellung wurde angenommen!</h1>
+                                                    <p>Hallo <strong>' . htmlspecialchars($name) . '</strong>,</p>
+                                                    <p>Vielen Dank für Ihre Bestellung bei <strong>Pizza Burger Point</strong>.</p>
+                                                    <p><strong>Bestellnummer:</strong> ' . htmlspecialchars($order_id) . '</p>
+                                                    <p>Ihre Bestellung wurde erfolgreich angenommen und wird in Kürze bearbeitet.</p>
+                                                    <h3>Was kommt als Nächstes?</h3>
+                                                    <ul>
+                                                        <li>Unser Team bereitet Ihre Bestellung mit größter Sorgfalt zu.</li>
+                                                        <li>Sie erhalten eine Benachrichtigung, sobald Ihre Bestellung unterwegs ist.</li>
+                                                    </ul>
+                                                    <p>Bei Fragen stehen wir Ihnen jederzeit zur Verfügung.</p>
+                                                    <p>Mit freundlichen Grüßen,<br>Ihr Pizza Burger Point Team</p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </body>
+                        </html>';
+                    
+                        $mail->send();
+                
+                } catch (Exception $e) {
+                    $data = [
+                        "status" => false,
+                        "Response_code" => 500,
+                        "Message" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"
+                    ];
+                    echo json_encode($data);
+                }
+
+            }
+        }
+
+    
     } else if($status == 'delivered') {
         
                $checkcashback = "SELECT * FROM cash_back WHERE status = 1";
@@ -129,7 +260,125 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     
             $response = curl_exec($ch);
             curl_close($ch);
-           
+            
+            
+            
+                        
+            $get_user_query = "SELECT user_id FROM orders_zee WHERE id = '$order_id'";
+            $result_user = mysqli_query($conn, $get_user_query);
+            $row_user = mysqli_fetch_assoc($result_user);
+            
+            if ($row_user) {
+                $user_id = $row_user['user_id'];
+            
+                // Fetch email and name of user from users table
+                $get_email_query = "SELECT email, name FROM users WHERE id = '$user_id'";
+                $result_email = mysqli_query($conn, $get_email_query);
+                $row_email = mysqli_fetch_assoc($result_email);
+            
+                if ($row_email) {
+                    $email = $row_email['email'];
+                    $name = $row_email['name'];
+                                    $mail = new PHPMailer(true);
+            
+                    try {
+                            $mail->isSMTP();
+                            $mail->Host = 'smtp.gmail.com';
+                            $mail->SMTPAuth = true;
+                            $mail->Username = 'boundedsocial@gmail.com'; 
+                            $mail->Password = 'iwumjedakkbledwe';
+                            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                            $mail->Port = 587;
+                        
+                            $mail->setFrom('support@burgerpoint.de', 'Pizza Burger Point');
+                            $mail->addAddress($email); 
+                        
+                            $mail->isHTML(true);
+                                                      $mail->Subject = "Ihre Bestellung wurde geliefert";
+
+                $mail->Body = '
+                <html>
+                <head>
+                    <title>Ihre Bestellung wurde geliefert – Pizza Burger Point</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+                    <style>
+                        body {
+                            font-family: "Poppins", Arial, sans-serif;
+                            line-height: 1.6;
+                            color: #333;
+                            padding: 20px;
+                            background-color: #f7f7f7;
+                        }
+                        .content {
+                            background-color: rgba(255, 255, 255, 0.95);
+                            padding: 20px;
+                            border-radius: 8px;
+                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                        }
+                        h1 {
+                            color: #2B2B29;
+                            font-size: 28px;
+                            margin-bottom: 10px;
+                        }
+                        h3 {
+                            color: #2B2B29;
+                            font-size: 20px;
+                            margin-top: 20px;
+                        }
+                        p, li {
+                            color: #555;
+                            font-size: 16px;
+                            margin: 8px 0;
+                        }
+                        a {
+                            color: #F2AF34;
+                            text-decoration: none;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://burgerpoint.shop/BurgerPoint/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                        <tr>
+                            <td align="center">
+                                <table width="100%" class="content" style="max-width: 600px;">
+                                    <tr>
+                                        <td align="center">
+                                            <img src="https://burgerpoint.shop/BurgerPoint/admin_panel/images/logo.png" alt="Pizza Burger Point" style="width: 100px; margin-bottom: 20px;">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <h1>Ihre Bestellung wurde geliefert!</h1>
+                                            <p>Hallo <strong>' . htmlspecialchars($user_name) . '</strong>,</p>
+                                            <p>Wir freuen uns, Ihnen mitteilen zu können, dass Ihre Bestellung erfolgreich geliefert wurde.</p>
+                                            <p><strong>Bestellnummer:</strong> #' . htmlspecialchars($order_id) . '</p>
+                                            <h3>Guten Appetit!</h3>
+                                            <p>Wir hoffen, dass Sie Ihr Essen genießen. Vielen Dank, dass Sie bei <strong>Pizza Burger Point</strong> bestellt haben.</p>
+                                            <p>Wenn Sie Fragen haben oder Feedback geben möchten, stehen wir Ihnen jederzeit zur Verfügung.</p>
+                                            <p>Mit freundlichen Grüßen,<br>Ihr Pizza Burger Point Team</p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </body>
+                </html>';
+
+                    $mail->send();
+    
+                        } catch (Exception $e) {
+                            $data = [
+                                "status" => false,
+                                "Response_code" => 500,
+                                "Message" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"
+                            ];
+                            echo json_encode($data);
+                        }
+
+                }
+            }
+                       
            
     }else{
          $sql = "UPDATE `orders_zee` SET `status` = '$status' WHERE `id` = $order_id";
