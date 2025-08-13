@@ -1,4 +1,7 @@
 <?php
+// ini_set('display_errors', 1);
+// error_reporting(E_ALL);
+
 include('connection.php'); // adjust path as needed
 header('Content-Type: application/json');
 
@@ -25,6 +28,15 @@ $inserted = 0;
 $updated = 0;
 
 while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+    
+       if (count(array_filter($data)) === 0) {
+        continue;
+    }
+
+    if (count($header) !== count($data)) {
+        // Skip or log inconsistent row
+        continue;
+    }
     $row = array_combine($header, $data);
 
     // Sanitize inputs

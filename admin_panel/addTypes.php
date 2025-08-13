@@ -264,12 +264,12 @@ $('#dynamic_fields').append(`
 
 
  function downloadSampleCSV() {
-    const headers = ["type_title", "type_title_user", "ts_name"];
+    const headers = ["type_title", "type_title_user", "ts_name", "price"];
     const sampleData = [
-        ["Type of pasta", "Type of pasta's", "with gnocchi"],
-        ["Type of pasta", "Type of pasta's", "with rigatoni"],
-        ["Type of pasta", "Type of pasta's", "with spaghetti"],
-        ["Type of pasta", "Type of pasta's", "with tagliatelle"]
+        ["Type of pasta", "Type of pasta's", "with gnocchi", "2.50"],
+        ["Type of pasta", "Type of pasta's", "with rigatoni", "2.50"],
+        ["Type of pasta", "Type of pasta's", "with spaghetti", "0.00"],
+        ["Type of pasta", "Type of pasta's", "with tagliatelle","2.50"]
     ];
 
     // Convert to CSV string

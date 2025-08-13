@@ -332,7 +332,6 @@ body {
 
 
 
-
     <div class="order-info">
     <h3><?php echo htmlspecialchars($datetime); ?></h3>
 

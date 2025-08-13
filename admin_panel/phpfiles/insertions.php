@@ -4,6 +4,133 @@
 //             error_reporting(E_ALL);
 // ini_set('display_errors', 1);
 
+define('BASE_DIRECTORY', __DIR__ . '/../../API/');
+
+require BASE_DIRECTORY . 'PHPMailer-master/src/PHPMailer.php';
+require BASE_DIRECTORY . 'PHPMailer-master/src/SMTP.php';
+require BASE_DIRECTORY . 'PHPMailer-master/src/Exception.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+if(isset($_POST['btnSubmit_imprint'])){
+    $imprint = $_POST['imprint'];
+    $id = $_POST['id'];
+
+       include('../assets/connection.php');
+
+             $sqladd = "UPDATE `imprint` SET `imprint`='$imprint' WHERE `id` = '$id'";
+             $add = mysqli_query($con,$sqladd);
+             if($add){
+                 header("Location:../imprint.php?Massage=Sucessfully Updated"); 
+           
+            
+        }
+        
+
+    
+}
+if (isset($_POST['btn_update_user'])) {
+
+    include('../assets/connection.php'); // Make sure this defines $con
+
+    // Get data from form
+    $user_id    = $_POST['user_id'];
+    $full_name  = $_POST['full_name'];
+    $email      = $_POST['email'];
+    $phone      = $_POST['phone'];
+    $password   = $_POST['password'];
+
+    // Optional: sanitize inputs (recommended for security)
+    $user_id    = mysqli_real_escape_string($con, $user_id);
+    $full_name  = mysqli_real_escape_string($con, $full_name);
+    $email      = mysqli_real_escape_string($con, $email);
+    $phone      = mysqli_real_escape_string($con, $phone);
+    $password   = mysqli_real_escape_string($con, $password);
+      $status     = mysqli_real_escape_string($con, $_POST['status']); // new
+
+
+    // Prepare the query
+    $update_query = "
+        UPDATE `users` 
+        SET 
+            `name` = '$full_name',
+            `phone` = '$phone',
+            `email` = '$email',
+            `password` = '$password',
+            `status` = '$status',
+            `updated_at` = NOW()
+        WHERE `id` = '$user_id'
+    ";
+    
+    
+    $update_result = mysqli_query($con, $update_query);
+
+ if ($update_result) {
+    echo "<script>alert('User updated successfully'); window.location.href='../manageusers.php';</script>";
+} else {
+    echo "<script>alert('Error updating user: " . mysqli_error($con) . "'); window.location.href='../manageusers.php';</script>";
+}
+
+}
+
+
+
+
+if (isset($_POST['btn_insert_user'])) {
+
+    include('../assets/connection.php');
+
+    $full_name    = $_POST['full_name'];
+    $email        = $_POST['email'];
+    $phone        = $_POST['phone'];
+    $country_code = $_POST['country_code'];
+    $password     = $_POST['password'];
+    $role_id      = 3;
+    $status       = 'active';
+    $full_phone   = $country_code . $phone;
+
+
+
+    $check_query = "SELECT `id` FROM `users` WHERE `email` = '$email'";
+    $check_result = mysqli_query($con, $check_query);
+
+    if (mysqli_num_rows($check_result) > 0) {
+        echo "<script>alert('User already exists');window.location.href='../manageusers.php'</script>";
+    } else {
+        $insert_query = "INSERT INTO `users` (`name`, `phone`, `country_code`, `email`, `password`, `role_id`, `status`, `created_at`, `updated_at`) 
+        VALUES ('$full_name', '$full_phone', '$country_code', '$email', '$password', '$role_id', '$status', NOW(), NOW())";
+
+        $insert_result = mysqli_query($con, $insert_query);
+
+        if ($insert_result) {
+            echo "<script>alert('User inserted successfully');window.location.href='../manageusers.php'</script>";
+        } else {
+            echo "<script>alert('Error inserting user: " . mysqli_error($con) . "');window.location.href='../manageusers.php'</script>";
+        }
+    }
+}
+
+
+if (isset($_POST['btn_Update_slider'])) {
+    include('../assets/connection.php');
+    $id = mysqli_real_escape_string($con, $_POST['id']);
+    $alt_name = mysqli_real_escape_string($con, $_POST['alt_name']);
+    $MainCat = mysqli_real_escape_string($con, $_POST['MainCat']);
+    $product_id = mysqli_real_escape_string($con, $_POST['product_id']);
+
+ 
+    $sql = "UPDATE `sliders` SET `alt_name`='$alt_name',`type`='$MainCat',`product_id`='$product_id' WHERE  `id` = '$id'";
+    $result = mysqli_query($con, $sql);
+
+    if ($result) {
+     echo "<script>alert('Updated successfully');window.location.href='../manageSliders.php'</script>";
+    } else {
+        echo "<script>alert('Error updating slider: " . mysqli_error($con) . "');window.location.href='../manageSliders.php'</script>";
+    }
+}
+
+
 if(isset($_POST['btn_insert_code'])){
 
     include('../assets/connection.php');
@@ -1301,13 +1428,16 @@ if (isset($_POST['btnSubmit_insertMoreAddonType'])) {
 
 
 if (isset($_POST['btnSubmit_insertMoreAddonDressing'])) {
-    error_reporting(E_ALL);
-ini_set('display_errors', 1);
+//     error_reporting(E_ALL);
+// ini_set('display_errors', 1);
     include('../assets/connection.php');
     session_start();
 
     $addon_name = $_POST['addon_name'];
+    $addon_price = $_POST['addon_price'];
     $addon_id = $_POST['addon_id'];
+    
+    
 
     // Fetch dressing details once
     $sql = "SELECT * FROM `dressing_list` WHERE `dressing_id`= '$addon_id'";
@@ -1315,16 +1445,19 @@ ini_set('display_errors', 1);
 
     if (mysqli_num_rows($exec) > 0) {
         $data = mysqli_fetch_assoc($exec);
+        
+        $combined = array_combine($addon_name, $addon_price);
+        
         $dressing_title = $data['dressing_title'];
         $dressing_title_user = $data['dressing_title_user'];
 
-       foreach ($addon_name as $addtype_name) {
-    $addtype_name_safe = mysqli_real_escape_string($con, $addtype_name);
+       foreach ($combined as  $addon_name => $addon_price) {
+    $addtype_name_safe = mysqli_real_escape_string($con, $addon_name);
     $dressing_title_safe = mysqli_real_escape_string($con, $dressing_title);
     $dressing_title_user_safe = mysqli_real_escape_string($con, $dressing_title_user);
 
-    $insert_addontype = "INSERT INTO `dressing_sublist`(`dressing_id`, `dressing_title`, `dressing_title_user`, `dressing_name`) 
-        VALUES ('$addon_id', '$dressing_title_safe', '$dressing_title_user_safe', '$addtype_name_safe')";
+    $insert_addontype = "INSERT INTO `dressing_sublist`(`dressing_id`, `dressing_title`, `dressing_title_user`, `dressing_name`, `price`) 
+        VALUES ('$addon_id', '$dressing_title_safe', '$dressing_title_user_safe', '$addtype_name_safe', '$addon_price')";
     
     $result_addon = mysqli_query($con, $insert_addontype);
 }
@@ -1966,6 +2099,129 @@ if (isset($_POST['btnSubmit_Action'])) {
         $sql = "UPDATE `orders_zee` SET `status` = '$status', `delivered_at` = '$datetime' WHERE `id` = $order_id";
         $update = mysqli_query($con, $sql);
         
+        
+        
+                $get_user_query = "SELECT user_id FROM orders_zee WHERE id = '$order_id'";
+        $result_user = mysqli_query($con, $get_user_query);
+        $row_user = mysqli_fetch_assoc($result_user);
+        
+        if ($row_user) {
+            $user_id = $row_user['user_id'];
+        
+            $get_email_query = "SELECT email, name FROM users WHERE id = '$user_id'";
+            $result_email = mysqli_query($con, $get_email_query);
+            $row_email = mysqli_fetch_assoc($result_email);
+        
+            if ($row_email) {
+                $email = $row_email['email'];
+                $name = $row_email['name'];
+                
+                $mail = new PHPMailer(true);
+        
+                   try {
+                        $mail->isSMTP();
+                        $mail->Host = 'smtp.gmail.com';
+                        $mail->SMTPAuth = true;
+                        $mail->Username = 'boundedsocial@gmail.com'; 
+                        $mail->Password = 'iwumjedakkbledwe';
+                        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                        $mail->Port = 587;
+                    
+                        $mail->setFrom('support@pizzatime.de', 'Pizza Time');
+                        $mail->addAddress($email); 
+                    
+                        $mail->isHTML(true);
+                        
+                        
+                       $mail->Subject = "Ihre Bestellung wurde angenommen";
+
+                        $mail->Body = '
+                        <html>
+                        <head>
+                            <title>Ihre Bestellung wurde angenommen – Pizza Time</title>
+                            <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+                            <style>
+                                body {
+                                    font-family: "Poppins", Arial, sans-serif;
+                                    line-height: 1.6;
+                                    color: #333;
+                                    padding: 20px;
+                                    background-color: #f7f7f7;
+                                }
+                                .content {
+                                    background-color: rgba(255, 255, 255, 0.95);
+                                    padding: 20px;
+                                    border-radius: 8px;
+                                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                                }
+                                h1 {
+                                    color: #2B2B29;
+                                    font-size: 28px;
+                                    margin-bottom: 10px;
+                                }
+                                h3 {
+                                    color: #2B2B29;
+                                    font-size: 20px;
+                                    margin-top: 20px;
+                                }
+                                p, li {
+                                    color: #555;
+                                    font-size: 16px;
+                                    margin: 8px 0;
+                                }
+                                a {
+                                    color: #F2AF34;
+                                    text-decoration: none;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://pizzatime.foodola.shop/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                                <tr>
+                                    <td align="center">
+                                        <table width="100%" class="content" style="max-width: 600px;">
+                                            <tr>
+                                                <td align="center">
+                                                    <img src="https://pizzatime.foodola.shop/admin_panel/images/logo.png" alt="Pizza Time" style="width: 100px; margin-bottom: 20px;">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <h1>Ihre Bestellung wurde angenommen!</h1>
+                                                    <p>Hallo <strong>' . htmlspecialchars($name) . '</strong>,</p>
+                                                    <p>Vielen Dank für Ihre Bestellung bei <strong>Pizza Time</strong>.</p>
+                                                    <p><strong>Bestellnummer:</strong> ' . htmlspecialchars($order_id) . '</p>
+                                                    <p>Ihre Bestellung wurde erfolgreich angenommen und wird in Kürze bearbeitet.</p>
+                                                    <h3>Was kommt als Nächstes?</h3>
+                                                    <ul>
+                                                        <li>Unser Team bereitet Ihre Bestellung mit größter Sorgfalt zu.</li>
+                                                        <li>Sie erhalten eine Benachrichtigung, sobald Ihre Bestellung unterwegs ist.</li>
+                                                    </ul>
+                                                    <p>Bei Fragen stehen wir Ihnen jederzeit zur Verfügung.</p>
+                                                    <p>Mit freundlichen Grüßen,<br>Ihr Pizza Time Team</p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </body>
+                        </html>';
+                    
+                        $mail->send();
+                
+                } catch (Exception $e) {
+                    $data = [
+                        "status" => false,
+                        "Response_code" => 500,
+                        "Message" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"
+                    ];
+                    echo json_encode($data);
+                }
+
+            }
+        }
+        
     }elseif($status == 'delivered'){
     
             $checkcashback = "SELECT * FROM cash_back WHERE status = 1";
@@ -2066,6 +2322,123 @@ if (isset($_POST['btnSubmit_Action'])) {
             
             $insert_noti_details = "INSERT INTO `notification` (`user_id`, `content`, `purpose`) VALUES ('$user_id', '$content', 'order')";
             mysqli_query($con, $insert_noti_details);
+            
+            $get_user_query = "SELECT user_id FROM orders_zee WHERE id = '$order_id'";
+            $result_user = mysqli_query($con, $get_user_query);
+            $row_user = mysqli_fetch_assoc($result_user);
+            
+            if ($row_user) {
+                $user_id = $row_user['user_id'];
+            
+                // Fetch email and name of user from users table
+                $get_email_query = "SELECT email, name FROM users WHERE id = '$user_id'";
+                $result_email = mysqli_query($con, $get_email_query);
+                $row_email = mysqli_fetch_assoc($result_email);
+            
+                if ($row_email) {
+                    $email = $row_email['email'];
+                    $name = $row_email['name'];
+                    
+                    $mail = new PHPMailer(true);
+            
+                    try {
+                            $mail->isSMTP();
+                            $mail->Host = 'smtp.gmail.com';
+                            $mail->SMTPAuth = true;
+                            $mail->Username = 'boundedsocial@gmail.com'; 
+                            $mail->Password = 'iwumjedakkbledwe';
+                            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                            $mail->Port = 587;
+                        
+                            $mail->setFrom('support@pizzatime.de', 'Pizza Time');
+                            $mail->addAddress($email); 
+                        
+                            $mail->isHTML(true);
+                           $mail->Subject = "Ihre Bestellung wurde geliefert";
+
+$mail->Body = '
+<html>
+<head>
+    <title>Ihre Bestellung wurde geliefert – Pizza Time</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: "Poppins", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            padding: 20px;
+            background-color: #f7f7f7;
+        }
+        .content {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2B2B29;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        h3 {
+            color: #2B2B29;
+            font-size: 20px;
+            margin-top: 20px;
+        }
+        p, li {
+            color: #555;
+            font-size: 16px;
+            margin: 8px 0;
+        }
+        a {
+            color: #F2AF34;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://pizzatime.foodola.shop/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+        <tr>
+            <td align="center">
+                <table width="100%" class="content" style="max-width: 600px;">
+                    <tr>
+                        <td align="center">
+                            <img src="https://pizzatime.foodola.shop/admin_panel/images/logo.png" alt="Pizza Time" style="width: 100px; margin-bottom: 20px;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h1>Ihre Bestellung wurde geliefert!</h1>
+                            <p>Hallo <strong>' . htmlspecialchars($user_name) . '</strong>,</p>
+                            <p>Wir freuen uns, Ihnen mitteilen zu können, dass Ihre Bestellung erfolgreich geliefert wurde.</p>
+                            <p><strong>Bestellnummer:</strong> #' . htmlspecialchars($order_id) . '</p>
+                            <h3>Guten Appetit!</h3>
+                            <p>Wir hoffen, dass Sie Ihr Essen genießen. Vielen Dank, dass Sie bei <strong>Pizza Pizza Time</strong> bestellt haben.</p>
+                            <p>Wenn Sie Fragen haben oder Feedback geben möchten, stehen wir Ihnen jederzeit zur Verfügung.</p>
+                            <p>Mit freundlichen Grüßen,<br>Ihr Pizza Time Team</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>';
+
+                    $mail->send();
+    
+                        } catch (Exception $e) {
+                            $data = [
+                                "status" => false,
+                                "Response_code" => 500,
+                                "Message" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"
+                            ];
+                            echo json_encode($data);
+                        }
+
+                }
+            }
+            
             
     }
 

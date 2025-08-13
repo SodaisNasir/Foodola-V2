@@ -22,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $type_title = mysqli_real_escape_string($conn, trim($record['type_title']));
             $type_title_user = mysqli_real_escape_string($conn, trim($record['type_title_user']));
             $ts_name = mysqli_real_escape_string($conn, trim($record['ts_name']));
+            $price = mysqli_real_escape_string($conn, trim($record['price']));
 
             // Check if the type already exists
             $checkTypeSql = "SELECT type_id FROM types_list WHERE type_title = '$type_title' AND type_title_user = '$type_title_user' LIMIT 1";
@@ -42,8 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (!mysqli_fetch_assoc($resultSub)) {
                 // Insert into types_sublist
-                $insertSubSql = "INSERT INTO types_sublist (type_id, type_title, type_title_user, ts_name)
-                                 VALUES ($type_id, '$type_title', '$type_title_user', '$ts_name')";
+                $insertSubSql = "INSERT INTO types_sublist (type_id, type_title, type_title_user, ts_name, price)
+                                 VALUES ($type_id, '$type_title', '$type_title_user', '$ts_name', '$price')";
                 mysqli_query($conn, $insertSubSql);
             }
         }

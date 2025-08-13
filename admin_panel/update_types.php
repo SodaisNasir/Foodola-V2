@@ -253,9 +253,9 @@
                                         <th>Type ID</th>
                                         <th>Type Name</th>
                                         <th>Type Title</th>
+                                        <th>Type Title User</th>
                                         <th>Type price</th>
                                         <th>Save</th>
-                                        <!--<th>Update</th>-->
                                         <th>Delete</th>
                                     </tr>
                                 </thead>
@@ -273,10 +273,10 @@
                                           echo "<td>{$row['ts_id']}</td>";
                                           echo "<td class='editable' contenteditable='true' data-field='ts_name' ts_name='cost'>{$row['ts_name']}</td>";
                                           echo "<td class='editable' contenteditable='false' data-field='type_title' ts_name='cost'>{$row['type_title']}</td>";
-                                          echo "<td class='editable' contenteditable='false' data-field='type_price' ts_name='price'>{$row['price']}</td>";
+                                          echo "<td class='editable' contenteditable='true' data-field='type_title_user' ts_name='cost'>{$row['type_title_user']}</td>";
+                                          echo "<td class='editable' contenteditable='true' data-field='price' ts_name='price'>{$row['price']}</td>";
                                 
                                           echo "<td><button class='btn btn-success save-btn' style='display:none;'>Save</button></td>";  
-                                        //   echo '<td><button class="btn btn-primary" onclick="openAddMore(\''. $row['ts_id'] .'\' ,\''.$row['ts_name'].'\', \''.$row['type_title'].'\')">Update</button></td>';
                                           echo '<td><button class="btn btn-danger" onclick="deleteRow(\''. $row['ts_id'] .'\')">Delete</button></td>';   
                                           echo "</tr>";
                                           $index++;
@@ -292,9 +292,9 @@
                                         <th>Type ID</th>
                                         <th>Type Name</th>
                                         <th>Type title</th>
+                                        <th>Type Title User</th>
                                         <th>Type Price</th>
                                         <th>Save</th>
-                                        <!--<th>Update</th>-->
                                         <th>Delete</th>
                                     </tr>
                                 </tfoot>
@@ -577,17 +577,41 @@ function toggle(status,id){
 
 <script>
 $(document).ready(function () {
-    // Show Save button when title is edited
+    // Show Save button when editable content is changed
     $('.editable').on('input', function () {
         $(this).closest('tr').find('.save-btn').show();
-    });
+        
+        
+           const field = $(this).data('field');
 
-    // Save updated title
+        // Allow only numbers and one dot for 'price' fields
+        if (field === 'price' || field === 'cost' || field === 'discount') {
+            let value = $(this).text();
+            value = value.replace(/[^0-9.]/g, ''); // Remove non-numeric and non-dot
+            const parts = value.split('.');
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts[1]; // Keep only the first dot
+            }
+            $(this).text(value);
+            placeCaretAtEnd(this); // Keep cursor at end
+        }
+        
+    });
+    
+    
+    
+    
+    
+
+    // Save button click handler
     $('.save-btn').on('click', function () {
         const row = $(this).closest('tr');
         const id = row.data('id');
         const ts_name = row.find('[data-field="ts_name"]').text().trim();
         const type_title = row.find('[data-field="type_title"]').text().trim();
+        const type_title_user = row.find('[data-field="type_title_user"]').text().trim();
+        const price = row.find('[data-field="price"]').text().trim();
+
 
         $.ajax({
             url: '../API/update_inline_subtypes.php',
@@ -597,23 +621,35 @@ $(document).ready(function () {
                 id: id,
                 ts_name: ts_name,
                 type_title: type_title,
-
+                type_title_user: type_title_user,
+                price: price
             },
             success: function (response) {
                 if (response.status) {
                     alert(response.message);
-                    row.find('.save-btn').hide();
+                    row.find('.save-btn').hide(); // Hide the save button again
                 } else {
                     alert("Error: " + response.message);
                 }
             },
-            error: function (xhr) {
-                alert("Request failed: " + xhr.responseText);
+            error: function (xhr, status, error) {
+                alert("AJAX Request failed: " + error);
             }
         });
     });
 });
 
+   function placeCaretAtEnd(el) {
+        el.focus();
+        if (typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined") {
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            range.collapse(false);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+    }
 
 $(document).ready(function () {
     var table = $('#example').DataTable(
@@ -633,14 +669,14 @@ $(document).ready(function () {
                 filename: 'types_csv',
                 bom: true,
                 exportOptions: {
-                    columns: [1,2,3], 
+                    columns: [2,3,4], 
                     format: {
                         header: function (data, columnIdx) {
                             switch(columnIdx) {
             
-                                case 1: return 'ts_id';
-                                case 2: return 'ts_name';
-                                case 3: return 'ts_title';
+                                case 2: return 'ts_id';
+                                case 3: return 'ts_name';
+                                case 4: return 'ts_title';
                                 default: return data;
                             }
                         }
