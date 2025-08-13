@@ -319,7 +319,7 @@ body {
 
 <body>
   <div class="receipt-container print">
-    <div class="header-logo">
+ <div class="header-logo">
       <img src="images/logo.png" alt="Firmenlogo" class="logo">
       <h3 class="company-name">Food Vibe</h3>
     </div>

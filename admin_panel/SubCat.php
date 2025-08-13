@@ -4,9 +4,9 @@
 <?php
 
 if (isset($_GET['Massage'])) {
-    if ($_GET['Massage'] == 'Successfully updated sub category') {
+    if ($_GET['Massage'] == 'Sucessfully updated sub category.') {
         header("Refresh: 3; url='SubCat.php'");
-        echo "<script>alert('Successfully updated sub category')</script>";
+        echo "<script>alert('Sucessfully updated sub category.')</script>";
     } else {
         echo "<script>alert('The was some error occured!')</script>";
     }
@@ -157,7 +157,7 @@ if (isset($_GET['Massage'])) {
                             <h2 class="content-header-title float-left mb-0">Manage Sub Category</h2>
                             <div class="breadcrumb-wrapper col-12">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="index.html">Home</a>
+                                    <li class="breadcrumb-item"><a href="index.php">Home</a>
                                     </li>
                                     <li class="breadcrumb-item active">Manage Sub Category
                                     </li>
@@ -221,28 +221,37 @@ if (isset($_GET['Massage'])) {
                                                     <tr data-id='{$id}'>
                                                         <th>☰</th>
                                                         <th>S no.</th>
-                                                        <th>Cateogry ID</th>
+                                                        <!--<th>Cateogry ID</th>-->
                                                         <th>Category Name</th>
-                                                        <th>Create time</th>
+                                                        <th>Category Image</th>
+                                                        <th>Banner Image</th>
+                                                        <!--<th>Create time</th>-->
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="sortableBody">
                                                     <?php
                                                     include_once('connection.php');
-                                                    $sql = "SELECT `id`, `category_id`, `name`, `img`, `created_at`, `updated_at`, `sort_order` FROM `sub_categories` ORDER BY `sort_order` ASC  ";
+                                                    $sql = "SELECT `id`, `category_id`, `name`, `img`,`banner_image`, `created_at`, `updated_at`, `sort_order` FROM `sub_categories` ORDER BY `sort_order` ASC  ";
                                                     $result = mysqli_query($conn, $sql);
                                                     
                                                     $index = 0;
+                                                    
                                                     while ($row = mysqli_fetch_array($result)) {
-                                                         $id  = $row['id'];
+                                                        $id  = $row['id'];
                                                         $sn = $index + 1;
+                                                        
+                                                        $imagePath = !empty($row['img']) ? 'Uploads/' . $row['img'] : '/admin_panel/images/logo.png';
+                                                        $banner_image = !empty($row['banner_image']) ? 'Uploads/' . $row['banner_image'] : '/admin_panel/images/logo.png';
                                                         echo "<tr data-id='{$id}'>";
                                                         echo "<td class='drag-handle'>☰</td>";
                                                         echo "<td>{$sn}</td>";
-                                                        echo "<td>{$row['id']}</td>";
                                                         echo "<td name='tittlename'>{$row['name']}</td>";
-                                                        echo "<td name='subname'>{$row['created_at']}</td>";
+                                                        echo "<td><img src='{$imagePath}' alt='Image' width='60' height='60' style='object-fit: cover; border-radius: 5px;'></td>";
+                                                        echo "<td><img src='{$banner_image}' alt='Image' width='60' height='60' style='object-fit: cover; border-radius: 5px;'></td>";
+                                                        // echo "<td>{$row['id']}</td>";
+                                                        // echo "<td name='subname'>{$row['created_at']}</td>";
+                                                        
 
                                                         echo '<td><button class="btn btn-primary m-1" onclick="openAddMore(\'' . $row['id'] . '\' ,\'' . $row['name'] . '\' ,\'' . $row['created_at'] . '\')">Update</button>';
 
@@ -258,9 +267,11 @@ if (isset($_GET['Massage'])) {
                                                 <tfoot>
                                                     <tr>
                                                         <th>S no.</th>
-                                                        <th>Cateogry ID</th>
+                                                        <!--<th>Cateogry ID</th>-->
                                                         <th>Category Name</th>
-                                                        <th>Create time</th>
+                                                        <th>Category Image</th>
+                                                        <th>Banner Image</th>
+                                                        <!--<th>Create time</th>-->
                                                         <th>Action</th>
                                                     </tr>
                                                 </tfoot>
@@ -393,8 +404,6 @@ if (isset($_GET['Massage'])) {
 
     <script>
         $(document).ready(function() {
-            
-            
             // Update subcategory image
             $("#updateImageForm").submit(function(e) {
                 e.preventDefault();
