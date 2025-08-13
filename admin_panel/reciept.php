@@ -331,7 +331,6 @@ body {
     </div>
 
 
-
     <div class="order-info">
     <h3><?php echo htmlspecialchars($datetime); ?></h3>
 
@@ -409,7 +408,7 @@ body {
           $addons = json_decode($value['addons']);
           $dressing = json_decode($value['dressing']);
           $types = json_decode($value['types']);
-          $basePrice = $value['price'];
+          $basePrice =  $value['price'] ;
           $totalAmount += $basePrice * $value['qty'];
 
           $addonforinner = 0;

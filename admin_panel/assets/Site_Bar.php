@@ -192,6 +192,14 @@
           </li>
           <?php } ?>
           
+                   <?php if($currentFile=="imprint.php"){?>
+          <li class="active nav-item"><a href="imprint.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Imprint</span></a>
+          </li>
+           <?php }else{ ?>
+            <li class=" nav-item"><a href="imprint.php"><i class="feather icon-edit"></i><span class="menu-title" data-i18n="Calender">Imprint</span></a>
+          </li>
+          <?php } ?>
+          
           
           <li class=" navigation-header"><span>View the Details</span>
           </li>

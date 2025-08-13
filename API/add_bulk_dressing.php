@@ -48,8 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
         }
-            fclose($handle);
 
+            fclose($handle);
         
         echo json_encode(['message' => 'Dressing imported successfully']);
     } else {

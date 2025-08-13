@@ -268,8 +268,8 @@ $('#dynamic_fields').append(`
     const sampleData = [
         ["Type of pasta", "Type of pasta's", "with gnocchi", "2.50"],
         ["Type of pasta", "Type of pasta's", "with rigatoni", "2.50"],
-        ["Type of pasta", "Type of pasta's", "with spaghetti", "2.50"],
-        ["Type of pasta", "Type of pasta's", "with tagliatelle", "2.50"]
+        ["Type of pasta", "Type of pasta's", "with spaghetti", "0.00"],
+        ["Type of pasta", "Type of pasta's", "with tagliatelle","2.50"]
     ];
 
     // Convert to CSV string

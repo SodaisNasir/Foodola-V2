@@ -86,11 +86,21 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
     $current_day = date("l"); 
 
     // Get today's working hours
-    $sql = "SELECT `id`, `day`, `start_time_1`, `end_time_1`, `start_time_2`, `end_time_2` FROM `tbl_working_hours` WHERE `day` = '$current_day'";
+    $sql = "SELECT `id`, `day`, `start_time_1`, `end_time_1`, `start_time_2`, `end_time_2`, `is_holiday` FROM `tbl_working_hours` WHERE `day` = '$current_day'";
     $exe = mysqli_query($conn, $sql);
     $data = mysqli_fetch_array($exe);
 
     $isOpen = false;
+    
+    if ($data['is_holiday'] == 1) {
+    echo json_encode([
+        "status" => false,
+        "Response_code" => 205,
+        "Message" => "Heute ist ein Feiertag. Das Restaurant ist geschlossen.",
+        "english_message" => "Today is a holiday. The restaurant is closed."
+    ]);
+    exit;
+}
 
     if ($data) {
         $start_time_1 = $data['start_time_1'];

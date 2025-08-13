@@ -56,7 +56,7 @@
         <h3>Naming of the responsible body </h3>
         <p>The responsible body for data processing on this website is: </p>
 
-        <p>Pizza Pazza home service. The responsible body decides alone or together with others on the purposes and means of processing personal data (e.g. names, contact details, etc.). </p>
+        <p>Burger Planet home service. The responsible body decides alone or together with others on the purposes and means of processing personal data (e.g. names, contact details, etc.). </p>
      
 
         <h3 class="mb-3">Revocation of your consent to data processing.</h3>

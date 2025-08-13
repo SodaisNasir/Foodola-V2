@@ -252,7 +252,6 @@
                                         <th>Dressing Name for users</th>
                                         <th>Dressing Price</th>
                                         <th>Save</th>
-                                        <!--<th>Update</th>-->
                                         <th>Delete</th>
                                       </tr>
                                 </thead>
@@ -270,13 +269,10 @@
                                             echo "<td>{$row['ds_id']}</td>";
                                             echo "<td class='editable' contenteditable='false' name='dressing_title' data-field='dressing_title' >{$row['dressing_title']}</td>";
                                             echo "<td class='editable' contenteditable='true' ts_name='dressing_name' data-field='dressing_name'>{$row['dressing_name']}</td>";
-                                            echo "<td class='editable' contenteditable='false' name='dressing_title_user' data-field='dressing_title_user'>{$row['dressing_title_user']}</td>";
-                                            echo "<td class='editable' contenteditable='false' name='dressing_price' data-field='dressing_price'>{$row['price']}</td>";
+                                            echo "<td class='editable' contenteditable='true' name='dressing_title_user' data-field='dressing_title_user'>{$row['dressing_title_user']}</td>";
+                                            echo "<td class='editable' contenteditable='true' name='dressing_price' data-field='price'>{$row['price']}</td>";
                                             
                                             echo "<td><button class='btn btn-success save-btn' style='display:none;'>Save</button></td>";    
-                                            
-                                            
-                                            // echo '<td><button class="btn btn-primary" onclick="openAddMore(\''. $row['ds_id'] .'\' ,\''.$row['dressing_name'].'\', \''.$row['dressing_title'].'\')">Update</button></td>';
 
                                               echo '<td><button class="btn btn-danger" onclick="deleteRow(\''. $row['ds_id'] .'\')">Delete</button></td>';
                                           echo "</tr>";
@@ -296,7 +292,6 @@
     <th>Dressing Name for users</th>
     <th>Dressing Price</th>
     <th>Save</th>
-    <!--<th>Update</th>-->
     <th>Delete</th>
   </tr>
 </tfoot>
@@ -573,6 +568,18 @@ $(document).ready(function () {
     // Show Save button when title is edited
     $('.editable').on('input', function () {
         $(this).closest('tr').find('.save-btn').show();
+        const field = $(this).data('field');
+        
+             if (field === 'price' || field === 'cost' || field === 'discount') {
+            let value = $(this).text();
+            value = value.replace(/[^0-9.]/g, ''); // Remove non-numeric and non-dot
+            const parts = value.split('.');
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts[1]; // Keep only the first dot
+            }
+            $(this).text(value);
+            placeCaretAtEnd(this); // Keep cursor at end
+        }
     });
 
     // Save updated title
@@ -582,7 +589,10 @@ $(document).ready(function () {
         const title = row.find('[data-field="dressing_title"]').text().trim();
         const dressing_title_user = row.find('[data-field="dressing_title_user"]').text().trim();
         const dressing_name = row.find('[data-field="dressing_name"]').text().trim();
-  console.log('Sending:', { id: id, dressing_title: title, dressing_title_user: dressing_title_user, dressing_name: dressing_name })
+        const price = row.find('[data-field="price"]').text().trim();
+        
+        
+//   console.log('Sending:', { id: id, dressing_title: title, dressing_title_user: dressing_title_user, dressing_name: dressing_name })
 
         $.ajax({
             url: '../API/update_subdressing_inline.php',
@@ -592,7 +602,8 @@ $(document).ready(function () {
                 id: id,
                 title: title,
                 dressing_title_user:dressing_title_user,
-                dressing_name:dressing_name
+                dressing_name:dressing_name,
+                price : price
             },
             success: function (response) {
                 if (response.status) {
@@ -608,6 +619,19 @@ $(document).ready(function () {
         });
     });
 });
+
+
+   function placeCaretAtEnd(el) {
+        el.focus();
+        if (typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined") {
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            range.collapse(false);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+    }
 </script>
 
 
