@@ -1,4 +1,5 @@
 <?php
+
 define('BASE_DIRECTORY', __DIR__ . '/../../API/');
 
 require BASE_DIRECTORY . 'PHPMailer-master/src/PHPMailer.php';
@@ -7,9 +8,6 @@ require BASE_DIRECTORY . 'PHPMailer-master/src/Exception.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-
-
-
 //             error_reporting(E_ALL);
 // ini_set('display_errors', 1);
 
@@ -448,7 +446,7 @@ $filewithnewname = mysqli_real_escape_string($con, $filewithnewname);
 
       if ($result) {
         $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                            VALUES ('pizzablitz', '1' ,NOW(),NOW())";
+                            VALUES ('latenight', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {
@@ -953,7 +951,7 @@ $product_id = mysqli_real_escape_string($con, $product_id);
 
       if ($result) {
         $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                     VALUES ('pizzablitz', '1' ,NOW(),NOW())";
+                     VALUES ('latenight', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {
@@ -1319,7 +1317,7 @@ include('../assets/config.php');
         $result = mysqli_query($con,$sql);
             if($result){
                  $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                                VALUES ('pizzablitz', '1' ,NOW(),NOW())";
+                                VALUES ('latenight', '1' ,NOW(),NOW())";
                 $monitor_update = mysqli_query($con, $monitor_sql);
         
                 if ($monitor_update) {
@@ -2099,8 +2097,10 @@ if (isset($_POST['btnSubmit_Action'])) {
         $sql = "UPDATE `orders_zee` SET `status` = '$status', `delivered_at` = '$datetime' WHERE `id` = $order_id";
         $update = mysqli_query($con, $sql);
         
-           
-        $get_user_query = "SELECT user_id FROM orders_zee WHERE id = '$order_id'";
+        
+        
+        
+          $get_user_query = "SELECT user_id FROM orders_zee WHERE id = '$order_id'";
         $result_user = mysqli_query($con, $get_user_query);
         $row_user = mysqli_fetch_assoc($result_user);
         
@@ -2126,7 +2126,7 @@ if (isset($_POST['btnSubmit_Action'])) {
                         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                         $mail->Port = 587;
                     
-                        $mail->setFrom('support@pizzapazza.de', 'Pizza Pazza');
+                        $mail->setFrom('support@pizzalatenight.de', 'Pizza Late Night');
                         $mail->addAddress($email); 
                     
                         $mail->isHTML(true);
@@ -2137,7 +2137,7 @@ if (isset($_POST['btnSubmit_Action'])) {
                         $mail->Body = '
                         <html>
                         <head>
-                            <title>Ihre Bestellung wurde angenommen – Pizza Pazza</title>
+                            <title>Ihre Bestellung wurde angenommen – Pizza Late Night</title>
                             <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
                             <style>
                                 body {
@@ -2175,20 +2175,20 @@ if (isset($_POST['btnSubmit_Action'])) {
                             </style>
                         </head>
                         <body>
-                            <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://pizzapazza.foodola.shop/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://pizzalatenight-ka.de/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
                                 <tr>
                                     <td align="center">
                                         <table width="100%" class="content" style="max-width: 600px;">
                                             <tr>
                                                 <td align="center">
-                                                    <img src="https://pizzapazza.foodola.shop/admin_panel/images/logo.png" alt="Pizza Pazza" style="width: 100px; margin-bottom: 20px;">
+                                                    <img src="https://pizzalatenight-ka.de/admin_panel/images/logo.png" alt="Pizza Late Night" style="width: 100px; margin-bottom: 20px;">
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>
                                                     <h1>Ihre Bestellung wurde angenommen!</h1>
                                                     <p>Hallo <strong>' . htmlspecialchars($name) . '</strong>,</p>
-                                                    <p>Vielen Dank für Ihre Bestellung bei <strong>Pizza Pazza</strong>.</p>
+                                                    <p>Vielen Dank für Ihre Bestellung bei <strong>Pizza Late Night</strong>.</p>
                                                     <p><strong>Bestellnummer:</strong> ' . htmlspecialchars($order_id) . '</p>
                                                     <p>Ihre Bestellung wurde erfolgreich angenommen und wird in Kürze bearbeitet.</p>
                                                     <h3>Was kommt als Nächstes?</h3>
@@ -2197,7 +2197,7 @@ if (isset($_POST['btnSubmit_Action'])) {
                                                         <li>Sie erhalten eine Benachrichtigung, sobald Ihre Bestellung unterwegs ist.</li>
                                                     </ul>
                                                     <p>Bei Fragen stehen wir Ihnen jederzeit zur Verfügung.</p>
-                                                    <p>Mit freundlichen Grüßen,<br>Ihr Pizza Pazza Team</p>
+                                                    <p>Mit freundlichen Grüßen,<br>Ihr Pizza Late Night Team</p>
                                                 </td>
                                             </tr>
                                         </table>
@@ -2220,8 +2220,6 @@ if (isset($_POST['btnSubmit_Action'])) {
 
             }
         }
-        
-        
         
     }elseif($status == 'delivered'){
     
@@ -2326,7 +2324,8 @@ if (isset($_POST['btnSubmit_Action'])) {
             
             
             
-              
+            
+                
             $get_user_query = "SELECT user_id FROM orders_zee WHERE id = '$order_id'";
             $result_user = mysqli_query($con, $get_user_query);
             $row_user = mysqli_fetch_assoc($result_user);
@@ -2354,80 +2353,80 @@ if (isset($_POST['btnSubmit_Action'])) {
                             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                             $mail->Port = 587;
                         
-                            $mail->setFrom('support@pizzapazza.de', 'Pizza Pazza');
+                            $mail->setFrom('support@pizzalatenight.de', 'Pizza Late Night');
                             $mail->addAddress($email); 
                         
                             $mail->isHTML(true);
                            $mail->Subject = "Ihre Bestellung wurde geliefert";
 
-                    $mail->Body = '
-                    <html>
-                    <head>
-                        <title>Ihre Bestellung wurde geliefert – Pizza Pazza</title>
-                        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-                        <style>
-                            body {
-                                font-family: "Poppins", Arial, sans-serif;
-                                line-height: 1.6;
-                                color: #333;
-                                padding: 20px;
-                                background-color: #f7f7f7;
-                            }
-                            .content {
-                                background-color: rgba(255, 255, 255, 0.95);
-                                padding: 20px;
-                                border-radius: 8px;
-                                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                            }
-                            h1 {
-                                color: #2B2B29;
-                                font-size: 28px;
-                                margin-bottom: 10px;
-                            }
-                            h3 {
-                                color: #2B2B29;
-                                font-size: 20px;
-                                margin-top: 20px;
-                            }
-                            p, li {
-                                color: #555;
-                                font-size: 16px;
-                                margin: 8px 0;
-                            }
-                            a {
-                                color: #F2AF34;
-                                text-decoration: none;
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://pizzapazza.foodola.shop/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
-                            <tr>
-                                <td align="center">
-                                    <table width="100%" class="content" style="max-width: 600px;">
-                                        <tr>
-                                            <td align="center">
-                                                <img src="https://pizzapazza.foodola.shop/admin_panel/images/logo.png" alt="Pizza Pazza" style="width: 100px; margin-bottom: 20px;">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <h1>Ihre Bestellung wurde geliefert!</h1>
-                                                <p>Hallo <strong>' . htmlspecialchars($user_name) . '</strong>,</p>
-                                                <p>Wir freuen uns, Ihnen mitteilen zu können, dass Ihre Bestellung erfolgreich geliefert wurde.</p>
-                                                <p><strong>Bestellnummer:</strong> #' . htmlspecialchars($order_id) . '</p>
-                                                <h3>Guten Appetit!</h3>
-                                                <p>Wir hoffen, dass Sie Ihr Essen genießen. Vielen Dank, dass Sie bei <strong>Pizza Pazza</strong> bestellt haben.</p>
-                                                <p>Wenn Sie Fragen haben oder Feedback geben möchten, stehen wir Ihnen jederzeit zur Verfügung.</p>
-                                                <p>Mit freundlichen Grüßen,<br>Ihr Pizza Pazza Point Team</p>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
-                    </body>
-                    </html>';
+$mail->Body = '
+<html>
+<head>
+    <title>Ihre Bestellung wurde geliefert – Pizza Late Night</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: "Poppins", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            padding: 20px;
+            background-color: #f7f7f7;
+        }
+        .content {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2B2B29;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        h3 {
+            color: #2B2B29;
+            font-size: 20px;
+            margin-top: 20px;
+        }
+        p, li {
+            color: #555;
+            font-size: 16px;
+            margin: 8px 0;
+        }
+        a {
+            color: #F2AF34;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://pizzalatenight-ka.de/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+        <tr>
+            <td align="center">
+                <table width="100%" class="content" style="max-width: 600px;">
+                    <tr>
+                        <td align="center">
+                            <img src="https://pizzalatenight-ka.de/admin_panel/images/logo.png" alt="Pizza Late Night" style="width: 100px; margin-bottom: 20px;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h1>Ihre Bestellung wurde geliefert!</h1>
+                            <p>Hallo <strong>' . htmlspecialchars($user_name) . '</strong>,</p>
+                            <p>Wir freuen uns, Ihnen mitteilen zu können, dass Ihre Bestellung erfolgreich geliefert wurde.</p>
+                            <p><strong>Bestellnummer:</strong> #' . htmlspecialchars($order_id) . '</p>
+                            <h3>Guten Appetit!</h3>
+                            <p>Wir hoffen, dass Sie Ihr Essen genießen. Vielen Dank, dass Sie bei <strong>Pizza Late Night</strong> bestellt haben.</p>
+                            <p>Wenn Sie Fragen haben oder Feedback geben möchten, stehen wir Ihnen jederzeit zur Verfügung.</p>
+                            <p>Mit freundlichen Grüßen,<br>Ihr Pizza Late Night Team</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>';
 
                     $mail->send();
     
@@ -2442,7 +2441,6 @@ if (isset($_POST['btnSubmit_Action'])) {
 
                 }
             }
-            
             
     }
 
@@ -2629,7 +2627,7 @@ if(isset($_POST['updateProduct'])){
     
     if($update){
          $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                        VALUES ('pizzablitz', '1' ,NOW(),NOW())";
+                        VALUES ('latenight', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {

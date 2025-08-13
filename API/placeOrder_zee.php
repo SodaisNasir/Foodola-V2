@@ -2,17 +2,13 @@
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
 require __DIR__ . '/vendor/autoload.php';
-
 require 'PHPMailer-master/src/PHPMailer.php';
 require 'PHPMailer-master/src/SMTP.php';
 require 'PHPMailer-master/src/Exception.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-
 use Pusher\Pusher;
-
-
 
 if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC') {
 
@@ -98,10 +94,10 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
             $sql_ins = "INSERT INTO `orders_zee`(`user_id`, `status`, `payment_type`,
                 `order_total_price`, `payment_status`, `Shipping_address`, `Shipping_address_2`,
                 `Shipping_city`, `Shipping_area`, `Shipping_postal_code`, `Shipping_Cost`,
-                `Shipping_state`, `addtional_notes` , `created_at`  , `payment_method` , `transaction_id` , `order_type`, `total_netto_tax`, `total_metto_tax`, `branch_id`, `platform`, `ordersheduletype`, `sheduletime`, `total_discount`, `created_at`) VALUES 
+                `Shipping_state`, `addtional_notes` , `created_at`  , `payment_method` , `transaction_id` , `order_type`, `total_netto_tax`, `total_metto_tax`, `branch_id`, `platform`, `ordersheduletype`, `sheduletime`, `total_discount`) VALUES 
                 ('$user_id','neworder','$payment_type','$order_total_price','$payment_status','$Shipping_address',
                   '$Shipping_address_2','$Shipping_city','$Shipping_area','$Shipping_postal_code','$Shipping_cost',
-                  '$Shipping_state','$addtional_notes' , '$datetime' , '$payment_method' , '$transaction_id' , '$order_type', '$total_netto_tax', '$total_metto_tax', '$branch_id', '$platform', '$ordersheduletype', '$sheduletime', '$total_discount', '$datetime')";
+                  '$Shipping_state','$addtional_notes' , '$datetime' , '$payment_method' , '$transaction_id' , '$order_type', '$total_netto_tax', '$total_metto_tax', '$branch_id', '$platform', '$ordersheduletype', '$sheduletime', '$total_discount')";
             $exec_sql_ins = mysqli_query($conn, $sql_ins);
 
             $last_id = $conn->insert_id;
@@ -308,7 +304,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                             $options
                         );
 
-                        $channel = 'pizzapazza_orders'; // Channel name dynamically based on user ID
+                        $channel = 'latenight_orders'; // Channel name dynamically based on user ID
                         $event   = 'new_order';
                         $data    = [
                             'order_id' => $last_id,
@@ -322,6 +318,9 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         // } else {
                         //     echo "Failed to trigger notification.";
                         // }
+                        
+                 
+                    
 
                     } catch (Exception $e) {
                         // error_log("Pusher error: " . $e->getMessage());
@@ -330,11 +329,11 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     
                     
                     
-                            // sending mail to resturant owner
-                
-                    $mail = new PHPMailer(true);
-
-                    try {
+                    
+                    
+                        $mail = new PHPMailer(true);
+                        
+                        try {
                         
                                 $mail->isSMTP();
                                 $mail->Host = 'smtp.gmail.com';  
@@ -344,13 +343,13 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;  
                                 $mail->Port = 587;  
                         
-                                $mail->setFrom('support@pizzapazza.de', 'Pizza Pazza');
+                                $mail->setFrom('support@burgerpoint.de', 'Pizza Late Night');
                                 $mail->addAddress('asharifkhan245@gmail.com');
                         
                                 $mail->isHTML(true);
                                 
-                                $mail->Subject = "Neue Bestellung #$last_id – Pizza Pazza";
-
+                                $mail->Subject = "Neue Bestellung #$last_id – Pizza Late Night";
+                                
                                 $mail->Body = '
                                 <html>
                                 <head>
@@ -399,7 +398,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                 <body>
                                     <div class="email-container">
                                         <div class="header">
-                                            <img src="https://pizzapazza.foodola.shop/admin_panel/images/logo.png" alt="Pizza Pazza" style="width: 100px;">
+                                            <img src="https://pizzalatenight-ka.de/admin_panel/images/logo.png" alt="Pizza Late Night" style="width: 100px;">
                                             <h2>Neue Bestellung erhalten</h2>
                                         </div>
                                         <div class="order-details">
@@ -412,10 +411,10 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                             <p><strong>Zusätzliche Hinweise:</strong> ' . htmlspecialchars($additionalNotes) . '</p>
                                             <p><strong>Bestelldatum:</strong> ' . htmlspecialchars($datetime) . '</p>
                                 
-                                            <a class="view-button" href="https://pizzapazza.foodola.shop/admin_panel/order_details.php?order_id=' . $last_id . '" target="_blank">Bestellung anzeigen</a>
+                                            <a class="view-button" href="https://pizzalatenight-ka.de/admin_panel/order_details.php?order_id=' . $last_id . '" target="_blank">Bestellung anzeigen</a>
                                         </div>
                                         <div class="footer">
-                                            <p>Diese E-Mail wurde automatisch von Pizza Pazza generiert.</p>
+                                            <p>Diese E-Mail wurde automatisch von Pizza Late Night generiert.</p>
                                         </div>
                                     </div>
                                 </body>
@@ -425,14 +424,14 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         
                                 $mail->send();
             
-                        } catch (Exception $e) {
+                    } catch (Exception $e) {
                             $data = [
                                     "status" => false,
                                     "Response_code" => 500,
                                     "Message" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"
                                 ];
                                 echo json_encode($data);
-                        }
+                    }
                 }
             }
         } else {
@@ -496,10 +495,10 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
         $sql_ins = "INSERT INTO `orders_zee`(`user_id`, `status`, `payment_type`,
                 `order_total_price`, `payment_status`, `Shipping_address`, `Shipping_address_2`,
                 `Shipping_city`, `Shipping_area`, `Shipping_postal_code`, `Shipping_Cost`,
-                `Shipping_state`, `addtional_notes` , `created_at`  , `payment_method` , `transaction_id` , `order_type`, `total_netto_tax`, `total_metto_tax`, `branch_id`, `platform`, `ordersheduletype`, `sheduletime`, `total_discount`, `created_at`) VALUES 
+                `Shipping_state`, `addtional_notes` , `created_at`  , `payment_method` , `transaction_id` , `order_type`, `total_netto_tax`, `total_metto_tax`, `branch_id`, `platform`, `ordersheduletype`, `sheduletime`, `total_discount`) VALUES 
                 ('$user_id','neworder','$payment_type','$order_total_price','$payment_status','$Shipping_address',
                   '$Shipping_address_2','$Shipping_city','$Shipping_area','$Shipping_postal_code','$Shipping_cost',
-                  '$Shipping_state','$addtional_notes' , '$datetime' , '$payment_method' , '$transaction_id' , '$order_type', '$total_netto_tax', '$total_metto_tax', '$branch_id', '$platform', '$ordersheduletype', '$sheduletime', '$total_discount', '$datetime')";
+                  '$Shipping_state','$addtional_notes' , '$datetime' , '$payment_method' , '$transaction_id' , '$order_type', '$total_netto_tax', '$total_metto_tax', '$branch_id', '$platform', '$ordersheduletype', '$sheduletime', '$total_discount')";
         $exec_sql_ins = mysqli_query($conn, $sql_ins);
 
         $last_id = $conn->insert_id;
@@ -706,7 +705,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         $options
                     );
 
-                    $channel = 'pizzapazza_orders'; // Channel name dynamically based on user ID
+                    $channel = 'latenight_orders'; // Channel name dynamically based on user ID
                     $event   = 'new_order';
                     $data    = [
                         'order_id' => $last_id,
@@ -720,18 +719,17 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     // } else {
                     //     echo "Failed to trigger notification.";
                     // }
+                    
 
                 } catch (Exception $e) {
                     // error_log("Pusher error: " . $e->getMessage());
                     echo "Error triggering notification: " . $e->getMessage();
                 }
                 
+                        $mail = new PHPMailer(true);
                 
-                            // sending mail to resturant owner
                 
-                    $mail = new PHPMailer(true);
-
-                    try {
+                                try {
                         
                                 $mail->isSMTP();
                                 $mail->Host = 'smtp.gmail.com';  
@@ -741,13 +739,13 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;  
                                 $mail->Port = 587;  
                         
-                                $mail->setFrom('support@pizzapazza.de', 'Pizza Pazza');
+                                $mail->setFrom('support@burgerpoint.de', 'Pizza Late Night');
                                 $mail->addAddress('asharifkhan245@gmail.com');
                         
                                 $mail->isHTML(true);
                                 
-                                $mail->Subject = "Neue Bestellung #$last_id – Pizza Pazza";
-
+                                $mail->Subject = "Neue Bestellung #$last_id – Pizza Late Night";
+                                
                                 $mail->Body = '
                                 <html>
                                 <head>
@@ -796,7 +794,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                 <body>
                                     <div class="email-container">
                                         <div class="header">
-                                            <img src="https://pizzapazza.foodola.shop/admin_panel/images/logo.png" alt="Pizza Pazza" style="width: 100px;">
+                                            <img src="https://pizzalatenight-ka.de/admin_panel/images/logo.png" alt="Pizza Late Night" style="width: 100px;">
                                             <h2>Neue Bestellung erhalten</h2>
                                         </div>
                                         <div class="order-details">
@@ -809,10 +807,10 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                             <p><strong>Zusätzliche Hinweise:</strong> ' . htmlspecialchars($additionalNotes) . '</p>
                                             <p><strong>Bestelldatum:</strong> ' . htmlspecialchars($datetime) . '</p>
                                 
-                                            <a class="view-button" href="https://pizzapazza.foodola.shop/admin_panel/order_details.php?order_id=' . $last_id . '" target="_blank">Bestellung anzeigen</a>
+                                            <a class="view-button" href="https://pizzalatenight-ka.de/admin_panel/order_details.php?order_id=' . $last_id . '" target="_blank">Bestellung anzeigen</a>
                                         </div>
                                         <div class="footer">
-                                            <p>Diese E-Mail wurde automatisch von Pizza Pazza generiert.</p>
+                                            <p>Diese E-Mail wurde automatisch von Pizza Late Night generiert.</p>
                                         </div>
                                     </div>
                                 </body>
@@ -822,16 +820,14 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         
                                 $mail->send();
             
-                        } catch (Exception $e) {
+                    } catch (Exception $e) {
                             $data = [
                                     "status" => false,
                                     "Response_code" => 500,
                                     "Message" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"
                                 ];
                                 echo json_encode($data);
-                        }
-                
-                
+                    }
             }
         }
     }

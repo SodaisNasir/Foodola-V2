@@ -2,6 +2,13 @@
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
 require __DIR__ . '/../vendor/autoload.php';
+require '../PHPMailer-master/src/PHPMailer.php';
+require '../PHPMailer-master/src/SMTP.php';
+require '../PHPMailer-master/src/Exception.php';
+
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 use Pusher\Pusher;
 
 
@@ -10,6 +17,8 @@ header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Access-Control-Allow-Credentials: true");
 include('connection.php');
+
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
   http_response_code(200);
@@ -435,7 +444,7 @@ $sheduletime = $_POST['sheduletime'] . ":00";
                     );
                 
                     // prepare notification
-                    $channel = 'pizzapazza_orders'; // Channel name dynamically based on user ID
+                    $channel = 'latenight_orders'; // Channel name dynamically based on user ID
                     $event   = 'new_order';
                     $data    = [
                         'order_id' => $last_order_id,
@@ -458,7 +467,10 @@ $sheduletime = $_POST['sheduletime'] . ":00";
                 }
                 
                 
-                    $mail = new PHPMailer(true);
+                
+                
+                
+                     $mail = new PHPMailer(true);
 
                     try {
                         
@@ -470,12 +482,12 @@ $sheduletime = $_POST['sheduletime'] . ":00";
                                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;  
                                 $mail->Port = 587;  
                         
-                                $mail->setFrom('support@pizzapazza.de', 'Pizza Pazza');
-                                $mail->addAddress('asharifkhan@gmail.com');
+                                $mail->setFrom('support@pizzalatenight.de', 'Pizza Late Night');
+                                $mail->addAddress('Ejaz8156@gmail.com');
                         
                                 $mail->isHTML(true);
                                 
-                                $mail->Subject = "Neue Bestellung #$last_id – Pizza Pazza";
+                                $mail->Subject = "Neue Bestellung #$last_order_id – Pizza Late Night";
 
                                 $mail->Body = '
                                 <html>
@@ -525,7 +537,7 @@ $sheduletime = $_POST['sheduletime'] . ":00";
                                 <body>
                                     <div class="email-container">
                                         <div class="header">
-                                            <img src="https://pizzapazza.foodola.shop/admin_panel/images/logo.png" alt="Pizza Pazza" style="width: 100px;">
+                                            <img src="https://pizzalatenight-ka.de/admin_panel/images/logo.png" alt="Pizza Late Night" style="width: 100px;">
                                             <h2>Neue Bestellung erhalten</h2>
                                         </div>
                                         <div class="order-details">
@@ -538,10 +550,10 @@ $sheduletime = $_POST['sheduletime'] . ":00";
                                             <p><strong>Zusätzliche Hinweise:</strong> ' . htmlspecialchars($additionalNotes) . '</p>
                                             <p><strong>Bestelldatum:</strong> ' . htmlspecialchars($datetime) . '</p>
                                 
-                                            <a class="view-button" href="https://pizzapazza.foodola.shop/admin_panel/order_details.php?order_id=' . $last_order_id . '" target="_blank">Bestellung anzeigen</a>
+                                            <a class="view-button" href="https://pizzalatenight-ka.de/admin_panel/order_details.php?order_id=' . $last_order_id . '" target="_blank">Bestellung anzeigen</a>
                                         </div>
                                         <div class="footer">
-                                            <p>Diese E-Mail wurde automatisch von Pizza Pazza generiert.</p>
+                                            <p>Diese E-Mail wurde automatisch von Pizza Late Night generiert.</p>
                                         </div>
                                     </div>
                                 </body>
@@ -558,6 +570,8 @@ $sheduletime = $_POST['sheduletime'] . ":00";
                                 ];
                                 echo json_encode($data);
                         }
+                
+                
                     
           
           
@@ -830,7 +844,7 @@ $sheduletime = $_POST['sheduletime'] . ":00";
                     );
                 
                     // prepare notification
-                    $channel = 'pizzapazza_orders'; // Channel name 
+                    $channel = 'latenight_orders'; // Channel name 
                     $event   = 'new_order';
                     $data    = [
                         'order_id' => $last_order_id,
@@ -853,7 +867,9 @@ $sheduletime = $_POST['sheduletime'] . ":00";
         }
         
         
-                       $mail = new PHPMailer(true);
+        
+        
+              $mail = new PHPMailer(true);
 
                     try {
                         
@@ -865,12 +881,12 @@ $sheduletime = $_POST['sheduletime'] . ":00";
                                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;  
                                 $mail->Port = 587;  
                         
-                                $mail->setFrom('support@pizzapazza.de', 'Pizza Pazza');
+                                $mail->setFrom('support@pizzalatenight.de', 'Pizza Late Night');
                                 $mail->addAddress('asharifkhan245@gmail.com');
                         
                                 $mail->isHTML(true);
                                 
-                                $mail->Subject = "Neue Bestellung #$last_id – Pizza Pazza";
+                                $mail->Subject = "Neue Bestellung #$last_order_id – Pizza Late Night";
 
                                 $mail->Body = '
                                 <html>
@@ -920,7 +936,7 @@ $sheduletime = $_POST['sheduletime'] . ":00";
                                 <body>
                                     <div class="email-container">
                                         <div class="header">
-                                            <img src="https://pizzapazza.foodola.shop/admin_panel/images/logo.png" alt="Pizza Pazza" style="width: 100px;">
+                                            <img src="https://pizzalatenight-ka.de/admin_panel/images/logo.png" alt="Pizza Late Night" style="width: 100px;">
                                             <h2>Neue Bestellung erhalten</h2>
                                         </div>
                                         <div class="order-details">
@@ -933,10 +949,10 @@ $sheduletime = $_POST['sheduletime'] . ":00";
                                             <p><strong>Zusätzliche Hinweise:</strong> ' . htmlspecialchars($additionalNotes) . '</p>
                                             <p><strong>Bestelldatum:</strong> ' . htmlspecialchars($datetime) . '</p>
                                 
-                                            <a class="view-button" href="https://pizzapazza.foodola.shop/admin_panel/order_details.php?order_id=' . $last_order_id . '" target="_blank">Bestellung anzeigen</a>
+                                            <a class="view-button" href="https://pizzalatenight-ka.de/admin_panel/order_details.php?order_id=' . $last_order_id . '" target="_blank">Bestellung anzeigen</a>
                                         </div>
                                         <div class="footer">
-                                            <p>Diese E-Mail wurde automatisch von Pizza Pazza generiert.</p>
+                                            <p>Diese E-Mail wurde automatisch von Pizza Late Night generiert.</p>
                                         </div>
                                     </div>
                                 </body>
@@ -953,8 +969,9 @@ $sheduletime = $_POST['sheduletime'] . ":00";
                                 ];
                                 echo json_encode($data);
                         }
+                
+                
                     
-          
                     
     } else {
       echo json_encode(array("statusCode" => 201, "message" => "Failed to create order", "error" => mysqli_error($conn)));

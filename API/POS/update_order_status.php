@@ -9,10 +9,6 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Content-Type: application/json"); 
 
-include('connection.php');
-
-
-
 
 require '../PHPMailer-master/src/PHPMailer.php';
 require '../PHPMailer-master/src/SMTP.php';
@@ -21,6 +17,7 @@ require '../PHPMailer-master/src/Exception.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+include('connection.php');
 
 $response = ["status" => "error", "message" => "An unexpected error occurred"];
 
@@ -49,9 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $delivered_at = $time->format('Y-m-d g:i A'); 
     $sql = "UPDATE `orders_zee` SET `status` = '$status', `delivered_at` = '$delivered_at' WHERE `id` = $order_id";
     
-    
-    
-        $get_user_query = "SELECT user_id FROM orders_zee WHERE id = '$order_id'";
+    $get_user_query = "SELECT user_id FROM orders_zee WHERE id = '$order_id'";
         $result_user = mysqli_query($conn, $get_user_query);
         $row_user = mysqli_fetch_assoc($result_user);
         
@@ -77,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                         $mail->Port = 587;
                     
-                        $mail->setFrom('support@pizzapazza.de', 'Pizza Pazza');
+                        $mail->setFrom('support@pizzalatenight.de', 'Pizza Late Night');
                         $mail->addAddress($email); 
                     
                         $mail->isHTML(true);
@@ -86,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $mail->Body = '
                         <html>
                         <head>
-                            <title>Ihre Bestellung wurde angenommen – Pizza Pazza</title>
+                            <title>Ihre Bestellung wurde angenommen – Pizza Late Night</title>
                             <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
                             <style>
                                 body {
@@ -124,20 +119,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </style>
                         </head>
                         <body>
-                            <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://pizzapazza.foodola.shop/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://pizzalatenight-ka.de/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
                                 <tr>
                                     <td align="center">
                                         <table width="100%" class="content" style="max-width: 600px;">
                                             <tr>
                                                 <td align="center">
-                                                    <img src="https://pizzapazza.foodola.shop/admin_panel/images/logo.png" alt="Pizza Pazza" style="width: 100px; margin-bottom: 20px;">
+                                                    <img src="https://pizzalatenight-ka.de/admin_panel/images/logo.png" alt="Pizza Late Night" style="width: 100px; margin-bottom: 20px;">
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>
                                                     <h1>Ihre Bestellung wurde angenommen!</h1>
                                                     <p>Hallo <strong>' . htmlspecialchars($name) . '</strong>,</p>
-                                                    <p>Vielen Dank für Ihre Bestellung bei <strong>Pizza Pazza</strong>.</p>
+                                                    <p>Vielen Dank für Ihre Bestellung bei <strong>Pizza Late Night</strong>.</p>
                                                     <p><strong>Bestellnummer:</strong> ' . htmlspecialchars($order_id) . '</p>
                                                     <p>Ihre Bestellung wurde erfolgreich angenommen und wird in Kürze bearbeitet.</p>
                                                     <h3>Was kommt als Nächstes?</h3>
@@ -146,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                         <li>Sie erhalten eine Benachrichtigung, sobald Ihre Bestellung unterwegs ist.</li>
                                                     </ul>
                                                     <p>Bei Fragen stehen wir Ihnen jederzeit zur Verfügung.</p>
-                                                    <p>Mit freundlichen Grüßen,<br>Ihr Pizza Pazza Team</p>
+                                                    <p>Mit freundlichen Grüßen,<br>Ihr Pizza Late Night Team</p>
                                                 </td>
                                             </tr>
                                         </table>
@@ -265,6 +260,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             curl_close($ch);
             
             
+            
+                        
+                        
             $get_user_query = "SELECT user_id FROM orders_zee WHERE id = '$order_id'";
             $result_user = mysqli_query($conn, $get_user_query);
             $row_user = mysqli_fetch_assoc($result_user);
@@ -291,16 +289,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                             $mail->Port = 587;
                         
-                            $mail->setFrom('support@pizzapazza.de', 'Pizza Pazza');
+                            $mail->setFrom('support@pizzalatenight.de', 'Pizza Late Night');
                             $mail->addAddress($email); 
                         
                             $mail->isHTML(true);
-                                                      $mail->Subject = "Ihre Bestellung wurde geliefert";
+                            $mail->Subject = "Ihre Bestellung wurde geliefert";
 
                 $mail->Body = '
                 <html>
                 <head>
-                    <title>Ihre Bestellung wurde geliefert – Pizza Pazza</title>
+                    <title>Ihre Bestellung wurde geliefert – Pizza Late Night</title>
                     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
                     <style>
                         body {
@@ -338,13 +336,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </style>
                 </head>
                 <body>
-                    <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://pizzapazza.foodola.shop/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://pizzalatenight-ka.de/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
                         <tr>
                             <td align="center">
                                 <table width="100%" class="content" style="max-width: 600px;">
                                     <tr>
                                         <td align="center">
-                                            <img src="https://pizzapazza.foodola.shop/admin_panel/images/logo.png" alt="Pizza Pazza" style="width: 100px; margin-bottom: 20px;">
+                                            <img src="https://pizzalatenight-ka.de/admin_panel/images/logo.png" alt="Pizza Late Point" style="width: 100px; margin-bottom: 20px;">
                                         </td>
                                     </tr>
                                     <tr>
@@ -354,9 +352,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <p>Wir freuen uns, Ihnen mitteilen zu können, dass Ihre Bestellung erfolgreich geliefert wurde.</p>
                                             <p><strong>Bestellnummer:</strong> #' . htmlspecialchars($order_id) . '</p>
                                             <h3>Guten Appetit!</h3>
-                                            <p>Wir hoffen, dass Sie Ihr Essen genießen. Vielen Dank, dass Sie bei <strong>Pizza Pazza</strong> bestellt haben.</p>
+                                            <p>Wir hoffen, dass Sie Ihr Essen genießen. Vielen Dank, dass Sie bei <strong>Pizza Late Night</strong> bestellt haben.</p>
                                             <p>Wenn Sie Fragen haben oder Feedback geben möchten, stehen wir Ihnen jederzeit zur Verfügung.</p>
-                                            <p>Mit freundlichen Grüßen,<br>Ihr Pizza Pazza Team</p>
+                                            <p>Mit freundlichen Grüßen,<br>Ihr Pizza Late Night Team</p>
                                         </td>
                                     </tr>
                                 </table>
