@@ -8,7 +8,6 @@ $DB_PASSWORD='>c6Ly*27w/#';
 
 
 
-
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
 
 // Check connection

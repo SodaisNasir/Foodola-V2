@@ -131,7 +131,7 @@ if ($data && isset($data['created_at'])) {
 
   .receipt-container {
     width: 100%; /* Use full printable width */
-    max-width: 80mm; /* Limit width if needed */
+    max-width: 70mm; /* Limit width if needed */
     margin: 0; /* No auto centering */
     padding: 0;
     text-align: center;
@@ -147,7 +147,7 @@ body {
 
 .receipt-container {
   width: 100%;
-  max-width: 80mm;
+  max-width: 70mm;
   margin: 0;
   padding: 0;
   text-align: center;
@@ -189,6 +189,7 @@ body {
     .order-info {
       text-align: left;
       margin-top: 5px;
+      margin-left: 20px ;
       margin-bottom: 5px;
             font-weight: bold;
 
@@ -452,11 +453,12 @@ body {
               </div>
             </td>
             <td class="total-price">
-              €<?php
+              <?php
               $total_product_price = number_format(($basePrice + $addonforinner) * $value['qty'], 2, '.', '');
               echo htmlspecialchars($total_product_price);
               $finalTotal += $total_product_price;
               ?>
+              €
             </td>
           </tr>
       <?php }
@@ -553,11 +555,12 @@ body {
               </div>
             </td>
             <td class="total-price font-weight-bold">
-              €<?php
+              <?php
               $dealTotal = number_format($value['price'] + $addonforinner, 2, '.', '');
               echo $dealTotal;
               $finalTotal += $dealTotal;
               ?>
+              €
             </td>
           </tr>
       <?php }
@@ -578,12 +581,12 @@ $grand_total = $subtotal - $discount + $shipping;
 
 <div class="footer-totals">
   <ul>
-    <li><span>Tatsächlicher Preis:</span><span>€<?php echo number_format($subtotal, 2, '.', ''); ?></span></li>
-    <li><span>Rabatt:</span><span>-€<?php echo number_format($discount, 2, '.', ''); ?></span></li>
-    <li><span>Lieferung:</span><span>€<?php echo number_format($shipping, 2, '.', ''); ?></span></li>
-    <li><span>MwSt. (7%):</span><span>€<?php echo number_format($tax_7, 2, '.', ''); ?></span></li>
-    <li><span>MwSt. (19%):</span><span>€<?php echo number_format($tax_19, 2, '.', ''); ?></span></li>
-    <li><span>Gesamt:</span><span>€<?php echo number_format($grand_total, 2, '.', ''); ?></span></li>
+    <li><span>Tatsächlicher Preis:</span><span><?php echo number_format($subtotal, 2, '.', ''); ?>€</span></li>
+    <li><span>Rabatt:</span><span>-<?php echo number_format($discount, 2, '.', ''); ?>€</span></li>
+    <li><span>Lieferung:</span><span><?php echo number_format($shipping, 2, '.', ''); ?>€</span></li>
+    <li><span>MwSt. (7%):</span><span><?php echo number_format($tax_7, 2, '.', ''); ?>€</span></li>
+    <li><span>MwSt. (19%):</span><span><?php echo number_format($tax_19, 2, '.', ''); ?>€</span></li>
+    <li><span>Gesamt:</span><span><?php echo number_format($grand_total, 2, '.', ''); ?>€</span></li>
   </ul>
 </div>
 

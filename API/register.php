@@ -155,24 +155,51 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                                                         <img src="https://burgerplanet-ka.de/admin_panel/images/logo.png" alt="Pizza Pizza Time Logo" style="width: 100px; margin-bottom: 20px;">
                                                     </td>
                                                 </tr>
-                                                <tr>
+                                               <tr>
                                                     <td>
-                                                         <h1>Welcome, ' . htmlspecialchars($name) . '!</h1>
-                                                        <p>Thank you for joining Burger Planet! We’re thrilled to welcome you to our community of pizza and burger lovers.</p>
-                                                        <h3>Why You’ll Love Pizza Burger Planet:</h3>
+                                                        <h1>Willkommen bei Pizza Planet – Dein Genuss startet jetzt! 🍕🎉</h1>
+                                                        <p>Hallo ' . htmlspecialchars($name) . ',</p>
+                                                        <p>herzlich willkommen bei Pizza Planet! 🥳<br>
+                                                        Schön, dass du da bist – wir freuen uns riesig, dich in unserer Community von Pizza- und Burgerliebhabern zu begrüßen.</p>
+                                                
+                                                        <h3>Warum du Pizza Planet lieben wirst:</h3>
                                                         <ul>
-                                                            <li>🍕 <strong>Authentic Flavors:</strong> Indulge in our chef-crafted pizzas and burgers made with the finest ingredients.</li>
-                                                            <li>🚀 <strong>Fast Delivery:</strong> Enjoy hot and fresh meals at your doorstep in no time.</li>
+                                                            <li>🍕 <strong>Höchste Qualität – ohne Kompromisse:</strong><br>
+                                                            Unsere Speisen werden mit frischen, ausgewählten Zutaten zubereitet. Qualität steht bei uns immer an erster Stelle – und das schmeckt man!</li>
+                                                            <li>🚀 <strong>Blitzschnelle Lieferung:</strong><br>
+                                                            Dein Lieblingsessen kommt heiß und frisch direkt zu dir nach Hause.</li>
+                                                            <li>🤝 <strong>Service mit Herz:</strong><br>
+                                                            Wir lieben, was wir tun – und das merkt man in jedem Bissen und jedem Service!</li>
                                                         </ul>
-                                                        <h3>Get Started Now!</h3>
-                                                        <p>Here’s what you can do next:</p>
+                                                
+                                                        <h3>🎁 So holst du dir deinen Willkommensbonus:</h3>
+                                                        <p>Du bekommst von uns ein kleines Geschenk zum Start!<br>So einfach geht’s:</p>
                                                         <ul>
-                                                            <li>👀 <a href="https://burgerplanet.foodola.shop/">Browse our Menu</a> and find your favorites.</li>
-                                                            <li>🛒 Place your first order and experience the convenience and quality we’re known for!</li>
+                                                            <li>📱 Öffne unsere App</li>
+                                                            <li>👤 Gehe in dein Profil</li>
+                                                            <li>🏷️ Tippe auf "Promo-Code"</li>
+                                                            <li>🔓 Gib deinen Gutscheincode ein, um deinen Bonus zu aktivieren</li>
                                                         </ul>
-                                                        <p>If you have any questions, feel free to reach out to our support team. We’re here to make sure you have the best experience possible.</p>
-                                                        <h4>Stay Connected:</h4>
-                                                        <p>Follow us on social media for the latest updates, promotions, and delicious inspiration!</p>
+                                                        <p>💰 Deine Bonuspunkte werden automatisch deinem Wallet gutgeschrieben – dort kannst du jederzeit deinen Punktestand einsehen und bei deiner nächsten Bestellung verwenden.</p>
+                                                
+                                                        <h3>📱 Exklusive Vorteile nur in unserer App:</h3>
+                                                        <ul>
+                                                            <li>✅ 5 % Sofortrabatt auf jede Bestellung</li>
+                                                            <li>💸 10 % Cashback bei jedem Einkauf</li>
+                                                            <li>🌟 Optimale Nutzererfahrung dank einfacher Bedienung</li>
+                                                            <li>🔔 Live-Updates zu jedem Schritt deiner Bestellung</li>
+                                                        </ul>
+                                                
+                                                        <h3>Was jetzt zu tun ist:</h3>
+                                                        <ul>
+                                                            <li>👀 <a href="https://burgerplanet-ka.de">Entdecke unsere Speisekarte</a> und finde deine Favoriten</li>
+                                                            <li>🛒 Bestelle direkt und genieße den Unterschied</li>
+                                                        </ul>
+                                                
+                                                        <p>Bei Fragen steht dir unser Support-Team gerne zur Seite – wir sind immer für dich da!</p>
+                                                
+                                                        <h4>Bleib mit uns in Kontakt:</h4>
+                                                        <p>Verpasse keine Aktion und keine Neuigkeit – folge uns auf Social Media!</p>
                                                         <div class="social-icons">
                                                             <a href="https://facebook.com/BurgerPlanet" target="_blank">
                                                                 <img src="https://burgerplanet-ka.de/API/uploads/facebook_logo.png" alt="Facebook">
@@ -184,10 +211,11 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                                                                 <img src="https://burgerplanet-ka.de/API/uploads/twitter_logo.png" alt="Twitter">
                                                             </a>
                                                         </div>
-                                                        <p>Enjoy every bite!</p>
-                                                        <p>Warm regards,<br><strong>The Burger Planet Team</strong></p>
+                                                
+                                                        <p>Guten Appetit & viel Spaß beim Genießen!<br><strong>Dein Pizza Planet Team 🍕</strong></p>
                                                     </td>
                                                 </tr>
+
                                             </table>
                                         </td>
                                     </tr>
