@@ -3,12 +3,20 @@
 
 <?php
 if (isset($_GET['Massage'])) {
-    if ($_GET['Massage'] == 'Sucessfully updated category.') {
-        echo "<script>alert('Successfully updated category.')</script>";
+    if ($_GET['Massage']== 'Category Updated Successfully') {
+        echo "<script>alert('Category Updated Successfully')</script>";
         header("Refresh: 1; url='viewcategories.php'");
     } else {
-        echo "<script>alert('Category added successfully')</script>";
+        echo "<script>alert('New Category Added Successfully')</script>";
+              header("Refresh: 1; url='viewcategories.php'");
     }
+}
+
+$categoryCount = 0;
+$sql = "SELECT COUNT(*) AS total FROM categories";
+$result = mysqli_query($conn, $sql);
+if ($row = mysqli_fetch_assoc($result)) {
+    $categoryCount = (int)$row['total'];
 }
 ?>
 
@@ -49,6 +57,23 @@ if (isset($_GET['Massage'])) {
     <!-- END: Custom CSS-->
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+
+<style>
+  #sortableBody tr {
+    cursor: move;
+  }
+  .drag-handle {
+    cursor: grab;
+    font-size: 18px;
+    user-select: none;
+  }
+  .drag-handle:active {
+    cursor: grabbing;
+  }
+</style>
+
+
+
 </head>
 
 <!-- BEGIN: Body-->
@@ -74,7 +99,7 @@ if (isset($_GET['Massage'])) {
                         <h2 class="content-header-title float-left mb-0">Manage Category</h2>
                         <div class="breadcrumb-wrapper col-12">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="index.html">Home</a>
+                                <li class="breadcrumb-item"><a href="index.php">Home</a>
                                 </li>
                                 <li class="breadcrumb-item active">Manage Category
                                 </li>
@@ -99,18 +124,21 @@ if (isset($_GET['Massage'])) {
                                     <div class="table-responsive">
                                         <table id="example" class="table">
                                             <thead>
-                                            <tr>
+                                            <tr data-id='{$id}'>
+                                                  <th>☰</th>
                                                 <th>S no.</th>
-                                                <th>Category ID</th>
                                                 <th>Category Name</th>
-                                                <th>Create time</th>
+                                                <th>Category Image</th>
+                                                <!--<th>Category ID</th>-->
+                                                <!--<th>Create time</th>-->
                                                 <th>Action</th>
                                             </tr>
                                             </thead>
-                                            <tbody>
+                                            <tbody id="sortableBody">
                                                    <?php
                                                     include_once('connection.php');
-                                                    $sql = "SELECT `id`, `name`, `img`, `created_at`, `updated_at` FROM `categories`";
+                                        $sql = "SELECT `id`, `name`, `img`, `created_at`, `updated_at`, `sort_order` FROM `categories` ORDER BY `sort_order` ASC";
+
                                                     $result = mysqli_query($conn, $sql);
                                                     $index = 0;
                                                     
@@ -119,12 +147,17 @@ if (isset($_GET['Massage'])) {
                                                         $name = $row['name'];
                                                         $created_at = $row['created_at'];
                                                         $id = $row['id'];
+                                                        
+                                                        $imagePath = !empty($row['img']) ? 'Uploads/' . $row['img'] : '/admin_panel/images/logo.png';
+                                                        
                                                     
-                                                        echo "<tr>";
+                                                        echo "<tr data-id='{$id}'>";
+                                                        echo "<td class='drag-handle'>☰</td>";
                                                         echo "<td>{$sn}</td>";
-                                                        echo "<td>{$row['id']}</td>";
+                                                        // echo "<td>{$row['id']}</td>";
                                                         echo "<td name='tittlename'>{$row['name']}</td>";
-                                                        echo "<td name='subname'>{$row['created_at']}</td>";
+                                                        echo "<td><img src='{$imagePath}' alt='Image' width='70' height='70' style='object-fit: cover; border-radius: 5px;'></td>";
+                                                        // echo "<td name='subname'>{$row['created_at']}</td>";
                                                         echo '<td>
                                                                 <button class="btn btn-primary" onclick="openAddMore(' . $id . ', \'' . addslashes($name) . '\')">Update</button>
                                                                 <button class="btn btn-secondary" onclick="openimagemodel(' . $id . ', \'' . addslashes($name) . '\')">Update Image</button>
@@ -139,9 +172,10 @@ if (isset($_GET['Massage'])) {
                                             <tfoot>
                                             <tr>
                                                 <th>S no.</th>
-                                                <th>Category ID</th>
+                                                <!--<th>Category ID</th>-->
                                                 <th>Category Name</th>
-                                                <th>Create time</th>
+                                                <th>Category Image</th>
+                                                <!--<th>Create time</th>-->
                                                 <th>Action</th>
                                             </tr>
                                             </tfoot>
@@ -177,26 +211,64 @@ if (isset($_GET['Massage'])) {
             </div>
 
             <!-- Update Category Modal -->
-            <div class="modal fade" id="updateCategoryModal" tabindex="-1" aria-labelledby="updateCategoryModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="updateCategoryModalLabel"></h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form method="POST" action="phpfiles/insertions.php">
-                                <input type="hidden" name="product_id" id="product_id">
-                                <div class="mb-3">
-                                    <label for="ProName" class="form-label">Category Name</label>
-                                    <input type="text" class="form-control" id="ProName" name="ProName" placeholder="Enter category name" required>
-                                </div>
-                                <button type="submit" name="updateCategory" class="btn btn-primary">Submit</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!--    <div class="modal fade" id="updateCategoryModal" tabindex="-1" aria-labelledby="updateCategoryModalLabel" aria-hidden="true">-->
+        <!--        <div class="modal-dialog">-->
+        <!--            <div class="modal-content">-->
+        <!--                <div class="modal-header">-->
+        <!--                    <h5 class="modal-title" id="updateCategoryModalLabel"></h5>-->
+        <!--                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
+        <!--                </div>-->
+        <!--                <div class="modal-body">-->
+        <!--                    <form method="POST" action="phpfiles/insertions.php">-->
+        <!--                        <input type="hidden" name="product_id" id="product_id">-->
+        <!--                        <div class="mb-3">-->
+        <!--                            <label for="ProName" class="form-label">Category Name</label>-->
+        <!--                            <input type="text" class="form-control" id="ProName" name="ProName" placeholder="Enter category name" required>-->
+        <!--                        </div>-->
+                                
+        <!--                         <select id="positionSelect" class="form-select" onchange="moveRowToTop(this.value)">-->
+          <!-- Options added dynamically via JS -->
+        <!--</select>-->
+        
+        <!--<button class="btn btn-warning mb-3" onclick="openPositionModal()">Sort Category Position</button>-->
+
+        <!--                        <button type="submit" name="updateCategory" class="btn btn-primary">Submit</button>-->
+        <!--                    </form>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--        </div>-->
+        <!--    </div>-->
+        <!-- Update Category Modal -->
+<div class="modal fade" id="updateCategoryModal" tabindex="-1" aria-labelledby="updateCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="updateCategoryModalLabel">Update Category</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="phpfiles/insertions.php">
+          <input type="hidden" name="product_id" id="product_id">
+          <div class="mb-3">
+            <label for="ProName" class="form-label">Category Name</label>
+            <input type="text" class="form-control" id="ProName" name="ProName" placeholder="Enter category name" required>
+          </div>
+
+          <!-- Select Position -->
+          <div class="mb-3">
+            <label for="positionSelect" class="form-label">Set Position</label>
+            <select id="positionSelect" class="form-select" onchange="moveRowToTop(this.value)">
+              <!-- Options filled via JS -->
+            </select>
+          </div>
+
+          <button type="submit" name="updateCategory" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 
         </div>
     </div>
@@ -204,23 +276,113 @@ if (isset($_GET['Massage'])) {
 <!-- END: Content-->
 
 <!--<script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha384-T9D0A/2jqEKbZ2dH1s5+6wsdPrjIYdeFbFSpYkYmD5E4bveQu6cD3fWAcDoJi6dg" crossorigin="anonymous"></script>-->
-<!--<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-OeIR/68Kfy87eI8Qq9NTtAgvsngF74+O7/EMqaXBdWq1s64Vcmz5+SUsp5cGdtmx" crossorigin="anonymous"></script>-->
-<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-GMFRYcANlsF1pyLQqD7bfz91IBhRyrdsVtJLBKHVxYvftoqxMJJmXCEpsGEL+zs1" crossorigin="anonymous"></script>-->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-OeIR/68Kfy87eI8Qq9NTtAgvsngF74+O7/EMqaXBdWq1s64Vcmz5+SUsp5cGdtmx" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-GMFRYcANlsF1pyLQqD7bfz91IBhRyrdsVtJLBKHVxYvftoqxMJJmXCEpsGEL+zs1" crossorigin="anonymous"></script>
 <script src="app-assets/vendors/js/vendors.min.js"></script>
 <script src="app-assets/vendors/js/forms/validation/jqBootstrapValidation.js"></script>
 <script src="app-assets/js/core/app-menu.min.js"></script>
 <script src="app-assets/js/core/app.min.js"></script>
 <script src="app-assets/js/scripts/forms/validation/form-validation.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script>
+    
+    
 function openAddMore(id, name, created_at) {
     $('#updateCategoryModal').modal('show');
     $('#product_id').val(id);
     $('#ProName').val(name);
     $('#updateCategoryModalLabel').text(`Update Category: ${name}`);
-    
+
+    populatePositionSelect(id);
 }
+
+function populatePositionSelect(currentId) {
+    const table = document.getElementById('example');
+    const rows = table.querySelectorAll('tbody tr');
+    const select = document.getElementById('positionSelect');
+    select.innerHTML = ''; // Clear previous options
+
+    rows.forEach((row, index) => {
+        const rowId = row.cells[1].textContent.trim();
+        const option = document.createElement('option');
+        option.value = index + 1;
+        option.text = `Position ${index + 1}`;
+        if (rowId === currentId.toString()) {
+            option.selected = true;  // Select current position
+        }
+        select.appendChild(option);
+    });
+}
+
+function moveRowToTop(position) {
+  const pos = parseInt(position);
+  const table = document.getElementById('example');
+  const tbody = table.querySelector('tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+
+  const modalId = document.getElementById('product_id').value.trim();
+
+  const selectedRow = rows.find(row => {
+    const rowId = row.cells[1]?.textContent.trim();
+    return rowId === modalId;
+  });
+
+  if (selectedRow && pos >= 1 && pos <= rows.length) {
+    tbody.removeChild(selectedRow);
+    tbody.insertBefore(selectedRow, tbody.children[pos - 1]);
+
+    // After moving, update the select options to reflect new order
+    populatePositionSelect(modalId);
+
+    // Optional: If you want to close the modal after moving, uncomment these lines:
+    // $('#updateCategoryModal').modal('hide');
+    // $('.modal-backdrop').remove();
+    // $('body').removeClass('modal-open');
+  }
+}
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const tbody = document.getElementById('sortableBody');
+
+Sortable.create(document.getElementById('sortableBody'), {
+  animation: 150,
+  handle: '.drag-handle', // restrict drag to handle only
+  onEnd: function (evt) {
+    const newOrder = [];
+    document.querySelectorAll('#sortableBody tr').forEach((row, index) => {
+      newOrder.push({ id: row.dataset.id, position: index + 1 });
+    });
+
+    // Optionally send to server:
+    sendOrderToServer(newOrder);
+  }
+});
+});
+
+
+function sendOrderToServer(orderArray) {
+  fetch('../API/update_category_order.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ order: orderArray })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert(data.message);
+    } else {
+      alert('Failed to update order');
+    }
+  });
+}
+
+
+
 
 function openimagemodel(id,name) {
     $('#updateImageModal').modal('show');
@@ -240,5 +402,7 @@ function openimagemodel(id,name) {
         ]
     } );
 } );</script>
+
+
 </body>
 </html>

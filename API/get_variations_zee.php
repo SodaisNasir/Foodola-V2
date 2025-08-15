@@ -21,7 +21,7 @@ if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbq
         while($row2 = mysqli_fetch_array($exec_sql2)){
             $temp = [
                 "product_id"=>$row2['product_id'],
-                "sub_title"=>$row2['name']."(".$row2['sub_title'].")",
+                "sub_title"=>"(".$row2['sub_title'].")",
                 "var_id"=>$row2['var_id'],
                 ];
                 array_push($variations_array,$temp);

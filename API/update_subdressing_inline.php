@@ -10,16 +10,13 @@ $id = $_POST['id'] ?? '';
 $title = mysqli_real_escape_string($conn, $_POST['title'] ?? '');
 $dressing_title_user = mysqli_real_escape_string($conn, $_POST['dressing_title_user'] ?? '');
 $dressing_name = mysqli_real_escape_string($conn, $_POST['dressing_name'] ?? '');
+$price = mysqli_real_escape_string($conn, $_POST['price'] ?? '');
 
 
-// Simple validation
-if (empty($id) || empty($title) || empty($dressing_title_user) || empty($dressing_name)) {
-    echo json_encode(['status' => false, 'message' => 'Missing required parameters']);
-    exit;
-}
+// Simple validati
 
 // Update query
-$sql = "UPDATE `dressing_sublist` SET `dressing_title` = '$title', `dressing_title_user` = '$dressing_title_user', `dressing_name` = '$dressing_name' WHERE `ds_id` = '$id'";
+$sql = "UPDATE `dressing_sublist` SET `dressing_title` = '$title', `dressing_title_user` = '$dressing_title_user', `dressing_name` = '$dressing_name', `price` = '$price' WHERE `ds_id` = '$id'";
 
 if (mysqli_query($conn, $sql)) {
     echo json_encode(['status' => true, 'message' => 'Dressing updated successfully']);

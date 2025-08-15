@@ -138,7 +138,7 @@
                 <h2 class="content-header-title float-left mb-0">Manage Credit</h2>
                 <div class="breadcrumb-wrapper col-12">
                   <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Home</a>
+                    <li class="breadcrumb-item"><a href="index.php">Home</a>
                     </li>
                     <li class="breadcrumb-item active">Manage Credit
                     </li>
@@ -301,7 +301,7 @@
                     <div class="controls">
                         <select name="Type" class="form-control" >
                             <option value="add">Add</option>
-                            <option value="sub">Subtract</option>
+                            <!--<option value="sub">Subtract</option>-->
                         </select>
                     </div>
                   </div>

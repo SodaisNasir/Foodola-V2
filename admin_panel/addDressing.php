@@ -231,7 +231,20 @@ $(document).ready(function() {
   var i = 1;
   $('#add').click(function() {
     if (i <= 20) {
-      $('#dynamic_fields').append('<div class="row"><div class="col-sm-6" ><div class="form-group"><input type="text" name="add_dressing[]" class="form-control" placeholder="Add Dressing" required ></div></div></div>')
+$('#dynamic_fields').append(`
+  <div class="row mb-2" id="row-${i}">
+    <div class="col-sm-6">
+      <div class="form-group">
+        <input type="text" name="add_dressing[]" class="form-control" placeholder="Add Dressing" required>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="form-group">
+        <input type="text" name="add_price[]" class="form-control" placeholder="Add Dressing Price" required>
+      </div>
+    </div>
+  </div>
+`);
       i++;
     }
   });
@@ -244,13 +257,13 @@ $(document).ready(function() {
 
 
  function downloadSampleCSV() {
-    const headers = ["dressing_title", "dressing_title_user", "dressing_name"];
+    const headers = ["dressing_title", "dressing_title_user", "dressing_name", "price"];
     const sampleData = [
-        ["Dressing for pasta", "Dressing for pasta", "Cheese-gratinated"],
-        ["Dressing for pasta", "Dressing for pasta", "Yogurt"],
-        ["Dressing for pasta", "Dressing for pasta", "Garlic"],
-        ["Dressing for pasta", "Dressing for pasta", "Ice and Oil"],
-        ["Dressing for pasta", "Dressing for pasta", "Without Dressing"]
+        ["Dressing for pasta", "Dressing for pasta", "Cheese-gratinated", "2.50"],
+        ["Dressing for pasta", "Dressing for pasta", "Yogurt", "2.50"],
+        ["Dressing for pasta", "Dressing for pasta", "Garlic", "2.50"],
+        ["Dressing for pasta", "Dressing for pasta", "Ice and Oil", "2.50"],
+        ["Dressing for pasta", "Dressing for pasta", "Without Dressing", "2.50"]
     ];
 
     // Convert to CSV string

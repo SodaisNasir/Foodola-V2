@@ -5,108 +5,107 @@ $pageName = basename($_SERVER['PHP_SELF'], ".php");
 
 switch ($pageName) {
     case 'index':
-        $pageTitle = "Analytics | pizzaburgerpoint";
+        $pageTitle = "Analytics | chickpom";
         break;
     case 'addareas':
-        $pageTitle = "Addareas | pizzaburgerpoint";
+        $pageTitle = "Addareas | chickpom";
         break;
     case 'addriders':
-        $pageTitle = "Addriders | pizzaburgerpoint";
+        $pageTitle = "Addriders | chickpom";
         break;
     case 'addmaincat':
-        $pageTitle = "Maincategories | pizzaburgerpoint";
+        $pageTitle = "Maincategories | chickpom";
         break;
     case 'addSubCat':
-        $pageTitle = "Subcategories | pizzaburgerpoint";
+        $pageTitle = "Subcategories | chickpom";
         break;
     case 'insertNewProduct':
-        $pageTitle = "Newproduct | pizzaburgerpoint";
+        $pageTitle = "Newproduct | chickpom";
         break;
     case 'addVariation':
-        $pageTitle = "Variation | pizzaburgerpoint";
+        $pageTitle = "Variation | chickpom";
         break;
     case 'addAddons':
-        $pageTitle = "Addons | pizzaburgerpoint";
+        $pageTitle = "Addons | chickpom";
         break;    
     case 'addDressing':
-        $pageTitle = "Dressing | pizzaburgerpoint";
+        $pageTitle = "Dressing | chickpom";
         break;
     case 'addTypes':
-        $pageTitle = "Types | pizzaburgerpoint";
+        $pageTitle = "Types | chickpom";
         break;
     case 'insertDeals':
-        $pageTitle = "Deals | pizzaburgerpoint";
+        $pageTitle = "Deals | chickpom";
         break;    
     case 'addslider':
-        $pageTitle = "Sliders | pizzaburgerpoint";
+        $pageTitle = "Sliders | chickpom";
         break;  
-        
      case 'addprivacypolicy':
-        $pageTitle = "Add-Privacy-Policy | pizzaburgerpoint";
+        $pageTitle = "Add-Privacy-Policy | chickpom";
         break;    
     case 'addterms_condition':
-        $pageTitle = "Terms-Conditions | pizzaburgerpoint";
+        $pageTitle = "Terms-Conditions | chickpom";
         break;
     case 'manage_pos':
-        $pageTitle = "Manage-Pos | pizzaburgerpoint";
+        $pageTitle = "Manage-Pos | chickpom";
         break;
     case 'manageriders':
-        $pageTitle = "Manage-Riders | pizzaburgerpoint";
+        $pageTitle = "Manage-Riders | chickpom";
         break;    
     case 'manageusers':
-        $pageTitle = "Manage-Users | pizzaburgerpoint";
+        $pageTitle = "Manage-Users | chickpom";
         break;  
         
     case 'managetimings':
-        $pageTitle = "Manage-Timings | pizzaburgerpoint";
+        $pageTitle = "Manage-Timings | chickpom";
         break;      
     case 'neworders':
-        $pageTitle = "New-Orders | pizzaburgerpoint";
+        $pageTitle = "New-Orders | chickpom";
         break;      
     case 'orders':
-        $pageTitle = "Orders | pizzaburgerpoint";
+        $pageTitle = "Orders | chickpom";
         break;      
     case 'manageinventory':
-        $pageTitle = "Manage-Inventory | pizzaburgerpoint";
+        $pageTitle = "Manage-Inventory | chickpom";
         break;      
     case 'manageAreas':
-        $pageTitle = "Manage-Areas | pizzaburgerpoint";
+        $pageTitle = "Manage-Areas | chickpom";
         break;      
     case 'manageproducts':
-        $pageTitle = "Manage-Products | pizzaburgerpoint";
+        $pageTitle = "Manage-Products | chickpom";
         break;      
     case 'managevariations':
-        $pageTitle = "Manage-Variations | pizzaburgerpoint";
+        $pageTitle = "Manage-Variations | chickpom";
         break;      
     case 'view_dressing':
-        $pageTitle = "Manage-Dressing | pizzaburgerpoint";
+        $pageTitle = "Manage-Dressing | chickpom";
         break;
     case 'view_types':
-        $pageTitle = "Manage-Types | pizzaburgerpoint";
+        $pageTitle = "Manage-Types | chickpom";
         break;
     case 'view_deals':
-        $pageTitle = "Manage-Deals | pizzaburgerpoint";
+        $pageTitle = "Manage-Deals | chickpom";
         break;
     case 'viewcategories':
-        $pageTitle = "Manage-Catagories | pizzaburgerpoint";
+        $pageTitle = "Manage-Catagories | chickpom";
         break;       
     case 'SubCat':
-        $pageTitle = "Manage-Sub-Catagories | pizzaburgerpoint";
+        $pageTitle = "Manage-Sub-Catagories | chickpom";
         break;                                      
     case 'manageSliders':
-        $pageTitle = "Manage-Sliders | pizzaburgerpoint";
+        $pageTitle = "Manage-Sliders | chickpom";
         break;
     case 'managePoints':
-        $pageTitle = "Manage-Points | pizzaburgerpoint";
+        $pageTitle = "Manage-Points | chickpom";
         break;
     case 'SendNotifications':
-        $pageTitle = "Notifications | pizzaburgerpoint";
+        $pageTitle = "Notifications | chickpom";
         break;   
     case 'view_addons':
-        $pageTitle = "Manage-Addons | pizzaburgerpoint";
+        $pageTitle = "Manage-Addons | chickpom";
         break;     
     default:
-        $pageTitle = "pizzaburgerpoint";
+        $pageTitle = "chickpom";
 }
 
 
