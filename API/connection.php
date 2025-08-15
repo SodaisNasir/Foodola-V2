@@ -1,9 +1,13 @@
 <?php
 
+
 $Host = 'localhost';
-$DB_DATABASE='u772850971_burgerpoint';
-$DB_USERNAME='u772850971_burgerpoint';
-$DB_PASSWORD='7Xj[4ABe=';
+$DB_DATABASE='u772850971_pizzasofort';
+$DB_USERNAME='u772850971_pizzasofort';
+$DB_PASSWORD='8[Y:/V=j?Yv';
+
+
+
 
 
 

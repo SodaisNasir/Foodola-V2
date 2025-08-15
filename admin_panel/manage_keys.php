@@ -22,20 +22,47 @@ if ($validTokenResult && $validTokenResult->num_rows > 0) {
 }
 
 if ($token === $validToken) {
-    if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-        $sql = "SELECT id, key_name, key_value FROM enviroments";
-        $result = mysqli_query($conn, $sql);
+if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+    $sql = "SELECT id, key_name, key_value, paypal_sandbox, mode FROM enviroments";
+    $result = mysqli_query($conn, $sql);
 
-        if ($result->num_rows > 0) {
-            $apiKeys = [];
-            while ($row = $result->fetch_assoc()) {
-                $apiKeys[] = $row;
+    if ($result && $result->num_rows > 0) {
+        $apiKeys = [];
+        $sandboxMode = false;
+
+        while ($row = $result->fetch_assoc()) {
+            // Store by key_name to allow override
+            $apiKeys[$row['key_name']] = [
+                'key_name' => $row['key_name'],
+                'key_value' => $row['key_value'],
+                'paypal_sandbox' => $row['paypal_sandbox']
+            ];
+
+            if ($row['mode'] == 0) {
+                $sandboxMode = true;
             }
-            echo json_encode($apiKeys);
-        } else {
-            echo json_encode(["message" => "No keys found"]);
         }
-    } elseif ($_SERVER['REQUEST_METHOD'] == 'PUT') {
+
+        // If sandbox mode is on, override key values and sandbox URLs in-place
+        if ($sandboxMode) {
+            if (isset($apiKeys['paypal_client_key'])) {
+                $apiKeys['paypal_client_key']['key_value'] = 'ARKKfmrRipxNVbR2MSgUBJVu4d7nyUzwwtU5w4aETlCEtyBwlaCUy9JbWG1_pK5b19u_ikjwyk15zODj';
+                $apiKeys['paypal_client_key']['paypal_sandbox'] = 'https://api-m.sandbox.paypal.com';
+            }
+            if (isset($apiKeys['paypal_secret_key'])) {
+                $apiKeys['paypal_secret_key']['key_value'] = 'EG2IjPuvsharjgPtjAIu_PfUCDSu-DQitfBsFeMCRA1iLshdeoPZCMai5ux4B1Wiz--6hHUpNmRhCoW9';
+                $apiKeys['paypal_secret_key']['paypal_sandbox'] = 'https://api-m.sandbox.paypal.com';
+            }
+        }
+
+        echo json_encode(array_values($apiKeys));
+    } else {
+        echo json_encode(["message" => "No keys found"]);
+    }
+}
+
+
+ elseif ($_SERVER['REQUEST_METHOD'] == 'PUT') {
         $data = json_decode(file_get_contents('php://input'), true);
 
         if (isset($data['id']) && isset($data['key_value'])) {

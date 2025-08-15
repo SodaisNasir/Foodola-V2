@@ -687,13 +687,27 @@ $('#mergeAddonsForm').on('submit', function(e) {
 
 <script>
 $(document).ready(function () {
-    // Show Save button when title is edited
-    $('.editable').on('input', function () {
+    // Show save button on edit
+    $(document).on('input', '.editable', function () {
+        const field = $(this).data('field');
+
+        // Allow only numbers and one optional dot for 'as_price'
+        if (field === 'as_price') {
+            let value = $(this).text();
+            value = value.replace(/[^0-9.]/g, ''); // Remove non-numeric and non-dot
+            const parts = value.split('.');
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts[1]; // Keep only first dot
+            }
+            $(this).text(value);
+            placeCaretAtEnd(this); // Keep cursor at end
+        }
+
         $(this).closest('tr').find('.save-btn').show();
     });
 
-    // Save updated title
-    $('.save-btn').on('click', function () {
+    // Save button logic
+    $(document).on('click', '.save-btn', function () {
         const row = $(this).closest('tr');
         const id = row.data('id');
         const as_name = row.find('[data-field="as_name"]').text().trim();
@@ -706,8 +720,7 @@ $(document).ready(function () {
             data: {
                 id: id,
                 as_name: as_name,
-                as_price : as_price
-
+                as_price: as_price
             },
             success: function (response) {
                 if (response.status) {
@@ -722,7 +735,23 @@ $(document).ready(function () {
             }
         });
     });
+
+    // Keep caret at the end after sanitizing input
+    function placeCaretAtEnd(el) {
+        el.focus();
+        if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            range.collapse(false);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+    }
 });
+
+
+
 </script>
 
 

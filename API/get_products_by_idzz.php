@@ -11,7 +11,7 @@ if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqa
 
     $array = array($_POST['product_id']);
     
-    $select_product = 'SELECT * FROM `products` WHERE `id` IN (' . implode(",", $array) . ') AND `qty` > 0';
+    $select_product = 'SELECT * FROM `products` WHERE `id` IN (' . implode(",", $array) . ') AND `qty` > 0 AND `status` = "Active"';
     $execute_products = mysqli_query($conn,$select_product);
     
 

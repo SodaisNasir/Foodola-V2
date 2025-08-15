@@ -21,6 +21,8 @@ use App\Models\Type_sublist;
 use League\Csv\Reader;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class OrderController extends Controller
 {
@@ -362,110 +364,165 @@ class OrderController extends Controller
     }
 
 
-
-    public function change_status(Request $request, $id)
-    {
-        $token = $request->header('Authorization');
-        if (strval($token) === 'Bearer ' . $this->token) {
-
-            if ($request->ETA) {
-                $success['ETA'] = $request->ETA;
-            }
-            $order = Orders_Zee::find($id);
-            if ($order) {
-
-                if ($request->status === 'pending') {
-
-                    $order->status = 'pending';
-                    $order->update();
-                    $qrcode = QrCode::size(300)->generate($order->id);
-                    $userData = User::where('id', '=', $order->user_id)->first();
-                    $order["userDetails"] = $userData;
-                    $totalCost = number_format((float)$order['order_total_price'], 2, '.', '');
-                    if ($request->ETA) {
-                        $TimeSelected = $request->ETA;
-                        $playerId = [];
-                        $subject = '';
-                        array_push($playerId, $userData['notification_token']);
-
-                        $content = array(
-                            "en" => ' Ihre Bestellnummer: ' . $id . ' im Wert von ' . $totalCost . '€ wurde erfolgreich bestätigt und wird im nächsten ' . $TimeSelected . ' an ' . ($TimeSelected + 10) . ' versendet. In wenigen Minuten geliefert.'
-                        );
-
-                        $fields = array(
-                            'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
-                            'include_player_ids' => $playerId,
-                            'data' => array("foo" => "NewMassage", "Id" => 0),
-                            'large_icon' => "ic_launcher_round.png",
-                            'contents' => $content
-                        );
-
-                        $fields = json_encode($fields);
-                        $ch = curl_init();
-                        curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
-                        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                            'Content-Type: application/json; charset=utf-8',
-                            'Authorization: Basic ODU5ZDhiZjAtOWRkZS00NDIyLWI0ZWItOTYxMDc5YzQzMGIz'
-                        ));
-                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-                        curl_setopt($ch, CURLOPT_HEADER, FALSE);
-                        curl_setopt($ch, CURLOPT_POST, TRUE);
-                        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-                        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-                        $response = curl_exec($ch);
-                        curl_close($ch);
-                    }
-
-                    // Convert the SVG QR code to base64
-                    $decodedData = base64_encode($qrcode);
-                    $encode = base64_decode($decodedData);
-
-                    // Define the image file path
-                    $rand = $order->id; // Generate a random number between 0 and 55555
-                    $filename = "base64_image_{$rand}.svg"; // Construct the file name
-
-                    // Define the image file path
-                    $imagePath = storage_path("app/public/{$filename}"); // Change the file extension as needed
-
-                    // Save the decoded data as an image
-                    file_put_contents($imagePath, $encode);
-
-                    // Return the image file name or URL as a response
-                    $success['qr_code'] = $filename;
-                    $success['user'] = $order;
-                    $success['status'] = 200;
-                    $success['message'] = 'Successfully Order Inprogress';
-                    return response()->json(['success' => $success], $this->successStatus);
-                } else if ($request->status === 'delivered') {
-                    $order->status = 'delivered';
-                    $order->delivered_at = Carbon::now()->timestamp;
-                    $order->update();
-
-                    $order->status = 'delivered';
-                    $order->save();
-                    $success['user'] = $order;
-                    $success['status'] = 200;
-                    $success['message'] = 'Successfully Order delivered';
-                    return response()->json(['success' => $success], $this->successStatus);
-                } else if ($request->status === 'canceled') {
-                    $order->status = 'canceled';
-                    $order->update();
-                    $success['user'] = $order;
-                    $success['status'] = 200;
-                    $success['message'] = 'Successfully Order canceled';
-                    return response()->json(['success' => $success], $this->successStatus);
-                }
-            } else {
-                $success['status'] = 400;
-                $success['message'] = 'No Orders found';
-                return response()->json(['error' => $success]);
-            }
-        } else {
-            // Token is invalid; deny access.
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
+public function change_status(Request $request, $id)
+{
+    $token = $request->header('Authorization');
+    if (strval($token) !== 'Bearer ' . $this->token) {
+        return response()->json(['error' => 'Unauthorized'], 401);
     }
 
+    $order = Orders_Zee::find($id);
+    if (!$order) {
+        return response()->json(['error' => ['status' => 400, 'message' => 'No Orders found']]);
+    }
+
+    $success = [];
+
+    if ($request->status === 'pending') {
+        $order->status = 'pending';
+        $order->update();
+
+        $userData = DB::table('users')->where('id', $order->user_id)->first();
+        $totalCost = number_format((float)$order->order_total_price, 2, '.', '');
+
+        if ($request->ETA) {
+            $success['ETA'] = $request->ETA;
+            $TimeSelected = (int) $request->ETA;
+            $playerId = [$userData->notification_token];
+
+            $content = [
+                "en" => ' Ihre Bestellnummer: ' . $id . ' im Wert von ' . $totalCost . '€ wurde erfolgreich bestätigt und wird im nächsten ' . $TimeSelected . ' an ' . ($TimeSelected + 10) . ' versendet. In wenigen Minuten geliefert.'
+            ];
+
+            $this->sendNotification($playerId, $content);
+        }
+
+        $qrcode = QrCode::size(300)->generate($order->id);
+        $filename = "base64_image_{$order->id}.svg";
+        $imagePath = storage_path("app/public/{$filename}");
+        file_put_contents($imagePath, base64_decode(base64_encode($qrcode)));
+
+        $order['userDetails'] = $userData;
+        $success['qr_code'] = $filename;
+        $success['user'] = $order;
+        $success['status'] = 200;
+        $success['message'] = 'Successfully Order Inprogress';
+        return response()->json(['success' => $success], $this->successStatus);
+
+    } elseif ($request->status === 'delivered') {
+        $order->delivered_at = Carbon::now()->timestamp;
+        $order->status = 'delivered';
+        $order->payment_status = 'paid';
+        $order->update();
+
+        // Cashback logic
+        $cashbackAmount = 0;
+        $cashbackStatusSet = false;
+
+        $activeCashback = DB::table('cash_back')->where('status', 1)->first();
+        // dd($activeCashback);
+        if ($activeCashback && !$order->cashback_status) {
+            $cashbackPercent = $activeCashback->cashback_percenatge;
+            $cashbackAmount = round($order->order_total_price * ($cashbackPercent / 100), 2);
+
+            DB::update("UPDATE users SET amount = amount + ? WHERE id = ?", [
+                $cashbackAmount,
+                $order->user_id,
+            ]);
+
+            DB::table('tbl_transaction')->insert([
+                'user_id' => $order->user_id,
+                'transaction_id' => rand(100000, 999999),
+                'amount' => $cashbackAmount,
+                'type' => 'credit',
+                'message' => "{$cashbackAmount} Cashback erhalten für (Bestell-ID: {$id})",
+                'english_message' => "{$cashbackAmount} Receive cashback for (order ID: {$id})",
+            ]);
+
+            DB::table('orders_zee')->where('id', $id)->update(['cashback_status' => 1]);
+            $cashbackStatusSet = true;
+        }
+
+        $user = DB::table('users')->where('id', $order->user_id)->first();
+        $playerIds = [$user->notification_token];
+
+        $content = $this->getOrderContentMessage('delivered', $id, null, null);
+        $this->sendNotification($playerIds, $content);
+
+        DB::table('notification')->insert([
+            'user_id' => $order->user_id,
+            'content' => $content['en'],
+            'german_content' => $content['de'],
+            'purpose' => 'order',
+        ]);
+
+        $success['user'] = $order;
+        $success['cashback'] = $cashbackStatusSet ? $cashbackAmount : 0;
+        $success['status'] = 200;
+        $success['message'] = 'Successfully Order delivered';
+        return response()->json(['success' => $success], $this->successStatus);
+
+    } elseif ($request->status === 'canceled') {
+        $order->status = 'canceled';
+        $order->update();
+
+        $success['user'] = $order;
+        $success['status'] = 200;
+        $success['message'] = 'Successfully Order canceled';
+        return response()->json(['success' => $success], $this->successStatus);
+    }
+
+    return response()->json(['error' => ['status' => 400, 'message' => 'Invalid Status']]);
+}
+
+
+private function sendNotification(array $playerIds, array $content)
+{
+    $fields = [
+        'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
+        'include_player_ids' => $playerIds,
+        'data' => ["foo" => "NewMessage"],
+        'large_icon' => "ic_launcher_round.png",
+        'contents' => $content,
+    ];
+
+    $fieldsJson = json_encode($fields);
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json; charset=utf-8',
+        'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'
+    ]);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+    curl_setopt($ch, CURLOPT_HEADER, FALSE);
+    curl_setopt($ch, CURLOPT_POST, TRUE);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $fieldsJson);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+
+    curl_exec($ch);
+    curl_close($ch);
+}
+
+private function getOrderContentMessage($status, $orderId, $deliveredAt = null, $riderName = '')
+{
+    if ($status === 'pending') {
+        return [
+            'en' => "Your order no: $orderId has been accepted. Expected delivery: $deliveredAt.",
+            'de' => "Ihre Bestellung Nr: $orderId wurde angenommen. Voraussichtliche Lieferung: $deliveredAt."
+        ];
+    } elseif ($status === 'shipped') {
+        return [
+            'en' => "Your order no: $orderId has been shipped to rider $riderName.",
+            'de' => "Ihre Bestellung Nr: $orderId wurde an Fahrer $riderName versendet."
+        ];
+    } else {
+        return [
+            'en' => "Your order no: $orderId has been $status.",
+            'de' => "Ihre Bestellung Nr: $orderId wurde $status."
+        ];
+    }
+}
 
 
 
@@ -502,7 +559,7 @@ class OrderController extends Controller
                 curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
                 curl_setopt($ch, CURLOPT_HTTPHEADER, array(
                     'Content-Type: application/json; charset=utf-8',
-                    'Authorization: Basic ODU5ZDhiZjAtOWRkZS00NDIyLWI0ZWItOTYxMDc5YzQzMGIz'
+                    'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'
                 ));
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
                 curl_setopt($ch, CURLOPT_HEADER, FALSE);

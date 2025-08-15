@@ -1,5 +1,8 @@
 <?php
-
+header("Access-Control-Allow-Origin: *"); 
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS"); 
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Content-Type: application/json"); 
 // include('connection.php');
 
 // if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC'){
@@ -68,7 +71,8 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
             echo json_encode([
                 "status" => false,
                 "Response_code" => 204,
-                "Message" => "Restaurant is currently closed."
+                "Message" => "Das Restaurant ist derzeit geschlossen",
+                "english_message" => "Restaurant is currently closed."
             ]);
             exit;
         }
@@ -80,9 +84,19 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
     $current_day = date('l', $datetime); // Full day name like Monday
 
     // Fetch working hours for the current day
-    $sql = "SELECT `start_time_1`, `end_time_1`, `start_time_2`, `end_time_2` FROM `tbl_working_hours` WHERE `day` = '$current_day'";
+    $sql = "SELECT `start_time_1`, `end_time_1`, `start_time_2`, `end_time_2` , `is_holiday` FROM `tbl_working_hours` WHERE `day` = '$current_day'";
     $exe = mysqli_query($conn, $sql);
     $data = mysqli_fetch_array($exe);
+    
+      if ($data['is_holiday'] == 1) {
+        echo json_encode([
+            "status" => false,
+            "Response_code" => 205,
+            "Message" => "Heute ist ein Feiertag. Das Restaurant ist geschlossen.",
+            "english_message" => "Today is a holiday. The restaurant is closed."
+        ]);
+        exit;
+    }
 
     if ($data) {
         $start_time_1 = $data['start_time_1'];
@@ -98,20 +112,23 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
             echo json_encode([
                 "status" => true,
                 "Response_code" => 200,
-                "Message" => "Restaurant will be opened at this date and time."
+                "Message" => "Das Restaurant wird an diesem Datum und zu dieser Uhrzeit geöffnet.",
+                "english_message" => "Restaurant will be opened at this date and time."
             ]);
         } else {
             echo json_encode([
                 "status" => false,
                 "Response_code" => 203,
-                "Message" => "Restaurant will be closed at your selected date and time!"
+                "Message" => "Das Restaurant ist zu Ihrem ausgewählten Datum und Zeitpunkt geschlossen!",
+                "english_message" => "Restaurant will be closed at your selected date and time!"
             ]);
         }
     } else {
         echo json_encode([
             "status" => false,
             "Response_code" => 500,
-            "Message" => "No working hours set for the selected day."
+            "Message" => "Für den ausgewählten Tag sind keine Arbeitszeiten festgelegt.",
+            "english_message" => "No working hours set for the selected day."
         ]);
     }
 

@@ -5,108 +5,107 @@ $pageName = basename($_SERVER['PHP_SELF'], ".php");
 
 switch ($pageName) {
     case 'index':
-        $pageTitle = "Analytics | pizzaburgerpoint";
+        $pageTitle = "Analytics | Pizza Sofort";
         break;
     case 'addareas':
-        $pageTitle = "Addareas | pizzaburgerpoint";
+        $pageTitle = "Addareas | Pizza Sofort";
         break;
     case 'addriders':
-        $pageTitle = "Addriders | pizzaburgerpoint";
+        $pageTitle = "Addriders | Pizza Sofort";
         break;
     case 'addmaincat':
-        $pageTitle = "Maincategories | pizzaburgerpoint";
+        $pageTitle = "Maincategories | Pizza Sofort";
         break;
     case 'addSubCat':
-        $pageTitle = "Subcategories | pizzaburgerpoint";
+        $pageTitle = "Subcategories | Pizza Sofort";
         break;
     case 'insertNewProduct':
-        $pageTitle = "Newproduct | pizzaburgerpoint";
+        $pageTitle = "Newproduct | Pizza Sofort";
         break;
     case 'addVariation':
-        $pageTitle = "Variation | pizzaburgerpoint";
+        $pageTitle = "Variation | Pizza Sofort";
         break;
     case 'addAddons':
-        $pageTitle = "Addons | pizzaburgerpoint";
+        $pageTitle = "Addons | Pizza Sofort";
         break;    
     case 'addDressing':
-        $pageTitle = "Dressing | pizzaburgerpoint";
+        $pageTitle = "Dressing | Pizza Sofort";
         break;
     case 'addTypes':
-        $pageTitle = "Types | pizzaburgerpoint";
+        $pageTitle = "Types | Pizza Sofort";
         break;
     case 'insertDeals':
-        $pageTitle = "Deals | pizzaburgerpoint";
+        $pageTitle = "Deals | Pizza Sofort";
         break;    
     case 'addslider':
-        $pageTitle = "Sliders | pizzaburgerpoint";
+        $pageTitle = "Sliders | Pizza Sofort";
         break;  
-        
      case 'addprivacypolicy':
-        $pageTitle = "Add-Privacy-Policy | pizzaburgerpoint";
+        $pageTitle = "Add-Privacy-Policy | Pizza Sofort";
         break;    
     case 'addterms_condition':
-        $pageTitle = "Terms-Conditions | pizzaburgerpoint";
+        $pageTitle = "Terms-Conditions | Pizza Sofort";
         break;
     case 'manage_pos':
-        $pageTitle = "Manage-Pos | pizzaburgerpoint";
+        $pageTitle = "Manage-Pos | Pizza Sofort";
         break;
     case 'manageriders':
-        $pageTitle = "Manage-Riders | pizzaburgerpoint";
+        $pageTitle = "Manage-Riders | Pizza Sofort";
         break;    
     case 'manageusers':
-        $pageTitle = "Manage-Users | pizzaburgerpoint";
+        $pageTitle = "Manage-Users | Pizza Sofort";
         break;  
         
     case 'managetimings':
-        $pageTitle = "Manage-Timings | pizzaburgerpoint";
+        $pageTitle = "Manage-Timings | Pizza Sofort";
         break;      
     case 'neworders':
-        $pageTitle = "New-Orders | pizzaburgerpoint";
+        $pageTitle = "New-Orders | Pizza Sofort";
         break;      
     case 'orders':
-        $pageTitle = "Orders | pizzaburgerpoint";
+        $pageTitle = "Orders | Pizza Sofort";
         break;      
     case 'manageinventory':
-        $pageTitle = "Manage-Inventory | pizzaburgerpoint";
+        $pageTitle = "Manage-Inventory | Pizza Sofort";
         break;      
     case 'manageAreas':
-        $pageTitle = "Manage-Areas | pizzaburgerpoint";
+        $pageTitle = "Manage-Areas | Pizza Sofort";
         break;      
     case 'manageproducts':
-        $pageTitle = "Manage-Products | pizzaburgerpoint";
+        $pageTitle = "Manage-Products | Pizza Sofort";
         break;      
     case 'managevariations':
-        $pageTitle = "Manage-Variations | pizzaburgerpoint";
+        $pageTitle = "Manage-Variations | Pizza Sofort";
         break;      
     case 'view_dressing':
-        $pageTitle = "Manage-Dressing | pizzaburgerpoint";
+        $pageTitle = "Manage-Dressing | Pizza Sofort";
         break;
     case 'view_types':
-        $pageTitle = "Manage-Types | pizzaburgerpoint";
+        $pageTitle = "Manage-Types | Pizza Sofort";
         break;
     case 'view_deals':
-        $pageTitle = "Manage-Deals | pizzaburgerpoint";
+        $pageTitle = "Manage-Deals | Pizza Sofort";
         break;
     case 'viewcategories':
-        $pageTitle = "Manage-Catagories | pizzaburgerpoint";
+        $pageTitle = "Manage-Catagories | Pizza Sofort";
         break;       
     case 'SubCat':
-        $pageTitle = "Manage-Sub-Catagories | pizzaburgerpoint";
+        $pageTitle = "Manage-Sub-Catagories | Pizza Sofort";
         break;                                      
     case 'manageSliders':
-        $pageTitle = "Manage-Sliders | pizzaburgerpoint";
+        $pageTitle = "Manage-Sliders | Pizza Sofort";
         break;
     case 'managePoints':
-        $pageTitle = "Manage-Points | pizzaburgerpoint";
+        $pageTitle = "Manage-Points | Pizza Sofort";
         break;
     case 'SendNotifications':
-        $pageTitle = "Notifications | pizzaburgerpoint";
+        $pageTitle = "Notifications | Pizza Sofort";
         break;   
     case 'view_addons':
-        $pageTitle = "Manage-Addons | pizzaburgerpoint";
+        $pageTitle = "Manage-Addons | Pizza Sofort";
         break;     
     default:
-        $pageTitle = "pizzaburgerpoint";
+        $pageTitle = "Pizza Sofort";
 }
 
 
