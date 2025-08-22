@@ -237,7 +237,20 @@ $(document).ready(function() {
   var i = 1;
   $('#add').click(function() {
     if (i <= 20) {
-      $('#dynamic_fields').append('<div class="row"><div class="col-sm-6" ><div class="form-group"><input type="text" name="add_type[]" class="form-control" placeholder="Add Type" required ></div></div></div>')
+$('#dynamic_fields').append(`
+  <div class="row mb-2" id="row-${i}">
+    <div class="col-sm-6">
+      <div class="form-group">
+        <input type="text" name="add_type[]" class="form-control" placeholder="Add Type" required>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="form-group">
+        <input type="number" name="add_price[]" step='0.01' class="form-control" placeholder="Add Type Price" required>
+      </div>
+    </div>
+  </div>
+`);
       i++;
     }
   });
@@ -251,12 +264,12 @@ $(document).ready(function() {
 
 
  function downloadSampleCSV() {
-    const headers = ["type_title", "type_title_user", "ts_name"];
+    const headers = ["type_title", "type_title_user", "ts_name", "price"];
     const sampleData = [
-        ["Type of pasta", "Type of pasta's", "with gnocchi"],
-        ["Type of pasta", "Type of pasta's", "with rigatoni"],
-        ["Type of pasta", "Type of pasta's", "with spaghetti"],
-        ["Type of pasta", "Type of pasta's", "with tagliatelle"]
+        ["Type of pasta", "Type of pasta's", "with gnocchi", "2.50"],
+        ["Type of pasta", "Type of pasta's", "with rigatoni", "2.50"],
+        ["Type of pasta", "Type of pasta's", "with spaghetti", "0.00"],
+        ["Type of pasta", "Type of pasta's", "with tagliatelle","2.50"]
     ];
 
     // Convert to CSV string

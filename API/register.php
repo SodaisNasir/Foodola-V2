@@ -34,16 +34,17 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'faracecut@gmail.com';
-        $mail->Password = 'ohvjrjlpxkjfvujd'; 
+     $mail->Username = 'boundedsocial@gmail.com'; 
+        $mail->Password = 'iwumjedakkbledwe';
+
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
-        $mail->setFrom('support@burgerpoint.de', 'Pizza Burger Point');
+        $mail->setFrom('support@pizzablitz.de', 'Pizza Blitz');
         $mail->addAddress($email); 
 
         $mail->isHTML(true);
-        $mail->Subject = "Welcome to Pizza Burger Point";
+        $mail->Subject = "Welcome to Pizza Blitz";
 
         $digits = 8;
         $referal_code = rand(pow(10, $digits - 1), pow(10, $digits) - 1);
@@ -72,7 +73,7 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                             $template = '
                             <html>
                             <head>
-                                <title>Welcome to Pizza Burger Point !</title>
+                                <title>Welcome to Pizza Blitz !</title>
 
                                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
                                 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -145,47 +146,74 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                                 </style>
                             </head>
                             <body>
-                                <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://burgerpoint.shop/BurgerPoint/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                                <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://xn--pizzablitzstringen-m3b.de/pizza_blitz/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
                                     <tr>
                                         <td align="center">
                                             <table width="100%" class="content" style="max-width: 600px;">
                                                 <tr>
                                                     <td align="center">
                                                         <!-- Logo Section -->
-                                                        <img src="https://burgerpoint.shop/BurgerPoint/admin_panel/images/logo.png" alt="Pizza Burger Point Logo" style="width: 100px; margin-bottom: 20px;">
+                                                        <img src="https://xn--pizzablitzstringen-m3b.de/pizza_blitz/admin_panel/images/logo.png" alt="Broad Way Pizza Logo" style="width: 100px; margin-bottom: 20px;">
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <td>
-                                                         <h1>Welcome, ' . htmlspecialchars($name) . '!</h1>
-                                                        <p>Thank you for joining Pizza Burger Point! We’re thrilled to welcome you to our community of pizza and burger lovers.</p>
-                                                        <h3>Why You’ll Love Pizza Burger Point :</h3>
+                                                   <td>
+                                                        <h1>Willkommen bei Pizza Blitz – Dein Genuss startet jetzt! 🍕🎉</h1>
+                                                        <p>Hallo ' . htmlspecialchars($name) . ',</p>
+                                                        <p>herzlich willkommen bei Pizza Blitz! 🥳<br>
+                                                        Schön, dass du da bist – wir freuen uns riesig, dich in unserer Community von Pizza- und Burgerliebhabern zu begrüßen.</p>
+                                                
+                                                        <h3>Warum du Pizza Blitz lieben wirst:</h3>
                                                         <ul>
-                                                            <li>🍕 <strong>Authentic Flavors:</strong> Indulge in our chef-crafted pizzas and burgers made with the finest ingredients.</li>
-                                                            <li>🚀 <strong>Fast Delivery:</strong> Enjoy hot and fresh meals at your doorstep in no time.</li>
+                                                            <li>🍕 <strong>Höchste Qualität – ohne Kompromisse:</strong><br>
+                                                            Unsere Speisen werden mit frischen, ausgewählten Zutaten zubereitet. Qualität steht bei uns immer an erster Stelle – und das schmeckt man!</li>
+                                                            <li>🚀 <strong>Blitzschnelle Lieferung:</strong><br>
+                                                            Dein Lieblingsessen kommt heiß und frisch direkt zu dir nach Hause.</li>
+                                                            <li>🤝 <strong>Service mit Herz:</strong><br>
+                                                            Wir lieben, was wir tun – und das merkt man in jedem Bissen und jedem Service!</li>
                                                         </ul>
-                                                        <h3>Get Started Now!</h3>
-                                                        <p>Here’s what you can do next:</p>
+                                                
+                                                        <h3>🎁 So holst du dir deinen Willkommensbonus:</h3>
+                                                        <p>Du bekommst von uns ein kleines Geschenk zum Start!<br>So einfach geht’s:</p>
                                                         <ul>
-                                                            <li>👀 <a href="https://burgerpoint.shop/menu">Browse our Menu</a> and find your favorites.</li>
-                                                            <li>🛒 Place your first order and experience the convenience and quality we’re known for!</li>
+                                                            <li>📱 Öffne unsere App</li>
+                                                            <li>👤 Gehe in dein Profil</li>
+                                                            <li>🏷️ Tippe auf "Promo-Code"</li>
+                                                            <li>🔓 Gib deinen Gutscheincode ein, um deinen Bonus zu aktivieren</li>
                                                         </ul>
-                                                        <p>If you have any questions, feel free to reach out to our support team. We’re here to make sure you have the best experience possible.</p>
-                                                        <h4>Stay Connected:</h4>
-                                                        <p>Follow us on social media for the latest updates, promotions, and delicious inspiration!</p>
+                                                        <p>💰 Deine Bonuspunkte werden automatisch deinem Wallet gutgeschrieben – dort kannst du jederzeit deinen Punktestand einsehen und bei deiner nächsten Bestellung verwenden.</p>
+                                                
+                                                        <h3>📱 Exklusive Vorteile nur in unserer App:</h3>
+                                                        <ul>
+                                                            <li>✅ 5 % Sofortrabatt auf jede Bestellung</li>
+                                                            <li>💸 10 % Cashback bei jedem Einkauf</li>
+                                                            <li>🌟 Optimale Nutzererfahrung dank einfacher Bedienung</li>
+                                                            <li>🔔 Live-Updates zu jedem Schritt deiner Bestellung</li>
+                                                        </ul>
+                                                
+                                                        <h3>Was jetzt zu tun ist:</h3>
+                                                        <ul>
+                                                            <li>👀 <a href="https://xn--pizzablitzstringen-m3b.de">Entdecke unsere Speisekarte</a> und finde deine Favoriten</li>
+                                                            <li>🛒 Bestelle direkt und genieße den Unterschied</li>
+                                                        </ul>
+                                                
+                                                        <p>Bei Fragen steht dir unser Support-Team gerne zur Seite – wir sind immer für dich da!</p>
+                                                
+                                                        <h4>Bleib mit uns in Kontakt:</h4>
+                                                        <p>Verpasse keine Aktion und keine Neuigkeit – folge uns auf Social Media!</p>
                                                         <div class="social-icons">
-                                                            <a href="https://facebook.com/burgerpoint" target="_blank">
-                                                                <img src="https://burgerpoint.shop/BurgerPoint/API/uploads/facebook_logo.png" alt="Facebook">
+                                                            <a href="https://facebook.com/pizzablitz" target="_blank">
+                                                                <img src="https://xn--pizzablitzstringen-m3b.de/pizza_blitz/API/uploads/facebook_logo.png" alt="Facebook">
                                                             </a>
-                                                            <a href="https://instagram.com/burgerpoint" target="_blank">
-                                                                <img src="https://burgerpoint.shop/BurgerPoint/API/uploads/instagram_logo.png" alt="Instagram">
+                                                            <a href="https://instagram.com/pizzablitz" target="_blank">
+                                                                <img src="https://xn--pizzablitzstringen-m3b.de/pizza_blitz/API/uploads/instagram_logo.png" alt="Instagram">
                                                             </a>
-                                                            <a href="https://twitter.com/burgerpoint" target="_blank">
-                                                                <img src="https://burgerpoint.shop/BurgerPoint/API/uploads/twitter_logo.png" alt="Twitter">
+                                                            <a href="https://twitter.com/pizzaBlitz" target="_blank">
+                                                                <img src="https://xn--pizzablitzstringen-m3b.de/pizza_blitz/API/uploads/twitter_logo.png" alt="Twitter">
                                                             </a>
                                                         </div>
-                                                        <p>Enjoy every bite!</p>
-                                                        <p>Warm regards,<br><strong>The Pizza Burger Point Team</strong></p>
+                                                
+                                                        <p>Guten Appetit & viel Spaß beim Genießen!<br><strong>Dein Pizza Blitz Team 🍕</strong></p>
                                                     </td>
                                                 </tr>
                                             </table>

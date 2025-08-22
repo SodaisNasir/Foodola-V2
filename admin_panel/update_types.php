@@ -171,7 +171,7 @@
 		<div class="col-md-12">
 			<div class="card">
 				<div class="card-header">
-					<h4 class="card-title">Add More Addon</h4>
+					<h4 class="card-title">Add More Addon Type</h4>
 				</div>
 				<div class="card-content">
 					<div class="card-body">
@@ -195,7 +195,7 @@
                             
                         </div>
 						<div class="col-sm-12">
-							<button type="button" name="add" id="add"    class="btn btn-primary mb-2">Add More Addon</button>
+							<button type="button" name="add" id="add"    class="btn btn-primary mb-2">Add More Addon Type</button>
     			    	</div>
                  
                
@@ -253,6 +253,7 @@
                                         <th>Type ID</th>
                                         <th>Type Name</th>
                                         <th>Type Title</th>
+                                        <th>Type price</th>
                                         <th>Save</th>
                                         <!--<th>Update</th>-->
                                         <th>Delete</th>
@@ -272,6 +273,7 @@
                                           echo "<td>{$row['ts_id']}</td>";
                                           echo "<td class='editable' contenteditable='true' data-field='ts_name' ts_name='cost'>{$row['ts_name']}</td>";
                                           echo "<td class='editable' contenteditable='false' data-field='type_title' ts_name='cost'>{$row['type_title']}</td>";
+                                          echo "<td class='editable' contenteditable='false' data-field='type_price' ts_name='price'>{$row['price']}</td>";
                                 
                                           echo "<td><button class='btn btn-success save-btn' style='display:none;'>Save</button></td>";  
                                         //   echo '<td><button class="btn btn-primary" onclick="openAddMore(\''. $row['ts_id'] .'\' ,\''.$row['ts_name'].'\', \''.$row['type_title'].'\')">Update</button></td>';
@@ -290,6 +292,7 @@
                                         <th>Type ID</th>
                                         <th>Type Name</th>
                                         <th>Type title</th>
+                                        <th>Type Price</th>
                                         <th>Save</th>
                                         <!--<th>Update</th>-->
                                         <th>Delete</th>
@@ -471,10 +474,27 @@ $(document).ready(function() {
   var i = 1;
   $('#add').click(function() {
    
-      $('#dynamic_fields').append('<div class="row"><div class="col-sm-6" ><div class="form-group"><input type="text" name="addon_name[]" class="form-control" placeholder="Add On" required ></div></div></div></div></div>')
+$('#dynamic_fields').append(`
+  <div class="row mb-2">
+    <div class="col-sm-6">
+      <div class="form-group d-flex gap-5">
+        <input type="text" name="addon_name[]" class="form-control" placeholder="Add On" required>
+      </div>
+    </div>
+        <div class="col-sm-6">
+      <div class="form-group d-flex gap-5">
+        <input type="text" name="addon_price[]" class="form-control" placeholder="Add On Price" required>
+      </div>
+    </div>
+  </div>
+`);
+
       i++;
 
   });
+  
+  
+  
   $(document).on('click', '.btn_remove', function() {
     var button_id = $(this).attr("id");
     i--;
@@ -613,14 +633,14 @@ $(document).ready(function () {
                 filename: 'types_csv',
                 bom: true,
                 exportOptions: {
-                    columns: [1,2,3], 
+                    columns: [2,3,4], 
                     format: {
                         header: function (data, columnIdx) {
                             switch(columnIdx) {
             
-                                case 1: return 'ts_id';
-                                case 2: return 'ts_name';
-                                case 3: return 'ts_title';
+                                case 2: return 'ts_id';
+                                case 3: return 'ts_name';
+                                case 4: return 'ts_title';
                                 default: return data;
                             }
                         }

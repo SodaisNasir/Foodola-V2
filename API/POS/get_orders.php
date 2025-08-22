@@ -16,7 +16,7 @@ if ($branch_id === null) {
 
 $sql = "SELECT orders.id, orders.user_id, orders.Shipping_address, orders.Shipping_address_2, orders.Shipping_city, 
         orders.Shipping_area, orders.payment_type, orders.Shipping_state, orders.Shipping_postal_code, 
-        orders.order_total_price, users.name, users.phone, orders.Shipping_Cost, orders.created_at, orders.addtional_notes , orders.status
+        orders.order_total_price, users.name, users.phone, orders.Shipping_Cost, orders.created_at, orders.addtional_notes , orders.status, orders.order_type
         FROM `orders_zee` AS orders 
         INNER JOIN users ON users.id = orders.user_id 
         WHERE orders.branch_id = '$branch_id'
@@ -39,7 +39,8 @@ if ($result) {
             'Shipping_Cost' =>$row['Shipping_Cost'],
             'payment_type' => $row['payment_type'],
             'additional_notes' => $row['addtional_notes'],
-            'status' => $row['status']
+            'status' => $row['status'],
+            'order_type' => $row['order_type']
         ];
 
         $response[] = $order;

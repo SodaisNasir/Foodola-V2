@@ -250,6 +250,7 @@
                                         <th>Dressing Title</th>
                                         <th>Dressing Name</th>
                                         <th>Dressing Name for users</th>
+                                        <th>Dressing Price</th>
                                         <th>Save</th>
                                         <!--<th>Update</th>-->
                                         <th>Delete</th>
@@ -258,7 +259,7 @@
                                 <tbody>
                                       <?php
                                       include_once('connection.php');
-                                      $sql="SELECT `ds_id`, `dressing_id`, `dressing_title`, `dressing_title_user`, `dressing_name` FROM `dressing_sublist` WHERE `dressing_id` = ".$_GET['id'];
+                                      $sql="SELECT `ds_id`, `dressing_id`, `dressing_title`, `dressing_title_user`, `dressing_name`, `price` FROM `dressing_sublist` WHERE `dressing_id` = ".$_GET['id'];
                                       $result = mysqli_query($conn,$sql);
                                       $index = 0;
                                       while($row = mysqli_fetch_array($result)){
@@ -270,6 +271,7 @@
                                             echo "<td class='editable' contenteditable='false' name='dressing_title' data-field='dressing_title' >{$row['dressing_title']}</td>";
                                             echo "<td class='editable' contenteditable='true' ts_name='dressing_name' data-field='dressing_name'>{$row['dressing_name']}</td>";
                                             echo "<td class='editable' contenteditable='false' name='dressing_title_user' data-field='dressing_title_user'>{$row['dressing_title_user']}</td>";
+                                            echo "<td class='editable' contenteditable='false' name='dressing_price' data-field='dressing_price'>{$row['price']}</td>";
                                             
                                             echo "<td><button class='btn btn-success save-btn' style='display:none;'>Save</button></td>";    
                                             
@@ -292,6 +294,7 @@
     <th>Dressing Title</th>
     <th>Dressing Name</th>
     <th>Dressing Name for users</th>
+    <th>Dressing Price</th>
     <th>Save</th>
     <!--<th>Update</th>-->
     <th>Delete</th>
@@ -470,19 +473,22 @@
 $(document).ready(function () {
   var i = 1;
 
-  $('#add').click(function () {
+$('#add').click(function () {
     $('#dynamic_fields').append(`
-      <div id='row-hgj-${i}' class="row">
-        <div class="col-sm-6">
-          <div class="form-group d-flex">
-            <input type="text" name="addon_name[]" class="form-control" placeholder="Add On" required>
-            <button type='button' class='btn btn-danger btn_remove ml-1' data-id='row-hgj-${i}'>Close</button>
-          </div>
+      <div id="row-hgj-${i}" class="row mb-2">
+        <div class="col-sm-5">
+          <input type="text" name="addon_name[]" class="form-control" placeholder="Add On" required>
+        </div>
+        <div class="col-sm-5">
+          <input type="Number" name="addon_price[]" step="0.1" class="form-control" placeholder="Add On Price" required>
+        </div>
+        <div class="col-sm-2">
+          <button type="button" class="btn btn-danger btn_remove" data-id="row-hgj-${i}">Remove</button>
         </div>
       </div>
     `);
     i++;
-  });
+});
 
   $(document).on('click', '.btn_remove', function () {
     var rowId = $(this).data('id');

@@ -9,6 +9,9 @@ if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbq
   $transaction_id = $_POST['transaction_id'];
   $transaction_type = $_POST['transaction_type'];
   $transaction_message = $_POST['transaction_message'];
+  $english_message = $_POST['english_message'];
+  $trans_type = $_POST['trans_type'];
+  
   include("connection.php");
       $getamount = "SELECT `amount` FROM `users` WHERE `id` = $user_id";
       $ex_getamount = mysqli_query($conn,$getamount);
@@ -78,7 +81,7 @@ if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbq
                 curl_close($ch);
 
                       
-                      $sql = "INSERT INTO `tbl_transaction`(`user_id`, `transaction_id`, `amount`, `old_amount`, `type`, `message`) VALUES ($user_id,'$transaction_id',$new_amount,$amount,'$transaction_type','$transaction_message')";
+                      $sql = "INSERT INTO `tbl_transaction`(`user_id`, `transaction_id`, `amount`, `old_amount`, `type`, `message`, `transaction_type`) VALUES ($user_id,'$transaction_id',$new_amount,$amount,'$transaction_type','$transaction_message', '$trans_type')";
                     $ex_sql = mysqli_query($conn,$sql);
                     if($ex_sql){
                          $data = ["status"=>true,
@@ -154,7 +157,7 @@ if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbq
 
                       
                       
-                      $sql = "INSERT INTO `tbl_transaction`(`user_id`, `transaction_id`, `amount`, `old_amount`, `type`, `message`) VALUES ($user_id,'$transaction_id',$new_amount,$amount,'$transaction_type','$transaction_message')";
+                      $sql = "INSERT INTO `tbl_transaction`(`user_id`, `transaction_id`, `amount`, `old_amount`, `type`, `message`, `transaction_type`) VALUES ($user_id,'$transaction_id',$new_amount,$amount,'$transaction_type','$transaction_message', '$trans_type')";
                     $ex_sql = mysqli_query($conn,$sql);
                     if($ex_sql){
                          $data = ["status"=>true,
@@ -178,7 +181,7 @@ if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbq
                     $execute_insert_noti = mysqli_query($conn,$insert_noti_details);
                     
                     
-               $sql = "INSERT INTO `tbl_transaction`(`user_id`, `transaction_id`, `amount`, `type`, `message`) VALUES ($user_id,'$transaction_id',$new_amount,'$transaction_type','$transaction_message')";
+               $sql = "INSERT INTO `tbl_transaction`(`user_id`, `transaction_id`, `amount`, `type`, `message`, `transaction_type`, `english_message`) VALUES ($user_id,'$transaction_id',$new_amount,'$transaction_type','$transaction_message', '$trans_type', '$english_message')";
                     $ex_sql = mysqli_query($conn,$sql);
 
                       

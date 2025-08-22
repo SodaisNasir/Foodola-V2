@@ -116,7 +116,18 @@ if (isset($_GET['Massage'])) {
             text-decoration: none;
             cursor: pointer;
         }
-        
+            
+      #sortableBody tr {
+    /*cursor: move;*/
+  }
+  .drag-handle {
+    cursor: grab;
+    font-size: 18px;
+    user-select: none;
+  }
+  .drag-handle:active {
+    cursor: grabbing;
+  }
 
         
          /* --- Responsive CSS --- */
@@ -179,6 +190,8 @@ if (isset($_GET['Massage'])) {
             .table-responsive { /* Ensure table responsiveness */
                 overflow-x: auto;
             }
+            
+            
         }
     </style>
 
@@ -205,6 +218,7 @@ if (isset($_GET['Massage'])) {
                                     <li class="breadcrumb-item active">Manage Products</li>
                                 </ol>
                             </div>
+                   
                         </div>
                     </div>
                 </div>
@@ -216,15 +230,36 @@ if (isset($_GET['Massage'])) {
                             <div class="card">
                                 <div class="card-header">
                                     <h4 class="card-title">Manage Products</h4>
+                                              <?php 
+                                    include("connection.php");
+                                    
+                                    $sql = "SELECT * FROM sub_categories";
+                                    $exec_sql = mysqli_query($conn, $sql);
+                                    
+                                    echo "<div class='mb-2'>";
+                                    echo "<label><strong>Select Sub Category</strong></label>"; 
+                                    echo "<select id='subCategorySelect' class='form-control status-select' style='width: 200px; display: inline-block; margin-left: 10px;'>";
+                                    echo "<option value=''>-- Select Sub Category --</option>";
+                                    
+                                    while ($row = mysqli_fetch_array($exec_sql)) {
+                                        echo "<option value='{$row['id']}'>{$row['name']}</option>";
+                                    }
+                                    
+                                    echo "</select>";
+                                    echo "</div>";
+                                ?>
                                 </div>
                                 <div class="card-content">
                                     <div class="card-body card-dashboard">
                                         <p class="card-text"></p>
+
+
                                         <div class="table-responsive table-hover">
-                                                <div class="mb-3" id="example_wrapper"></div>
+                                                <div class="" id="example_wrapper"></div>
                                             <table id="example" class="table data-list-view">
                                                 <thead class="table-light">
-                                                    <tr>
+                                                    <tr data-id='{$id}'>
+                                                        <th>☰</th>
                                                         <th>S no.</th>
                                                         <th>Product ID</th>
                                                         <th>Product Name</th>
@@ -245,7 +280,7 @@ if (isset($_GET['Massage'])) {
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
-                                        <tbody>
+                                                        <tbody id="sortableBody">
 <?php
 include_once('connection.php');
 
@@ -312,9 +347,11 @@ if (isset($conn)) {
             $for_deal_only = htmlspecialchars($row['for_deal_only']);
             $imagePath = "Uploads/" . $imgurl;
 
-            echo "<tr data-id='{$productId}'>";
+            echo "<tr id='sortableBody' data-id='{$productId}'> ";
+            echo "<td class='drag-handle'>☰</td>";
             echo "<td>{$sn}</td>";
             echo "<td>{$productId}</td>";
+            
             echo "<td class='editable border border-5' contenteditable='true' data-field='proname'>{$productName}</td>";
             echo "<td class='editable border border-5' contenteditable='true' data-field='sku_id'>{$skuId}</td>";
 
@@ -327,7 +364,7 @@ if (isset($conn)) {
             echo "</select></td>";
 
             echo "<td class='editable border border-5' contenteditable='true' data-field='cost'>{$cost}</td>";
-            echo "<td class='editable border border-5' contenteditable='true' data-field='price'>{$price}</td>";
+            echo "<td class='editable border border-5' contenteditable='true' data-field='price' inputmode='decimal'>{$price}</td>";
             echo "<td class='editable border border-5' contenteditable='true' data-field='discount'>{$discount}</td>";
             echo "<td class='editable description-short border border-5' contenteditable='true' data-field='description'>{$description}</td>";
 
@@ -383,7 +420,7 @@ if (isset($conn)) {
             }
             echo "</select></td>";
             
-            
+
             
                   echo "<td class='border border-5' style='min-width: 200px;' data-field='for_deal_only'>
           <select class='form-control status-select'  >
@@ -413,20 +450,34 @@ if (isset($conn)) {
 
                 //  <button class='btn btn-primary' onclick=\"openAddMore('{$productId}', '{$productName}', '{$row['subname']}', '{$cost}', '{$price}', '{$discount}', '{$description}', '{$skuId}')\">Update</button>
 
+
+
+
+
             echo "</tr>";
             $index++;
         }
+
+
+        
     } else {
         echo "<tr><td colspan='17'>Error: " . mysqli_error($conn) . "</td></tr>";
     }
 } else {
     echo "<tr><td colspan='17'>Database connection not found.</td></tr>";
 }
+
+
 ?>
+
 </tbody>
+</div>
+
+
 
                                                 <tfoot class="table-light">
                                                     <tr>
+                                                        <th>☰</th>
                                                         <th>S no.</th>
                                                         <th>Product ID</th>
                                                         <th>Product Name</th>
@@ -454,9 +505,20 @@ if (isset($conn)) {
                             </div>
                         </div>
                     </div>
+                    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+  <div id="orderToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body" id="orderToastBody">
+        <!-- Message will be injected here -->
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+
                 </section>
                 
-                
+      
                 
                 <div id="myModal" class="modal">
                     <div class="modal-content-base modal-content-Updated2"> <span onclick="closeModel(1)" class="close">&times;</span>
@@ -567,7 +629,7 @@ if (isset($conn)) {
                             </div></div></div></div></div> </div> </div> <div class="sidenav-overlay"></div>
                             
     <div class="drag-target"></div>
-
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <!-- BEGIN: Vendor JS-->
     <script src="app-assets/vendors/js/vendors.min.js"></script>
     <!-- BEGIN Vendor JS-->
@@ -595,13 +657,13 @@ if (isset($conn)) {
     <script src="app-assets/js/scripts/datatables/datatable.min.js"></script>
     <!-- END: Page JS-->
 
-    <script>
+      <script>
         // --- Modal Handling ---
-        var modalImageUpdate = document.getElementById("myModal"); // Image update modal
-        var modalDetailsUpdate = document.getElementById("myModal_Add"); // Detailed update modal
+var modalImageUpdate = document.getElementById("myModal"); // Image update modal
+var modalDetailsUpdate = document.getElementById("myModal_Add"); // Detailed update modal
 
         // Function to open the image update modal
-        function openimagemodel(id) {
+function openimagemodel(id) {
             if (modalImageUpdate) {
                 document.getElementById('ProID').value = id; // Set the hidden ProID input
                 modalImageUpdate.style.display = "block";
@@ -611,7 +673,7 @@ if (isset($conn)) {
         }
 
         // Function to open the detailed product update modal
-        function openAddMore(id, proname, /* subname, */ cost, price, discount, des, sku_id /* Add other params as needed */) {
+function openAddMore(id, proname, /* subname, */ cost, price, discount, des, sku_id /* Add other params as needed */) {
              if (modalDetailsUpdate) {
 
                 document.getElementById('product_id').value = id;
@@ -631,7 +693,7 @@ if (isset($conn)) {
         }
 
         // Function to close modals
-        function closeModel(id) {
+function closeModel(id) {
             if (id === 1 && modalImageUpdate) {
                 modalImageUpdate.style.display = "none";
                  // Optional: Reset the form inside the image modal when closed
@@ -644,19 +706,18 @@ if (isset($conn)) {
                  // Be careful if you want edits to persist if reopened without saving
             }
         }
-
         // Close modal if clicking outside of the modal content
-        window.onclick = function(event) {
-            if (event.target === modalImageUpdate) {
-                closeModel(1);
-            } else if (event.target === modalDetailsUpdate) {
-                closeModel(2);
-            }
-        }
+window.onclick = function(event) {
+if (event.target === modalImageUpdate) {
+    closeModel(1);
+    } else if (event.target === modalDetailsUpdate) {
+        closeModel(2);
+    }
+}
 
         // --- AJAX Form Submission for Image Update ---
-        const updateImageForm = document.getElementById('updateImageForm');
-        if (updateImageForm) {
+const updateImageForm = document.getElementById('updateImageForm');
+if (updateImageForm) {
             updateImageForm.onsubmit = function(e) {
                 e.preventDefault(); // Prevent default form submission
 
@@ -720,12 +781,11 @@ if (isset($conn)) {
 
                 xhr.send(formData); // Send FormData
             };
-        } else {
+} else {
             console.warn("Image update form ('updateImageForm') not found.");
         }
 
-
-        function deleteRow(id) {
+function deleteRow(id) {
              if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
                 return; // Stop if user cancels
             }
@@ -750,8 +810,7 @@ if (isset($conn)) {
                 alert('Network error during deletion.');
             };
         }
-
-        function toggle(status, id) {
+function toggle(status, id) {
             const action = status === 'Active' ? 'Deactivate' : 'Activate';
              if (!confirm(`Are you sure you want to ${action} this product?`)) {
                  return; // Stop if user cancels
@@ -780,8 +839,7 @@ if (isset($conn)) {
         }
 
 
-
-        $(document).ready(function () {
+$(document).ready(function () {
         var table = $('#example').DataTable(
                 {
                 dom: 'Bfrtip',
@@ -811,19 +869,32 @@ if (isset($conn)) {
         ]
     });
 });
-$(document).ready(function () {
-    let selectedFiles = {}; // Store image files per row/product ID
 
-    // Show Save button on content editable or select change
+$(document).ready(function () {
+    let selectedFiles = {};
+
     $('#example tbody').on('input', '.editable', function () {
         $(this).closest('tr').find('.save-btn').show();
+
+        const field = $(this).data('field');
+
+        // Allow only numbers and one dot for 'price' fields
+        if (field === 'price' || field === 'cost' || field === 'discount') {
+            let value = $(this).text();
+            value = value.replace(/[^0-9.]/g, ''); // Remove non-numeric and non-dot
+            const parts = value.split('.');
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts[1]; // Keep only the first dot
+            }
+            $(this).text(value);
+            placeCaretAtEnd(this); // Keep cursor at end
+        }
     });
 
     $(document).on('change', '.status-select', function () {
         $(this).closest('tr').find('.save-btn').show();
     });
 
-    // Handle image selection
     $(document).on('change', '.fileInput', function () {
         const fileInput = this;
         const productId = $(this).data('id');
@@ -842,7 +913,6 @@ $(document).ready(function () {
         }
     });
 
-    // Save product updates
     $('#example tbody').on('click', '.save-btn', function () {
         const row = $(this).closest('tr');
         const id = row.data('id');
@@ -909,11 +979,199 @@ $(document).ready(function () {
             }
         });
     });
+
+    function placeCaretAtEnd(el) {
+        el.focus();
+        if (typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined") {
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            range.collapse(false);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+    }
 });
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const tbody = document.getElementById('sortableBody');
+
+    Sortable.create(document.getElementById('sortableBody'), {
+  animation: 150,
+  handle: '.drag-handle', // restrict drag to handle only
+  onEnd: function (evt) {
+    const newOrder = [];
+    document.querySelectorAll('#sortableBody tr').forEach((row, index) => {
+      newOrder.push({ id: row.dataset.id, position: index + 1 });
+    });
+
+    // Optionally send to server:
+    sendOrderToServer(newOrder);
+  }
+});
+});
+
+
+function sendOrderToServer(orderArray) {
+  fetch('../API/update_products_order.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ order: orderArray })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert(data.message);
+    } else {
+      alert('Failed to update order');
+    }
+  });
+}
+
+
+
+
+    const addonOptions = <?= json_encode($addonOptions) ?>;
+    const typeOptions = <?= json_encode($typeOptions) ?>;
+    const dressingOptions = <?= json_encode($dressingOptions) ?>;
+    const subCategoryOptions = <?= json_encode($subCategoryOptions) ?>;
+    const imgUrl = <?= json_encode($imagePath = "Uploads/" ) ?>;
+    
+
+$('#subCategorySelect').on('change', function () {
+    const categoryId = $(this).val();
+
+    if (categoryId) {
+        $('#sortableBody').html(`
+            <tr>
+                <td colspan="17">
+                    <div id="loader" class="text-center mb-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <p>Loading products...</p>
+                    </div>
+                </td>
+            </tr>
+        `);
+
+        $.ajax({
+            url: '../API/get_products_by_categoryzz.php',
+            method: 'POST',
+            data: {
+                token: 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC',
+                category_id: categoryId
+            },
+            success: function (response) {
+                const res = JSON.parse(response);
+                if (res.status && res.data.length > 0) {
+                    let html = '';
+                         res.data.forEach((item, index) => {
+                            html += `
+                            <tr data-id="${item.product_id}">
+                                echo "<td class='drag-handle'>☰</td>";
+                                <td>${index + 1}</td>
+                                <td class="border-5">${item.product_id}</td>
+                                <td class="editable border-5" contenteditable="true" data-field="proname">${item.name}</td>
+                                <td class="editable border-5" contenteditable="true" data-field="sku_id">${item.sku_id ?? '-'}</td>
+                                <td class='border border-5' style='min-width: 220px;' data-field='sub_category_id'>
+                                    <select class="form-control status-select">
+                                        ${subCategoryOptions.map(opt => `
+                                            <option value="${opt.id}" ${opt.id == item.sub_category_id ? 'selected' : ''}>${opt.name}</option>
+                                        `).join('')}
+                                    </select>
+                                </td>
+                                <td class="editable border-5" contenteditable="true" data-field="cost">${item.cost}</td>
+                                <td class="editable border-5" contenteditable="true" data-field="price">${item.price}</td>
+                                <td class="editable border-5" contenteditable="true" data-field="discount">${item.discount}</td>
+                                <td class="editable border-5" contenteditable="true" data-field="description">${item.description}</td>
+                                <td class='border border-5' style='min-width: 100px;' data-field='features'>
+                                    <select class="form-control">
+                                        <option value="Yes" ${item.features === 'Yes' ? 'selected' : ''}>Yes</option>
+                                        <option value="No" ${item.features === 'No' ? 'selected' : ''}>No</option>
+                                    </select>
+                                </td>
+                                <td class='border border-5' style='min-width: 100px;' data-field='status'>
+                                    <select class="form-control status-select">
+                                        <option value="Active" ${item.status === 'Active' ? 'selected' : ''}>Active</option>
+                                        <option value="Inactive" ${item.status === 'Inactive' ? 'selected' : ''}>Inactive</option>
+                                    </select>
+                                </td>
+                                <td class='border border-5' style='min-width: 100px;'  data-field='tax'>
+                                    <select class="form-control status-select">
+                                        <option value="7" ${item.tax == 7 ? 'selected' : ''}>7</option>
+                                        <option value="19" ${item.tax == 19 ? 'selected' : ''}>19</option>
+                                    </select>
+                                </td>
+                                <td class='border border-5' style='min-width: 200px;'  data-field='addon_id'>
+                                    <select class="form-control status-select">
+                                        <option value="-1">None</option>
+                                        ${addonOptions.map(opt => `
+                                            <option value="${opt.ao_id}" ${opt.ao_id == item.addons[0]?.ao_id ? 'selected' : ''}>${opt.ao_title}</option>
+                                        `).join('')}
+                                    </select>
+                                </td>
+                                <td class='border border-5' style='min-width: 200px;'   data-field='type_id'>
+                                    <select class="form-control status-select">
+                                        <option value="-1">None</option>
+                                        ${typeOptions.map(opt => `
+                                            <option value="${opt.type_id}" ${opt.type_id == item.types[0]?.type_id ? 'selected' : ''}>${opt.type_title}</option>
+                                        `).join('')}
+                                    </select>
+                                </td>
+                                <td class='border border-5' style='min-width: 200px;' data-field='dressing_id'>
+                                    <select class="form-control status-select">
+                                        <option value="-1">None</option>
+                                        ${dressingOptions.map(opt => `
+                                            <option value="${opt.dressing_id}" ${opt.dressing_id == item.dressing[0]?.dressing_id ? 'selected' : ''}>${opt.dressing_title}</option>
+                                        `).join('')}
+                                    </select>
+                                </td>
+                                <td class='border border-5' style='min-width: 200px;' data-field='for_deal_only'>
+                                    <select class="form-control status-select">
+                                        <option value="0" ${item.for_deal_only == 0 ? 'selected' : ''}>Regular Product</option>
+                                        <option value="1" ${item.for_deal_only == 1 ? 'selected' : ''}>Only for Deals</option>
+                                    </select>
+                                </td>
+                                <td class='border border-5'>
+                                    <label for="fileUpload${item.product_id}" style="cursor: pointer;">
+                                        <img class="image-clickable" src="${'Uploads/'+item.img}" width="80" height="80" style="object-fit: cover; border-radius: 8px;">
+                                    </label>
+                                    <input type="file" id="fileUpload${item.product_id}" data-id="${item.product_id}" class="d-none fileInput">
+                                </td>
+                                <td><button class="btn btn-success save-btn" style="display:none;">Save</button></td>
+                            </tr>
+                            
+                            `;
+                        });
+
+                    $('#sortableBody').html(html);
+                } else {
+                    $('#sortableBody').html('<tr><td colspan="17">No Product found.</td></tr>');
+                }
+            },
+            error: function () {
+                $('#sortableBody').html('<tr><td colspan="17">Failed to fetch products.</td></tr>');
+                alert("Failed to fetch products.");
+            }
+        });
+    } else {
+        $('#sortableBody').html('');
+    }
+});
+
+
+
+
  // End $(document).ready
 
 
     </script>
+    
+    
+    
 
 </body>
 </html>

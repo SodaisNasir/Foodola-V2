@@ -1,4 +1,7 @@
 <?php
+
+
+
 header("Access-Control-Allow-Origin: *");  // Allow the specific origin
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS"); // Allow specific HTTP methods
 header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Allow specific headers
@@ -7,7 +10,9 @@ header("Content-Type: application/json");
 if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC'){
   $user_id = $_POST['user_id'];
   include('connection.php');
-  $sql = "SELECT `id`, `user_id`, `transaction_id`, `old_amount`,`amount`, `type`, `message`, `created_at` FROM `tbl_transaction` WHERE `user_id` = $user_id Order BY id DESC";
+  $sql = "SELECT `id`, `user_id`, `transaction_id`, `old_amount`,`amount`, `type`, `message`, `created_at`, `english_message`, `transaction_type` FROM `tbl_transaction` WHERE `user_id` = '$user_id' AND `transaction_type` != 'paypal' Order BY id DESC";
+
+
   $ex = mysqli_query($conn,$sql);
   if(mysqli_num_rows($ex) > 0){
      $data = array(); 
@@ -19,6 +24,7 @@ if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbq
                 "transaction_type"=>$row['type'],
                 "message"=>$row['message'],
                 "created_at"=>$row['created_at'],
+                "english_message" => $row['english_message']
             
                 ];
                 
