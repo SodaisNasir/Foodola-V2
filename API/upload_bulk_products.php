@@ -1,4 +1,7 @@
 <?php
+// ini_set('display_errors', 1);
+// error_reporting(E_ALL);
+
 include('connection.php'); // adjust path as needed
 header('Content-Type: application/json');
 
@@ -22,19 +25,27 @@ if ($handle === false) {
 
 $header = fgetcsv($handle);
 $inserted = 0;
-$updated = 0;
 
 while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+    // Skip empty rows
+    if (count(array_filter($data)) === 0) continue;
+    if (count($header) !== count($data)) continue;
+
+    // Convert each value to UTF-8 from ISO-8859-1 (common for Western European CSVs)
+    foreach ($data as &$value) {
+        $value = mb_convert_encoding($value, 'UTF-8', 'ISO-8859-1');
+    }
+
     $row = array_combine($header, $data);
 
     // Sanitize inputs
-    $addon_id        = mysqli_real_escape_string($conn, $row['addon_id']);
-    $type_id         = mysqli_real_escape_string($conn, $row['type_id']);
-    $dressing_id     = mysqli_real_escape_string($conn, $row['dressing_id']);
+    $addon_id        = mysqli_real_escape_string($conn, $row['addon_id']) ?? '-1';
+    $type_id         = mysqli_real_escape_string($conn, $row['type_id']) ?? '-1';
+    $dressing_id     = mysqli_real_escape_string($conn, $row['dressing_id']) ?? '-1';
     $sub_category_id = mysqli_real_escape_string($conn, $row['sub_category_id']);
     $name            = mysqli_real_escape_string($conn, $row['name']);
     $sku_id          = mysqli_real_escape_string($conn, $row['sku_id']);
-    $description     = mysqli_real_escape_string($conn, $row['description']);
+    $description     = mysqli_real_escape_string($conn, $row['description']); // now UTF-8 safe
     $cost            = mysqli_real_escape_string($conn, $row['cost']);
     $price           = mysqli_real_escape_string($conn, $row['price']);
     $discount        = mysqli_real_escape_string($conn, $row['discount']);
@@ -43,44 +54,17 @@ while (($data = fgetcsv($handle, 1000, ',')) !== false) {
     $features        = mysqli_real_escape_string($conn, $row['features']);
     $img             = mysqli_real_escape_string($conn, $row['img']);
 
-    // Check if addon_id exists to decide insert or update
-    $checkQuery = "SELECT id FROM products WHERE addon_id = '$addon_id'";
-    $checkResult = mysqli_query($conn, $checkQuery);
+    // Insert new
+    $insertQuery = "INSERT INTO products (
+        addon_id, type_id, dressing_id, sub_category_id, name, sku_id, description, 
+        cost, price, discount, qty, tax, features, img
+    ) VALUES (
+        '$addon_id', '$type_id', '$dressing_id', '$sub_category_id', '$name', '$sku_id',
+        '$description', '$cost', '$price', '$discount', '$qty', '$tax', '$features', '$img'
+    )";
 
-    if (mysqli_num_rows($checkResult) > 0) {
-        // Update existing
-        $updateQuery = "UPDATE products SET 
-            type_id = '$type_id',
-            dressing_id = '$dressing_id',
-            sub_category_id = '$sub_category_id',
-            name = '$name',
-            sku_id = '$sku_id',
-            description = '$description',
-            cost = '$cost',
-            price = '$price',
-            discount = '$discount',
-            qty = '$qty',
-            tax = '$tax',
-            features = '$features',
-            img = '$img'
-            WHERE addon_id = '$addon_id'";
-
-        if (mysqli_query($conn, $updateQuery)) {
-            $updated++;
-        }
-    } else {
-        // Insert new
-        $insertQuery = "INSERT INTO products (
-            addon_id, type_id, dressing_id, sub_category_id, name, sku_id,
-            description, cost, price, discount, qty, tax, features, img
-        ) VALUES (
-            '$addon_id', '$type_id', '$dressing_id', '$sub_category_id', '$name', '$sku_id',
-            '$description', '$cost', '$price', '$discount', '$qty', '$tax', '$features', '$img'
-        )";
-
-        if (mysqli_query($conn, $insertQuery)) {
-            $inserted++;
-        }
+    if (mysqli_query($conn, $insertQuery)) {
+        $inserted++;
     }
 }
 
@@ -88,7 +72,6 @@ fclose($handle);
 
 echo json_encode([
     'status' => 'success',
-    'message' => "Upload completed. Inserted: $inserted, Updated: $updated."
+    'message' => "$inserted products added successfully",
 ]);
 exit;
-?>

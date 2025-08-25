@@ -2,9 +2,12 @@
 
 
 $Host = 'localhost';
-$DB_DATABASE='u772850971_foodola';
-$DB_USERNAME='u772850971_foodola';
-$DB_PASSWORD=']f0Hy^78Uf0s';
+$DB_DATABASE='u772850971_himalayaspicy';
+$DB_USERNAME='u772850971_himalayaspicy';
+$DB_PASSWORD='g1U;&1LaZd+';
+
+
+
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
 

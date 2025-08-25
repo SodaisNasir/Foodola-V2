@@ -88,7 +88,7 @@ if (isset($_GET['Massage'])) {
                             <h2 class="content-header-title float-left mb-0">View Deals</h2>
                             <div class="breadcrumb-wrapper col-12">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="index.html">Home</a>
+                                    <li class="breadcrumb-item"><a href="index.php">Home</a>
                                     </li>
                                     <li class="breadcrumb-item active">View Deals
                                     </li>
@@ -154,7 +154,7 @@ if (isset($_GET['Massage'])) {
                                                     
                                                             $imagePath = $row['deal_image'];
                                                             if (!empty($imagePath)) {
-                                                                $imgSrc = '/admin_panel/'.$imagePath;
+                                                                $imgSrc = '/admin_panel/Uploads/'.$imagePath;
                                                             } 
                                                             
                                                         $itemsQuery = "SELECT `di_id`, `deal_id`, `di_title`, `di_num_free_items`, `deal_subdata` FROM `deal_items` WHERE `deal_id` = '$dealId'";

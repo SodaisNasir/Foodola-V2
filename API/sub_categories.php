@@ -4,7 +4,7 @@
 if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC'){
 
      $main_category_id = $_POST['main_category_id'];
-     $sql = "SELECT `id`, `category_id`, `name`, `img`, `created_at`, `updated_at` FROM `sub_categories` WHERE `category_id`=$main_category_id";
+     $sql = "SELECT `id`, `category_id`, `name`, `img`, `created_at`, `updated_at` FROM `sub_categories` WHERE `category_id`=$main_category_id ORDER BY `sort_order` ASC ";
      include('connection.php');
      $execute = mysqli_query($conn,$sql);
      if(mysqli_num_rows($execute) > 0){

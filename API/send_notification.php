@@ -36,7 +36,7 @@ function sendNotification($notification_token)
     //     'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebndohgjidlvpeo7en2ev5vls473qc26gslgf4tvpouj6t4in75jdztefftz5c52matdxdsstnomodc3a'
     // ));
      curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8',
-                                                              'Authorization: Basic  ODU5ZDhiZjAtOWRkZS00NDIyLWI0ZWItOTYxMDc5YzQzMGIz'));
+                                                              'Authorization: Basic  os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
     curl_setopt($ch, CURLOPT_HEADER, FALSE);
     curl_setopt($ch, CURLOPT_POST, TRUE);

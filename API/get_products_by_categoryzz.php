@@ -10,7 +10,7 @@ if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqa
  
     $category_id = $_POST['category_id'];
     
-    $select_user_restuarant = "SELECT * FROM `products` WHERE `sub_category_id` = '$category_id'";   
+$select_user_restuarant = "SELECT * FROM `products` WHERE `sub_category_id` = '$category_id' AND `status` = 'Active' AND `for_deal_only` = '0' ORDER BY `sort_order` ASC";
     $execute_restuarant = mysqli_query($conn,$select_user_restuarant);
     
     if(mysqli_num_rows($execute_restuarant) > 0){
@@ -26,7 +26,8 @@ if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqa
 
             
                     // ADDONS
-                       $select_addon_title = 'SELECT * FROM `addon_list` WHERE `ao_id` ='.$row['addon_id'];
+                    $addon_id =$row['addon_id'];
+                       $select_addon_title = "SELECT * FROM `addon_list` WHERE `ao_id` = '$addon_id'";
                         $execute_addon_title  = mysqli_query($conn,$select_addon_title);   
                       if(mysqli_num_rows($execute_addon_title) > 0){
                           $addon = array();
@@ -61,8 +62,9 @@ if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqa
                     
                     
                     ////TYPE
+                    $type_id = $row['type_id'];
                     
-                                $select_type_title = 'SELECT `type_id`, `type_title`, `type_title_user` FROM `types_list` WHERE `type_id` = '.$row['type_id'];
+                                $select_type_title = "SELECT `type_id`, `type_title`, `type_title_user` FROM `types_list` WHERE `type_id` = '$type_id' ";
                                 $execute_type_title  = mysqli_query($conn,$select_type_title);  
                                  if(mysqli_num_rows($execute_type_title) > 0){
                                   $type = array();

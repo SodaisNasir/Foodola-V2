@@ -15,18 +15,17 @@ function getOrderData($conn, $order_id)
 
   $has_table_id = !empty($check_data['table_id']);
 
-  $base_sql_products = "SELECT o.id, o.order_total_price, o.addtional_notes, o.payment_type, o.Shipping_Cost,
+  $base_sql_products = "SELECT o.id, o.order_total_price, o.payment_type, o.Shipping_Cost,
                            o.Shipping_address, o.Shipping_state , o.Shipping_address_2, o.Shipping_city, o.Shipping_area, o.Shipping_postal_code,
                            od.id AS order_detail_id, o.total_discount, o.order_type, o.payment_method, o.ordersheduletype,
                            o.sheduletime, od.order_id, od.deal_id, od.deal_item_id, od.product_id, od.qty, od.addons, od.types,
-                           od.dressing, p.name, p.description, p.img, od.price, od.cost, od.discount_percent, o.created_at, o.total_netto_tax, o.total_metto_tax
+                           od.dressing, od.additional_notes, p.name, p.description, p.img, od.price, od.cost, od.discount_percent, o.created_at, o.total_netto_tax, o.total_metto_tax
                            FROM `orders_zee` o
                            INNER JOIN `order_details_zee` od ON od.order_id = o.id
                            INNER JOIN `products` p ON p.id = od.product_id
                            WHERE o.id = " . $order_id . " AND od.deal_id = 0";
 
-  $base_sql_deals = "SELECT od.no_of_deal, od.qty, od.cost, od.price, de.deal_name, o.order_total_price,
-                          o.addtional_notes, o.payment_type, o.Shipping_Cost, o.Shipping_address, o.Shipping_address_2,
+  $base_sql_deals = "SELECT od.no_of_deal, od.qty, od.cost, od.price, od.additional_notes, de.deal_name, o.order_total_price, o.payment_type, o.Shipping_Cost, o.Shipping_address, o.Shipping_address_2,
                           o.Shipping_city, o.Shipping_state , o.Shipping_area, o.Shipping_postal_code, o.total_discount, o.order_type,
                           o.payment_method, o.ordersheduletype, o.sheduletime, o.total_netto_tax, o.total_metto_tax
                           FROM `orders_zee` o
@@ -113,39 +112,48 @@ if ($data && isset($data['created_at'])) {
   <style type="text/css">
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
 
-    @media print {
-      .button {
-        display: none;
-      }
+@media print {
+  .button {
+    display: none;
+  }
 
-      @page {
-        margin-top: 0;
-        margin-bottom: 0;
-      }
+  @page {
+    margin: 0; /* Removes all page margins */
+  }
 
-      body {
-        max-height: fit-content;
-        max-width: fit-content;
-        padding-top: 10px;
-        padding-bottom: 10px;
- 
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    font-family: sans-serif;
+    font-size: 18px;
+  }
 
-      }
-    }
+  .receipt-container {
+    width: 100%; /* Use full printable width */
+    max-width: 70mm; /* Limit width if needed */
+    margin: 0; /* No auto centering */
+    padding: 0;
+    text-align: center;
+    box-shadow: none;
+    border: none;
+  }
+}
 
-    body {
-      font-family: sans-serif;
-      font-size: 18px;
-    }
+body {
+  font-family: sans-serif;
+  font-size: 18px;
+}
 
-    .receipt-container {
-      border: none;
-      width: 56mm;
-      margin: 0 auto;
-      text-align: center;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-
-    }
+.receipt-container {
+  width: 100%;
+  max-width: 70mm;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  border: none;
+}
 
     .header-logo {
       display: flex;
@@ -181,6 +189,7 @@ if ($data && isset($data['created_at'])) {
     .order-info {
       text-align: left;
       margin-top: 5px;
+      margin-left: 20px ;
       margin-bottom: 5px;
             font-weight: bold;
 
@@ -298,6 +307,13 @@ if ($data && isset($data['created_at'])) {
         text-align: center;
     }
     
+    .item-notes {
+  font-size: 0.7rem;
+  color: black; /* Slightly lighter for a subdued look */
+  margin-top: 4px;
+  white-space: pre-wrap; /* Preserves line breaks */
+}
+
  
   </style>
 </head>
@@ -306,14 +322,16 @@ if ($data && isset($data['created_at'])) {
   <div class="receipt-container print">
     <div class="header-logo">
       <img src="images/logo.png" alt="Firmenlogo" class="logo">
-      <h3 class="company-name">Pizzablitzöstringen.de</h3>
+      <h3 class="company-name">Pizza Sofort Karlsruhe</h3>
     </div>
 
     <div class="company-details">
-      <h3>Kuhngasse 1, 76684 Östringen</h3>
-      <h3>Östringen, Tell:0725326560-61</h3>
+      <h3>Breitestr. 58, 76135 Karlsruhe</h3>
+      <h3>Karlsruhe, Tell:0721 8408840</h3>
       <h3>Bestellnummer: <?php echo $order_id ?></h3>
     </div>
+
+
 
     <div class="order-info">
     <h3><?php echo htmlspecialchars($datetime); ?></h3>
@@ -330,7 +348,7 @@ if ($data && isset($data['created_at'])) {
         <h3>E-Mail: <?php echo htmlspecialchars($data['email']); ?></h3>
     <?php endif; ?>
 
-    <h3>Name: <?php echo htmlspecialchars($data['Shipping_address'] ?? ''); ?></h3>
+    <h3>Name: <?php echo htmlspecialchars($data['cxname'] ?? ''); ?></h3>
 
     <?php if ($data['order_type'] == 'delivery'): ?>
        
@@ -358,7 +376,7 @@ if ($data && isset($data['created_at'])) {
     <?php if (!empty($data['order_type'])): ?>
         <h3>Auftragsart: 
             <?php echo htmlspecialchars($data['order_type']); ?>
-            <?php if ($data['order_type'] == 'delivery' && $data['ordersheduletype'] == 'orderlater'): ?>
+            <?php if ( $data['ordersheduletype'] == 'orderlater'): ?>
                 @ <?php echo htmlspecialchars($data['sheduletime']); ?>
             <?php endif; ?>
         </h3>
@@ -372,152 +390,205 @@ if ($data && isset($data['created_at'])) {
     </div>
 
     <div class="item-details">
-      <table style="width: 100%; border-collapse: collapse;">
-        <thead>
+  <table style="width: 100%; border-collapse: collapse;">
+    <thead>
+      <tr>
+        <th style="text-align: left;">Menge</th>
+        <th style="text-align: left; width: 60%;">Artikel</th>
+        <th style="text-align: right;">Preis</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php
+      $totalAmount = 0;
+      $Addons_Price = 0;
+      $finalTotal = 0;
+
+      if ($result && mysqli_num_rows($result) > 0) {
+        mysqli_data_seek($result, 0);
+        while ($value = mysqli_fetch_assoc($result)) {
+          $addons = json_decode($value['addons']);
+          $dressing = json_decode($value['dressing']);
+          $types = json_decode($value['types']);
+          $basePrice =  $value['price'] ;
+          $totalAmount += $basePrice * $value['qty'];
+
+          $addonforinner = 0;
+      ?>
           <tr>
-            <th style="text-align: left;">Menge</th>
-            <th style="text-align: left; width: 60%;">Artikel</th>
-            <th style="text-align: right;">Preis</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php
-          $totalAmount = 0;
-          $Addons_Price = 0;
-          if ($result && mysqli_num_rows($result) > 0) {
-            mysqli_data_seek($result, 0);
-            while ($value = mysqli_fetch_assoc($result)) {
-              $addons =  json_decode($value['addons']);
-              $dressing = json_decode($value['dressing']);
-              $types = json_decode($value['types']);
-              $totalAmount += ($value['price'] - ($value['price'] * $value['discount_percent'] / 100)) * $value['qty'];
-              $addonforinner = 0;
-          ?>
-              <tr>
-                <td>x<?php echo htmlspecialchars($value['qty']); ?></td>
-                <td>
-                  <div class="item-name"><?php echo htmlspecialchars($value['name']); ?></div>
-                  <div class="item-options">
-                    <?php if (!empty($types)) : ?>
-                      <?php foreach ($types as $type) : ?>
-                        - <?php echo htmlspecialchars($type->ts_name); ?><br>
-                      <?php endforeach; ?>
-                    <?php endif; ?>
-                    <?php if (!empty($addons)) : ?>
-                      <?php foreach ($addons as $addon) : ?>
-                        x<?php echo htmlspecialchars($addon->quantity); ?> <?php echo htmlspecialchars($addon->as_name); ?><br>
-                        <?php $addonforinner += number_format((float)($addon->as_price * $addon->quantity), 2, '.', ''); ?>
-                        <?php $Addons_Price += number_format((float)($addon->as_price * $addon->quantity), 2, '.', ''); ?>
-                      <?php endforeach; ?>
-                    <?php endif; ?>
-                    <?php if (!empty($dressing)) : ?>
-                      <?php foreach ($dressing as $dressings) : ?>
-                        <?php echo htmlspecialchars($dressings->dressing_name); ?>
-                      <?php endforeach; ?>
-                    <?php endif; ?>
-                  </div>
-                </td>
-                <td class="total-price">
-                  €<?php
-                    $total_product_price =  number_format((($value['price'] - ($value['price'] * $value['discount_percent'] / 100)) + $addonforinner) * $value['qty'], 2, '.', '');
-                    echo htmlspecialchars($total_product_price);
-                    ?>
-                </td>
-              </tr>
-          <?php }
-          } ?>
-          <?php
-          if ($result_deal && mysqli_num_rows($result_deal) > 0) {
-            mysqli_data_seek($result_deal, 0);
-            while ($value = mysqli_fetch_assoc($result_deal)) {
-              // echo var_dump($value);
-          ?>
+            <td>x<?php echo htmlspecialchars($value['qty']); ?></td>
+            <td>
+              <div class="item-name"><?php echo htmlspecialchars($value['name']); ?></div>
 
-              <tr>
-                <td>x<?php echo htmlspecialchars($value['qty']); ?></td>
-                <td>
-                  <div class="item-name"><?php echo htmlspecialchars($value['deal_name']); ?></div>
-                  <div class="item-options">
+              <?php if (!empty($value['additional_notes'])) : ?>
+                <div class="mt-1 item-notes">Notiz: <?php echo htmlspecialchars($value['additional_notes']); ?></div>
+              <?php endif; ?>
+
+              <div class="item-options">
+                <?php if (!empty($addons)) : ?>
+                  <?php foreach ($addons as $addon) : ?>
+                    x<?php echo htmlspecialchars($addon->quantity); ?> <?php echo htmlspecialchars($addon->as_name); ?><br>
                     <?php
-                    $no = $value['no_of_deal'];
-
-                    $sql_sub = '';
-                    if ($has_table_id) {
-                      $sql_sub = "SELECT o.id, od.deal_item_id, od.product_id, od.qty, od.addons, od.types, od.dressing ,p.name, od.price , dl.di_num_free_items
-                                                    FROM `orders_zee` o
-                                                    INNER JOIN `order_details_zee` od ON od.order_id = o.id
-                                                    INNER JOIN `products` p ON p.id = od.product_id
-                                                    INNER JOIN deal_items as dl ON dl.di_id = od.deal_item_id
-                                                    WHERE o.id = " . $order_id . " AND od.deal_id > 0 AND od.no_of_deal = " . $no;
-                    } else {
-                      $sql_sub = "SELECT o.id, od.deal_item_id, od.product_id, od.qty, od.addons, od.types, od.dressing ,p.name, od.price , dl.di_num_free_items
-                                                    FROM `orders_zee` o
-                                                    INNER JOIN `order_details_zee` od ON od.order_id = o.id
-                                                    INNER JOIN `products` p ON p.id = od.product_id
-                                                    INNER JOIN users as u ON u.id = o.user_id
-                                                    INNER JOIN deal_items as dl ON dl.di_id = od.deal_item_id
-                                                    WHERE o.id = " . $order_id . " AND od.deal_id > 0 AND od.no_of_deal = " . $no;
-                    }
-
-                    $result_sub = mysqli_query($conn, $sql_sub);
-
-                    if ($result_sub && mysqli_num_rows($result_sub) > 0) {
-                      mysqli_data_seek($result_sub, 0);
-                      while ($row = mysqli_fetch_assoc($result_sub)) {
-                        $addons =  json_decode($row['addons']);
-                        $dressing = json_decode($row['dressing']);
-                        $types = json_decode($row['types']);
-                        $di_num_free_items = ($row['di_num_free_items']);
-                        $addonforinner = 0;
+                    $addonTotal = $addon->as_price * $addon->quantity;
+                    $addonforinner += $addonTotal;
+                    $Addons_Price += $addonTotal;
                     ?>
-                        <?php echo htmlspecialchars($row['name']); ?> -
-                        <?php if (!empty($types)) : ?>
-                          <?php foreach ($types as $type) : ?>
-                            - <?php echo htmlspecialchars($type->ts_name); ?><br>
-                          <?php endforeach; ?>
-                        <?php endif; ?>
+                  <?php endforeach; ?>
+                <?php endif; ?>
+
+                <?php if (!empty($types)) : ?>
+                  <?php foreach ($types as $type) : ?>
+                    <?php echo htmlspecialchars($type->ts_name); ?><br>
+                    <?php $addonforinner += $type->price; ?>
+                  <?php endforeach; ?>
+                <?php endif; ?>
+
+                <?php if (!empty($dressing)) : ?>
+                  <?php foreach ($dressing as $dressings) : ?>
+                    <?php echo htmlspecialchars($dressings->dressing_name); ?><br>
+                    <?php $addonforinner += $dressings->price; ?>
+                  <?php endforeach; ?>
+                <?php endif; ?>
+              </div>
+            </td>
+            <td class="total-price">
+              €<?php
+              $total_product_price = number_format(($basePrice + $addonforinner) * $value['qty'], 2, '.', '');
+              echo htmlspecialchars($total_product_price);
+              $finalTotal += $total_product_price;
+              ?>
+            </td>
+          </tr>
+      <?php }
+      } ?>
+
+      <?php
+      if ($result_deal && mysqli_num_rows($result_deal) > 0) {
+        mysqli_data_seek($result_deal, 0);
+        while ($value = mysqli_fetch_assoc($result_deal)) {
+      ?>
+          <tr>
+            <td>x<?php echo htmlspecialchars($value['qty']); ?></td>
+            <td>
+              <div class="item-details">
+                <strong class="item-name d-block mb-1"><?php echo htmlspecialchars($value['deal_name']); ?></strong>
+                <div class="item-options text-muted small">
+                  <?php
+                  $no = $value['no_of_deal'];
+                  $sql_sub = $has_table_id ?
+                    "SELECT o.id, od.deal_item_id, od.product_id, od.qty, od.addons, od.types, od.dressing, p.name, od.price, od.additional_notes, dl.di_num_free_items
+                     FROM `orders_zee` o
+                     INNER JOIN `order_details_zee` od ON od.order_id = o.id
+                     INNER JOIN `products` p ON p.id = od.product_id
+                     INNER JOIN deal_items dl ON dl.di_id = od.deal_item_id
+                     WHERE o.id = $order_id AND od.deal_id > 0 AND od.no_of_deal = $no"
+                    :
+                    "SELECT o.id, od.deal_item_id, od.product_id, od.qty, od.addons, od.types, od.dressing, od.additional_notes, p.name, od.price, dl.di_num_free_items
+                     FROM `orders_zee` o
+                     INNER JOIN `order_details_zee` od ON od.order_id = o.id
+                     INNER JOIN `products` p ON p.id = od.product_id
+                     INNER JOIN users u ON u.id = o.user_id
+                     INNER JOIN deal_items dl ON dl.di_id = od.deal_item_id
+                     WHERE o.id = $order_id AND od.deal_id > 0 AND od.no_of_deal = $no";
+
+                  $result_sub = mysqli_query($conn, $sql_sub);
+                  $addonforinner = 0;
+
+                  if ($result_sub && mysqli_num_rows($result_sub) > 0) {
+                    mysqli_data_seek($result_sub, 0);
+                    while ($row = mysqli_fetch_assoc($result_sub)) {
+                      $addons = json_decode($row['addons']);
+                      $types = json_decode($row['types']);
+                      $dressing = json_decode($row['dressing']);
+                      $di_num_free_items = $row['di_num_free_items'];
+                  ?>
+                      <div class="mb-2">
+                        <strong><?php echo htmlspecialchars($row['name']); ?></strong>
+
                         <?php if (!empty($addons)) : ?>
-                          <?php foreach ($addons as $addon) : ?>
-                            x<?php echo htmlspecialchars($addon->quantity); ?> <?php echo htmlspecialchars($addon->as_name); ?><br>
-                            <?php
-                            if ($di_num_free_items == 0) {
-                              $addonforinner += number_format((float)($addon->as_price * $addon->quantity), 2, '.', '');
-                              $Addons_Price += number_format((float)($addon->as_price * $addon->quantity), 2, '.', '');
-                            } else {
-                              $di_num_free_items -= $addon->quantity;
-                            }
-                            ?>
-                          <?php endforeach; ?>
+                          <div>
+                            <?php foreach ($addons as $addon) : ?>
+                              x<?php echo htmlspecialchars($addon->quantity); ?> <?php echo htmlspecialchars($addon->as_name); ?><br>
+                              <?php
+                              if ($di_num_free_items == 0) {
+                                $addonTotal = $addon->as_price * $addon->quantity;
+                                $addonforinner += $addonTotal;
+                                $Addons_Price += $addonTotal;
+                              } else {
+                                $di_num_free_items -= $addon->quantity;
+                              }
+                              ?>
+                            <?php endforeach; ?>
+                          </div>
                         <?php endif; ?>
-                        <?php if (!empty($dressing)) : ?>
-                          <?php foreach ($dressing as $dressings) : ?>
-                            <?php echo htmlspecialchars($dressings->dressing_name); ?>
-                          <?php endforeach; ?>
-                        <?php endif; ?>
-                    <?php }
-                      mysqli_free_result($result_sub);
-                    }
-                    ?>
-                  </div>
-                </td>
-                <td class="total-price">€<?php echo number_format((float)($value['price'] + $addonforinner), 2, '.', ''); ?></td>
-              </tr>
-          <?php }
-          } ?>
-        </tbody>
-      </table>
-    </div>
 
-    <div class="footer-totals">
-      <ul>
-        <li><span>Zwischensumme:</span><span><?php echo "€" . number_format((float)($data['order_total_price'] ?? 0), 2, '.', ''); ?></span></li>
-        <li><span>Rabatt:</span><span><?php echo "€" . number_format((float)($total['total_discount'] ?? 0), 2, '.', ''); ?></span></li>
-        <li><span>Lieferung:</span><span><?php echo "€" . number_format((float)($total['Shipping_Cost'] ?? 0), 2, '.', ''); ?></span></li>
-        <li><span>MwSt. (7%):</span><span><?php echo "€" . number_format((float)($data['total_netto_tax'] ?? 0), 2, '.', ''); ?></span></li>
-        <li><span>MwSt. (19%):</span><span><?php echo "€" . number_format((float)($data['total_metto_tax'] ?? 0), 2, '.', ''); ?></span></li>
-        <li><span>Gesamt:</span><span><?php echo "€" . number_format((float)($data['order_total_price'] ?? 0), 2, '.', ''); ?></span></li>
-      </ul>
-    </div>
+                        <?php if (!empty($types)) : ?>
+                          <div>
+                            <?php foreach ($types as $type) : ?>
+                              <?php echo htmlspecialchars($type->ts_name); ?>
+                              <?php $addonforinner += $type->price; ?>
+                            <?php endforeach; ?>
+                          </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($dressing)) : ?>
+                          <div>Dressing:
+                            <?php foreach ($dressing as $dressings) : ?>
+                              <?php echo htmlspecialchars($dressings->dressing_name); ?>
+                              <?php $addonforinner += $dressings->price; ?>
+                            <?php endforeach; ?>
+                          </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($row['additional_notes'])) : ?>
+                          <div class="item-notes mt-1">Notiz: <?php echo htmlspecialchars($row['additional_notes']); ?></div>
+                        <?php endif; ?>
+                      </div>
+                  <?php
+                    }
+                    mysqli_free_result($result_sub);
+                  }
+                  ?>
+                </div>
+              </div>
+            </td>
+            <td class="total-price font-weight-bold">
+              €<?php
+              $dealTotal = number_format($value['price'] + $addonforinner, 2, '.', '');
+              echo $dealTotal;
+              $finalTotal += $dealTotal;
+              ?>
+            </td>
+          </tr>
+      <?php }
+      } ?>
+    </tbody>
+  </table>
+</div>
+
+<?php
+$discount = isset($total['total_discount']) ? (float) $total['total_discount'] : 0.00;
+$shipping = isset($total['Shipping_Cost']) ? (float) $total['Shipping_Cost'] : 0.00;
+$tax_7 = isset($data['total_netto_tax']) ? (float) $data['total_netto_tax'] : 0.00;
+$tax_19 = isset($data['total_metto_tax']) ? (float) $data['total_metto_tax'] : 0.00;
+
+$subtotal = $finalTotal;
+$grand_total = $subtotal - $discount + $shipping;
+?>
+
+<div class="footer-totals">
+  <ul>
+    <li><span>Tatsächlicher Preis:</span><span>€<?php echo number_format($subtotal, 2, '.', ''); ?></span></li>
+    <li><span>Rabatt:</span><span>-€<?php echo number_format($discount, 2, '.', ''); ?></span></li>
+    <li><span>Lieferung:</span><span>€<?php echo number_format($shipping, 2, '.', ''); ?></span></li>
+    <li><span>MwSt. (7%):</span><span>€<?php echo number_format($tax_7, 2, '.', ''); ?></span></li>
+    <li><span>MwSt. (19%):</span><span>€<?php echo number_format($tax_19, 2, '.', ''); ?></span></li>
+    <li><span>Gesamt:</span><span>€<?php echo number_format($grand_total, 2, '.', ''); ?></span></li>
+  </ul>
+</div>
+
+
+    
 
     <div class="payment-method-info">
       Zahlungsmethode: <?php echo htmlspecialchars($data['payment_type'] ?? 'N/A'); ?> </div>
