@@ -11,6 +11,10 @@
        }
      
   }   
+  
+//   error_reporting(E_ALL);        // Report all errors
+// ini_set('display_errors', 1);  // Show errors on screen
+// ini_set('display_startup_errors', 1); //
 ?>
 
 
@@ -136,7 +140,7 @@
                 <h2 class="content-header-title float-left mb-0">New Orders</h2>
                 <div class="breadcrumb-wrapper col-12">
                   <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Home</a>
+                    <li class="breadcrumb-item"><a href="index.php">Home</a>
                     </li>
                     <li class="breadcrumb-item active">New Orders
                     </li>
@@ -175,7 +179,7 @@
                             <table id="example" class="table">
                                 <thead>
                                     <tr>
-                                        <!--<th>S No.</th>-->
+                                        <th>S No.</th>
                                         <th>Order ID</th>
                                         <th>Name</th>
                                         <th>Order Type</th>
@@ -183,7 +187,7 @@
                                         <th>Order date&time</th>
                                         <th>Shipping</th>
                                         <th>Payment type</th>
-                                        <th>Additional notes</th>
+                                        <th>Order status</th>
                     
                                         <th>Action</th>
                                     </tr>
@@ -200,12 +204,14 @@ if (isset($_SESSION['branch_id'])) {
     include_once('connection.php');
     
     // Modify the SQL query to filter orders based on branch_id from the session
-    $sql = "SELECT orders.id, orders.user_id, orders.Shipping_address, orders.Shipping_address_2, orders.Shipping_city, orders.Shipping_area, 
+    $sql = "SELECT orders.id, orders.user_id, orders.Shipping_address, orders.status, orders.Shipping_address_2, orders.Shipping_city, orders.Shipping_area, 
             orders.payment_type, orders.Shipping_state, orders.Shipping_postal_code, orders.order_total_price, 
             orders.Shipping_Cost, orders.created_at, orders.addtional_notes, orders.branch_id, orders.table_id, orders.order_type
             FROM `orders_zee` AS orders 
-            WHERE orders.branch_id = '$session_branch_id' 
+          
             ORDER BY orders.id DESC";
+            
+            //  WHERE orders.branch_id = '$session_branch_id' 
 
     $result = mysqli_query($conn, $sql);
     $index = 0;
@@ -230,17 +236,29 @@ if (isset($_SESSION['branch_id'])) {
             }
         }
 
+ $price = number_format((float)($row['order_total_price'] ?? 0), 2);
+$shipping_cost = number_format((float)($row['Shipping_Cost'] ?? 0), 2);
+
         // Prepare and display the order row
         echo "<tr>";
-        // echo "<td>{$sn}</td>";
+        echo "<td>{$sn}</td>";
         echo "<td>{$row['id']}</td>";
         echo "<td>" . ($user_name ?? '-') . "</td>";  // Show name or "-" if not available
         echo "<td>{$row['order_type']}</td>";
-        echo "<td style='min-width:100px;'>€ {$row['order_total_price']}</td>";
-        echo "<td style='min-width:200px;' >{$row['created_at']}</td>";
-        echo "<td>€ {$row['Shipping_Cost']}</td>";
+        echo "<td style='min-width:100px;'>€ {$price}</td>";
+        echo "<td style='min-width:200px;'>{$row['created_at']}</td>";
+        echo "<td>€ {$shipping_cost}</td>";
         echo "<td>{$row['payment_type']}</td>";
-        echo "<td>{$row['addtional_notes']}</td>";
+        if($row['status'] === 'canceled'){
+            echo "<td style='color:red'>Canceled</td>";
+        }else  if($row['status'] === 'pending'){
+           echo "<td style='color:yellow'>Pending</td>";  
+        }else  if($row['status'] === 'delivered'){
+           echo "<td style='color:green'>Delivered</td>";  
+        }else {
+           echo "<td style='color:orange'>New Order</td>";  
+        }
+       
         echo "<td><a href='order_details.php?order_id={$row['id']}'><button class='btn btn-primary'>Details</button></a></td>";
         echo "</tr>";
         $index++;
@@ -255,7 +273,7 @@ if (isset($_SESSION['branch_id'])) {
 
                                 <tfoot>
                                     <tr>
-                                        <!--<th>S No.</th>-->
+                                        <th>S No.</th>
                                         <th>Order ID</th>
                                         <th>Name</th>
                                         <th>Address</th>
@@ -263,7 +281,7 @@ if (isset($_SESSION['branch_id'])) {
                                         <th>Order date&time</th>
                                         <th>Shipping</th>
                                         <th>Payment type</th>
-                                        <th>Additional notes</th>
+                                        <th>Order Statuss</th>
                     
                                         <th>Action</th>
                                     </tr>
