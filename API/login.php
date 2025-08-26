@@ -57,6 +57,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                 "ref_amount" => $user_data['ref_amount'],
                 "created_at" => $user_data['created_at'],
                 "wishlist" => $wishlist_array,
+                "country_code" => $user_data['country_code'],
             ];
 
             $data = [

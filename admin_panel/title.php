@@ -5,108 +5,108 @@ $pageName = basename($_SERVER['PHP_SELF'], ".php");
 
 switch ($pageName) {
     case 'index':
-        $pageTitle = "Analytics | pizzaburgerpoint";
+        $pageTitle = "Analytics | Burgerpoint Graben";
         break;
     case 'addareas':
-        $pageTitle = "Addareas | pizzaburgerpoint";
+        $pageTitle = "Addareas | Burgerpoint Graben";
         break;
     case 'addriders':
-        $pageTitle = "Addriders | pizzaburgerpoint";
+        $pageTitle = "Addriders | Burgerpoint Graben";
         break;
     case 'addmaincat':
-        $pageTitle = "Maincategories | pizzaburgerpoint";
+        $pageTitle = "Maincategories | Burgerpoint Graben";
         break;
     case 'addSubCat':
-        $pageTitle = "Subcategories | pizzaburgerpoint";
+        $pageTitle = "Subcategories | Burgerpoint Graben";
         break;
     case 'insertNewProduct':
-        $pageTitle = "Newproduct | pizzaburgerpoint";
+        $pageTitle = "Newproduct | Burgerpoint Graben";
         break;
     case 'addVariation':
-        $pageTitle = "Variation | pizzaburgerpoint";
+        $pageTitle = "Variation | Burgerpoint Graben";
         break;
     case 'addAddons':
-        $pageTitle = "Addons | pizzaburgerpoint";
+        $pageTitle = "Addons | Burgerpoint Graben";
         break;    
     case 'addDressing':
-        $pageTitle = "Dressing | pizzaburgerpoint";
+        $pageTitle = "Dressing | Burgerpoint Graben";
         break;
     case 'addTypes':
-        $pageTitle = "Types | pizzaburgerpoint";
+        $pageTitle = "Types | Burgerpoint Graben";
         break;
     case 'insertDeals':
-        $pageTitle = "Deals | pizzaburgerpoint";
+        $pageTitle = "Deals | Burgerpoint Graben";
         break;    
     case 'addslider':
-        $pageTitle = "Sliders | pizzaburgerpoint";
+        $pageTitle = "Sliders | Burgerpoint Graben";
         break;  
         
      case 'addprivacypolicy':
-        $pageTitle = "Add-Privacy-Policy | pizzaburgerpoint";
+        $pageTitle = "Add-Privacy-Policy | Burgerpoint Graben";
         break;    
     case 'addterms_condition':
-        $pageTitle = "Terms-Conditions | pizzaburgerpoint";
+        $pageTitle = "Terms-Conditions | Burgerpoint Graben";
         break;
     case 'manage_pos':
-        $pageTitle = "Manage-Pos | pizzaburgerpoint";
+        $pageTitle = "Manage-Pos | Burgerpoint Graben";
         break;
     case 'manageriders':
-        $pageTitle = "Manage-Riders | pizzaburgerpoint";
+        $pageTitle = "Manage-Riders | Burgerpoint Graben";
         break;    
     case 'manageusers':
-        $pageTitle = "Manage-Users | pizzaburgerpoint";
+        $pageTitle = "Manage-Users | Burgerpoint Graben";
         break;  
         
     case 'managetimings':
-        $pageTitle = "Manage-Timings | pizzaburgerpoint";
+        $pageTitle = "Manage-Timings | Burgerpoint Graben";
         break;      
     case 'neworders':
-        $pageTitle = "New-Orders | pizzaburgerpoint";
+        $pageTitle = "New-Orders | Burgerpoint Graben";
         break;      
     case 'orders':
-        $pageTitle = "Orders | pizzaburgerpoint";
+        $pageTitle = "Orders | Burgerpoint Graben";
         break;      
     case 'manageinventory':
-        $pageTitle = "Manage-Inventory | pizzaburgerpoint";
+        $pageTitle = "Manage-Inventory | Burgerpoint Graben";
         break;      
     case 'manageAreas':
-        $pageTitle = "Manage-Areas | pizzaburgerpoint";
+        $pageTitle = "Manage-Areas | Burgerpoint Graben";
         break;      
     case 'manageproducts':
-        $pageTitle = "Manage-Products | pizzaburgerpoint";
+        $pageTitle = "Manage-Products | Burgerpoint Graben";
         break;      
     case 'managevariations':
-        $pageTitle = "Manage-Variations | pizzaburgerpoint";
+        $pageTitle = "Manage-Variations | Burgerpoint Graben";
         break;      
     case 'view_dressing':
-        $pageTitle = "Manage-Dressing | pizzaburgerpoint";
+        $pageTitle = "Manage-Dressing | Burgerpoint Graben";
         break;
     case 'view_types':
-        $pageTitle = "Manage-Types | pizzaburgerpoint";
+        $pageTitle = "Manage-Types | Burgerpoint Graben";
         break;
     case 'view_deals':
-        $pageTitle = "Manage-Deals | pizzaburgerpoint";
+        $pageTitle = "Manage-Deals | Burgerpoint Graben";
         break;
     case 'viewcategories':
-        $pageTitle = "Manage-Catagories | pizzaburgerpoint";
+        $pageTitle = "Manage-Catagories | Burgerpoint Graben";
         break;       
     case 'SubCat':
-        $pageTitle = "Manage-Sub-Catagories | pizzaburgerpoint";
+        $pageTitle = "Manage-Sub-Catagories | Burgerpoint Graben";
         break;                                      
     case 'manageSliders':
-        $pageTitle = "Manage-Sliders | pizzaburgerpoint";
+        $pageTitle = "Manage-Sliders | Burgerpoint Graben";
         break;
     case 'managePoints':
-        $pageTitle = "Manage-Points | pizzaburgerpoint";
+        $pageTitle = "Manage-Points | Burgerpoint Graben";
         break;
     case 'SendNotifications':
-        $pageTitle = "Notifications | pizzaburgerpoint";
+        $pageTitle = "Notifications | Burgerpoint Graben";
         break;   
     case 'view_addons':
-        $pageTitle = "Manage-Addons | pizzaburgerpoint";
+        $pageTitle = "Manage-Addons | Burgerpoint Graben";
         break;     
     default:
-        $pageTitle = "pizzaburgerpoint";
+        $pageTitle = "Burgerpoint Graben";
 }
 
 

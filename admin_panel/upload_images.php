@@ -229,7 +229,8 @@ if (isset($_GET['Massage'])) {
                                                         <tr>
                                                             <th>S no.</th>
                                                             <th>Product ID</th>
-                                                            <th>Sub Category Name</th>
+                                                            <!--<th>Sub Category Name</th>-->
+                                                            <th>Product Name</th>
                                                             <th>Image</th>
                                                             <th>Action</th>
                                                         </tr>
@@ -262,13 +263,14 @@ if (isset($_GET['Massage'])) {
                                                                 while ($row = mysqli_fetch_array($result)) {
                                                                     $productId = htmlspecialchars($row['id']);
                                                                     $subCategoryName = htmlspecialchars($row['subname']);
+                                                                    $pro_name = htmlspecialchars($row['proname']);
                                                                     $imgurl = htmlspecialchars($row['img']);
                                                                     $imagePath = "Uploads/" . $imgurl;
                                                 
                                                                     echo "<tr>";
                                                                     echo "<td>{$index}</td>";
                                                                     echo "<td>{$productId}</td>";
-                                                                    echo "<td>{$subCategoryName}</td>";
+                                                                    echo "<td>{$pro_name}</td>";
                                                                     echo "<td><img width='80' height='80' src='{$imagePath}' alt='Product Image' data-id='{$productId}' style='object-fit: cover;'></td>";
                                                                     echo "<td><button class='btn btn-primary' onclick='openimagemodel(\"{$productId}\")'>Update Image</button></td>";
                                                                     echo "</tr>";
@@ -287,7 +289,8 @@ if (isset($_GET['Massage'])) {
                                                         <tr>
                                                             <th>S no.</th>
                                                             <th>Product ID</th>
-                                                            <th>Sub Category Name</th>
+                                                            <!--<th>Sub Category Name</th>-->
+                                                            <th>Product Name</th>
                                                             <th>Image</th>
                                                             <th>Action</th>
                                                         </tr>

@@ -16,9 +16,9 @@ License: You must have a valid license purchased only from themeforest(the above
 <?php
 
 if (isset($_GET['Massage'])) {
-  if ($_GET['Massage'] == 'Sucessfully added new category.') {
-    echo "<script>alert('Sucessfully added new category.')</script>";
-    header("Refresh: 1; url='addmaincat.php'");
+  if ($_GET['Massage'] === 'Sucessfully Added New Sub Category.') {
+    echo "<script>alert('Sucessfully Added New Sub Category.')</script>";
+    header("Refresh: 1; url='addSubCat.php'");
   } else {
     echo "<script>alert('There was some issue.')</script>";
   }

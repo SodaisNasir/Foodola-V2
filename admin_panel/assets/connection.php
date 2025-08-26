@@ -1,10 +1,14 @@
 <?php
 
 
+
+
 $Host = 'localhost';
-$DB_DATABASE='u772850971_burgerpoint';
-$DB_USERNAME='u772850971_burgerpoint';
-$DB_PASSWORD='7Xj[4ABe=';
+$DB_DATABASE='u772850971_bp_graben';
+$DB_USERNAME='u772850971_bp_graben';
+$DB_PASSWORD='dYLdc@S3d8&Y';
+
+
 
 
 $con = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);

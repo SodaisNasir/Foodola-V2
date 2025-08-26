@@ -135,12 +135,12 @@
           <div class="content-header-left col-md-9 col-12 mb-2">
             <div class="row breadcrumbs-top">
               <div class="col-12">
-                <h2 class="content-header-title float-left mb-0">Manage Points</h2>
+                <h2 class="content-header-title float-left mb-0">Manage Notifications</h2>
                 <div class="breadcrumb-wrapper col-12">
                   <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Home</a>
+                    <li class="breadcrumb-item"><a href="index.php">Home</a>
                     </li>
-                    <li class="breadcrumb-item active">Manage Points
+                    <li class="breadcrumb-item active">Manage Notifications
                     </li>
                   </ol>
                 </div>
@@ -167,7 +167,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Manage Points</h4>
+                    <h4 class="card-title">Manage Notifications</h4>
                 </div>
         
                 <div class="card-content">
@@ -175,63 +175,51 @@
                         <p class="card-text"></p>
                         <div class="table-responsive">
                             <form method='POST' action="phpfiles/insertions.php">
-                            <table id="example" class="table">
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        <th>Check Item</th>
-                                        <th>S no.</th>
-                                        <th>Customer Id</th>
-                                        <th>Customer Name</th>
-                                        <th>Phone</th>
-                                        <th>Email</th>
-                                        <th>Points</th>
-                                       
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                      <?php
-                                      include_once('connection.php');
-                                      $sql="SELECT `id`, `role_id`, `name`, `phone`, `email`, `email_verified_at`, `password`, `notification_token`, `remember_token`, `rewards_token`, `created_at`, `updated_at` FROM `users` WHERE `role_id` = 3 && `notification_token` != 'null'";
-                                      $result = mysqli_query($conn,$sql);
-                                      $index = 0;
-                                      while($row = mysqli_fetch_array($result))
-                                      {
-                                          $sn = $index+1;
-                                          
-                                          
-                                          echo "<tr>";
-                                          echo "<td><input type='hidden' name='user_id' value={$row['id']} /></td>";
-                                            echo "<td><input type='checkbox' name='checkbox[]' value={$row['id']} /></td>";
-                                            echo "<td>{$sn}</td>";
-                                            echo "<td>{$row['id']}</td>";
-                                            echo "<td name='name'>{$row['name']}</td>";
-                                           
-                                            echo "<td name='phone'>{$row['phone']}</td>";
-                                            echo "<td name='email'>{$row['email']}</td>";
-                                            echo "<td name='rewards_token'>{$row['rewards_token']}</td>";
-                                         
-                                          echo "</tr>";
-                                          $index++;
-                                      }
-                                      
-                                      ?>
-                                    
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                       <th></th>
-                                        <th>Check Item</th>
-                                        <th>S no.</th>
-                                        <th>Customer Id</th>
-                                        <th>Customer Name</th>
-                                        <th>Phone</th>
-                                        <th>Email</th>
-                                        <th>Points</th>
-                                       
-                                    </tr>
-                                </tfoot>
-                            </table>
+                   <table id="example" class="table">
+    <thead>
+        <tr>
+            <th><input type="checkbox" id="select-all" /> Select All</th>
+            <th>S no.</th>
+            <th>Customer Id</th>
+            <th>Customer Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Points</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        include_once('connection.php');
+        $sql="SELECT `id`, `role_id`, `name`, `phone`, `email`, `email_verified_at`, `password`, `notification_token`, `remember_token`, `rewards_token`, `created_at`, `updated_at` FROM `users` WHERE `role_id` = 3 && `notification_token` != 'null'";
+        $result = mysqli_query($conn,$sql);
+        $index = 0;
+        while($row = mysqli_fetch_array($result)) {
+            $sn = $index + 1;
+            echo "<tr>";
+            echo "<td><input type='checkbox' class='user-checkbox' name='checkbox[]' value='{$row['id']}' /></td>";
+            echo "<td>{$sn}</td>";
+            echo "<td>{$row['id']}</td>";
+            echo "<td>{$row['name']}</td>";
+            echo "<td>{$row['phone']}</td>";
+            echo "<td>{$row['email']}</td>";
+            echo "<td>{$row['rewards_token']}</td>";
+            echo "</tr>";
+            $index++;
+        }
+        ?>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Select All</th>
+            <th>S no.</th>
+            <th>Customer Id</th>
+            <th>Customer Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Points</th>
+        </tr>
+    </tfoot>
+</table>
                                <div class="col-sm-6">
                                   <div class="form-group">
                                     <div class="controls"  id="text_for_option1">
@@ -453,17 +441,87 @@ function toggle(status,id){
       };
 }
 </script>    
-<script>$(document).ready(function() {
-    $('#example').DataTable( {
-        dom: 'Bfrtip',
-        buttons: [
-            'copyHtml5',
-            'excelHtml5',
-            'csvHtml5',
-            'pdfHtml5'
-        ]
-    } );
-} );</script>
+// <script>$(document).ready(function() {
+//     $('#example').DataTable( {
+//         dom: 'Bfrtip',
+//         buttons: [
+//             'copyHtml5',
+//             'excelHtml5',
+//             'csvHtml5',
+//             'pdfHtml5'
+//         ]
+//     } );
+// } );</script>
+
+
+
+
+
+<script>
+
+
+    
+    let selectedUsers = new Set();
+
+    // Initialize DataTable
+    const table = $('#example').DataTable();
+
+    // Checkbox changed
+    $('#example tbody').on('change', '.user-checkbox', function () {
+        const id = $(this).val();
+        if ($(this).is(':checked')) {
+            selectedUsers.add(id);
+        } else {
+            selectedUsers.delete(id);
+        }
+        updateSelectAllCheckbox();
+    });
+
+    // Redraw page (e.g., after pagination) — restore checkboxes
+    table.on('draw', function () {
+        $('.user-checkbox').each(function () {
+            const id = $(this).val();
+            $(this).prop('checked', selectedUsers.has(id));
+        });
+        updateSelectAllCheckbox();
+    });
+
+    // Handle Select All
+    $('#select-all').on('click', function () {
+        const isChecked = this.checked;
+        $('.user-checkbox').each(function () {
+            const id = $(this).val();
+            $(this).prop('checked', isChecked);
+            if (isChecked) {
+                selectedUsers.add(id);
+            } else {
+                selectedUsers.delete(id);
+            }
+        });
+    });
+
+    // Submit — attach all selected IDs
+    $('form').on('submit', function () {
+        $('input[name="selected_users[]"]').remove(); // clear
+        selectedUsers.forEach(id => {
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'selected_users[]',
+                value: id
+            }).appendTo(this);
+        });
+    });
+
+    // Helper: Update "Select All" checkbox based on current page
+    function updateSelectAllCheckbox() {
+        const allOnPage = $('.user-checkbox').length;
+        const checkedOnPage = $('.user-checkbox:checked').length;
+        $('#select-all').prop('checked', allOnPage === checkedOnPage && allOnPage > 0);
+    }
+</script>
+
+
+
   </body>
   <!-- END: Body-->
 
