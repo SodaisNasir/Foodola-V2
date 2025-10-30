@@ -5,107 +5,107 @@ $pageName = basename($_SERVER['PHP_SELF'], ".php");
 
 switch ($pageName) {
     case 'index':
-        $pageTitle = "Analytics | Haveli Resturant";
+        $pageTitle = "Analytics | Namaste India";
         break;
     case 'addareas':
-        $pageTitle = "Addareas | Haveli Resturant";
+        $pageTitle = "Addareas | Namaste India";
         break;
     case 'addriders':
-        $pageTitle = "Addriders | Haveli Resturant";
+        $pageTitle = "Addriders | Namaste India";
         break;
     case 'addmaincat':
-        $pageTitle = "Maincategories | Haveli Resturant";
+        $pageTitle = "Maincategories | Namaste India";
         break;
     case 'addSubCat':
-        $pageTitle = "Subcategories | Haveli Resturant";
+        $pageTitle = "Subcategories | Namaste India";
         break;
     case 'insertNewProduct':
-        $pageTitle = "Newproduct | Haveli Resturant";
+        $pageTitle = "Newproduct | Namaste India";
         break;
     case 'addVariation':
-        $pageTitle = "Variation | Haveli Resturant";
+        $pageTitle = "Variation | Namaste India";
         break;
     case 'addAddons':
-        $pageTitle = "Addons | Haveli Resturant";
+        $pageTitle = "Addons | Namaste India";
         break;    
     case 'addDressing':
-        $pageTitle = "Dressing | Haveli Resturant";
+        $pageTitle = "Dressing | Namaste India";
         break;
     case 'addTypes':
-        $pageTitle = "Types | Haveli Resturant";
+        $pageTitle = "Types | Namaste India";
         break;
     case 'insertDeals':
-        $pageTitle = "Deals | Haveli Resturant";
+        $pageTitle = "Deals | Namaste India";
         break;    
     case 'addslider':
-        $pageTitle = "Sliders | Haveli Resturant";
+        $pageTitle = "Sliders | Namaste India";
         break;  
      case 'addprivacypolicy':
-        $pageTitle = "Add-Privacy-Policy | Haveli Resturant";
+        $pageTitle = "Add-Privacy-Policy | Namaste India";
         break;    
     case 'addterms_condition':
-        $pageTitle = "Terms-Conditions | Haveli Resturant";
+        $pageTitle = "Terms-Conditions | Namaste India";
         break;
     case 'manage_pos':
-        $pageTitle = "Manage-Pos | Haveli Resturant";
+        $pageTitle = "Manage-Pos | Namaste India";
         break;
     case 'manageriders':
-        $pageTitle = "Manage-Riders | Haveli Resturant";
+        $pageTitle = "Manage-Riders | Namaste India";
         break;    
     case 'manageusers':
-        $pageTitle = "Manage-Users | Haveli Resturant";
+        $pageTitle = "Manage-Users | Namaste India";
         break;  
         
     case 'managetimings':
-        $pageTitle = "Manage-Timings | Haveli Resturant";
+        $pageTitle = "Manage-Timings | Namaste India";
         break;      
     case 'neworders':
-        $pageTitle = "New-Orders | Haveli Resturant";
+        $pageTitle = "New-Orders | Namaste India";
         break;      
     case 'orders':
-        $pageTitle = "Orders | Haveli Resturant";
+        $pageTitle = "Orders | Namaste India";
         break;      
     case 'manageinventory':
-        $pageTitle = "Manage-Inventory | Haveli Resturant";
+        $pageTitle = "Manage-Inventory | Namaste India";
         break;      
     case 'manageAreas':
-        $pageTitle = "Manage-Areas | Haveli Resturant";
+        $pageTitle = "Manage-Areas | Namaste India";
         break;      
     case 'manageproducts':
-        $pageTitle = "Manage-Products | Haveli Resturant";
+        $pageTitle = "Manage-Products | Namaste India";
         break;      
     case 'managevariations':
-        $pageTitle = "Manage-Variations | Haveli Resturant";
+        $pageTitle = "Manage-Variations | Namaste India";
         break;      
     case 'view_dressing':
-        $pageTitle = "Manage-Dressing | Haveli Resturant";
+        $pageTitle = "Manage-Dressing | Namaste India";
         break;
     case 'view_types':
-        $pageTitle = "Manage-Types | Haveli Resturant";
+        $pageTitle = "Manage-Types | Namaste India";
         break;
     case 'view_deals':
-        $pageTitle = "Manage-Deals | Haveli Resturant";
+        $pageTitle = "Manage-Deals | Namaste India";
         break;
     case 'viewcategories':
-        $pageTitle = "Manage-Catagories | Haveli Resturant";
+        $pageTitle = "Manage-Catagories | Namaste India";
         break;       
     case 'SubCat':
-        $pageTitle = "Manage-Sub-Catagories | Haveli Resturant";
+        $pageTitle = "Manage-Sub-Catagories | Namaste India";
         break;                                      
     case 'manageSliders':
-        $pageTitle = "Manage-Sliders | Haveli Resturant";
+        $pageTitle = "Manage-Sliders | Namaste India";
         break;
     case 'managePoints':
-        $pageTitle = "Manage-Points | Haveli Resturant";
+        $pageTitle = "Manage-Points | Namaste India";
         break;
     case 'SendNotifications':
-        $pageTitle = "Notifications | Haveli Resturant";
+        $pageTitle = "Notifications | Namaste India";
         break;   
     case 'view_addons':
-        $pageTitle = "Manage-Addons | Haveli Resturant";
+        $pageTitle = "Manage-Addons | Namaste India";
         break;     
     default:
-        $pageTitle = "Haveli Resturant";
+        $pageTitle = "Namaste India";
 }
 
 

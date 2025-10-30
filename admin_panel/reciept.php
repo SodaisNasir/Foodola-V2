@@ -420,8 +420,6 @@ body {
 .header h2 { margin: 5px 0; font-size: 20px; }
   </style>
 </head>
-
-
 <body>
   <div class="receipt-container print">
 
@@ -429,12 +427,12 @@ body {
         
      <div class="header">
         <img src="images/logo.png" alt="Firmenlogo">
-        <h2>Haveli Resturant</h2>
+        <h2>Namaste India Bruchsal</h2>
     </div>    
 
     <div class="company-details">
-      <h3>Von-Behring-Strasse 276297 Stutensee</h3>
-      <h3>Karlsruhe, Tell: 072447424450</h3>
+      <h3>Kaiserstraße 22b76646 Bruchsal</h3>
+      <h3>Bruchsal, Tell: +4972516188707</h3>
       <h3>Bestellnummer: <?php echo $order_id ?></h3>
     </div>
 

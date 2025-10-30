@@ -1,11 +1,10 @@
 <?php
 
 
-
 $Host = 'localhost';
-$DB_DATABASE='u772850971_haveli';
-$DB_USERNAME='u772850971_haveli';
-$DB_PASSWORD='#7!~s>I|nV';
+$DB_DATABASE='u772850971_namasteindia';
+$DB_USERNAME='u772850971_namasteindia';
+$DB_PASSWORD='Gws*KYFED|s0';
 
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);

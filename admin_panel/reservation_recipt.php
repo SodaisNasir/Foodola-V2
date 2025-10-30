@@ -91,7 +91,7 @@ body { font-family: Arial, sans-serif; font-size: 16px; }
 <div class="receipt-container">
     <div class="header">
         <img src="images/logo.png" alt="Firmenlogo">
-        <h2>Haveli Resturant</h2>
+        <h2>Namaste India Bruchsal</h2>
         
         <div class="big-order">Tischnummer: <?php echo $order_id; ?></div>
     </div>
