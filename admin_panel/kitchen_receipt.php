@@ -173,7 +173,7 @@ if ($result_deal && mysqli_num_rows($result_deal) > 0) {
       
     <div class="header">
       <img src="images/logo.png" alt="Logo">
-      <h2>Namaste India Bruchsal</h2>
+      <h2>Indian Rasoi</h2>
       <div class="big-order">BESTELL-NR: <?php echo $order_id; ?></div>
     </div>
 

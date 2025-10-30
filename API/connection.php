@@ -1,10 +1,10 @@
 <?php
 
-$Host = 'localhost';
-$DB_DATABASE='u772850971_namasteindia';
-$DB_USERNAME='u772850971_namasteindia';
-$DB_PASSWORD='Gws*KYFED|s0';
 
+$Host = 'localhost';
+$DB_DATABASE='sassolut_indianrasoi';
+$DB_USERNAME='sassolut_indianrasoi';
+$DB_PASSWORD=';op6ACzp0EFU';
 
 
 

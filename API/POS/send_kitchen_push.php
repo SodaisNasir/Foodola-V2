@@ -34,7 +34,7 @@ try {
             );
 
             // prepare notification
-            $channel = 'namaste_orders'; // Channel name dynamically based on user ID
+            $channel = 'indianrasoi_orders'; // Channel name dynamically based on user ID
             $event   = 'print_kitchen_receipt';
             $data    = [
               'table_id' => $table_id,

@@ -231,7 +231,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
 
             // prepare notification
-            $channel = 'namaste_orders'; // Channel name dynamically based on user ID
+            $channel = 'indianrasoi_orders'; // Channel name dynamically based on user ID
             $event   = 'new_order';
             $data    = [
               'order_id' => $last_order_id,
@@ -546,7 +546,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
 
             // prepare notification
-            $channel = 'namaste_orders'; // Channel name dynamically based on user ID
+            $channel = 'indianrasoi_orders'; // Channel name dynamically based on user ID
             $event   = 'new_order';
             $data    = [
               'order_id' => $last_order_id,
@@ -584,12 +584,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
 
-            $mail->setFrom('support@namasteindia.de', 'Namaste India');
+            $mail->setFrom('support@indianrasoi.de', 'Indian Rasoi');
             $mail->addAddress('asharifkhan@gmail.com');
 
             $mail->isHTML(true);
 
-            $mail->Subject = "Neue Bestellung #$last_id – Namaste India";
+            $mail->Subject = "Neue Bestellung #$last_id – Indian Rasoi";
 
             $mail->Body = '
                                 <html>
@@ -639,7 +639,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <body>
                                     <div class="email-container">
                                         <div class="header">
-                                            <img src="https://namasteindia.foodola.shop/admin_panel/images/logo.png" alt="Namaste India" style="width: 100px;">
+                                            <img src="https://indianrasoi.sassolution.org/admin_panel/images/logo.png" alt="Indian Rasoi" style="width: 100px;">
                                             <h2>Neue Bestellung erhalten</h2>
                                         </div>
                                         <div class="order-details">
@@ -652,10 +652,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <p><strong>Zusätzliche Hinweise:</strong> ' . htmlspecialchars($additionalNotes) . '</p>
                                             <p><strong>Bestelldatum:</strong> ' . htmlspecialchars($datetime) . '</p>
                                 
-                                            <a class="view-button" href="https://namasteindia.foodola.shop/admin_panel/order_details.php?order_id=' . $last_order_id . '" target="_blank">Bestellung anzeigen</a>
+                                            <a class="view-button" href="https://indianrasoi.sassolution.org/admin_panel/order_details.php?order_id=' . $last_order_id . '" target="_blank">Bestellung anzeigen</a>
                                         </div>
                                         <div class="footer">
-                                            <p>Diese E-Mail wurde automatisch von Namaste India generiert.</p>
+                                            <p>Diese E-Mail wurde automatisch von Indian Rasoi generiert.</p>
                                         </div>
                                     </div>
                                 </body>
@@ -967,7 +967,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
 
         // prepare notification
-        $channel = 'namaste_orders'; // Channel name 
+        $channel = 'indianrasoi_orders'; // Channel name 
         $event   = 'new_order';
         $data    = [
           'order_id' => $last_order_id,
@@ -1007,12 +1007,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
-        $mail->setFrom('support@namasteindia.de', 'Namaste India');
+        $mail->setFrom('support@indianrasoi.de', 'Indian Rasoi');
         $mail->addAddress('asharifkhan@gmail.com');
 
         $mail->isHTML(true);
 
-        $mail->Subject = "Neue Bestellung #$last_id – Namaste India";
+        $mail->Subject = "Neue Bestellung #$last_id – Indian Rasoi";
 
         $mail->Body = '
                                 <html>
@@ -1062,7 +1062,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <body>
                                     <div class="email-container">
                                         <div class="header">
-                                            <img src="https://namasteindia.foodola.shop/admin_panel/images/logo.png" alt="Namaste India" style="width: 100px;">
+                                            <img src="https://indianrasoi.sassolution.org/admin_panel/images/logo.png" alt="Indian Rasoi" style="width: 100px;">
                                             <h2>Neue Bestellung erhalten</h2>
                                         </div>
                                         <div class="order-details">
@@ -1075,10 +1075,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <p><strong>Zusätzliche Hinweise:</strong> ' . htmlspecialchars($additionalNotes) . '</p>
                                             <p><strong>Bestelldatum:</strong> ' . htmlspecialchars($datetime) . '</p>
                                 
-                                            <a class="view-button" href="https://namasteindia.foodola.shop/admin_panel/order_details.php?order_id=' . $last_order_id . '" target="_blank">Bestellung anzeigen</a>
+                                            <a class="view-button" href="https://indianrasoi.sassolution.org/admin_panel/order_details.php?order_id=' . $last_order_id . '" target="_blank">Bestellung anzeigen</a>
                                         </div>
                                         <div class="footer">
-                                            <p>Diese E-Mail wurde automatisch von Namaste India generiert.</p>
+                                            <p>Diese E-Mail wurde automatisch von Indian Rasoi generiert.</p>
                                         </div>
                                     </div>
                                 </body>

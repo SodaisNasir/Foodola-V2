@@ -40,11 +40,11 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
-        $mail->setFrom('support@namasteindiaruchsal', 'Namaste India');
+        $mail->setFrom('support@indianrasoi.de', 'Indian Rasoi');
         $mail->addAddress($email); 
 
         $mail->isHTML(true);
-        $mail->Subject = "Welcome to Namaste India";
+        $mail->Subject = "Welcome to Indian Rasoi";
 
         $digits = 8;
         $referal_code = rand(pow(10, $digits - 1), pow(10, $digits) - 1);
@@ -73,7 +73,7 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                             $template = '
                             <html>
                             <head>
-                                <title>Welcome to Namaste India !</title>
+                                <title>Welcome to Indian Rasoi !</title>
 
                                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
                                 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -146,24 +146,24 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                                 </style>
                             </head>
                             <body>
-                                <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://namasteindia.foodola.shop/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                                <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://indianrasoi.sassolution.org/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
                                     <tr>
                                         <td align="center">
                                             <table width="100%" class="content" style="max-width: 600px;">
                                                 <tr>
                                                     <td align="center">
                                                         <!-- Logo Section -->
-                                                        <img src="https://namasteindia.foodola.shop/admin_panel/images/logo.png" alt="Namaste India" style="width: 100px; margin-bottom: 20px;">
+                                                        <img src="https://indianrasoi.sassolution.org/admin_panel/images/logo.png" alt="Indian Rasoi" style="width: 100px; margin-bottom: 20px;">
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                    <td>
-                                                        <h1>Willkommen bei Namaste India – Dein Genuss startet jetzt! 🍕🎉</h1>
+                                                        <h1>Willkommen bei Indian Rasoi – Dein Genuss startet jetzt! 🍕🎉</h1>
                                                         <p>Hallo ' . htmlspecialchars($name) . ',</p>
-                                                        <p>herzlich willkommen bei Namaste India! 🥳<br>
+                                                        <p>herzlich willkommen bei Indian Rasoi! 🥳<br>
                                                         Schön, dass du da bist – wir freuen uns riesig, dich in unserer Community von Pizza- und Burgerliebhabern zu begrüßen.</p>
                                                 
-                                                        <h3>Warum du Namaste India lieben wirst:</h3>
+                                                        <h3>Warum du Indian Rasoi lieben wirst:</h3>
                                                         <ul>
                                                             <li>🍕 <strong>Höchste Qualität – ohne Kompromisse:</strong><br>
                                                             Unsere Speisen werden mit frischen, ausgewählten Zutaten zubereitet. Qualität steht bei uns immer an erster Stelle – und das schmeckt man!</li>
@@ -193,7 +193,7 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                                                 
                                                         <h3>Was jetzt zu tun ist:</h3>
                                                         <ul>
-                                                            <li>👀 <a href="https://namasteindia.foodola.shop">Entdecke unsere Speisekarte</a> und finde deine Favoriten</li>
+                                                            <li>👀 <a href="https://indianrasoi.sassolution.org/">Entdecke unsere Speisekarte</a> und finde deine Favoriten</li>
                                                             <li>🛒 Bestelle direkt und genieße den Unterschied</li>
                                                         </ul>
                                                 
@@ -202,18 +202,18 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                                                         <h4>Bleib mit uns in Kontakt:</h4>
                                                         <p>Verpasse keine Aktion und keine Neuigkeit – folge uns auf Social Media!</p>
                                                         <div class="social-icons">
-                                                            <a href="https://facebook.com/namasteindiaruchsal" target="_blank">
-                                                                <img src="https://namasteindia.foodola.shop/API/uploads/facebook_logo.png" alt="Facebook">
+                                                            <a href="https://facebook.com/indianrasoi" target="_blank">
+                                                                <img src="https://indianrasoi.sassolution.org/API/uploads/facebook_logo.png" alt="Facebook">
                                                             </a>
-                                                            <a href="https://instagram.com/namasteindiaruchsal" target="_blank">
-                                                                <img src="https://namasteindia.foodola.shop/API/uploads/instagram_logo.png" alt="Instagram">
+                                                            <a href="https://instagram.com/indianrasoi" target="_blank">
+                                                                <img src="https://indianrasoi.sassolution.org/API/uploads/instagram_logo.png" alt="Instagram">
                                                             </a>
-                                                            <a href="https://twitter.com/namasteindiaruchsal" target="_blank">
-                                                                <img src="https://namasteindia.foodola.shop/API/uploads/twitter_logo.png" alt="Twitter">
+                                                            <a href="https://twitter.com/indianrasoi" target="_blank">
+                                                                <img src="https://indianrasoi.sassolution.org/API/uploads/twitter_logo.png" alt="Twitter">
                                                             </a>
                                                         </div>
                                                 
-                                                        <p>Guten Appetit & viel Spaß beim Genießen!<br><strong>Dein Namaste India Team 🍕</strong></p>
+                                                        <p>Guten Appetit & viel Spaß beim Genießen!<br><strong>Dein Indian Rasoi Team 🍕</strong></p>
                                                     </td>
                                                 </tr>
                                             </table>

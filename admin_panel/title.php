@@ -5,107 +5,107 @@ $pageName = basename($_SERVER['PHP_SELF'], ".php");
 
 switch ($pageName) {
     case 'index':
-        $pageTitle = "Analytics | Namaste India";
+        $pageTitle = "Analytics | Indian Rasoi";
         break;
     case 'addareas':
-        $pageTitle = "Addareas | Namaste India";
+        $pageTitle = "Addareas | Indian Rasoi";
         break;
     case 'addriders':
-        $pageTitle = "Addriders | Namaste India";
+        $pageTitle = "Addriders | Indian Rasoi";
         break;
     case 'addmaincat':
-        $pageTitle = "Maincategories | Namaste India";
+        $pageTitle = "Maincategories | Indian Rasoi";
         break;
     case 'addSubCat':
-        $pageTitle = "Subcategories | Namaste India";
+        $pageTitle = "Subcategories | Indian Rasoi";
         break;
     case 'insertNewProduct':
-        $pageTitle = "Newproduct | Namaste India";
+        $pageTitle = "Newproduct | Indian Rasoi";
         break;
     case 'addVariation':
-        $pageTitle = "Variation | Namaste India";
+        $pageTitle = "Variation | Indian Rasoi";
         break;
     case 'addAddons':
-        $pageTitle = "Addons | Namaste India";
+        $pageTitle = "Addons | Indian Rasoi";
         break;    
     case 'addDressing':
-        $pageTitle = "Dressing | Namaste India";
+        $pageTitle = "Dressing | Indian Rasoi";
         break;
     case 'addTypes':
-        $pageTitle = "Types | Namaste India";
+        $pageTitle = "Types | Indian Rasoi";
         break;
     case 'insertDeals':
-        $pageTitle = "Deals | Namaste India";
+        $pageTitle = "Deals | Indian Rasoi";
         break;    
     case 'addslider':
-        $pageTitle = "Sliders | Namaste India";
+        $pageTitle = "Sliders | Indian Rasoi";
         break;  
      case 'addprivacypolicy':
-        $pageTitle = "Add-Privacy-Policy | Namaste India";
+        $pageTitle = "Add-Privacy-Policy | Indian Rasoi";
         break;    
     case 'addterms_condition':
-        $pageTitle = "Terms-Conditions | Namaste India";
+        $pageTitle = "Terms-Conditions | Indian Rasoi";
         break;
     case 'manage_pos':
-        $pageTitle = "Manage-Pos | Namaste India";
+        $pageTitle = "Manage-Pos | Indian Rasoi";
         break;
     case 'manageriders':
-        $pageTitle = "Manage-Riders | Namaste India";
+        $pageTitle = "Manage-Riders | Indian Rasoi";
         break;    
     case 'manageusers':
-        $pageTitle = "Manage-Users | Namaste India";
+        $pageTitle = "Manage-Users | Indian Rasoi";
         break;  
         
     case 'managetimings':
-        $pageTitle = "Manage-Timings | Namaste India";
+        $pageTitle = "Manage-Timings | Indian Rasoi";
         break;      
     case 'neworders':
-        $pageTitle = "New-Orders | Namaste India";
+        $pageTitle = "New-Orders | Indian Rasoi";
         break;      
     case 'orders':
-        $pageTitle = "Orders | Namaste India";
+        $pageTitle = "Orders | Indian Rasoi";
         break;      
     case 'manageinventory':
-        $pageTitle = "Manage-Inventory | Namaste India";
+        $pageTitle = "Manage-Inventory | Indian Rasoi";
         break;      
     case 'manageAreas':
-        $pageTitle = "Manage-Areas | Namaste India";
+        $pageTitle = "Manage-Areas | Indian Rasoi";
         break;      
     case 'manageproducts':
-        $pageTitle = "Manage-Products | Namaste India";
+        $pageTitle = "Manage-Products | Indian Rasoi";
         break;      
     case 'managevariations':
-        $pageTitle = "Manage-Variations | Namaste India";
+        $pageTitle = "Manage-Variations | Indian Rasoi";
         break;      
     case 'view_dressing':
-        $pageTitle = "Manage-Dressing | Namaste India";
+        $pageTitle = "Manage-Dressing | Indian Rasoi";
         break;
     case 'view_types':
-        $pageTitle = "Manage-Types | Namaste India";
+        $pageTitle = "Manage-Types | Indian Rasoi";
         break;
     case 'view_deals':
-        $pageTitle = "Manage-Deals | Namaste India";
+        $pageTitle = "Manage-Deals | Indian Rasoi";
         break;
     case 'viewcategories':
-        $pageTitle = "Manage-Catagories | Namaste India";
+        $pageTitle = "Manage-Catagories | Indian Rasoi";
         break;       
     case 'SubCat':
-        $pageTitle = "Manage-Sub-Catagories | Namaste India";
+        $pageTitle = "Manage-Sub-Catagories | Indian Rasoi";
         break;                                      
     case 'manageSliders':
-        $pageTitle = "Manage-Sliders | Namaste India";
+        $pageTitle = "Manage-Sliders | Indian Rasoi";
         break;
     case 'managePoints':
-        $pageTitle = "Manage-Points | Namaste India";
+        $pageTitle = "Manage-Points | Indian Rasoi";
         break;
     case 'SendNotifications':
-        $pageTitle = "Notifications | Namaste India";
+        $pageTitle = "Notifications | Indian Rasoi";
         break;   
     case 'view_addons':
-        $pageTitle = "Manage-Addons | Namaste India";
+        $pageTitle = "Manage-Addons | Indian Rasoi";
         break;     
     default:
-        $pageTitle = "Namaste India";
+        $pageTitle = "Indian Rasoi";
 }
 
 
