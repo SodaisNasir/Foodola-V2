@@ -22,11 +22,11 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
         $OTP = rand(1000, 9999);  
 
         // Email Content with Template
-        $subject = 'Your OTP for Foodola';
+        $subject = 'Your OTP for Haveli Resturant';
       $message = '
 <html>
 <head>
-    <title>Your OTP for Foodola</title>
+    <title>Your OTP for Haveli Resturant</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
@@ -68,23 +68,23 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
     </style>
 </head>
 <body>
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://foodola.foodola.shop/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://havelirestaurant.foodola.shop/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
         <tr>
             <td align="center">
                 <table class="content">
                     <tr>
                         <td align="center">
-                            <img src="https://foodola.foodola.shop/admin_panel/images/logo.png" alt="foodola" style="width: 100px; margin-bottom: 20px;">
+                            <img src="https://havelirestaurant.foodola.shop/admin_panel/images/logo.png" alt="Haveli Resturant" style="width: 100px; margin-bottom: 20px;">
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <h1>Your OTP for Foodola</h1>
+                            <h1>Your OTP for Haveli Resturant</h1>
                             <p>Your One-Time Password (OTP) for accessing your account is:</p>
                             <h2>' . htmlspecialchars($OTP) . '</h2>
                             <p>Please use this OTP to complete your login.</p>
                             <p>If you did not request this, please ignore this email.</p>
-                            <p class="footer">Best regards,<br>The Foodola Team</p>
+                            <p class="footer">Best regards,<br>The Haveli Resturant Team</p>
                         </td>
                     </tr>
                 </table>
@@ -95,8 +95,8 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
 </html>';
 
 
-        $headers = "From: support@Foodola.de\r\n";
-        $headers .= "Reply-To: support@Foodola.de\r\n";
+        $headers = "From: support@haveliresturant.de\r\n";
+        $headers .= "Reply-To: support@haveliresturant.de\r\n";
         $headers .= "Content-type: text/html; charset=UTF-8\r\n";
 
         if (mail($email, $subject, $message, $headers)) {

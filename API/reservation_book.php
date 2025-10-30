@@ -91,7 +91,7 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                 '1982652',              // App ID
                 ['cluster' => 'mt1', 'useTLS' => true]
             );
-            $pusher->trigger('reservations', 'new_reservation', $inserted_row);
+            $pusher->trigger('Haveli_reservations', 'new_reservation', $inserted_row);
         } catch (Exception $e) {
             error_log("Pusher error: " . $e->getMessage());
         }

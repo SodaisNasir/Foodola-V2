@@ -5,107 +5,107 @@ $pageName = basename($_SERVER['PHP_SELF'], ".php");
 
 switch ($pageName) {
     case 'index':
-        $pageTitle = "Analytics | foodola";
+        $pageTitle = "Analytics | Haveli Resturant";
         break;
     case 'addareas':
-        $pageTitle = "Addareas | foodola";
+        $pageTitle = "Addareas | Haveli Resturant";
         break;
     case 'addriders':
-        $pageTitle = "Addriders | foodola";
+        $pageTitle = "Addriders | Haveli Resturant";
         break;
     case 'addmaincat':
-        $pageTitle = "Maincategories | foodola";
+        $pageTitle = "Maincategories | Haveli Resturant";
         break;
     case 'addSubCat':
-        $pageTitle = "Subcategories | foodola";
+        $pageTitle = "Subcategories | Haveli Resturant";
         break;
     case 'insertNewProduct':
-        $pageTitle = "Newproduct | foodola";
+        $pageTitle = "Newproduct | Haveli Resturant";
         break;
     case 'addVariation':
-        $pageTitle = "Variation | foodola";
+        $pageTitle = "Variation | Haveli Resturant";
         break;
     case 'addAddons':
-        $pageTitle = "Addons | foodola";
+        $pageTitle = "Addons | Haveli Resturant";
         break;    
     case 'addDressing':
-        $pageTitle = "Dressing | foodola";
+        $pageTitle = "Dressing | Haveli Resturant";
         break;
     case 'addTypes':
-        $pageTitle = "Types | foodola";
+        $pageTitle = "Types | Haveli Resturant";
         break;
     case 'insertDeals':
-        $pageTitle = "Deals | foodola";
+        $pageTitle = "Deals | Haveli Resturant";
         break;    
     case 'addslider':
-        $pageTitle = "Sliders | foodola";
+        $pageTitle = "Sliders | Haveli Resturant";
         break;  
      case 'addprivacypolicy':
-        $pageTitle = "Add-Privacy-Policy | foodola";
+        $pageTitle = "Add-Privacy-Policy | Haveli Resturant";
         break;    
     case 'addterms_condition':
-        $pageTitle = "Terms-Conditions | foodola";
+        $pageTitle = "Terms-Conditions | Haveli Resturant";
         break;
     case 'manage_pos':
-        $pageTitle = "Manage-Pos | foodola";
+        $pageTitle = "Manage-Pos | Haveli Resturant";
         break;
     case 'manageriders':
-        $pageTitle = "Manage-Riders | foodola";
+        $pageTitle = "Manage-Riders | Haveli Resturant";
         break;    
     case 'manageusers':
-        $pageTitle = "Manage-Users | foodola";
+        $pageTitle = "Manage-Users | Haveli Resturant";
         break;  
         
     case 'managetimings':
-        $pageTitle = "Manage-Timings | foodola";
+        $pageTitle = "Manage-Timings | Haveli Resturant";
         break;      
     case 'neworders':
-        $pageTitle = "New-Orders | foodola";
+        $pageTitle = "New-Orders | Haveli Resturant";
         break;      
     case 'orders':
-        $pageTitle = "Orders | foodola";
+        $pageTitle = "Orders | Haveli Resturant";
         break;      
     case 'manageinventory':
-        $pageTitle = "Manage-Inventory | foodola";
+        $pageTitle = "Manage-Inventory | Haveli Resturant";
         break;      
     case 'manageAreas':
-        $pageTitle = "Manage-Areas | foodola";
+        $pageTitle = "Manage-Areas | Haveli Resturant";
         break;      
     case 'manageproducts':
-        $pageTitle = "Manage-Products | foodola";
+        $pageTitle = "Manage-Products | Haveli Resturant";
         break;      
     case 'managevariations':
-        $pageTitle = "Manage-Variations | foodola";
+        $pageTitle = "Manage-Variations | Haveli Resturant";
         break;      
     case 'view_dressing':
-        $pageTitle = "Manage-Dressing | foodola";
+        $pageTitle = "Manage-Dressing | Haveli Resturant";
         break;
     case 'view_types':
-        $pageTitle = "Manage-Types | foodola";
+        $pageTitle = "Manage-Types | Haveli Resturant";
         break;
     case 'view_deals':
-        $pageTitle = "Manage-Deals | foodola";
+        $pageTitle = "Manage-Deals | Haveli Resturant";
         break;
     case 'viewcategories':
-        $pageTitle = "Manage-Catagories | foodola";
+        $pageTitle = "Manage-Catagories | Haveli Resturant";
         break;       
     case 'SubCat':
-        $pageTitle = "Manage-Sub-Catagories | foodola";
+        $pageTitle = "Manage-Sub-Catagories | Haveli Resturant";
         break;                                      
     case 'manageSliders':
-        $pageTitle = "Manage-Sliders | foodola";
+        $pageTitle = "Manage-Sliders | Haveli Resturant";
         break;
     case 'managePoints':
-        $pageTitle = "Manage-Points | foodola";
+        $pageTitle = "Manage-Points | Haveli Resturant";
         break;
     case 'SendNotifications':
-        $pageTitle = "Notifications | foodola";
+        $pageTitle = "Notifications | Haveli Resturant";
         break;   
     case 'view_addons':
-        $pageTitle = "Manage-Addons | foodola";
+        $pageTitle = "Manage-Addons | Haveli Resturant";
         break;     
     default:
-        $pageTitle = "foodola";
+        $pageTitle = "Haveli Resturant";
 }
 
 

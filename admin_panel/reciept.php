@@ -421,21 +421,20 @@ body {
   </style>
 </head>
 
+
 <body>
   <div class="receipt-container print">
-      <!--<img src="images/logo.png" alt="Firmenlogo">-->
-      <!--  <h2>Pizzablitzöstringen.de</h2>-->
-        
+
+
         
      <div class="header">
         <img src="images/logo.png" alt="Firmenlogo">
-        <h2>Pizzablitzöstringen.de</h2>
-        
+        <h2>Haveli Resturant</h2>
     </div>    
 
     <div class="company-details">
-      <h3>Kuhngasse 1, 76684 Östringen</h3>
-      <h3>Östringen, Tell:0725326560-61</h3>
+      <h3>Von-Behring-Strasse 276297 Stutensee</h3>
+      <h3>Karlsruhe, Tell: 072447424450</h3>
       <h3>Bestellnummer: <?php echo $order_id ?></h3>
     </div>
 

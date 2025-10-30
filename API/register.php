@@ -44,7 +44,7 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
         $mail->addAddress($email); 
 
         $mail->isHTML(true);
-        $mail->Subject = "Welcome to Foodola";
+        $mail->Subject = "Welcome to Haveli Resturant";
 
         $digits = 8;
         $referal_code = rand(pow(10, $digits - 1), pow(10, $digits) - 1);
@@ -73,7 +73,7 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                             $template = '
                             <html>
                             <head>
-                                <title>Welcome to Foodola !</title>
+                                <title>Welcome to Haveli Resturant !</title>
 
                                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
                                 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -146,24 +146,24 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                                 </style>
                             </head>
                             <body>
-                                <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://foodola.foodola.shop/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                                <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://havelirestaurant.foodola.shop/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
                                     <tr>
                                         <td align="center">
                                             <table width="100%" class="content" style="max-width: 600px;">
                                                 <tr>
                                                     <td align="center">
                                                         <!-- Logo Section -->
-                                                        <img src="https://foodola.foodola.shop/admin_panel/images/logo.png" alt="Foodola Logo" style="width: 100px; margin-bottom: 20px;">
+                                                        <img src="https://havelirestaurant.foodola.shop/admin_panel/images/logo.png" alt="Haveli Resturant Logo" style="width: 100px; margin-bottom: 20px;">
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                    <td>
-                                                        <h1>Willkommen bei Foodola – Dein Genuss startet jetzt! 🍕🎉</h1>
+                                                        <h1>Willkommen bei Haveli Resturant – Dein Genuss startet jetzt! 🍕🎉</h1>
                                                         <p>Hallo ' . htmlspecialchars($name) . ',</p>
-                                                        <p>herzlich willkommen bei Foodola! 🥳<br>
+                                                        <p>herzlich willkommen bei Haveli Resturant! 🥳<br>
                                                         Schön, dass du da bist – wir freuen uns riesig, dich in unserer Community von Pizza- und Burgerliebhabern zu begrüßen.</p>
                                                 
-                                                        <h3>Warum du Foodola lieben wirst:</h3>
+                                                        <h3>Warum du Haveli Resturant lieben wirst:</h3>
                                                         <ul>
                                                             <li>🍕 <strong>Höchste Qualität – ohne Kompromisse:</strong><br>
                                                             Unsere Speisen werden mit frischen, ausgewählten Zutaten zubereitet. Qualität steht bei uns immer an erster Stelle – und das schmeckt man!</li>
@@ -202,18 +202,18 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                                                         <h4>Bleib mit uns in Kontakt:</h4>
                                                         <p>Verpasse keine Aktion und keine Neuigkeit – folge uns auf Social Media!</p>
                                                         <div class="social-icons">
-                                                            <a href="https://facebook.com/foodola" target="_blank">
-                                                                <img src="https://foodola.foodola.shop/API/uploads/facebook_logo.png" alt="Facebook">
+                                                            <a href="https://facebook.com/haveliresturant" target="_blank">
+                                                                <img src="https://havelirestaurant.foodola.shop/API/uploads/facebook_logo.png" alt="Facebook">
                                                             </a>
-                                                            <a href="https://instagram.com/foodola" target="_blank">
-                                                                <img src="https://foodola.foodola.shop/API/uploads/instagram_logo.png" alt="Instagram">
+                                                            <a href="https://instagram.com/haveliresturant" target="_blank">
+                                                                <img src="https://havelirestaurant.foodola.shop/API/uploads/instagram_logo.png" alt="Instagram">
                                                             </a>
-                                                            <a href="https://twitter.com/foodola" target="_blank">
-                                                                <img src="https://foodola.foodola.shop/API/uploads/twitter_logo.png" alt="Twitter">
+                                                            <a href="https://twitter.com/haveliresturant" target="_blank">
+                                                                <img src="https://havelirestaurant.foodola.shop/API/uploads/twitter_logo.png" alt="Twitter">
                                                             </a>
                                                         </div>
                                                 
-                                                        <p>Guten Appetit & viel Spaß beim Genießen!<br><strong>Dein Foodola Team 🍕</strong></p>
+                                                        <p>Guten Appetit & viel Spaß beim Genießen!<br><strong>Dein Haveli Resturant Team 🍕</strong></p>
                                                     </td>
                                                 </tr>
                                             </table>

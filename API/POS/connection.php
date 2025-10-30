@@ -2,9 +2,9 @@
 
 
 $Host = 'localhost';
-$DB_DATABASE='u772850971_foodola';
-$DB_USERNAME='u772850971_foodola';
-$DB_PASSWORD=']f0Hy^78Uf0s';
+$DB_DATABASE='u772850971_haveli';
+$DB_USERNAME='u772850971_haveli';
+$DB_PASSWORD='#7!~s>I|nV';
 
 
 
