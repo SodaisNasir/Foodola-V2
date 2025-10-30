@@ -32,11 +32,18 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
     $total_netto_tax = $_POST['total_netto_tax'];
     $total_metto_tax = $_POST['total_metto_tax'];
     $wallet_balance = $_POST['wallet_balance'];
+    $platform = $_POST['platform'];
 
     date_default_timezone_set('Europe/Berlin');
+    
+    // $odetails = json_encode('[{"id":75,"is_deal":"no","deal_id":"null","deal_items":"null","additionalNotes":"","quantity":"1","addons":[{"as_id":"63","as_name":"mit Jalapenos","as_price":"2.00","sum":2,"quantity":1}],"types":[{}],"dressing":[]}]');
+    // $log_sql = "INSERT INTO `logs`(`user_id`, `order_details`) VALUES ($user_id, '$odetails')";
+    // $exec_log_sql = mysqli_query($conn,$log_sql);
+    
     $datetime = date('Y-m-d H:i:s', time());
     if ($payment_type == 'online') {
         if($wallet_balance){
+
                 $sql_check_wallet = "SELECT `amount` FROM `users` WHERE `id` = '$user_id'";
                 $result_check_wallet = mysqli_query($conn, $sql_check_wallet);
                 $row_wallet = mysqli_fetch_assoc($result_check_wallet);
@@ -58,6 +65,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     // Deduct the balance
                     $sql_update_wallet = "UPDATE `users` SET `amount` = `amount` - $wallet_balance WHERE `id` = '$user_id'";
                     mysqli_query($conn, $sql_update_wallet);
+
                     
                     
                     $transaction_message = "Abzug von €$wallet_balance vom Guthaben";
@@ -77,7 +85,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     echo json_encode($response);
                     exit;
                 }
-                }
+            }
         
         $sql_check = "SELECT `id` FROM `orders_zee` WHERE `transaction_id` = '$transaction_id'";
         $r_check = mysqli_query($conn, $sql_check);
@@ -85,10 +93,10 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
             $sql_ins = "INSERT INTO `orders_zee`(`user_id`, `status`, `payment_type`,
                 `order_total_price`, `payment_status`, `Shipping_address`, `Shipping_address_2`,
                 `Shipping_city`, `Shipping_area`, `Shipping_postal_code`, `Shipping_Cost`,
-                `Shipping_state`, `addtional_notes` , `created_at`  , `payment_method` , `transaction_id` , `order_type` , `ordersheduletype` , `sheduletime` , `total_discount`, `branch_id`, `total_netto_tax`, `total_metto_tax`) VALUES 
+                `Shipping_state`, `addtional_notes` , `created_at`  , `payment_method` , `transaction_id` , `order_type` , `ordersheduletype` , `sheduletime` , `total_discount`, `branch_id`, `total_netto_tax`, `total_metto_tax`, `platform`, `created_at`) VALUES 
                 ('$user_id','neworder','$payment_type','$order_total_price','$payment_status','$Shipping_address',
                   '$Shipping_address_2','$Shipping_city','$Shipping_area','$Shipping_postal_code','$Shipping_cost',
-                  '$Shipping_state','$addtional_notes' , '$datetime' , '$payment_method' , '$transaction_id' , '$order_type' , '$ordersheduletype','$sheduletime' , '$total_discount', '$branch_id', '$total_metto_tax', '$total_metto_tax')";
+                  '$Shipping_state','$addtional_notes' , '$datetime' , '$payment_method' , '$transaction_id' , '$order_type' , '$ordersheduletype','$sheduletime' , '$total_discount', '$branch_id', '$total_metto_tax', '$total_metto_tax', '$platform', '$datetime')";
             $exec_sql_ins = mysqli_query($conn, $sql_ins);
 
             $last_id = $conn->insert_id;
@@ -162,6 +170,7 @@ if ($order_result) {
                     $deal_id =  $details->deal_id;
                     $isDeal = $details->is_deal;
                     $deal_items_array = $details->deal_items;
+                    $additionalNotes = $details->additionalNotes;
                     $no_of_deal++;
                     if ($isDeal == "yes") {
                         foreach ($deal_items_array as $itemsOfDeals) {
@@ -194,9 +203,10 @@ if ($order_result) {
                                 $pro_decs = $product['description'];
 
                                 //print_r($tyy_pes); 
-                                $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`, `product_name`,`product_description`, `addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`)
-                                                  VALUES ('$last_id','$deal_id','$item_id','$product_id', '$pro_name', '$pro_decs', $add_oon','$tyy_pes','$dress_ing' , $cost , $price , $discount  , $no_of_deal, '$datetime')";
+                                $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`, `product_name`,`product_description`,`additional_notes`, `addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`)
+                                                  VALUES ('$last_id','$deal_id','$item_id','$product_id', '$pro_name', '$pro_decs','$additionalNotes', '$add_oon','$tyy_pes','$dress_ing' , $cost , $price , $discount  , $no_of_deal, '$datetime')";
                                 $exec_sql_deal = mysqli_query($conn, $sql_deal);
+
                             }
                         }
                     } else {
@@ -210,7 +220,7 @@ if ($order_result) {
                         $discount = $Data['discount'];
 
                         $quantity = $details->quantity;
-                        $additionalNotes = "$details->additionalNotes";
+                        $additionalNotes = $details->additionalNotes;
                         $addons_array = $details->addons;
                         $types_array = $details->types;
                         $dressing_array = $details->dressing;
@@ -234,9 +244,9 @@ if ($order_result) {
                             array_push($addonarray, $temp);
                         }
 
-                        $tyy_pes = json_encode($types_array);
-                        $dress_ing = json_encode($dressing_array);
-                        $add_oon = json_encode($addonarray, JSON_UNESCAPED_UNICODE);
+                           $tyy_pes = mysqli_real_escape_string($conn, json_encode($types_array, JSON_UNESCAPED_UNICODE));
+                                    $dress_ing = mysqli_real_escape_string($conn, json_encode($dressing_array, JSON_UNESCAPED_UNICODE));
+                                    $add_oon = mysqli_real_escape_string($conn, json_encode($addonarray, JSON_UNESCAPED_UNICODE));
 
                         //  print_r($dress_ing);
                         
@@ -285,7 +295,7 @@ if ($order_result) {
 
 
                     $fields = array(
-                        'app_id' => "2de883ec-be41-4820-a517-558beee8b0ac",
+                        'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
                         'include_player_ids' => $playerId,
                         'data' => array("foo" => "NewMassage", "Id" => $taskid),
                         'large_icon' => "ic_launcher_round.png",
@@ -299,7 +309,7 @@ if ($order_result) {
                     curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
                     curl_setopt($ch, CURLOPT_HTTPHEADER, array(
                         'Content-Type: application/json; charset=utf-8',
-                        'Authorization: Basic os_v2_app_fxuih3f6ifecbjixkwf652fqvth5cvjs6zyu6x45bxrdyqx6thsko5tkpievvqngjhhkpn6l3n53whqh5xextgwkut3dbjnai26xili'
+                        'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'
                     ));
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
                     curl_setopt($ch, CURLOPT_HEADER, FALSE);
@@ -312,52 +322,46 @@ if ($order_result) {
                     
                     
                         
-                try {
-                    // configure Pusher
-                    $options = [
-                        'cluster' => 'mt1',  // e.g. 'mt1'
-                        'useTLS'  => true
-                    ];
-                
-                    $pusher = new Pusher(
-                        'a1964c3ac950c1a0cdf5',    // App key from Pusher dashboard
-                        'a711ec3a4b827eb6bcc5', // App secret from Pusher dashboard
-                        '1982652',     // App ID from Pusher dashboard
-                        $options
-                    );
-                
-                    // prepare notification
-                    $channel = 'orders'; // Channel name dynamically based on user ID
-                    $event   = 'new_order';
-                    $data    = [
-                        'order_id' => $last_id,
-                        'order_data'  => $order_info,
-                    ];
-                
-                    // trigger the event
-                    $response = $pusher->trigger($channel, $event, $data);
-                
-                    // if ($response) {
-                    //     echo "Notification triggered successfully!";
-                    // } else {
-                    //     echo "Failed to trigger notification.";
-                    // }
+                    try {
+                        // configure Pusher
+                        $options = [
+                            'cluster' => 'mt1',  // e.g. 'mt1'
+                            'useTLS'  => true
+                        ];
                     
-                } catch (Exception $e) {
-                    // Handle Pusher error
-                    error_log("Pusher error: " . $e->getMessage());
-                    echo "Error triggering notification: " . $e->getMessage();
-                }
+                        $pusher = new Pusher(
+                            'a1964c3ac950c1a0cdf5',    // App key from Pusher dashboard
+                            'a711ec3a4b827eb6bcc5', // App secret from Pusher dashboard
+                            '1982652',     // App ID from Pusher dashboard
+                            $options
+                        );
                     
+                        // prepare notification
+                        $channel = 'pizzapazza_orders'; // Channel name dynamically based on user ID
+                        $event   = 'new_order';
+                        $data    = [
+                            'order_id' => $last_id,
+                            'order_data'  => $order_info,
+                        ];
                     
+                        // trigger the event
+                        $response = $pusher->trigger($channel, $event, $data);
                     
-                    
-                    
-                    
-                    
-                    
+                        // if ($response) {
+                        //     echo "Notification triggered successfully!";
+                        // } else {
+                        //     echo "Failed to trigger notification.";
+                        // }
+                        
+                    } catch (Exception $e) {
+                        // Handle Pusher error
+                        error_log("Pusher error: " . $e->getMessage());
+                        echo "Error triggering notification: " . $e->getMessage();
+                    }
                     
                 }
+                
+
             }
         } else {
             $data_array = array();
@@ -374,6 +378,7 @@ if ($order_result) {
             // checking the wallet balnce and deduct the wallet amount
             
                 if($wallet_balance){
+
                     $sql_check_wallet = "SELECT `amount` FROM `users` WHERE `id` = '$user_id'";
                     $result_check_wallet = mysqli_query($conn, $sql_check_wallet);
                     $row_wallet = mysqli_fetch_assoc($result_check_wallet);
@@ -421,10 +426,10 @@ if ($order_result) {
         $sql_ins = "INSERT INTO `orders_zee`(`user_id`, `status`, `payment_type`,
                 `order_total_price`, `payment_status`, `Shipping_address`, `Shipping_address_2`,
                 `Shipping_city`, `Shipping_area`, `Shipping_postal_code`, `Shipping_Cost`,
-                `Shipping_state`, `addtional_notes` , `created_at`  ,  `order_type`  , `ordersheduletype` , `sheduletime` , `total_discount`, `branch_id`, `total_netto_tax`, `total_metto_tax`) VALUES 
+                `Shipping_state`, `addtional_notes` , `created_at`  ,  `order_type`  , `ordersheduletype` , `sheduletime` , `total_discount`, `branch_id`, `total_netto_tax`, `total_metto_tax`, `platform`, `created_at`) VALUES 
                 ('$user_id','neworder','$payment_type','$order_total_price','$payment_status','$Shipping_address',
                   '$Shipping_address_2','$Shipping_city','$Shipping_area','$Shipping_postal_code','$Shipping_cost',
-                  '$Shipping_state','$addtional_notes' , '$datetime' , '$order_type', '$ordersheduletype','$sheduletime' , '$total_discount', '$branch_id', '$total_netto_tax', '$total_metto_tax')";
+                  '$Shipping_state','$addtional_notes' , '$datetime' , '$order_type', '$ordersheduletype','$sheduletime' , '$total_discount', '$branch_id', '$total_netto_tax', '$total_metto_tax', '$platform', '$datetime')";
         $exec_sql_ins = mysqli_query($conn, $sql_ins);
 
 
@@ -508,6 +513,7 @@ if ($order_result) {
                 $deal_id = isset($details->deal_id) ? $details->deal_id : null;
                 $isDeal = isset($details->is_deal) ? $details->is_deal : null;
                 $deal_items_array = isset($details->deal_items) ? $details->deal_items : [];
+                $additionalNotes = $details->additionalNotes;
                 $no_of_deal++;
                 if ($isDeal == "yes") {
                     foreach ($deal_items_array as $itemsOfDeals) {
@@ -540,10 +546,11 @@ if ($order_result) {
                             $pro_decs = $product['description'];
 
                             //print_r($tyy_pes); 
-                            $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`,`product_description`,`addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`)
-                                                  VALUES ('$last_id','$deal_id','$item_id','$product_id','$pro_name','$pro_decs', '$add_oon','$tyy_pes','$dress_ing' , $cost , $price , $discount  , $no_of_deal, '$datetime')";
+                            $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`,`product_description`,`additional_notes`,`addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`)
+                                                  VALUES ('$last_id','$deal_id','$item_id','$product_id','$pro_name','$pro_decs','$additionalNotes', '$add_oon','$tyy_pes','$dress_ing' , $cost , $price , $discount  , $no_of_deal, '$datetime')";
                             mysqli_set_charset($conn, 'utf8');
                             $exec_sql_deal = mysqli_query($conn, $sql_deal);
+
                         }
                     }
                 } else {
@@ -589,7 +596,8 @@ if ($order_result) {
                         $temp_type = [
                             "ts_id" => $type->ts_id,
                             "type_title" => $type->type_title,
-                            "ts_name" => $type->ts_name
+                            "ts_name" => $type->ts_name,
+                            "price" => $type->price
                         ];
                         array_push($typesarray, $temp_type);
                     }
@@ -646,7 +654,7 @@ if ($order_result) {
             );
 
                 $fields = array(
-                    'app_id' => "2de883ec-be41-4820-a517-558beee8b0ac",
+                    'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
                     'include_player_ids' => $playerId,
                     'data' => array("foo" => "NewMassage", "Id" => $taskid),
                     'large_icon' => "ic_launcher_round.png",
@@ -660,7 +668,7 @@ if ($order_result) {
                 curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
                 curl_setopt($ch, CURLOPT_HTTPHEADER, array(
                     'Content-Type: application/json; charset=utf-8',
-                    'Authorization: Basic os_v2_app_fxuih3f6ifecbjixkwf652fqvth5cvjs6zyu6x45bxrdyqx6thsko5tkpievvqngjhhkpn6l3n53whqh5xextgwkut3dbjnai26xili'
+                    'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'
                 ));
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
                 curl_setopt($ch, CURLOPT_HEADER, FALSE);
@@ -689,7 +697,7 @@ if ($order_result) {
                     );
                 
                     // prepare notification
-                    $channel = 'orders'; // Channel name dynamically based on user ID
+                    $channel = 'pizzapazza_orders'; // Channel name dynamically based on user ID
                     $event   = 'new_order';
                     $data    = [
                         'order_id' => $last_id,
@@ -709,8 +717,18 @@ if ($order_result) {
                     error_log("Pusher error: " . $e->getMessage());
                     echo "Error triggering notification: " . $e->getMessage();
                 }
+                
+                // createLog("Order created: Order ID $last_id for User $user_id with total €$order_total_price.");
+
             
             }
+            
+            
+            // if (!$exec_sql_ins) {
+            //     createLog("Order insertion failed for User $user_id. SQL: $sql_ins");
+            // }
+
+            
         }
     }
 } else {

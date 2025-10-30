@@ -2,7 +2,7 @@
 
 if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC'){
   
-     $sql = "SELECT `id`, `name`, `img`, `created_at`, `updated_at` FROM `categories`";
+     $sql = "SELECT `id`, `name`, `img`, `created_at`, `updated_at` FROM `categories` ORDER BY `sort_order` ASC";
      include('connection.php');
      $execute = mysqli_query($conn,$sql);
      if(mysqli_num_rows($execute) > 0){

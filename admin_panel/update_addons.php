@@ -70,9 +70,9 @@
   cursor: pointer;
 
 }
-td[name="price"]::before {
-    content: "€ ";
-}
+/*td[name="price"]::before {*/
+/*    content: "€ ";*/
+/*}*/
 
 </style>  
 <head>
@@ -249,6 +249,33 @@ td[name="price"]::before {
                                 <tbody>
                                   <?php
                                   include_once('connection.php');
+                                  
+                                  
+                                $sqlSettings = "SELECT * FROM `system_setting` LIMIT 1";
+                                $resultSettings = mysqli_query($conn, $sqlSettings);
+                                
+                                if ($row = mysqli_fetch_assoc($resultSettings)) {
+                                    $currency = json_decode($row['currency'], true);
+                                    $currency_sign = $currency['sign'];
+                                    $currency_position = $currency['position'];
+                                }
+                                
+                                
+                                function formatCurrency($amount, $sign, $position = "left") {
+                                    $formatted = number_format($amount, 2);
+                                    if ($position === "left") {
+                                        return $sign . $formatted;
+                                    } else {
+                                        return $formatted . $sign;
+                                    }
+                                }
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
                                   $sql="SELECT * FROM `addon_sublist` WHERE `ao_id` = ".$_GET['id'];
                                   $result = mysqli_query($conn,$sql);
                                   $index = 0;
@@ -259,7 +286,10 @@ td[name="price"]::before {
                                       echo "<td>{$sn}</td>";
                                       echo "<td>{$row['as_id']}</td>";
                                       echo "<td class='editable' contenteditable='true' data-field='as_name' name='cost'>{$row['as_name']}</td>";
-                                      echo "<td class='editable' contenteditable='true' data-field='as_price' name='price'>{$row['as_price']}</td>";
+                                    echo "<td class='editable' contenteditable='true' data-field='as_price' name='price'>"
+                                    . formatCurrency($row['as_price'], $currency_sign, $currency_position)
+                                    . "</td>";
+
                                       
                                     //   echo "<td><button class='btn btn-primary' onclick=\"openAddMore('{$row['as_id']}', '{$row['as_name']}', '{$row['as_price']}')\">Update</button></td>";
                             
@@ -687,13 +717,27 @@ $('#mergeAddonsForm').on('submit', function(e) {
 
 <script>
 $(document).ready(function () {
-    // Show Save button when title is edited
-    $('.editable').on('input', function () {
+    // Show save button on edit
+    $(document).on('input', '.editable', function () {
+        const field = $(this).data('field');
+
+        // Allow only numbers and one optional dot for 'as_price'
+        if (field === 'as_price') {
+            let value = $(this).text();
+            value = value.replace(/[^0-9.]/g, ''); // Remove non-numeric and non-dot
+            const parts = value.split('.');
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts[1]; // Keep only first dot
+            }
+            $(this).text(value);
+            placeCaretAtEnd(this); // Keep cursor at end
+        }
+
         $(this).closest('tr').find('.save-btn').show();
     });
 
-    // Save updated title
-    $('.save-btn').on('click', function () {
+    // Save button logic
+    $(document).on('click', '.save-btn', function () {
         const row = $(this).closest('tr');
         const id = row.data('id');
         const as_name = row.find('[data-field="as_name"]').text().trim();
@@ -706,8 +750,7 @@ $(document).ready(function () {
             data: {
                 id: id,
                 as_name: as_name,
-                as_price : as_price
-
+                as_price: as_price
             },
             success: function (response) {
                 if (response.status) {
@@ -722,7 +765,23 @@ $(document).ready(function () {
             }
         });
     });
+
+    // Keep caret at the end after sanitizing input
+    function placeCaretAtEnd(el) {
+        el.focus();
+        if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            range.collapse(false);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+    }
 });
+
+
+
 </script>
 
 

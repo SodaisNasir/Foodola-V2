@@ -22,11 +22,11 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
         $OTP = rand(1000, 9999);  
 
         // Email Content with Template
-        $subject = 'Your OTP for Pizza Burger Point';
+        $subject = 'Your OTP for Foodola';
       $message = '
 <html>
 <head>
-    <title>Your OTP for Pizza Burger Point</title>
+    <title>Your OTP for Foodola</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
@@ -68,23 +68,23 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
     </style>
 </head>
 <body>
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://burgerpoint.shop/BurgerPoint/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://foodola.foodola.shop/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
         <tr>
             <td align="center">
                 <table class="content">
                     <tr>
                         <td align="center">
-                            <img src="https://burgerpoint.shop/BurgerPoint/admin_panel/images/logo.png" alt="Pizza Burger Point" style="width: 100px; margin-bottom: 20px;">
+                            <img src="https://foodola.foodola.shop/admin_panel/images/logo.png" alt="foodola" style="width: 100px; margin-bottom: 20px;">
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <h1>Your OTP for Pizza Burger Point</h1>
+                            <h1>Your OTP for Foodola</h1>
                             <p>Your One-Time Password (OTP) for accessing your account is:</p>
                             <h2>' . htmlspecialchars($OTP) . '</h2>
                             <p>Please use this OTP to complete your login.</p>
                             <p>If you did not request this, please ignore this email.</p>
-                            <p class="footer">Best regards,<br>The Pizza Burger Point Team</p>
+                            <p class="footer">Best regards,<br>The Foodola Team</p>
                         </td>
                     </tr>
                 </table>
@@ -95,8 +95,8 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
 </html>';
 
 
-        $headers = "From: support@burgerpoint.de\r\n";
-        $headers .= "Reply-To: support@burgerpoint.de\r\n";
+        $headers = "From: support@Foodola.de\r\n";
+        $headers .= "Reply-To: support@Foodola.de\r\n";
         $headers .= "Content-type: text/html; charset=UTF-8\r\n";
 
         if (mail($email, $subject, $message, $headers)) {

@@ -1,5 +1,7 @@
 <?php include('assets/header.php');
 
+// error_reporting(E_ALL); 
+// ini_set('display_errors', 1);
 
 if (isset($_GET['Massage'])) {
     $message = $_GET['Massage'];
@@ -66,7 +68,7 @@ if (isset($_GET['Massage'])) {
                             <h2 class="content-header-title float-left mb-0">Manage Tables</h2>
                             <div class="breadcrumb-wrapper col-12">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="index.html">Home</a>
+                                    <li class="breadcrumb-item"><a href="index.php">Home</a>
                                     </li>
                                     <li class="breadcrumb-item active">Manage Tables
                                     </li>
@@ -96,48 +98,73 @@ if (isset($_GET['Massage'])) {
                                                         <th>Sno</th>
                                                         <th>Name</th>
                                                         <th>Seats</th>
+                                                        <th>Min</th>
+                                                        <th>Maximum</th>
                                                         <th>Image</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody class="text-center">
-                                                    <?php
-                                                    include_once('connection.php');
-                                                      session_start();
-                                                     $branch_id = $_SESSION['branch_id'];
-                                                     
-                                                    $sql = "SELECT `id`, `table_name`, `seats`, `table_image` ,`status`, `created_at`, `updated_at` FROM `tables` Where `branch_id`= '$branch_id'";
-                                                    
-                                                    $result = mysqli_query($conn, $sql);
-                                                    $index = 0;
-                                                    while ($row = mysqli_fetch_array($result)) {
-                                                        $sn = $index + 1;
-                                                    
-                                                        $imagePath = 'Uploads/' . $row['table_image'];
-                                                        echo "<tr>";
-                                                        echo "<td>{$sn}</td>";
-                                                        echo "<td name='tittlename'>{$row['table_name']}</td>";
-                                                        echo "<td name='subname'>{$row['seats']}</td>";
-                                      
-                                                        echo "<td name='subname'><img src='$imagePath' alt='Product Image' style='width: 100px; height: auto;'/></td>";
-                                                                           echo "<td name='subname'>{$row['status']}</td>";
-                                                        echo "<td class='d-flex justify-content-around'>
-                                                        <button class='btn btn-primary' data-toggle='modal' data-target='#updateTableModal' onclick='openUpdateModal(\"{$row['id']}\", \"{$row['table_name']}\", \"{$row['seats']}\",\"{$row['table_image']}\")'>Update</button>
-                                                        
-                                                        <form action='phpfiles/insertions.php' method='POST' '>
-                                                            <input type='hidden' name='table_id' value='{$row['id']}'>
-                                                            <button type='submit' name='btn_delete_tbl' class='btn btn-danger' onclick='return confirm(\"Are you sure you want to delete this table?\")'>Delete</button>
-                                                        </form>
-                                                    </td>";
-                                                        echo "</tr>";
-                                 
-                                                        $index++;
-                                                    }
+                                                    <tbody class="text-center">
+<?php
+include_once('connection.php');
+session_start();
+$branch_id = $_SESSION['branch_id'];
 
-                                                    ?>
+$sql = "SELECT `id`, `table_name`, `seats`, `table_image`, `status`, `created_at`, `updated_at`, `min`, `maximum` 
+        FROM `tables` 
+        WHERE `branch_id`= '$branch_id'";
 
-                                                </tbody>
+$result = mysqli_query($conn, $sql);
+$index = 0;
+
+while ($row = mysqli_fetch_array($result)) {
+    $sn = $index + 1;
+    $imagePath = 'Uploads/' . $row['table_image'];
+
+
+
+    echo "<tr>";
+    echo "<td>{$sn}</td>";
+    echo "<td name='tittlename'>{$row['table_name']}</td>";
+    echo "<td name='subname'>{$row['seats']}</td>";
+    echo "<td name='subname'>{$row['min']}</td>";
+    echo "<td name='subname'>{$row['maximum']}</td>";
+    echo "<td name='subname'><img src='$imagePath' alt='Product Image' style='width: 100px; height: auto;'/></td>";
+    echo "<td name='subname'>{$row['status']}</td>";
+
+    echo "<td class='text-center'>
+            <div class='d-flex justify-content-center gap-2'>
+                <button class='btn btn-primary'
+                    data-toggle='modal'
+                    data-target='#updateTableModal'
+                    data-id='{$row['id']}'
+                    data-table-name='" . htmlspecialchars($row['table_name'], ENT_QUOTES) . "'
+                    data-seats='{$row['seats']}'
+                    data-image='{$row['table_image']}'
+                    data-min='{$row['min']}'
+                    data-maximum='{$row['maximum']}'
+                    onclick='openUpdateModalFromBtn(this)'>
+                    Update
+                </button>
+
+                <form action='phpfiles/insertions.php' method='POST' class='m-0 p-0'>
+                    <input type='hidden' name='table_id' value='{$row['id']}'>
+                    <button type='submit' name='btn_delete_tbl' class='btn btn-danger'
+                        onclick='return confirm(\"Are you sure you want to delete this table?\")'>
+                        Delete
+                    </button>
+                </form>
+            </div>
+        </td>";
+
+    echo "</tr>";
+
+    $index++;
+}
+?>
+</tbody>
+
                                                 <tfoot>
                                                     <tr>
                                                         <th>Sno</th>
@@ -177,10 +204,22 @@ if (isset($_GET['Massage'])) {
                         <label for="Seats">Seats</label>
                         <input type="number" class="form-control" id="Seats" name="seats" required>
                     </div>
+                    
+                    <div class="form-group">
+                        <label for="TableName">Min</label>
+                        <input type="text" class="form-control" id="Min" name="min" required>
+                    </div>
+                                    
+                    <div class="form-group">
+                            <label for="TableName">Maximum</label>
+                            <input type="text" class="form-control" id="Maximum" name="maximum" required>
+                    </div>
+                    
                     <div class="form-group">
                         <label for="TableImage">Table Image</label>
                         <input type="file" class="form-control" id="TableImage" name="table_image">
                     </div>
+                    
                     <div class="form-group">
                         <label for="Status">Status</label>
                         <select class="form-control" id="Status" name="status" required>
@@ -188,7 +227,16 @@ if (isset($_GET['Massage'])) {
                             <option value="occupied">Occupied</option>
                         </select>
                     </div>
-                    <button type="submit" name="btn_update_table" class="btn btn-primary">Update</button>
+                    
+
+                    <!--<button type="button" class="btn btn-primary my-2" id="updateAddSlotBtn">Add Slot</button>-->
+
+                    <!--<div class="form-group">-->
+                    <!--    <label>Time Slots</label>-->
+                    <!--    <div id="updateSlotsContainer"></div>-->
+                    <!--</div>-->
+                    
+                    <button type="submit" name="btn_update_table" class="btn btn-primary w-100">Update</button>
                 </form>
             </div>
         </div>
@@ -211,15 +259,43 @@ if (isset($_GET['Massage'])) {
                                         <label for="TableName">Table Name</label>
                                         <input type="text" class="form-control" id="TableName" name="table_name" required>
                                     </div>
+                                    
                                     <div class="form-group">
                                         <label for="TableName">Seats</label>
                                         <input type="text" class="form-control" id="Seats" name="seats" required>
                                     </div>
+                                    
                                     <div class="form-group">
-                                        <label for="TableImage">Table Image</label>
+                                        <label for="TableName">Min</label>
+                                        <input type="text" class="form-control" id="Min" name="min" required>
+                                    </div>
+                                    
+                                    
+                                    <div class="form-group">
+                                        <label for="TableName">Maximum</label>
+                                        <input type="text" class="form-control" id="Maximum" name="maximum" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="TableImage" class="mb-2">Table Image</label>
                                         <input type="file" class="form-control" id="TableImage" name="table_image">
+                                    </div>
+                                    
+                                    
+                                    
+                                      <!-- Slots Section -->
+                                    <!--<button type="button" class="btn btn-primary my-2" id="addSlotBtn">Add Slot</button>-->
+                                    
+                                    <!--<div class="form-group">-->
+                                    <!--    <label>Time Slots</label>-->
+                                    <!--    <div id="slotsContainer"></div>-->
+                                    <!--</div>-->
 
-                                    <button type="submit" name="btn_insert_table" class="btn btn-primary">Add New Table</button>
+                                    
+                            
+                                        
+                                    <button type="submit" name="btn_insert_table" class="btn btn-primary w-100 " >Add New Table</button>
+                                    
                                 </form>
 
                             </div>
@@ -265,20 +341,78 @@ if (isset($_GET['Massage'])) {
     <!-- BEGIN: Page JS-->
     <script src="app-assets/js/scripts/datatables/datatable.min.js"></script>
     
-    <script>
-        function openUpdateModal(id, table_name, seats, table_image) {
-             $('#tbl_id').val(id);
-            $('#TableName').val(table_name);
-            $('#Seats').val(seats);
-            // Display the current table image in an img tag for preview
-    if (table_image) {
-        $('#TableImagePreview').attr('src', `../Uploads/${table_image}`).show();
+<script>
+function openUpdateModalFromBtn(btn) {
+    const id = btn.dataset.id;
+    const tableName = btn.dataset.tableName;
+    const seats = btn.dataset.seats;
+    const tableImage = btn.dataset.image;
+    const min = btn.dataset.min;
+    const maximum = btn.dataset.maximum;
+    const timeSlotsJson = btn.dataset.slots;
+
+    // Fill modal fields
+    $('#tbl_id').val(id);
+    $('#TableName').val(tableName);
+    $('#Seats').val(seats);
+    $('#Min').val(min);
+    $('#Maximum').val(maximum);
+
+    if (tableImage) {
+        $('#TableImagePreview').attr('src', `../Uploads/${tableImage}`).show();
     } else {
-        $('#TableImagePreview').hide(); // Hide if no image is provided
+        $('#TableImagePreview').hide();
     }
-        }
-    </script>
-    <script>
+
+    // Parse and populate time slots
+    let container = document.getElementById("updateSlotsContainer");
+    container.innerHTML = "";
+
+    let slots = [];
+    try {
+        slots = JSON.parse(timeSlotsJson);
+    } catch (e) {
+        console.error("Invalid JSON for time_slots", e);
+    }
+
+    if (Array.isArray(slots) && slots.length > 0) {
+        slots.forEach(slot => {
+            addSlotRow(container, slot.date, slot.start, slot.end);
+        });
+    }
+
+    // Event for adding slot inside modal
+    const addSlotBtn = document.getElementById('updateAddSlotBtn');
+    if (addSlotBtn) {
+        addSlotBtn.onclick = function () {
+            addSlotRow(container);
+        };
+    }
+}
+
+// Function to add a slot row
+function addSlotRow(container, date = '', start = '', end = '') {
+    const slotRow = document.createElement('div');
+    slotRow.classList.add('slot-row', 'd-flex', 'mb-2', 'gap-2');
+
+    slotRow.innerHTML = `
+        <input type="date" class="form-control" name="slots[date][]" value="${date}" required>
+        <input type="time" class="form-control" name="slots[start][]" value="${start}" required>
+        <input type="time" class="form-control" name="slots[end][]" value="${end}" required>
+        <button type="button" class="btn btn-danger btn-sm removeSlot">
+            <i class="fa fa-trash"></i>
+        </button>
+    `;
+
+    // Remove slot functionality
+    slotRow.querySelector('.removeSlot').addEventListener('click', function () {
+        slotRow.remove();
+    });
+
+    container.appendChild(slotRow);
+}
+</script>
+<script>
         $(document).ready(function() {
             $('#example').DataTable({
                 dom: 'Bfrtip',
@@ -291,6 +425,32 @@ if (isset($_GET['Massage'])) {
             });
         });
     </script>
+<script>
+    
+        
+document.getElementById('addSlotBtn').addEventListener('click', function() {
+    const container = document.getElementById('slotsContainer');
+    const slotRow = document.createElement('div');
+    slotRow.classList.add('slot-row', 'd-flex', 'mb-2', 'gap-2');
+
+  slotRow.innerHTML = `
+    <input type="date" class="form-control" name="slots[date][]" required>
+    <input type="time" class="form-control" name="slots[start][]" required>
+    <input type="time" class="form-control" name="slots[end][]" required>
+    <button type="button" class="btn btn-danger btn-sm removeSlot">
+        <i class="fa fa-trash"></i>
+    </button>
+`;
+
+
+    container.appendChild(slotRow);
+
+    // Remove slot event
+    slotRow.querySelector('.removeSlot').addEventListener('click', function() {
+        slotRow.remove();
+    });
+});
+</script>
     <!-- END: Page JS-->
 
 </body>

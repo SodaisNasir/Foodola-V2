@@ -1,32 +1,48 @@
 <?php
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
 include_once('connection.php');
 
 date_default_timezone_set('Europe/Berlin');
 $order_id = intval($_GET['order_id']); // Sanitize input
 $minutes_to_add = 0;
 
+
+include_once('./phpqrcode/qrlib.php');
+$order_id = intval($_GET['order_id']); // Sanitize
+
+$qrFile = "qrcodes/order_" . $order_id . ".png";
+if (!file_exists('qrcodes')) {
+    mkdir('qrcodes', 0777, true); // make folder if not exists
+}
+QRcode::png($order_id, $qrFile, QR_ECLEVEL_L, 4);
+
+
+
+
+
+
 // --- 1. Function to fetch order data (without bind param) ---
 function getOrderData($conn, $order_id)
 {
   // Check if the order has a table_id or user_id first
-  $sql_check = "SELECT table_id, user_id FROM `orders_zee` WHERE id = " . $order_id;
+  $sql_check = "SELECT table_id, user_id, reservation_id FROM `orders_zee` WHERE id = " . $order_id;
   $result_check = mysqli_query($conn, $sql_check);
   $check_data = mysqli_fetch_assoc($result_check);
 
   $has_table_id = !empty($check_data['table_id']);
 
-  $base_sql_products = "SELECT o.id, o.order_total_price, o.addtional_notes, o.payment_type, o.Shipping_Cost,
+  $base_sql_products = "SELECT o.id, o.order_total_price, o.payment_type, o.Shipping_Cost,
                            o.Shipping_address, o.Shipping_state , o.Shipping_address_2, o.Shipping_city, o.Shipping_area, o.Shipping_postal_code,
                            od.id AS order_detail_id, o.total_discount, o.order_type, o.payment_method, o.ordersheduletype,
                            o.sheduletime, od.order_id, od.deal_id, od.deal_item_id, od.product_id, od.qty, od.addons, od.types,
-                           od.dressing, p.name, p.description, p.img, od.price, od.cost, od.discount_percent, o.created_at, o.total_netto_tax, o.total_metto_tax
+                           od.dressing, od.additional_notes, p.name, p.description, p.img, od.price, od.cost, od.discount_percent, o.created_at, o.total_netto_tax, o.total_metto_tax
                            FROM `orders_zee` o
                            INNER JOIN `order_details_zee` od ON od.order_id = o.id
                            INNER JOIN `products` p ON p.id = od.product_id
                            WHERE o.id = " . $order_id . " AND od.deal_id = 0";
 
-  $base_sql_deals = "SELECT od.no_of_deal, od.qty, od.cost, od.price, de.deal_name, o.order_total_price,
-                          o.addtional_notes, o.payment_type, o.Shipping_Cost, o.Shipping_address, o.Shipping_address_2,
+  $base_sql_deals = "SELECT od.no_of_deal, od.qty, od.cost, od.price, od.additional_notes, de.deal_name, o.order_total_price, o.payment_type, o.Shipping_Cost, o.Shipping_address, o.Shipping_address_2,
                           o.Shipping_city, o.Shipping_state , o.Shipping_area, o.Shipping_postal_code, o.total_discount, o.order_type,
                           o.payment_method, o.ordersheduletype, o.sheduletime, o.total_netto_tax, o.total_metto_tax
                           FROM `orders_zee` o
@@ -40,6 +56,32 @@ function getOrderData($conn, $order_id)
   if ($has_table_id) {
     $sql_products = $base_sql_products;
     $sql_deals = $base_sql_deals;
+    
+    
+    // if($check_data['reservation_id']){
+        
+        
+    //      $reservation_id = mysqli_real_escape_string($conn, $check_data['reservation_id']);
+        
+    //           $fetch_reservation = "
+    //         SELECT `id`, `user_id`, `table_id`, `reservation_date`, `people`, 
+    //               `start_time`, `end_time`, `duration_minutes`, 
+    //               `reservation_fees`, `status`, `created_at`
+    //         FROM `reservations`
+    //         WHERE `id` = '$reservation_id'
+    //     ";
+        
+    //     $result_reservation = mysqli_query($conn,$fetch_reservation);
+    //      $reservation = mysqli_fetch_assoc($result_reservation);
+         
+    //      $reservation_fees = $reservation['reservation_fees'];
+         
+    // } 
+    
+    
+    
+    
+    
   } else {
     $sql_products = "SELECT o.id, o.user_id, u.phone, u.email, u.name as cxname, " . substr($base_sql_products, 7); // Prepend user fields
     $sql_products = str_replace("FROM `orders_zee` o", "FROM `orders_zee` o INNER JOIN users as u ON u.id = o.user_id", $sql_products);
@@ -83,6 +125,8 @@ $check_data = $order_data_results['check_data'];
 $has_table_id = $order_data_results['has_table_id'];
 
 $table_name = getTableName($conn, $check_data['table_id']);
+$reservation_fees = isset($order_data_results['reservation_fees']) ? $order_data_results['reservation_fees'] : 0;
+
 
 
 $get_totals_sql = "SELECT `order_total_price`, `total_discount`, `total_netto_tax`, `total_metto_tax`, `Shipping_Cost` , `table_id` FROM `orders_zee` WHERE `id` = " . $order_id;
@@ -98,6 +142,54 @@ if ($data && isset($data['created_at'])) {
   $datetime = $time->format('Y-m-d H:i:00');
 }
 
+
+
+
+
+$sqlSettings = "SELECT * FROM `system_setting` LIMIT 1";
+$resultSettings = mysqli_query($conn, $sqlSettings);
+
+if ($row = mysqli_fetch_assoc($resultSettings)) {
+    $currency = json_decode($row['currency'], true);
+    $currency_sign = $currency['sign'];
+    $currency_position = $currency['position'];
+}
+
+function formatCurrency($amount, $sign, $position = "left") {
+    $formatted = number_format($amount, 2);
+    if ($position === "left") {
+        return $sign . $formatted;
+    } else {
+        return $formatted . $sign;
+    }
+}
+
+
+
+  if ($has_table_id) {
+    if($check_data['reservation_id']){
+         $reservation_id = mysqli_real_escape_string($conn, $check_data['reservation_id']);
+        
+               $fetch_reservation = "
+            SELECT `id`, `user_id`, `table_id`, `reservation_date`, `people`, 
+                   `start_time`, `end_time`, `duration_minutes`, 
+                   `reservation_fees`, `status`, `created_at`
+            FROM `reservations`
+            WHERE `id` = '$reservation_id'
+        ";
+        
+        $result_reservation = mysqli_query($conn,$fetch_reservation);
+         $reservation = mysqli_fetch_assoc($result_reservation);
+         
+         $reservation_fees = $reservation['reservation_fees'];
+         
+    } 
+  }
+// // After fetching $data
+// echo "<pre>";
+// print_r($data);
+// echo "</pre>";
+// exit;
 ?>
 
 <!DOCTYPE html>
@@ -109,43 +201,58 @@ if ($data && isset($data['created_at'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
   <title>Quittung</title>
-  <style type="text/css">
+  <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
 
-    @media print {
-      .button {
-        display: none;
-      }
 
-      @page {
-        margin-top: 0;
-        margin-bottom: 0;
-      }
 
-      body {
-        max-height: fit-content;
-        max-width: fit-content;
-        padding-top: 10px;
-        padding-bottom: 10px;
- 
+@media print {
+  .button {
+    display: none;
+  }
 
-      }
-    }
+  @page {
+    margin: 0; /* Removes all page margins */
+  }
 
-    body {
-      font-family: sans-serif;
-      font-size: 18px;
-    }
+html, body {
+  background: none;
+  margin: 0 !important;
+  padding: 0 1mm !important; /* 🟢 super tiny space on both sides */
+  width: calc(100% - 2mm);   /* keeps total width consistent */
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 18px;
+}
 
-    .receipt-container {
-      border: none;
-      width: 56mm;
-      margin: 0 auto;
-      text-align: center;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 
-    }
+  .receipt-container {
+    width: 100%; /* Use full printable width */
+    max-width: 80mm; /* Limit width if needed */
+    margin: 0; /* No auto centering */
+    /*padding: 10px;*/
+    text-align: center;
+    box-shadow: none;
+    border: none;
+  }
+}
+
+body {
+  font-family: sans-serif;
+  font-size: 18px;
+}
+
+.receipt-container {
+  width: 100%;
+  max-width: 80mm;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  border: none;
+}
 
     .header-logo {
       display: flex;
@@ -298,16 +405,33 @@ if ($data && isset($data['created_at'])) {
         text-align: center;
     }
     
- 
+    .item-notes {
+  font-size: 0.7rem;
+  color: black; /* Slightly lighter for a subdued look */
+  margin-top: 4px;
+  white-space: pre-wrap; /* Preserves line breaks */
+  
+  
+  
+}
+
+ .header { text-align: center; margin-bottom: 10px; }
+.header img { width: 50px; height: auto; }
+.header h2 { margin: 5px 0; font-size: 20px; }
   </style>
 </head>
 
 <body>
   <div class="receipt-container print">
-    <div class="header-logo">
-      <img src="images/logo.png" alt="Firmenlogo" class="logo">
-      <h3 class="company-name">Pizzablitzöstringen.de</h3>
-    </div>
+      <!--<img src="images/logo.png" alt="Firmenlogo">-->
+      <!--  <h2>Pizzablitzöstringen.de</h2>-->
+        
+        
+     <div class="header">
+        <img src="images/logo.png" alt="Firmenlogo">
+        <h2>Pizzablitzöstringen.de</h2>
+        
+    </div>    
 
     <div class="company-details">
       <h3>Kuhngasse 1, 76684 Östringen</h3>
@@ -330,7 +454,10 @@ if ($data && isset($data['created_at'])) {
         <h3>E-Mail: <?php echo htmlspecialchars($data['email']); ?></h3>
     <?php endif; ?>
 
-    <h3>Name: <?php echo htmlspecialchars($data['Shipping_address'] ?? ''); ?></h3>
+       <?php if (!empty($data['cxname'])): ?>
+        <h3>Name: <?php echo htmlspecialchars($data['cxname']); ?></h3>
+    <?php endif; ?>
+
 
     <?php if ($data['order_type'] == 'delivery'): ?>
        
@@ -358,166 +485,248 @@ if ($data && isset($data['created_at'])) {
     <?php if (!empty($data['order_type'])): ?>
         <h3>Auftragsart: 
             <?php echo htmlspecialchars($data['order_type']); ?>
-            <?php if ($data['order_type'] == 'delivery' && $data['ordersheduletype'] == 'orderlater'): ?>
+            <?php if ( $data['ordersheduletype'] == 'orderlater'): ?>
                 @ <?php echo htmlspecialchars($data['sheduletime']); ?>
             <?php endif; ?>
         </h3>
     <?php endif; ?>
 </div>
 
-
-
     <div class="order-details-header">
       <h1>Bestelldetails</h1>
     </div>
 
     <div class="item-details">
-      <table style="width: 100%; border-collapse: collapse;">
-        <thead>
+        
+  <table style="width: 100%; border-collapse: collapse;">
+    <thead>
+      <tr>
+        <th style="text-align: left;">Menge</th>
+        <th style="text-align: left; width: 60%;">Artikel</th>
+        <th style="text-align: right;">Preis</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php
+      $totalAmount = 0;
+      $Addons_Price = 0;
+      $finalTotal = 0;
+
+      if ($result && mysqli_num_rows($result) > 0) {
+        mysqli_data_seek($result, 0);
+        while ($value = mysqli_fetch_assoc($result)) {
+          $addons = json_decode($value['addons']);
+          $dressing = json_decode($value['dressing']);
+          $types = json_decode($value['types']);
+          $basePrice =  $value['price'] ;
+          $totalAmount += $basePrice * $value['qty'];
+
+          $addonforinner = 0;
+      ?>
           <tr>
-            <th style="text-align: left;">Menge</th>
-            <th style="text-align: left; width: 60%;">Artikel</th>
-            <th style="text-align: right;">Preis</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php
-          $totalAmount = 0;
-          $Addons_Price = 0;
-          if ($result && mysqli_num_rows($result) > 0) {
-            mysqli_data_seek($result, 0);
-            while ($value = mysqli_fetch_assoc($result)) {
-              $addons =  json_decode($value['addons']);
-              $dressing = json_decode($value['dressing']);
-              $types = json_decode($value['types']);
-              $totalAmount += ($value['price'] - ($value['price'] * $value['discount_percent'] / 100)) * $value['qty'];
-              $addonforinner = 0;
-          ?>
-              <tr>
-                <td>x<?php echo htmlspecialchars($value['qty']); ?></td>
-                <td>
-                  <div class="item-name"><?php echo htmlspecialchars($value['name']); ?></div>
-                  <div class="item-options">
-                    <?php if (!empty($types)) : ?>
-                      <?php foreach ($types as $type) : ?>
-                        - <?php echo htmlspecialchars($type->ts_name); ?><br>
-                      <?php endforeach; ?>
-                    <?php endif; ?>
-                    <?php if (!empty($addons)) : ?>
-                      <?php foreach ($addons as $addon) : ?>
-                        x<?php echo htmlspecialchars($addon->quantity); ?> <?php echo htmlspecialchars($addon->as_name); ?><br>
-                        <?php $addonforinner += number_format((float)($addon->as_price * $addon->quantity), 2, '.', ''); ?>
-                        <?php $Addons_Price += number_format((float)($addon->as_price * $addon->quantity), 2, '.', ''); ?>
-                      <?php endforeach; ?>
-                    <?php endif; ?>
-                    <?php if (!empty($dressing)) : ?>
-                      <?php foreach ($dressing as $dressings) : ?>
-                        <?php echo htmlspecialchars($dressings->dressing_name); ?>
-                      <?php endforeach; ?>
-                    <?php endif; ?>
-                  </div>
-                </td>
-                <td class="total-price">
-                  €<?php
-                    $total_product_price =  number_format((($value['price'] - ($value['price'] * $value['discount_percent'] / 100)) + $addonforinner) * $value['qty'], 2, '.', '');
-                    echo htmlspecialchars($total_product_price);
-                    ?>
-                </td>
-              </tr>
-          <?php }
-          } ?>
-          <?php
-          if ($result_deal && mysqli_num_rows($result_deal) > 0) {
-            mysqli_data_seek($result_deal, 0);
-            while ($value = mysqli_fetch_assoc($result_deal)) {
-              // echo var_dump($value);
-          ?>
+            <td>x<?php echo htmlspecialchars($value['qty']); ?></td>
+            <td>
+              <div class="item-name"><?php echo htmlspecialchars($value['name']); ?></div>
 
-              <tr>
-                <td>x<?php echo htmlspecialchars($value['qty']); ?></td>
-                <td>
-                  <div class="item-name"><?php echo htmlspecialchars($value['deal_name']); ?></div>
-                  <div class="item-options">
+              <?php if (!empty($value['additional_notes'])) : ?>
+                <div class="mt-1 item-notes">Notiz: <?php echo htmlspecialchars($value['additional_notes']); ?></div>
+              <?php endif; ?>
+
+              <div class="item-options">
+                <?php if (!empty($addons)) : ?>
+                  <?php foreach ($addons as $addon) : ?>
+                    x<?php echo htmlspecialchars($addon->quantity); ?> <?php echo htmlspecialchars($addon->as_name); ?><br>
                     <?php
-                    $no = $value['no_of_deal'];
-
-                    $sql_sub = '';
-                    if ($has_table_id) {
-                      $sql_sub = "SELECT o.id, od.deal_item_id, od.product_id, od.qty, od.addons, od.types, od.dressing ,p.name, od.price , dl.di_num_free_items
-                                                    FROM `orders_zee` o
-                                                    INNER JOIN `order_details_zee` od ON od.order_id = o.id
-                                                    INNER JOIN `products` p ON p.id = od.product_id
-                                                    INNER JOIN deal_items as dl ON dl.di_id = od.deal_item_id
-                                                    WHERE o.id = " . $order_id . " AND od.deal_id > 0 AND od.no_of_deal = " . $no;
-                    } else {
-                      $sql_sub = "SELECT o.id, od.deal_item_id, od.product_id, od.qty, od.addons, od.types, od.dressing ,p.name, od.price , dl.di_num_free_items
-                                                    FROM `orders_zee` o
-                                                    INNER JOIN `order_details_zee` od ON od.order_id = o.id
-                                                    INNER JOIN `products` p ON p.id = od.product_id
-                                                    INNER JOIN users as u ON u.id = o.user_id
-                                                    INNER JOIN deal_items as dl ON dl.di_id = od.deal_item_id
-                                                    WHERE o.id = " . $order_id . " AND od.deal_id > 0 AND od.no_of_deal = " . $no;
-                    }
-
-                    $result_sub = mysqli_query($conn, $sql_sub);
-
-                    if ($result_sub && mysqli_num_rows($result_sub) > 0) {
-                      mysqli_data_seek($result_sub, 0);
-                      while ($row = mysqli_fetch_assoc($result_sub)) {
-                        $addons =  json_decode($row['addons']);
-                        $dressing = json_decode($row['dressing']);
-                        $types = json_decode($row['types']);
-                        $di_num_free_items = ($row['di_num_free_items']);
-                        $addonforinner = 0;
+                    $addonTotal = $addon->as_price * $addon->quantity;
+                    $addonforinner += $addonTotal;
+                    $Addons_Price += $addonTotal;
                     ?>
-                        <?php echo htmlspecialchars($row['name']); ?> -
-                        <?php if (!empty($types)) : ?>
-                          <?php foreach ($types as $type) : ?>
-                            - <?php echo htmlspecialchars($type->ts_name); ?><br>
-                          <?php endforeach; ?>
-                        <?php endif; ?>
+                  <?php endforeach; ?>
+                <?php endif; ?>
+
+                <?php if (!empty($types)) : ?>
+                  <?php foreach ($types as $type) : ?>
+                    <?php echo htmlspecialchars($type->ts_name); ?><br>
+                    <?php $addonforinner += $type->price; ?>
+                  <?php endforeach; ?>
+                <?php endif; ?>
+
+                <?php if (!empty($dressing)) : ?>
+                  <?php foreach ($dressing as $dressings) : ?>
+                    <?php echo htmlspecialchars($dressings->dressing_name); ?><br>
+                    <?php $addonforinner += $dressings->price; ?>
+                  <?php endforeach; ?>
+                <?php endif; ?>
+              </div>
+            </td>
+            <td class="total-price">
+              <?php
+              $total_product_price = number_format(($basePrice + $addonforinner) * $value['qty'], 2, '.', '');
+            //   echo htmlspecialchars($total_product_price);
+            echo formatCurrency($total_product_price, $currency_sign, $currency_position);
+              $finalTotal += $total_product_price;
+              ?>
+            </td>
+          </tr>
+      <?php }
+      } ?>
+
+      <?php
+      if ($result_deal && mysqli_num_rows($result_deal) > 0) {
+        mysqli_data_seek($result_deal, 0);
+        while ($value = mysqli_fetch_assoc($result_deal)) {
+      ?>
+          <tr>
+            <td>x<?php echo htmlspecialchars($value['qty']); ?></td>
+            <td>
+              <div class="item-details">
+                <strong class="item-name d-block mb-1"><?php echo htmlspecialchars($value['deal_name']); ?></strong>
+                <div class="item-options text-muted small">
+                  <?php
+                  $no = $value['no_of_deal'];
+                  $sql_sub = $has_table_id ?
+                    "SELECT o.id, od.deal_item_id, od.product_id, od.qty, od.addons, od.types, od.dressing, p.name, od.price, od.additional_notes, dl.di_num_free_items
+                     FROM `orders_zee` o
+                     INNER JOIN `order_details_zee` od ON od.order_id = o.id
+                     INNER JOIN `products` p ON p.id = od.product_id
+                     INNER JOIN deal_items dl ON dl.di_id = od.deal_item_id
+                     WHERE o.id = $order_id AND od.deal_id > 0 AND od.no_of_deal = $no"
+                    :
+                    "SELECT o.id, od.deal_item_id, od.product_id, od.qty, od.addons, od.types, od.dressing, od.additional_notes, p.name, od.price, dl.di_num_free_items
+                     FROM `orders_zee` o
+                     INNER JOIN `order_details_zee` od ON od.order_id = o.id
+                     INNER JOIN `products` p ON p.id = od.product_id
+                     INNER JOIN users u ON u.id = o.user_id
+                     INNER JOIN deal_items dl ON dl.di_id = od.deal_item_id
+                     WHERE o.id = $order_id AND od.deal_id > 0 AND od.no_of_deal = $no";
+
+                  $result_sub = mysqli_query($conn, $sql_sub);
+                  $addonforinner = 0;
+
+                  if ($result_sub && mysqli_num_rows($result_sub) > 0) {
+                    mysqli_data_seek($result_sub, 0);
+                    while ($row = mysqli_fetch_assoc($result_sub)) {
+                      $addons = json_decode($row['addons']);
+                      $types = json_decode($row['types']);
+                      $dressing = json_decode($row['dressing']);
+                      $di_num_free_items = $row['di_num_free_items'];
+                  ?>
+                      <div class="mb-2">
+                        <strong><?php echo htmlspecialchars($row['name']); ?></strong>
+
                         <?php if (!empty($addons)) : ?>
-                          <?php foreach ($addons as $addon) : ?>
-                            x<?php echo htmlspecialchars($addon->quantity); ?> <?php echo htmlspecialchars($addon->as_name); ?><br>
-                            <?php
-                            if ($di_num_free_items == 0) {
-                              $addonforinner += number_format((float)($addon->as_price * $addon->quantity), 2, '.', '');
-                              $Addons_Price += number_format((float)($addon->as_price * $addon->quantity), 2, '.', '');
-                            } else {
-                              $di_num_free_items -= $addon->quantity;
-                            }
-                            ?>
-                          <?php endforeach; ?>
+                          <div>
+                            <?php foreach ($addons as $addon) : ?>
+                              x<?php echo htmlspecialchars($addon->quantity); ?> <?php echo htmlspecialchars($addon->as_name); ?><br>
+                              <?php
+                              if ($di_num_free_items == 0) {
+                                $addonTotal = $addon->as_price * $addon->quantity;
+                                $addonforinner += $addonTotal;
+                                $Addons_Price += $addonTotal;
+                              } else {
+                                $di_num_free_items -= $addon->quantity;
+                              }
+                              ?>
+                            <?php endforeach; ?>
+                          </div>
                         <?php endif; ?>
-                        <?php if (!empty($dressing)) : ?>
-                          <?php foreach ($dressing as $dressings) : ?>
-                            <?php echo htmlspecialchars($dressings->dressing_name); ?>
-                          <?php endforeach; ?>
-                        <?php endif; ?>
-                    <?php }
-                      mysqli_free_result($result_sub);
-                    }
-                    ?>
-                  </div>
-                </td>
-                <td class="total-price">€<?php echo number_format((float)($value['price'] + $addonforinner), 2, '.', ''); ?></td>
-              </tr>
-          <?php }
-          } ?>
-        </tbody>
-      </table>
-    </div>
 
-    <div class="footer-totals">
-      <ul>
-        <li><span>Zwischensumme:</span><span><?php echo "€" . number_format((float)($data['order_total_price'] ?? 0), 2, '.', ''); ?></span></li>
-        <li><span>Rabatt:</span><span><?php echo "€" . number_format((float)($total['total_discount'] ?? 0), 2, '.', ''); ?></span></li>
-        <li><span>Lieferung:</span><span><?php echo "€" . number_format((float)($total['Shipping_Cost'] ?? 0), 2, '.', ''); ?></span></li>
-        <li><span>MwSt. (7%):</span><span><?php echo "€" . number_format((float)($data['total_netto_tax'] ?? 0), 2, '.', ''); ?></span></li>
-        <li><span>MwSt. (19%):</span><span><?php echo "€" . number_format((float)($data['total_metto_tax'] ?? 0), 2, '.', ''); ?></span></li>
-        <li><span>Gesamt:</span><span><?php echo "€" . number_format((float)($data['order_total_price'] ?? 0), 2, '.', ''); ?></span></li>
-      </ul>
-    </div>
+                        <?php if (!empty($types)) : ?>
+                          <div>
+                            <?php foreach ($types as $type) : ?>
+                              <?php echo htmlspecialchars($type->ts_name); ?>
+                              <?php $addonforinner += $type->price; ?>
+                            <?php endforeach; ?>
+                          </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($dressing)) : ?>
+                          <div>Dressing:
+                            <?php foreach ($dressing as $dressings) : ?>
+                              <?php echo htmlspecialchars($dressings->dressing_name); ?>
+                              <?php $addonforinner += $dressings->price; ?>
+                            <?php endforeach; ?>
+                          </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($row['additional_notes'])) : ?>
+                          <div class="item-notes mt-1">Notiz: <?php echo htmlspecialchars($row['additional_notes']); ?></div>
+                        <?php endif; ?>
+                      </div>
+                  <?php
+                    }
+                    mysqli_free_result($result_sub);
+                  }
+                  ?>
+                </div>
+              </div>
+            </td>
+            <td class="total-price font-weight-bold">
+              <?php
+              $dealTotal = number_format($value['price'] + $addonforinner, 2, '.', '');
+            //   echo $dealTotal;
+            echo formatCurrency($dealTotal, $currency_sign, $currency_position);
+              $finalTotal += $dealTotal;
+              ?>
+            </td>
+          </tr>
+      <?php }
+      } ?>
+    </tbody>
+  </table>
+</div>
+
+<?php
+$discount = isset($total['total_discount']) ? (float) $total['total_discount'] : 0.00;
+$shipping = isset($total['Shipping_Cost']) ? (float) $total['Shipping_Cost'] : 0.00;
+$tax_7 = isset($data['total_netto_tax']) ? (float) $data['total_netto_tax'] : 0.00;
+$tax_19 = isset($data['total_metto_tax']) ? (float) $data['total_metto_tax'] : 0.00;
+
+$subtotal = $finalTotal;
+$grand_total = $subtotal - $discount + $shipping;
+
+
+?>
+
+<!--<div class="footer-totals">-->
+<!--  <ul>-->
+<!--    <li><span>Tatsächlicher Preis:</span><span>€<?php echo number_format($subtotal, 2, '.', ''); ?></span></li>-->
+<!--    <li><span>Rabatt:</span><span>-€<?php echo number_format($discount, 2, '.', ''); ?></span></li>-->
+<!--    <li><span>Lieferung:</span><span>€<?php echo number_format($shipping, 2, '.', ''); ?></span></li>-->
+<!--    <li><span>MwSt. (7%):</span><span>€<?php echo number_format($tax_7, 2, '.', ''); ?></span></li>-->
+<!--    <li><span>MwSt. (19%):</span><span>€<?php echo number_format($tax_19, 2, '.', ''); ?></span></li>-->
+<!--    <li><span>Gesamt:</span><span>€<?php echo number_format($grand_total, 2, '.', ''); ?></span></li>-->
+<!--  </ul>-->
+<!--</div>-->
+<?php
+// Adjust total if reservation fee exists
+if (!empty($reservation_id)) {
+    $grand_total -= $reservation_fees; 
+}
+
+?>
+
+
+<div class="footer-totals">
+  <ul>
+    <li><span>Tatsächlicher Preis:</span><span><?php echo formatCurrency($subtotal, $currency_sign, $currency_position); ?></span></li>
+    <li><span>Rabatt:</span><span>-<?php echo formatCurrency($discount, $currency_sign, $currency_position); ?></span></li>
+    <li><span>Lieferung:</span><span><?php echo formatCurrency($shipping, $currency_sign, $currency_position); ?></span></li>
+    
+<?php if (!empty($reservation_id)) { ?>
+  <li>
+    <span>Reservierungsgebühren:</span>
+    <span>-<?php echo formatCurrency($reservation_fees, $currency_sign, $currency_position); ?></span>
+  </li>
+<?php } ?>
+
+    <li><span>MwSt. (7%):</span><span><?php echo formatCurrency($tax_7, $currency_sign, $currency_position); ?></span></li>
+    <li><span>MwSt. (19%):</span><span><?php echo formatCurrency($tax_19, $currency_sign, $currency_position); ?></span></li>
+    <li><span>Gesamt:</span><span><?php echo formatCurrency($grand_total, $currency_sign, $currency_position); ?></span></li>
+  </ul>
+</div>
+
+
 
     <div class="payment-method-info">
       Zahlungsmethode: <?php echo htmlspecialchars($data['payment_type'] ?? 'N/A'); ?> </div>
@@ -525,7 +734,14 @@ if ($data && isset($data['created_at'])) {
     <div class="footer-message">
       <p>Vielen Dank für Ihren Einkauf!</p>
     </div>
+    
+    
+      <div style="margin:10px 0;">
+    <img src="<?php echo $qrFile; ?>" alt="QR Code Order <?php echo $order_id; ?>" />
   </div>
+  </div>
+  
+  
 
   <script type="text/javascript">
     function printReceipt() {

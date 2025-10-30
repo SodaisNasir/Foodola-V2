@@ -5,108 +5,107 @@ $pageName = basename($_SERVER['PHP_SELF'], ".php");
 
 switch ($pageName) {
     case 'index':
-        $pageTitle = "Analytics | pizzaburgerpoint";
+        $pageTitle = "Analytics | foodola";
         break;
     case 'addareas':
-        $pageTitle = "Addareas | pizzaburgerpoint";
+        $pageTitle = "Addareas | foodola";
         break;
     case 'addriders':
-        $pageTitle = "Addriders | pizzaburgerpoint";
+        $pageTitle = "Addriders | foodola";
         break;
     case 'addmaincat':
-        $pageTitle = "Maincategories | pizzaburgerpoint";
+        $pageTitle = "Maincategories | foodola";
         break;
     case 'addSubCat':
-        $pageTitle = "Subcategories | pizzaburgerpoint";
+        $pageTitle = "Subcategories | foodola";
         break;
     case 'insertNewProduct':
-        $pageTitle = "Newproduct | pizzaburgerpoint";
+        $pageTitle = "Newproduct | foodola";
         break;
     case 'addVariation':
-        $pageTitle = "Variation | pizzaburgerpoint";
+        $pageTitle = "Variation | foodola";
         break;
     case 'addAddons':
-        $pageTitle = "Addons | pizzaburgerpoint";
+        $pageTitle = "Addons | foodola";
         break;    
     case 'addDressing':
-        $pageTitle = "Dressing | pizzaburgerpoint";
+        $pageTitle = "Dressing | foodola";
         break;
     case 'addTypes':
-        $pageTitle = "Types | pizzaburgerpoint";
+        $pageTitle = "Types | foodola";
         break;
     case 'insertDeals':
-        $pageTitle = "Deals | pizzaburgerpoint";
+        $pageTitle = "Deals | foodola";
         break;    
     case 'addslider':
-        $pageTitle = "Sliders | pizzaburgerpoint";
+        $pageTitle = "Sliders | foodola";
         break;  
-        
      case 'addprivacypolicy':
-        $pageTitle = "Add-Privacy-Policy | pizzaburgerpoint";
+        $pageTitle = "Add-Privacy-Policy | foodola";
         break;    
     case 'addterms_condition':
-        $pageTitle = "Terms-Conditions | pizzaburgerpoint";
+        $pageTitle = "Terms-Conditions | foodola";
         break;
     case 'manage_pos':
-        $pageTitle = "Manage-Pos | pizzaburgerpoint";
+        $pageTitle = "Manage-Pos | foodola";
         break;
     case 'manageriders':
-        $pageTitle = "Manage-Riders | pizzaburgerpoint";
+        $pageTitle = "Manage-Riders | foodola";
         break;    
     case 'manageusers':
-        $pageTitle = "Manage-Users | pizzaburgerpoint";
+        $pageTitle = "Manage-Users | foodola";
         break;  
         
     case 'managetimings':
-        $pageTitle = "Manage-Timings | pizzaburgerpoint";
+        $pageTitle = "Manage-Timings | foodola";
         break;      
     case 'neworders':
-        $pageTitle = "New-Orders | pizzaburgerpoint";
+        $pageTitle = "New-Orders | foodola";
         break;      
     case 'orders':
-        $pageTitle = "Orders | pizzaburgerpoint";
+        $pageTitle = "Orders | foodola";
         break;      
     case 'manageinventory':
-        $pageTitle = "Manage-Inventory | pizzaburgerpoint";
+        $pageTitle = "Manage-Inventory | foodola";
         break;      
     case 'manageAreas':
-        $pageTitle = "Manage-Areas | pizzaburgerpoint";
+        $pageTitle = "Manage-Areas | foodola";
         break;      
     case 'manageproducts':
-        $pageTitle = "Manage-Products | pizzaburgerpoint";
+        $pageTitle = "Manage-Products | foodola";
         break;      
     case 'managevariations':
-        $pageTitle = "Manage-Variations | pizzaburgerpoint";
+        $pageTitle = "Manage-Variations | foodola";
         break;      
     case 'view_dressing':
-        $pageTitle = "Manage-Dressing | pizzaburgerpoint";
+        $pageTitle = "Manage-Dressing | foodola";
         break;
     case 'view_types':
-        $pageTitle = "Manage-Types | pizzaburgerpoint";
+        $pageTitle = "Manage-Types | foodola";
         break;
     case 'view_deals':
-        $pageTitle = "Manage-Deals | pizzaburgerpoint";
+        $pageTitle = "Manage-Deals | foodola";
         break;
     case 'viewcategories':
-        $pageTitle = "Manage-Catagories | pizzaburgerpoint";
+        $pageTitle = "Manage-Catagories | foodola";
         break;       
     case 'SubCat':
-        $pageTitle = "Manage-Sub-Catagories | pizzaburgerpoint";
+        $pageTitle = "Manage-Sub-Catagories | foodola";
         break;                                      
     case 'manageSliders':
-        $pageTitle = "Manage-Sliders | pizzaburgerpoint";
+        $pageTitle = "Manage-Sliders | foodola";
         break;
     case 'managePoints':
-        $pageTitle = "Manage-Points | pizzaburgerpoint";
+        $pageTitle = "Manage-Points | foodola";
         break;
     case 'SendNotifications':
-        $pageTitle = "Notifications | pizzaburgerpoint";
+        $pageTitle = "Notifications | foodola";
         break;   
     case 'view_addons':
-        $pageTitle = "Manage-Addons | pizzaburgerpoint";
+        $pageTitle = "Manage-Addons | foodola";
         break;     
     default:
-        $pageTitle = "pizzaburgerpoint";
+        $pageTitle = "foodola";
 }
 
 

@@ -8,7 +8,7 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 
 if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC'){
 
-     $sql = "SELECT `id`, `category_id`, `name`, `img`, `created_at`, `updated_at`, `banner_image` FROM `sub_categories`";
+     $sql = "SELECT `id`, `category_id`, `name`, `img`, `created_at`, `updated_at`, `banner_image` FROM `sub_categories` ORDER BY `sort_order` ASC";
      include('connection.php');
      $execute = mysqli_query($conn,$sql);
      if(mysqli_num_rows($execute) > 0){

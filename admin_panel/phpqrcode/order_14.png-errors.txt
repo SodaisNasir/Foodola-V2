@@ -1,0 +1,60 @@
+2025-10-02 16:03:43: <br />
+<b>Warning</b>:  Trying to access array offset on value of type int in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>71</b><br />
+<br />
+<b>Warning</b>:  Trying to access array offset on value of type int in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>53</b><br />
+<br />
+<b>Deprecated</b>:  ord(): Passing null to parameter #1 ($character) of type string is deprecated in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>53</b><br />
+<br />
+<b>Warning</b>:  Trying to access array offset on value of type int in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>62</b><br />
+<br />
+<b>Deprecated</b>:  ord(): Passing null to parameter #1 ($character) of type string is deprecated in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>62</b><br />
+<br />
+<b>Warning</b>:  Trying to access array offset on value of type int in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>71</b><br />
+<br />
+<b>Warning</b>:  Trying to access array offset on value of type int in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>53</b><br />
+<br />
+<b>Deprecated</b>:  ord(): Passing null to parameter #1 ($character) of type string is deprecated in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>53</b><br />
+<br />
+<b>Warning</b>:  Trying to access array offset on value of type int in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>62</b><br />
+<br />
+<b>Deprecated</b>:  ord(): Passing null to parameter #1 ($character) of type string is deprecated in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>62</b><br />
+2025-10-02 16:04:17: <br />
+<b>Warning</b>:  Trying to access array offset on value of type int in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>71</b><br />
+<br />
+<b>Warning</b>:  Trying to access array offset on value of type int in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>53</b><br />
+<br />
+<b>Deprecated</b>:  ord(): Passing null to parameter #1 ($character) of type string is deprecated in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>53</b><br />
+<br />
+<b>Warning</b>:  Trying to access array offset on value of type int in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>62</b><br />
+<br />
+<b>Deprecated</b>:  ord(): Passing null to parameter #1 ($character) of type string is deprecated in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>62</b><br />
+<br />
+<b>Warning</b>:  Trying to access array offset on value of type int in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>71</b><br />
+<br />
+<b>Warning</b>:  Trying to access array offset on value of type int in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>53</b><br />
+<br />
+<b>Deprecated</b>:  ord(): Passing null to parameter #1 ($character) of type string is deprecated in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>53</b><br />
+<br />
+<b>Warning</b>:  Trying to access array offset on value of type int in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>62</b><br />
+<br />
+<b>Deprecated</b>:  ord(): Passing null to parameter #1 ($character) of type string is deprecated in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>62</b><br />
+2025-10-02 16:05:09: <br />
+<b>Warning</b>:  Trying to access array offset on value of type int in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>71</b><br />
+<br />
+<b>Warning</b>:  Trying to access array offset on value of type int in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>53</b><br />
+<br />
+<b>Deprecated</b>:  ord(): Passing null to parameter #1 ($character) of type string is deprecated in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>53</b><br />
+<br />
+<b>Warning</b>:  Trying to access array offset on value of type int in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>62</b><br />
+<br />
+<b>Deprecated</b>:  ord(): Passing null to parameter #1 ($character) of type string is deprecated in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>62</b><br />
+<br />
+<b>Warning</b>:  Trying to access array offset on value of type int in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>71</b><br />
+<br />
+<b>Warning</b>:  Trying to access array offset on value of type int in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>53</b><br />
+<br />
+<b>Deprecated</b>:  ord(): Passing null to parameter #1 ($character) of type string is deprecated in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>53</b><br />
+<br />
+<b>Warning</b>:  Trying to access array offset on value of type int in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>62</b><br />
+<br />
+<b>Deprecated</b>:  ord(): Passing null to parameter #1 ($character) of type string is deprecated in <b>/home/u772850971/domains/foodola.shop/public_html/foodola/admin_panel/phpqrcode/qrsplit.php</b> on line <b>62</b><br />

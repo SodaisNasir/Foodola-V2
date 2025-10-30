@@ -6,6 +6,9 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Content-Type: application/json"); 
 
+// require __DIR__ . '/../vendor/autoload.php';
+// use Pusher\Pusher;
+
 include("connection.php");
 
 $valid_token = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC';
@@ -33,6 +36,10 @@ if ($execute) {
 
         if ($execute) {
             echo json_encode(['status' => true, 'message' => 'Table data cleared successfully']);
+            
+            
+        
+          
         } else {
             echo json_encode(['status' => false, 'message' => 'Failed to clear last inserted table order detail']);
         }

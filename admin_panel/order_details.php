@@ -183,7 +183,7 @@ if (isset($_GET['Massage'])) {
                   <?php
                   include_once('connection.php');
                   $order_id = intval($_GET['order_id']);
-                  $sqlx = "SELECT `status`, `delivered_at`, `order_type`, `user_id`, `Shipping_Cost`, `total_discount`, `order_total_price`, `ordersheduletype`, `Shipping_address`, `Shipping_address_2`, `Shipping_postal_code`,`Shipping_area`,`Shipping_state`,`Shipping_city`, `sheduletime` FROM `orders_zee` WHERE `id` = $order_id";
+                  $sqlx = "SELECT `table_id`,`status`, `delivered_at`, `order_type`, `user_id`, `Shipping_Cost`, `total_discount`, `order_total_price`, `ordersheduletype`, `Shipping_address`, `Shipping_address_2`, `Shipping_postal_code`,`Shipping_area`,`Shipping_state`,`Shipping_city`, `sheduletime` FROM `orders_zee` WHERE `id` = $order_id";
                   $resultx = mysqli_query($conn, $sqlx);
         
                   if ($rowx = mysqli_fetch_assoc($resultx)) {
@@ -191,7 +191,7 @@ if (isset($_GET['Massage'])) {
                     $delivered_at = htmlspecialchars($rowx['delivered_at']);
                     $orderType = htmlspecialchars($rowx['order_type']);
                     $user_id = intval($rowx['user_id']);
-                    $shippingCost = htmlspecialchars($rowx['Shipping_Cost']);
+                    $shippingCost = intval($rowx['Shipping_Cost']);
                     $total_discount = htmlspecialchars($rowx['total_discount']);
                     $order_total = htmlspecialchars($rowx['order_total_price']);
                     $orderscedule = htmlspecialchars($rowx['ordersheduletype']);
@@ -201,8 +201,7 @@ if (isset($_GET['Massage'])) {
                     $shipping_area = htmlspecialchars($rowx['Shipping_area']);
                     $shipping_state = htmlspecialchars($rowx['Shipping_state']);
                     $shipping_city =htmlspecialchars($rowx['Shipping_city']);
-                    
-                    
+                    $table_id =htmlspecialchars($rowx['table_id']);
                     $scedule = htmlspecialchars($rowx['sheduletime']);
                     
                     
@@ -216,27 +215,69 @@ if (isset($_GET['Massage'])) {
           
         
                     if ($user_id) {
-                      $sqlUser = "SELECT `name` FROM `users` WHERE `id` = $user_id";
-                      $resultUser = mysqli_query($conn, $sqlUser);
-                      if ($rowUser = mysqli_fetch_assoc($resultUser)) {
-                        $customer_name = htmlspecialchars($rowUser['name']);
-                      }
+                        
+                        $sqlUser = "SELECT `name` FROM `users` WHERE `id` = $user_id";
+                          $resultUser = mysqli_query($conn, $sqlUser);
+                          if ($rowUser = mysqli_fetch_assoc($resultUser)) {
+                            $customer_name = htmlspecialchars($rowUser['name']);
+                        }
+                        
+                    }else if($table_id){
+                        
+                        $sqlTable = "SELECT `id`,`table_name` FROM `tables` WHERE `id` = '$table_id'";
+                        $resultTable = mysqli_query($conn, $sqlTable);
+                        if ($row = mysqli_fetch_assoc($resultTable)) {
+                            $table_name = htmlspecialchars($row['table_name']);
+                        }
                     }
+                    
+                    
+                    $sqlSettings = "SELECT * FROM `system_setting` LIMIT 1";
+                    $resultSettings = mysqli_query($conn, $sqlSettings);
+                    
+                    if ($row = mysqli_fetch_assoc($resultSettings)) {
+                        $currency = json_decode($row['currency'], true); // decode as array
+                        $currency_sign = $currency['sign'];
+                        $currency_position = $currency['position'];
+                    }
+                    
+                    
+                    function formatCurrency($amount, $sign, $position = "left") {
+                        $formatted = number_format($amount, 2);
+                        if ($position === "left") {
+                            return $sign . $formatted;
+                        } else {
+                            return $formatted . $sign;
+                        }
+                    }
+
+
                   }
                   ?>
                   <div class="mt-3">
                     <div class="d-flex justify-content-between">
                       <p><strong>Order Type:</strong> <?php echo $orderType; ?></p>
-                      <p><strong>Shipping Cost:</strong> <?php echo '€' . $shippingCost; ?></p>
+                 <p><strong>Shipping Cost:</strong> <?php echo formatCurrency($shippingCost, $currency_sign, $currency_position); ?></p>
                     </div>
                     <div class="d-flex justify-content-between">
+                        
+                    <?php if($user_id){ ?>
                       <p><strong>Customer Name:</strong> <?php echo htmlspecialchars($customer_name); ?></p>
-                      <p><strong>Total Discount:</strong> <?php echo '€' . $total_discount; ?></p>
+                      <?php }?>  
+                      
+                    <?php if($table_id){ ?>
+                      <p><strong>Table Name:</strong> <?php echo htmlspecialchars($table_name); ?></p>
+                    <?php }?>  
+                      <p><strong>Total Discount:</strong> <?php echo formatCurrency($total_discount, $currency_sign, $currency_position); ?></p>
                     </div>
+                    
+                    
                     <div class="d-flex justify-content-between">
-                      <p><strong>Customer Address:</strong> <?php echo $address_1 . ', ' . $address_2 . ', ' . $postal_code . ', ' . $shipping_area . ', ' . $shipping_city . ', ' . $shipping_state; ?></p>
-                      <p><strong>Order Total:</strong> <?php echo '€' . $order_total; ?></p>
+                      <p class="w-50"><strong>Customer Address:</strong> <?php echo  $address_2 . ', ' . $postal_code . ', ' . $shipping_area . ', ' . $shipping_city . ', ' . $shipping_state; ?></p>
+                     <p><strong>Order Total:</strong> <?php echo formatCurrency($order_total, $currency_sign, $currency_position); ?></p>
                     </div>
+                    
+                    
                     <div>
                       <?php
                       if ($orderscedule == 'ordernow') {
@@ -246,36 +287,45 @@ if (isset($_GET['Massage'])) {
                       }
                       ?>
                     </div>
+                    
+                    
                   </div>
-                  <form action="phpfiles/insertions.php" method="POST" class="mt-3">
-                    <input type="hidden" name="order_id" value="<?php echo $order_id; ?>">
-                    <div class="form-group col-lg-6 p-0">
-                      <select name="Action" id="orderStatus" onchange="updateShipping(this.value)" class="form-control mb-1" required>
-                        <option value="">Select order status</option>
-                        <option value="pending">Accept</option>
-                        <option value="delivered">Delivered</option>
-                        <option value="canceled">Cancel</option>
-                      </select>
-                    </div>
-                    <div class="form-group" id="riderSelect" style="display:none;">
-                      <label for="rider_id">Assign Rider</label>
-                      <select name="rider_id" id="rider_id" class="form-control">
-                        <?php
-                        include('assets/connection.php');
-                        $sql = "SELECT `id`, `name` FROM `users` WHERE `role_id` = 2";
-                        $execute = mysqli_query($conn, $sql);
-                        while ($row = mysqli_fetch_array($execute)) {
-                          echo "<option value=" . intval($row['id']) . ">" . htmlspecialchars($row['name']) . "</option>";
-                        }
-                        ?>
-                      </select>
-                    </div>
-                    <button type="submit" name="btnSubmit_Action" class="btn btn-primary mt-1">Submit</button>
-                  </form>
+                        <form action="phpfiles/insertions.php" method="POST" class="mt-3">
+                            <input type="hidden" name="order_id" value="<?php echo $order_id; ?>">
+                                
+                                <div class="form-group col-lg-6 p-0">
+                                  <select name="Action" id="orderStatus" onchange="updateShipping(this.value)" class="form-control mb-1" required>
+                                    <option value="">Select order status</option>
+                                    <option value="pending">Accept</option>
+                                    <option value="delivered">Delivered</option>
+                                    <option value="canceled">Cancel</option>
+                                  </select>
+                                </div>
+                                
+                                <div class="form-group" id="riderSelect" style="display:none;">
+                                  <label for="rider_id">Assign Rider</label>
+                                  <select name="rider_id" id="rider_id" class="form-control">
+                                    <?php
+                                    include('assets/connection.php');
+                                    $sql = "SELECT `id`, `name` FROM `users` WHERE `role_id` = 2";
+                                    $execute = mysqli_query($conn, $sql);
+                                    while ($row = mysqli_fetch_array($execute)) {
+                                      echo "<option value=" . intval($row['id']) . ">" . htmlspecialchars($row['name']) . "</option>";
+                                    }
+                                    ?>
+                                  </select>
+                                </div>
+                            
+                            <button type="submit" name="btnSubmit_Action" class="btn btn-primary mt-1">Submit</button>
+                        </form>
                 </div>
               </div>
             </div>
           </div>
+          
+          
+          
+          
     <section id="basic-datatable">
     <div class="row">
         <div class="col-12">
@@ -288,7 +338,7 @@ if (isset($_GET['Massage'])) {
                 include_once('connection.php');
                 $order_id = $_GET['order_id'];
 
-                $sql = "SELECT o.id, o.order_total_price, o.addtional_notes, od.id AS order_detail_id, od.order_id, od.deal_id, od.deal_item_id,
+                $sql = "SELECT o.id, o.order_total_price, od.additional_notes, od.id AS order_detail_id, od.order_id, od.deal_id, od.deal_item_id,
                         od.product_id, od.qty, od.addons, od.types, od.dressing, od.product_name, od.price, p.description, p.cost, p.img  
                         FROM `orders_zee` o 
                         INNER JOIN `order_details_zee` od ON od.order_id = o.id 
@@ -361,15 +411,18 @@ if (isset($_GET['Massage'])) {
                             echo "<tr>
                                     <td>" . $index++ . "</td>
                                     <td>" . htmlspecialchars($row['product_name']) . "</td>
-                                    <td>" . (!empty($row['addtional_notes']) ? htmlspecialchars($row['addtional_notes']) : '-') . "</td>
+                                    <td>" . (!empty($row['additional_notes']) ? htmlspecialchars($row['additional_notes']) : '-') . "</td>
                                     <td>" . htmlspecialchars($row['qty']) . "</td>
-                                    <td>€" . htmlspecialchars($row['cost']) . "</td>
-                                    <td>€" . htmlspecialchars($row['price']) . "</td>
+                                    <td>" . formatCurrency($row['cost'], $currency_sign, $currency_position) . "</td>
+                                    <td>" . formatCurrency($row['price'], $currency_sign, $currency_position) . "</td>
                                     <td>";
 
-                            if (count($addons) > 0) {
+                             if (count($addons) > 0 && !empty($addons)) {
                                 foreach ($addons as $addon) {
-                                    echo htmlspecialchars($addon->as_name) . " X " . htmlspecialchars($addon->quantity) . " €" . htmlspecialchars($addon->as_price) . "<br>";
+                                    echo htmlspecialchars($addon->as_name) 
+                                        . " X " . htmlspecialchars($addon->quantity) 
+                                        . " " . formatCurrency($addon->as_price, $currency_sign, $currency_position) 
+                                        . "<br>";
                                 }
                             } else {
                                 echo "No addons available.";
@@ -381,15 +434,24 @@ if (isset($_GET['Massage'])) {
                             foreach ($addons as $addon) {
                                 $total_addon += $addon->as_price * $addon->quantity;
                             }
-                            echo '€' . htmlspecialchars($total_addon) . "</td><td>";
+                            
+                            echo formatCurrency($total_addon, $currency_sign, $currency_position) . "</td><td>";
 
-                            if (is_array($types) && count($types) > 0) {
-                                foreach ($types as $type) {
-                                    echo htmlspecialchars($type->ts_name) . " ";
+                                 if (is_array($types) && !empty($types)) {
+                                    $hasValidType = false;
+                                    foreach ($types as $type) {
+                                        if (!empty($type->ts_name)) {
+                                            echo htmlspecialchars($type->ts_name) . " ";
+                                            $hasValidType = true;
+                                        }
+                                    }
+                                
+                                    if (!$hasValidType) {
+                                        echo "No types available.";
+                                    }
+                                } else {
+                                    echo "No types available.";
                                 }
-                            } else {
-                                echo "No types available.";
-                            }
 
                             echo "</td><td>";
 
@@ -417,6 +479,7 @@ if (isset($_GET['Massage'])) {
                                                 <tr>
                                                     <th>S No.</th>
                                                     <th>Deal Name</th>
+                                                    <th>Additional Notes</th>
                                                     <th>Deal Item Name</th>
                                                     <th>Product Name</th>
                                                     <th>Cost</th>
@@ -448,19 +511,24 @@ if (isset($_GET['Massage'])) {
                             echo "<tr>
                                     <td>" . $index++ . "</td>
                                     <td>" . htmlspecialchars($deal_d['deal_name']) . "</td>
+                                    <td>" . (!empty($row['additional_notes']) ? htmlspecialchars($row['additional_notes']) : '-') . "</td>
                                     <td>" . htmlspecialchars($deal_item['di_title']) . "</td>
                                     <td>" . htmlspecialchars($row['product_name']) . "</td>
-                                    <td>€" . htmlspecialchars($deal_d['deal_cost']) . "</td>
-                                    <td>€" . htmlspecialchars($deal_d['deal_price']) . "</td>
+                                    <td>" . formatCurrency($deal_d['deal_cost'], $currency_sign, $currency_position) . "</td>
+                                    <td>" . formatCurrency($deal_d['deal_price'], $currency_sign, $currency_position) . "</td>
                                     <td>";
 
-                            if (is_array($addons)) {
-                                foreach ($addons as $addon) {
-                                    echo htmlspecialchars($addon->as_name) . " X " . htmlspecialchars($addon->quantity) . " €" . htmlspecialchars($addon->as_price) . "<br>";
-                                }
-                            } else {
-                                echo "No addons.";
+                        if (is_array($addons) && !empty($addons)) {
+                            foreach ($addons as $addon) {
+                                echo htmlspecialchars($addon->as_name) 
+                                    . " X " . htmlspecialchars($addon->quantity) . " " 
+                                    . formatCurrency($addon->price, $currency_sign, $currency_position) 
+                                    . "<br>";
                             }
+                        } else {
+                            echo "No addons.";
+                        }
+
 
                             echo "</td><td>";
 
@@ -471,9 +539,9 @@ if (isset($_GET['Massage'])) {
                                     $val_addon_total += $total_addon;
                                 }
                             }
-                            echo '€' . htmlspecialchars($val_addon_total) . "</td><td>";
+                            echo formatCurrency($val_addon_total, $currency_sign, $currency_position) . "</td><td>";
 
-                            if (is_array($types)) {
+                            if (is_array($types) && !empty($types)) {
                                 foreach ($types as $type) {
                                     echo htmlspecialchars($type->ts_name);
                                 }
@@ -483,7 +551,7 @@ if (isset($_GET['Massage'])) {
 
                             echo "</td><td>";
 
-                            if (is_array($dressings)) {
+                            if (is_array($dressings) && !empty($dressings)) {
                                 foreach ($dressings as $dressing) {
                                     echo htmlspecialchars($dressing->dressing_name);
                                 }
@@ -507,7 +575,8 @@ if (isset($_GET['Massage'])) {
                             <table class='table'>
                                 <tr>
                                     <th class='text-center' colspan='9' style='font-weight:bold; font-size:16px'>Subtotal</th>
-                                    <td style='font-weight:bold; font-size:16px'>€" . number_format($final_total, 2, '.', '') . "</td>
+                            <td style='font-weight:bold; font-size:16px'>" . formatCurrency($final_total, $currency_sign, $currency_position) . "</td>
+
                                 </tr>
                             </table>
                         </div>
