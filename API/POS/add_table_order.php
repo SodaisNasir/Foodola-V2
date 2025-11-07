@@ -55,7 +55,7 @@ if ($token === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEW
                     );
         
                     // prepare notification
-                    $channel = 'indianrasoi_orders'; // Channel name dynamically based on user ID
+                    $channel = 'kohinoorindian_orders'; // Channel name dynamically based on user ID
                     $event   = 'table_cart_state';
                     $data    = [
                       'cart_items' => $_POST['order_details'],
@@ -105,7 +105,7 @@ if ($token === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEW
                     );
         
                     // prepare notification
-                    $channel = 'indianrasoi_orders'; // Channel name dynamically based on user ID
+                    $channel = 'kohinoorindian_orders'; // Channel name dynamically based on user ID
                     $event   = 'table_cart_state';
                     $data    = [
                       'cart_items' => $_POST['order_details'],

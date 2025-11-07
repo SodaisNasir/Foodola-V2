@@ -5,107 +5,107 @@ $pageName = basename($_SERVER['PHP_SELF'], ".php");
 
 switch ($pageName) {
     case 'index':
-        $pageTitle = "Analytics | Indian Rasoi";
+        $pageTitle = "Analytics | Kohinoor Indian";
         break;
     case 'addareas':
-        $pageTitle = "Addareas | Indian Rasoi";
+        $pageTitle = "Addareas | Kohinoor Indian";
         break;
     case 'addriders':
-        $pageTitle = "Addriders | Indian Rasoi";
+        $pageTitle = "Addriders | Kohinoor Indian";
         break;
     case 'addmaincat':
-        $pageTitle = "Maincategories | Indian Rasoi";
+        $pageTitle = "Maincategories | Kohinoor Indian";
         break;
     case 'addSubCat':
-        $pageTitle = "Subcategories | Indian Rasoi";
+        $pageTitle = "Subcategories | Kohinoor Indian";
         break;
     case 'insertNewProduct':
-        $pageTitle = "Newproduct | Indian Rasoi";
+        $pageTitle = "Newproduct | Kohinoor Indian";
         break;
     case 'addVariation':
-        $pageTitle = "Variation | Indian Rasoi";
+        $pageTitle = "Variation | Kohinoor Indian";
         break;
     case 'addAddons':
-        $pageTitle = "Addons | Indian Rasoi";
+        $pageTitle = "Addons | Kohinoor Indian";
         break;    
     case 'addDressing':
-        $pageTitle = "Dressing | Indian Rasoi";
+        $pageTitle = "Dressing | Kohinoor Indian";
         break;
     case 'addTypes':
-        $pageTitle = "Types | Indian Rasoi";
+        $pageTitle = "Types | Kohinoor Indian";
         break;
     case 'insertDeals':
-        $pageTitle = "Deals | Indian Rasoi";
+        $pageTitle = "Deals | Kohinoor Indian";
         break;    
     case 'addslider':
-        $pageTitle = "Sliders | Indian Rasoi";
+        $pageTitle = "Sliders | Kohinoor Indian";
         break;  
      case 'addprivacypolicy':
-        $pageTitle = "Add-Privacy-Policy | Indian Rasoi";
+        $pageTitle = "Add-Privacy-Policy | Kohinoor Indian";
         break;    
     case 'addterms_condition':
-        $pageTitle = "Terms-Conditions | Indian Rasoi";
+        $pageTitle = "Terms-Conditions | Kohinoor Indian";
         break;
     case 'manage_pos':
-        $pageTitle = "Manage-Pos | Indian Rasoi";
+        $pageTitle = "Manage-Pos | Kohinoor Indian";
         break;
     case 'manageriders':
-        $pageTitle = "Manage-Riders | Indian Rasoi";
+        $pageTitle = "Manage-Riders | Kohinoor Indian";
         break;    
     case 'manageusers':
-        $pageTitle = "Manage-Users | Indian Rasoi";
+        $pageTitle = "Manage-Users | Kohinoor Indian";
         break;  
         
     case 'managetimings':
-        $pageTitle = "Manage-Timings | Indian Rasoi";
+        $pageTitle = "Manage-Timings | Kohinoor Indian";
         break;      
     case 'neworders':
-        $pageTitle = "New-Orders | Indian Rasoi";
+        $pageTitle = "New-Orders | Kohinoor Indian";
         break;      
     case 'orders':
-        $pageTitle = "Orders | Indian Rasoi";
+        $pageTitle = "Orders | Kohinoor Indian";
         break;      
     case 'manageinventory':
-        $pageTitle = "Manage-Inventory | Indian Rasoi";
+        $pageTitle = "Manage-Inventory | Kohinoor Indian";
         break;      
     case 'manageAreas':
-        $pageTitle = "Manage-Areas | Indian Rasoi";
+        $pageTitle = "Manage-Areas | Kohinoor Indian";
         break;      
     case 'manageproducts':
-        $pageTitle = "Manage-Products | Indian Rasoi";
+        $pageTitle = "Manage-Products | Kohinoor Indian";
         break;      
     case 'managevariations':
-        $pageTitle = "Manage-Variations | Indian Rasoi";
+        $pageTitle = "Manage-Variations | Kohinoor Indian";
         break;      
     case 'view_dressing':
-        $pageTitle = "Manage-Dressing | Indian Rasoi";
+        $pageTitle = "Manage-Dressing | Kohinoor Indian";
         break;
     case 'view_types':
-        $pageTitle = "Manage-Types | Indian Rasoi";
+        $pageTitle = "Manage-Types | Kohinoor Indian";
         break;
     case 'view_deals':
-        $pageTitle = "Manage-Deals | Indian Rasoi";
+        $pageTitle = "Manage-Deals | Kohinoor Indian";
         break;
     case 'viewcategories':
-        $pageTitle = "Manage-Catagories | Indian Rasoi";
+        $pageTitle = "Manage-Catagories | Kohinoor Indian";
         break;       
     case 'SubCat':
-        $pageTitle = "Manage-Sub-Catagories | Indian Rasoi";
+        $pageTitle = "Manage-Sub-Catagories | Kohinoor Indian";
         break;                                      
     case 'manageSliders':
-        $pageTitle = "Manage-Sliders | Indian Rasoi";
+        $pageTitle = "Manage-Sliders | Kohinoor Indian";
         break;
     case 'managePoints':
-        $pageTitle = "Manage-Points | Indian Rasoi";
+        $pageTitle = "Manage-Points | Kohinoor Indian";
         break;
     case 'SendNotifications':
-        $pageTitle = "Notifications | Indian Rasoi";
+        $pageTitle = "Notifications | Kohinoor Indian";
         break;   
     case 'view_addons':
-        $pageTitle = "Manage-Addons | Indian Rasoi";
+        $pageTitle = "Manage-Addons | Kohinoor Indian";
         break;     
     default:
-        $pageTitle = "Indian Rasoi";
+        $pageTitle = "Kohinoor Indian";
 }
 
 

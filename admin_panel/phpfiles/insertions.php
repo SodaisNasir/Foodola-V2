@@ -584,7 +584,7 @@ $filewithnewname = mysqli_real_escape_string($con, $filewithnewname);
 
       if ($result) {
         $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                            VALUES ('haveliresturant', '1' ,NOW(),NOW())";
+                            VALUES ('kohinoorindian', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {
@@ -1089,7 +1089,7 @@ $product_id = mysqli_real_escape_string($con, $product_id);
 
       if ($result) {
         $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                     VALUES ('haveliresturant', '1' ,NOW(),NOW())";
+                     VALUES ('kohinoorindian', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {
@@ -1455,7 +1455,7 @@ include('../assets/config.php');
         $result = mysqli_query($con,$sql);
             if($result){
                  $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                                VALUES ('haveliresturant', '1' ,NOW(),NOW())";
+                                VALUES ('kohinoorindian', '1' ,NOW(),NOW())";
                 $monitor_update = mysqli_query($con, $monitor_sql);
         
                 if ($monitor_update) {
@@ -2263,7 +2263,7 @@ if (isset($_POST['btnSubmit_Action'])) {
                         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                         $mail->Port = 587;
                     
-                        $mail->setFrom('support@indianrasoi.de', 'Indian Rasoi');
+                        $mail->setFrom('support@kohinoorindian.de', 'Kohinoor Indian');
                         $mail->addAddress($email); 
                     
                         $mail->isHTML(true);
@@ -2274,7 +2274,7 @@ if (isset($_POST['btnSubmit_Action'])) {
                         $mail->Body = '
                         <html>
                         <head>
-                            <title>Ihre Bestellung wurde angenommen – Indian Rasoi</title>
+                            <title>Ihre Bestellung wurde angenommen – Kohinoor Indian</title>
                             <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
                             <style>
                                 body {
@@ -2312,20 +2312,20 @@ if (isset($_POST['btnSubmit_Action'])) {
                             </style>
                         </head>
                         <body>
-                            <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://indianrasoi.sassolution.org/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://kohinoorindian-ka.de/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
                                 <tr>
                                     <td align="center">
                                         <table width="100%" class="content" style="max-width: 600px;">
                                             <tr>
                                                 <td align="center">
-                                                    <img src="https://indianrasoi.sassolution.org/admin_panel/images/logo.png" alt="Indian Rasoi" style="width: 100px; margin-bottom: 20px;">
+                                                    <img src="https://kohinoorindian-ka.de/admin_panel/images/logo.png" alt="Kohinoor Indian" style="width: 100px; margin-bottom: 20px;">
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>
                                                     <h1>Ihre Bestellung wurde angenommen!</h1>
                                                     <p>Hallo <strong>' . htmlspecialchars($name) . '</strong>,</p>
-                                                    <p>Vielen Dank für Ihre Bestellung bei <strong></strong>.</p>
+                                                    <p>Vielen Dank für Ihre Bestellung bei <strong>Kohinoor Indian</strong>.</p>
                                                     <p><strong>Bestellnummer:</strong> ' . htmlspecialchars($order_id) . '</p>
                                                     <p>Ihre Bestellung wurde erfolgreich angenommen und wird in Kürze bearbeitet.</p>
                                                     <h3>Was kommt als Nächstes?</h3>
@@ -2334,7 +2334,7 @@ if (isset($_POST['btnSubmit_Action'])) {
                                                         <li>Sie erhalten eine Benachrichtigung, sobald Ihre Bestellung unterwegs ist.</li>
                                                     </ul>
                                                     <p>Bei Fragen stehen wir Ihnen jederzeit zur Verfügung.</p>
-                                                    <p>Mit freundlichen Grüßen,<br>Ihr Indian Rasoi Team</p>
+                                                    <p>Mit freundlichen Grüßen,<br>Ihr Kohinoor Indian Team</p>
                                                 </td>
                                             </tr>
                                         </table>
@@ -2489,7 +2489,7 @@ if (isset($_POST['btnSubmit_Action'])) {
                             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                             $mail->Port = 587;
                         
-                            $mail->setFrom('support@indianrasoi.de', 'Indian Rasoi');
+                            $mail->setFrom('support@kohinoorindian.de', 'Kohinoor Indian');
                             $mail->addAddress($email); 
                         
                             $mail->isHTML(true);
@@ -2498,7 +2498,7 @@ if (isset($_POST['btnSubmit_Action'])) {
                         $mail->Body = '
                         <html>
                         <head>
-                            <title>Ihre Bestellung wurde geliefert – Indian Rasoi</title>
+                            <title>Ihre Bestellung wurde geliefert – Kohinoor Indian</title>
                             <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
                             <style>
                                 body {
@@ -2536,13 +2536,13 @@ if (isset($_POST['btnSubmit_Action'])) {
                             </style>
                         </head>
                         <body>
-                            <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://indianrasoi.sassolution.org/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://kohinoorindian-ka.de/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
                                 <tr>
                                     <td align="center">
                                         <table width="100%" class="content" style="max-width: 600px;">
                                             <tr>
                                                 <td align="center">
-                                                    <img src="https://indianrasoi.sassolution.org/admin_panel/images/logo.png" alt="Indian Rasoi" style="width: 100px; margin-bottom: 20px;">
+                                                    <img src="https://kohinoorindian-ka.de/admin_panel/images/logo.png" alt="Kohinoor Indian" style="width: 100px; margin-bottom: 20px;">
                                                 </td>
                                             </tr>
                                             <tr>
@@ -2552,9 +2552,9 @@ if (isset($_POST['btnSubmit_Action'])) {
                                                     <p>Wir freuen uns, Ihnen mitteilen zu können, dass Ihre Bestellung erfolgreich geliefert wurde.</p>
                                                     <p><strong>Bestellnummer:</strong> #' . htmlspecialchars($order_id) . '</p>
                                                     <h3>Guten Appetit!</h3>
-                                                    <p>Wir hoffen, dass Sie Ihr Essen genießen. Vielen Dank, dass Sie bei <strong>Indian Rasoi</strong> bestellt haben.</p>
+                                                    <p>Wir hoffen, dass Sie Ihr Essen genießen. Vielen Dank, dass Sie bei <strong>Kohinoor Indian</strong> bestellt haben.</p>
                                                     <p>Wenn Sie Fragen haben oder Feedback geben möchten, stehen wir Ihnen jederzeit zur Verfügung.</p>
-                                                    <p>Mit freundlichen Grüßen,<br>Ihr Indian Rasoi Team</p>
+                                                    <p>Mit freundlichen Grüßen,<br>Ihr Kohinoor Indian Team</p>
                                                 </td>
                                             </tr>
                                         </table>
@@ -2763,7 +2763,7 @@ if(isset($_POST['updateProduct'])){
     
     if($update){
          $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                        VALUES ('haveliresturant', '1' ,NOW(),NOW())";
+                        VALUES ('kohinoorindian', '1' ,NOW(),NOW())";
         $monitor_update = mysqli_query($con, $monitor_sql);
 
         if ($monitor_update) {

@@ -420,19 +420,22 @@ body {
 .header h2 { margin: 5px 0; font-size: 20px; }
   </style>
 </head>
+
 <body>
   <div class="receipt-container print">
-
-
+      <!--<img src="images/logo.png" alt="Firmenlogo">-->
+      <!--  <h2>Pizzablitzöstringen.de</h2>-->
+        
         
      <div class="header">
         <img src="images/logo.png" alt="Firmenlogo">
-        <h2>Namaste India Bruchsal</h2>
+        <h2>Kohinoor Indian Curry</h2>
+        
     </div>    
 
     <div class="company-details">
-      <h3>Kaiserstraße 22b76646 Bruchsal</h3>
-      <h3>Bruchsal, Tell: +4972516188707</h3>
+      <h3>Neckarstraße 3276199 Karlsruhe</h3>
+      <h3>Karlsruhe, Tell:0800 20207702</h3>
       <h3>Bestellnummer: <?php echo $order_id ?></h3>
     </div>
 

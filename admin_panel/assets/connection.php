@@ -2,11 +2,10 @@
 
 
 
-
 $Host = 'localhost';
-$DB_DATABASE='sassolut_indianrasoi';
-$DB_USERNAME='sassolut_indianrasoi';
-$DB_PASSWORD=';op6ACzp0EFU';
+$DB_DATABASE='u772850971_kohinoorindia';
+$DB_USERNAME='u772850971_kohinoorindia';
+$DB_PASSWORD='K6t=rSTy3u3~';
 
 
 

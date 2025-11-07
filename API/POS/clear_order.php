@@ -37,7 +37,8 @@ if ($execute) {
         if ($execute) {
             echo json_encode(['status' => true, 'message' => 'Table data cleared successfully']);
             
-         
+            
+        
           
         } else {
             echo json_encode(['status' => false, 'message' => 'Failed to clear last inserted table order detail']);
