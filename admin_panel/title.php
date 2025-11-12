@@ -5,107 +5,107 @@ $pageName = basename($_SERVER['PHP_SELF'], ".php");
 
 switch ($pageName) {
     case 'index':
-        $pageTitle = "Analytics | Kohinoor Indian";
+        $pageTitle = "Analytics | Super Pizza";
         break;
     case 'addareas':
-        $pageTitle = "Addareas | Kohinoor Indian";
+        $pageTitle = "Addareas | Super Pizza";
         break;
     case 'addriders':
-        $pageTitle = "Addriders | Kohinoor Indian";
+        $pageTitle = "Addriders | Super Pizza";
         break;
     case 'addmaincat':
-        $pageTitle = "Maincategories | Kohinoor Indian";
+        $pageTitle = "Maincategories | Super Pizza";
         break;
     case 'addSubCat':
-        $pageTitle = "Subcategories | Kohinoor Indian";
+        $pageTitle = "Subcategories | Super Pizza";
         break;
     case 'insertNewProduct':
-        $pageTitle = "Newproduct | Kohinoor Indian";
+        $pageTitle = "Newproduct | Super Pizza";
         break;
     case 'addVariation':
-        $pageTitle = "Variation | Kohinoor Indian";
+        $pageTitle = "Variation | Super Pizza";
         break;
     case 'addAddons':
-        $pageTitle = "Addons | Kohinoor Indian";
+        $pageTitle = "Addons | Super Pizza";
         break;    
     case 'addDressing':
-        $pageTitle = "Dressing | Kohinoor Indian";
+        $pageTitle = "Dressing | Super Pizza";
         break;
     case 'addTypes':
-        $pageTitle = "Types | Kohinoor Indian";
+        $pageTitle = "Types | Super Pizza";
         break;
     case 'insertDeals':
-        $pageTitle = "Deals | Kohinoor Indian";
+        $pageTitle = "Deals | Super Pizza";
         break;    
     case 'addslider':
-        $pageTitle = "Sliders | Kohinoor Indian";
+        $pageTitle = "Sliders | Super Pizza";
         break;  
      case 'addprivacypolicy':
-        $pageTitle = "Add-Privacy-Policy | Kohinoor Indian";
+        $pageTitle = "Add-Privacy-Policy | Super Pizza";
         break;    
     case 'addterms_condition':
-        $pageTitle = "Terms-Conditions | Kohinoor Indian";
+        $pageTitle = "Terms-Conditions | Super Pizza";
         break;
     case 'manage_pos':
-        $pageTitle = "Manage-Pos | Kohinoor Indian";
+        $pageTitle = "Manage-Pos | Super Pizza";
         break;
     case 'manageriders':
-        $pageTitle = "Manage-Riders | Kohinoor Indian";
+        $pageTitle = "Manage-Riders | Super Pizza";
         break;    
     case 'manageusers':
-        $pageTitle = "Manage-Users | Kohinoor Indian";
+        $pageTitle = "Manage-Users | Super Pizza";
         break;  
         
     case 'managetimings':
-        $pageTitle = "Manage-Timings | Kohinoor Indian";
+        $pageTitle = "Manage-Timings | Super Pizza";
         break;      
     case 'neworders':
-        $pageTitle = "New-Orders | Kohinoor Indian";
+        $pageTitle = "New-Orders | Super Pizza";
         break;      
     case 'orders':
-        $pageTitle = "Orders | Kohinoor Indian";
+        $pageTitle = "Orders | Super Pizza";
         break;      
     case 'manageinventory':
-        $pageTitle = "Manage-Inventory | Kohinoor Indian";
+        $pageTitle = "Manage-Inventory | Super Pizza";
         break;      
     case 'manageAreas':
-        $pageTitle = "Manage-Areas | Kohinoor Indian";
+        $pageTitle = "Manage-Areas | Super Pizza";
         break;      
     case 'manageproducts':
-        $pageTitle = "Manage-Products | Kohinoor Indian";
+        $pageTitle = "Manage-Products | Super Pizza";
         break;      
     case 'managevariations':
-        $pageTitle = "Manage-Variations | Kohinoor Indian";
+        $pageTitle = "Manage-Variations | Super Pizza";
         break;      
     case 'view_dressing':
-        $pageTitle = "Manage-Dressing | Kohinoor Indian";
+        $pageTitle = "Manage-Dressing | Super Pizza";
         break;
     case 'view_types':
-        $pageTitle = "Manage-Types | Kohinoor Indian";
+        $pageTitle = "Manage-Types | Super Pizza";
         break;
     case 'view_deals':
-        $pageTitle = "Manage-Deals | Kohinoor Indian";
+        $pageTitle = "Manage-Deals | Super Pizza";
         break;
     case 'viewcategories':
-        $pageTitle = "Manage-Catagories | Kohinoor Indian";
+        $pageTitle = "Manage-Catagories | Super Pizza";
         break;       
     case 'SubCat':
-        $pageTitle = "Manage-Sub-Catagories | Kohinoor Indian";
+        $pageTitle = "Manage-Sub-Catagories | Super Pizza";
         break;                                      
     case 'manageSliders':
-        $pageTitle = "Manage-Sliders | Kohinoor Indian";
+        $pageTitle = "Manage-Sliders | Super Pizza";
         break;
     case 'managePoints':
-        $pageTitle = "Manage-Points | Kohinoor Indian";
+        $pageTitle = "Manage-Points | Super Pizza";
         break;
     case 'SendNotifications':
-        $pageTitle = "Notifications | Kohinoor Indian";
+        $pageTitle = "Notifications | Super Pizza";
         break;   
     case 'view_addons':
-        $pageTitle = "Manage-Addons | Kohinoor Indian";
+        $pageTitle = "Manage-Addons | Super Pizza";
         break;     
     default:
-        $pageTitle = "Kohinoor Indian";
+        $pageTitle = "Super Pizza";
 }
 
 

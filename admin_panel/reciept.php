@@ -429,13 +429,13 @@ body {
         
      <div class="header">
         <img src="images/logo.png" alt="Firmenlogo">
-        <h2>Kohinoor Indian Curry</h2>
+        <h2>Super Pizza Karlsruhe</h2>
         
     </div>    
 
     <div class="company-details">
-      <h3>Neckarstraße 3276199 Karlsruhe</h3>
-      <h3>Karlsruhe, Tell:0800 20207702</h3>
+      <h3>Kaiserallee 37, 76133 Karlsruhe</h3>
+      <h3>Karlsruhe, Tell:080020207702</h3>
       <h3>Bestellnummer: <?php echo $order_id ?></h3>
     </div>
 

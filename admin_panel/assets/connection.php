@@ -1,14 +1,10 @@
 <?php
 
 
-
 $Host = 'localhost';
-$DB_DATABASE='u772850971_kohinoorindia';
-$DB_USERNAME='u772850971_kohinoorindia';
-$DB_PASSWORD='K6t=rSTy3u3~';
-
-
-
+$DB_DATABASE='u772850971_superpizza';
+$DB_USERNAME='u772850971_superpizza';
+$DB_PASSWORD='>dYp1x6Ch';
 
 
 

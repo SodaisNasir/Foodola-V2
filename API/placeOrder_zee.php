@@ -339,7 +339,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                             $options
                         );
 
-                        $channel = 'kohinoorindian_orders'; // Channel name dynamically based on user ID
+                        $channel = 'superpizza_orders'; // Channel name dynamically based on user ID
                         $event   = 'new_order';
                         $data    = [
                             'order_id' => $last_id,
@@ -378,12 +378,12 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;  
                                         $mail->Port = 587;  
                                 
-                                        $mail->setFrom('support@kohinoorindian.de', 'Kohinoor Indian');
+                                        $mail->setFrom('support@superpizza.de', 'Super Pizza');
                                         $mail->addAddress('asharifkhan245@gmail.com');
                                 
                                         $mail->isHTML(true);
                                         
-                                        $mail->Subject = "Neue Bestellung #$last_id – Kohinoor Indian";
+                                        $mail->Subject = "Neue Bestellung #$last_id – Super Pizza";
         
                                         $mail->Body = '
                                         <html>
@@ -433,7 +433,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                         <body>
                                             <div class="email-container">
                                                 <div class="header">
-                                                    <img src="https://kohinoorindian-ka.de/admin_panel/images/logo.png" alt="Kohinoor Indian" style="width: 100px;">
+                                                    <img src="https://pizzapazza.foodola.shop/admin_panel/images/logo.png" alt="Foodola" style="width: 100px;">
                                                     <h2>Neue Bestellung erhalten</h2>
                                                 </div>
                                                 <div class="order-details">
@@ -446,10 +446,10 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                                     <p><strong>Zusätzliche Hinweise:</strong> ' . htmlspecialchars($additionalNotes) . '</p>
                                                     <p><strong>Bestelldatum:</strong> ' . htmlspecialchars($datetime) . '</p>
                                         
-                                                    <a class="view-button" href="https://kohinoorindian-ka.de/admin_panel/order_details.php?order_id=' . $last_id . '" target="_blank">Bestellung anzeigen</a>
+                                                    <a class="view-button" href="https://superpizza.foodola.shop/admin_panel/order_details.php?order_id=' . $last_id . '" target="_blank">Bestellung anzeigen</a>
                                                 </div>
                                                 <div class="footer">
-                                                    <p>Diese E-Mail wurde automatisch von Kohinoor Indian generiert.</p>
+                                                    <p>Diese E-Mail wurde automatisch von Super Pizza generiert.</p>
                                                 </div>
                                             </div>
                                         </body>
@@ -774,7 +774,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         $options
                     );
 
-                    $channel = 'orders'; // Channel name dynamically based on user ID
+                    $channel = 'superpizza_orders'; // Channel name dynamically based on user ID
                     $event   = 'new_order';
                     $data    = [
                         'order_id' => $last_id,
@@ -812,12 +812,12 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;  
                                         $mail->Port = 587;  
                                 
-                                        $mail->setFrom('support@kohinoorindian.de', 'Kohinoor Indian');
+                                        $mail->setFrom('support@superpizza.de', 'Super Pizza');
                                         $mail->addAddress('asharifkhan245@gmail.com');
                                 
                                         $mail->isHTML(true);
                                         
-                                        $mail->Subject = "Neue Bestellung #$last_id – Kohinoor Indian";
+                                        $mail->Subject = "Neue Bestellung #$last_id – Super Pizza";
         
                                         $mail->Body = '
                                         <html>
@@ -867,7 +867,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                         <body>
                                             <div class="email-container">
                                                 <div class="header">
-                                                    <img src="https://kohinoorindian-ka.de/admin_panel/images/logo.png" alt="Kohinoor Indian" style="width: 100px;">
+                                                    <img src="https://pizzapazza.foodola.shop/admin_panel/images/logo.png" alt="Super Pizza" style="width: 100px;">
                                                     <h2>Neue Bestellung erhalten</h2>
                                                 </div>
                                                 <div class="order-details">
@@ -880,10 +880,10 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                                     <p><strong>Zusätzliche Hinweise:</strong> ' . htmlspecialchars($additionalNotes) . '</p>
                                                     <p><strong>Bestelldatum:</strong> ' . htmlspecialchars($datetime) . '</p>
                                         
-                                                    <a class="view-button" href="https://kohinoorindian-ka.de/admin_panel/order_details.php?order_id=' . $last_id . '" target="_blank">Bestellung anzeigen</a>
+                                                    <a class="view-button" href="https://superpizza.foodola.shop/admin_panel/order_details.php?order_id=' . $last_id . '" target="_blank">Bestellung anzeigen</a>
                                                 </div>
                                                 <div class="footer">
-                                                    <p>Diese E-Mail wurde automatisch von Kohinoor Indian generiert.</p>
+                                                    <p>Diese E-Mail wurde automatisch von Super Pizza generiert.</p>
                                                 </div>
                                             </div>
                                         </body>

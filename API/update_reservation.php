@@ -66,7 +66,7 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                 $mail->Port = 587;
             
-                $mail->setFrom('support@kohinoorindian.de', 'Kohinoor Indian');
+                $mail->setFrom('support@foodola.de', 'Foodola');
                 $mail->addAddress($email); 
             
                 $mail->isHTML(true);
@@ -75,7 +75,7 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                 $mail->Body = '
                 <html>
                 <head>
-                    <title>Reservierung bestätigt – Kohinoor Indian</title>
+                    <title>Reservierung bestätigt – Foodola</title>
                     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
                     <style>
                         body { font-family: "Poppins", Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px; background-color: #f7f7f7; }
@@ -87,13 +87,13 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                     </style>
                 </head>
                 <body>
-                    <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://kohinoorindian-ka.de/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://foodola.foodola.shop/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
                         <tr>
                             <td align="center">
                                 <table width="100%" class="content" style="max-width: 600px;">
                                     <tr>
                                         <td align="center">
-                                            <img src="https://kohinoorindian-ka.de/admin_panel/images/logo.png" alt="foodola" style="width: 100px; margin-bottom: 20px;">
+                                            <img src="https://foodola.foodola.shop/admin_panel/images/logo.png" alt="foodola" style="width: 100px; margin-bottom: 20px;">
                                         </td>
                                     </tr>
                                     <tr>
@@ -111,7 +111,7 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                                                 <a href="' . $payment_link . '" class="button">Jetzt bezahlen</a>
                                             </p>
                                             <p>Vielen Dank und wir freuen uns, Sie bald bei uns begrüßen zu dürfen.</p>
-                                            <p>Mit freundlichen Grüßen,<br>Ihr Kohinoor Indian Team</p>
+                                            <p>Mit freundlichen Grüßen,<br>Ihr Foodola Team</p>
                                         </td>
                                     </tr>
                                 </table>
