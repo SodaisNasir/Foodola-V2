@@ -9,17 +9,24 @@ if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbq
  
  include('connection.php');
  
- 
- 
-   $check_email_phone = "SELECT `id`, `role_id`, `ref_amount`,`name`, `phone`, `email`, `referal_code`, `profilepic`, `email_verified_at`, `password`, `notification_token`, `remember_token`, `rewards_token`, `card_number`, `cvc_code`, `amount`, `created_at`, `updated_at`, `country_code` FROM `users` WHERE `id` = $user_id";
- 
 
-     $execute_check_email_phone = mysqli_query($conn,$check_email_phone);
+   $check_email_phone = "SELECT `id`, `role_id`, `ref_amount`,`name`, `phone`, `email`, `referal_code`, `profilepic`, `email_verified_at`, `password`, `notification_token`, `remember_token`, `rewards_token`, `card_number`, `cvc_code`, `amount`, `created_at`, `updated_at`, `country_code` FROM `users` WHERE `id` = $user_id";
+    $execute_check_email_phone = mysqli_query($conn,$check_email_phone);
+     
+     
+     
+     
      
      if(mysqli_num_rows($execute_check_email_phone) > 0){
-         
-        $Data = mysqli_fetch_array($execute_check_email_phone);
+         $Data = mysqli_fetch_array($execute_check_email_phone);
+        
         $response = mail($email,$subject,$txt,$headers);
+        
+        
+        $sql = "SELECT `id`, `cashback_percenatge`, `status`, `cap_amount` FROM `cash_back`";
+        $exec_sql = mysqli_query($conn, $sql);
+        $data = mysqli_fetch_array($exec_sql);
+        
         $userdata = [
                         "user_id"=>$Data['id'],
                         "role_id"=>$Data['role_id'],
@@ -36,6 +43,7 @@ if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbq
                         "password"=>$Data['password'],
                         "created_at"=>$Data['created_at'],
                         "country_code"=>$Data['country_code'],
+                        "cap_amount" =>$data['cap_amount']
                         
                     ];
 

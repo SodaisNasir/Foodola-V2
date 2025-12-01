@@ -1,12 +1,12 @@
 <?php
 
 
-include_once('../assets/connection.php');
+include('../connection.php');
 $dealid = $_GET['dealid'];
 $index = 0;
 $free_items = 0;
 $sql = "SELECT `di_id`, `deal_id`, `di_title`, `di_num_free_items`, `deal_subdata` FROM `deal_items` WHERE `deal_id` = $dealid";
-$execute = mysqli_query($con,$sql);
+$execute = mysqli_query($conn,$sql);
 if(mysqli_num_rows($execute) > 0){
     while($row = mysqli_fetch_array($execute)){
         $free_items = $row['di_num_free_items'];
@@ -17,7 +17,7 @@ if(mysqli_num_rows($execute) > 0){
         foreach($Product_ids->product_id as $Product_id ){
             $id =  $Product_id;
             $get_product = "SELECT `addon_id` , `type_id` , `dressing_id` , `name`, `id` FROM `products` WHERE `id`=$id";
-            $ex_product = mysqli_query($con,$get_product);
+            $ex_product = mysqli_query($conn,$get_product);
             $Data = mysqli_fetch_array($ex_product);
         
             echo "<Option value='[{$Data['id']},{$Data['addon_id']},{$Data['dressing_id']},{$Data['type_id']},{$index},{$dealid},{$free_items}]'>{$Data['name']}</Option>";

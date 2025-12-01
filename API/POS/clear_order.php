@@ -9,7 +9,7 @@ header("Content-Type: application/json");
 // require __DIR__ . '/../vendor/autoload.php';
 // use Pusher\Pusher;
 
-include("connection.php");
+include("../connection.php");
 
 $valid_token = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC';
 

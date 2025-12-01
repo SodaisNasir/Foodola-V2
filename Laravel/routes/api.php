@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\AdminController;
 use Illuminate\Http\Request;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Route;
@@ -72,4 +73,8 @@ Route::post('/add-sub-categories', [OrderController::class,'store_sub_categories
 Route::post('/store-addon', [OrderController::class,'store_addon']);
 Route::post('/store-dressing', [OrderController::class,'store_dressing']);
 Route::post('/store-types', [OrderController::class,'store_types']);
+
+
+
+Route::post('accounts', [AdminController::class, 'accounts']);
 

@@ -3,7 +3,7 @@ header("Access-Control-Allow-Origin: *"); ; // Allow the specific origin
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS"); // Allow specific HTTP methods
 header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Allow specific headers
 header("Content-Type: application/json"); 
-include("connection.php"); 
+include("../connection.php"); 
 
 $query = "SELECT * FROM categories"; 
 $execute = mysqli_query($conn, $query);

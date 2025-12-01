@@ -10,7 +10,7 @@ header("Content-Type: application/json");
 
 if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC'){
      $sql = "SELECT `id`, `tbl_id`,`order_details`, `branch_id`, `status`, `created_at`, `updated_at` FROM `tables_order_details` where `status` = 'pending'";
-     include('connection.php');
+     include('../connection.php');
      $execute = mysqli_query($conn,$sql);
      if(mysqli_num_rows($execute) > 0){
          $product_array = array();

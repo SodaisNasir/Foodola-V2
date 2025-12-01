@@ -5,8 +5,7 @@ session_start();
 // Check if the branch_id is set in the session
 if (isset($_SESSION['branch_id'])) {
     $session_branch_id = $_SESSION['branch_id'];
-
-    include_once('../connection.php');
+include('../connection.php');
     
     // SQL query to get orders based on the session branch_id
     $sql = "SELECT orders.id, orders.user_id, orders.Shipping_address, orders.Shipping_address_2,

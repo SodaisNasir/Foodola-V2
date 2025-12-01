@@ -187,6 +187,7 @@ if(isset($_GET["Message"])){
                             <th>Area ID</th>
                             <th>Area Name</th>
                             <th>Min order price</th>
+                            <th>Discounted delivery amount</th>
                             <th>Status</th>
                             <th>Branch Name</th>
                             <th>Action</th>
@@ -195,7 +196,7 @@ if(isset($_GET["Message"])){
                  <tbody>
   <?php
   include_once('connection.php');
-  $sql = "SELECT `id`, `area_name`, `min_order_amount`, `branch_id`, `is_disable`, `created_at` FROM `tbl_areas`";
+  $sql = "SELECT `id`, `area_name`, `min_order_amount`, `branch_id`, `is_disable`, `created_at`, `discounted_delivery_amount` FROM `tbl_areas`";
   $result = mysqli_query($conn, $sql);
 
   $count = 1;
@@ -207,6 +208,7 @@ if(isset($_GET["Message"])){
       echo "<td>{$count}</td>";
       echo "<td class='editable border border-5' contenteditable='true' data-field='area_name' name='area_name'>{$row['area_name']}</td>";
       echo "<td class='editable border border-5' contenteditable='true' data-field='min_order_amount' name='min_order_amount'>{$row['min_order_amount']}</td>";
+      echo "<td class='editable border border-5' contenteditable='true' data-field='discounted_delivery_amount' name='discounted_delivery_amount'>{$row['discounted_delivery_amount']}</td>";
 
       // Status select dropdown
       echo "<td class='border border-5'>";
@@ -241,6 +243,7 @@ if(isset($_GET["Message"])){
                             <th>Area ID</th>
                             <th>Area Name</th>
                             <th>Min order price</th>
+                            <th>Discounted Delivery Amount</th>
                             <th>Status</th>
                             <th>Branch Name</th>
                             <th>Action</th>
@@ -362,10 +365,10 @@ if(isset($_GET["Message"])){
                       <div class="form-group col-md-6">
                         <label for="is_disable">Select Status</label>
                        <select name="is_disable" id="is_disable" class="form-control" data-field="is_disable">
-  <option value="">Select status</option>
-  <option value="0" <?= $current_status === '0' ? 'selected' : '' ?>>Active</option>
-  <option value="1" <?= $current_status === '1' ? 'selected' : '' ?>>Inactive</option>
-</select>
+                          <option value="">Select status</option>
+                          <option value="0" <?= $current_status === '0' ? 'selected' : '' ?>>Active</option>
+                          <option value="1" <?= $current_status === '1' ? 'selected' : '' ?>>Inactive</option>
+                        </select>
 
                       </div>
                     </div>
@@ -537,6 +540,7 @@ $(document).ready(function () {
         const id = row.data('id');
         const area_name = row.find('[data-field="area_name"]').text().trim();
         const min_order_amount = row.find('[data-field="min_order_amount"]').text().trim();
+        const discounted_delivery_amount = row.find('[data-field="discounted_delivery_amount"]').text().trim();
         const branch_id = row.find('[data-field="branch_id"]').text().trim();
         const is_disable = row.find('[data-field="is_disable"]').val();
 
@@ -546,6 +550,7 @@ $(document).ready(function () {
             min_order_amount: min_order_amount,
             is_disable: is_disable,
             branch_id: branch_id,
+            discounted_delivery_amount:discounted_delivery_amount
         };
 
         console.log('Sending inline update data:', dataToSend); // Debug log

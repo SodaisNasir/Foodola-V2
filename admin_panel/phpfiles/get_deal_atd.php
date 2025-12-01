@@ -9,7 +9,7 @@ $dealid = $_GET['deal_id'];
 $index_range = $_GET['index_range'];
 $num_free_items = 0;
 
-include_once('../assets/connection.php');
+include('../connection.php');
 
 if($addonid != null && $addonid != -1){
 ?>
@@ -17,17 +17,17 @@ if($addonid != null && $addonid != -1){
 <?php 
 
 $sql = "SELECT `ao_id`, `ao_title` FROM `addon_list` WHERE `ao_id` = '$addonid'";
-$exec = mysqli_query($con,$sql);
+$exec = mysqli_query($conn,$sql);
 $addt = mysqli_fetch_array($exec);
 
 $sql_free = "SELECT `di_id`, `deal_id`, `di_title`, `di_num_free_items`, `deal_subdata` FROM `deal_items` WHERE `deal_id` = '$dealid'";
-$exec_sql_free = mysqli_query($con,$sql_free);
+$exec_sql_free = mysqli_query($conn,$sql_free);
 $nfit = mysqli_fetch_array($exec_sql_free);
 $num_free_items = $nfit['di_num_free_items'] != null ? $nfit['di_num_free_items'] : 0;
 
 
 $addonz = "SELECT `as_id`, `ao_id`,`ao_title`, `as_name`, `as_price` FROM `addon_sublist` WHERE `ao_id` = $addonid ";
-$resultz = mysqli_query($con,$addonz);
+$resultz = mysqli_query($conn,$addonz);
 ?>    
 <h6 style="margin-left:5px" class="cardtitle">Add-On : <?php echo $addt['ao_title'] ?></h6>
 <div style="height : 150px" class="scroll"> 
@@ -56,7 +56,7 @@ $resultz = mysqli_query($con,$addonz);
 </div>
 <?php } if($typeid != null && $typeid != -1){ 
      $sql = "SELECT `ts_id`, `type_title`, `type_title_user`, `ts_name` FROM `types_sublist` WHERE `type_id` = $typeid";
-            $execute = mysqli_query($con,$sql);
+            $execute = mysqli_query($conn,$sql);
 
 ?>
 
@@ -73,7 +73,7 @@ $resultz = mysqli_query($con,$addonz);
 <?php } if($dressingid != null && $dressingid != -1){
 
   $dressingd = "SELECT `ds_id`, `dressing_title`, `dressing_title_user`, `dressing_name` FROM `dressing_sublist` WHERE `dressing_id` = $dressingid";
-  $resultd = mysqli_query($con,$dressingd);
+  $resultd = mysqli_query($conn,$dressingd);
 
   $dressingtittle = mysqli_fetch_array($resultd);
 ?>

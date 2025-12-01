@@ -136,6 +136,8 @@ $select_user_restuarant = "SELECT * FROM `products` WHERE `sub_category_id` = '$
             
             $restuarant_data =[
                         "product_id"=>$row['id'],
+                        "sku_id" =>$row['sku_id'],
+                        "tax" => $row['tax'],
                         "sub_category_id"=>$row['sub_category_id'],
                         "name"=>$row['name'],
                         "description"=>$row['description'],

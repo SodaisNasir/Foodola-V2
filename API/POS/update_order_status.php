@@ -1,7 +1,13 @@
 <?php
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
+require '../PHPMailer-master/src/PHPMailer.php';
+require '../PHPMailer-master/src/SMTP.php';
+require '../PHPMailer-master/src/Exception.php';
 
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *"); 
@@ -9,12 +15,13 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Content-Type: application/json"); 
 
-include('connection.php');
+include('../connection.php');
 
 $response = ["status" => "error", "message" => "An unexpected error occurred"];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
+    
+    
 
     $status = $_POST['action'] ?? null;
     $order_id = $_POST['order_id'] ?? null;
@@ -36,13 +43,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $time = new DateTime();
         $time->add(new DateInterval("PT{$minutesToAdd}M")); 
         $delivered_at = $time->format('Y-m-d g:i A'); 
-        $sql = "UPDATE `orders_zee` SET `status` = '$status', `delivered_at` = '$delivered_at' WHERE `id` = $order_id";
+         $sql = "UPDATE `orders_zee` SET `status` = '$status', `delivered_at` = '$delivered_at' WHERE `id` = $order_id";
     
         $get_user_query = "SELECT user_id FROM orders_zee WHERE id = '$order_id'";
         $result_user = mysqli_query($conn, $get_user_query);
         $row_user = mysqli_fetch_assoc($result_user);
         
         if ($row_user) {
+            
+          
             $user_id = $row_user['user_id'];
         
             $get_email_query = "SELECT email, name FROM users WHERE id = '$user_id'";
@@ -50,12 +59,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $row_email = mysqli_fetch_assoc($result_email);
         
             if ($row_email) {
+                
+              
+                
                 $email = $row_email['email'];
                 $name = $row_email['name'];
                 
                 $mail = new PHPMailer(true);
         
-                   try {
+                  try {
                         $mail->isSMTP();
                         $mail->Host = 'smtp.gmail.com';
                         $mail->SMTPAuth = true;
@@ -64,11 +76,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                         $mail->Port = 587;
                     
-                        $mail->setFrom('support@foodola.de', 'Foodola');
+                        $mail->setFrom($FROM_EMAIL, $APP_NAME);
                         $mail->addAddress($email); 
                     
                         $mail->isHTML(true);
-                                  $mail->Subject = "Ihre Bestellung wurde angenommen";
+                        $mail->Subject = "Ihre Bestellung wurde angenommen";
 
                         $mail->Body = '
                         <html>
@@ -111,20 +123,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </style>
                         </head>
                         <body>
-                            <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://foodola.foodola.shop/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background-image:  url(\'' . $BASE_URL . 'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
                                 <tr>
                                     <td align="center">
                                         <table width="100%" class="content" style="max-width: 600px;">
                                             <tr>
                                                 <td align="center">
-                                                    <img src="https://foodola.foodola.shop/admin_panel/images/logo.png" alt="Foodola" style="width: 100px; margin-bottom: 20px;">
+                                                                    <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="'. htmlspecialchars($APP_NAME) .'" style="width: 100px; margin-bottom: 20px;">
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>
                                                     <h1>Ihre Bestellung wurde angenommen!</h1>
                                                     <p>Hallo <strong>' . htmlspecialchars($name) . '</strong>,</p>
-                                                    <p>Vielen Dank für Ihre Bestellung bei <strong>Foodola</strong>.</p>
+                                                    <p>Vielen Dank für Ihre Bestellung bei <strong>' . htmlspecialchars($APP_NAME) . '</strong>.</p>
                                                     <p><strong>Bestellnummer:</strong> ' . htmlspecialchars($order_id) . '</p>
                                                     <p>Ihre Bestellung wurde erfolgreich angenommen und wird in Kürze bearbeitet.</p>
                                                     <h3>Was kommt als Nächstes?</h3>
@@ -133,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                         <li>Sie erhalten eine Benachrichtigung, sobald Ihre Bestellung unterwegs ist.</li>
                                                     </ul>
                                                     <p>Bei Fragen stehen wir Ihnen jederzeit zur Verfügung.</p>
-                                                    <p>Mit freundlichen Grüßen,<br>Ihr Foodola Team</p>
+                                                    <p>Mit freundlichen Grüßen,<br>Ihr ' . htmlspecialchars($APP_NAME) . 'Team</p>
                                                 </td>
                                             </tr>
                                         </table>
@@ -277,7 +289,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                             $mail->Port = 587;
                         
-                            $mail->setFrom('support@foodola.de', 'Foodola');
+                            $mail->setFrom($FROM_EMAIL, $APP_NAME);
                             $mail->addAddress($email); 
                         
                             $mail->isHTML(true);
@@ -286,7 +298,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $mail->Body = '
                 <html>
                 <head>
-                    <title>Ihre Bestellung wurde geliefert – Foodola</title>
+                    <title>Ihre Bestellung wurde geliefert – ' . htmlspecialchars($APP_NAME) . '</title>
                     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
                     <style>
                         body {
@@ -324,13 +336,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </style>
                 </head>
                 <body>
-                    <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://foodola.foodola.shop/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background-image:  url(\'' . $BASE_URL . 'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
                         <tr>
                             <td align="center">
                                 <table width="100%" class="content" style="max-width: 600px;">
                                     <tr>
                                         <td align="center">
-                                            <img src="https://foodola.foodola.shop/admin_panel/images/logo.png" alt="Foodola" style="width: 100px; margin-bottom: 20px;">
+                                            <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="'. htmlspecialchars($APP_NAME) .'" style="width: 100px; margin-bottom: 20px;">
                                         </td>
                                     </tr>
                                     <tr>
@@ -340,9 +352,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <p>Wir freuen uns, Ihnen mitteilen zu können, dass Ihre Bestellung erfolgreich geliefert wurde.</p>
                                             <p><strong>Bestellnummer:</strong> #' . htmlspecialchars($order_id) . '</p>
                                             <h3>Guten Appetit!</h3>
-                                            <p>Wir hoffen, dass Sie Ihr Essen genießen. Vielen Dank, dass Sie bei <strong>Foodola</strong> bestellt haben.</p>
+                                            <p>Wir hoffen, dass Sie Ihr Essen genießen. Vielen Dank, dass Sie bei <strong>' . htmlspecialchars($APP_NAME) . '</strong> bestellt haben.</p>
                                             <p>Wenn Sie Fragen haben oder Feedback geben möchten, stehen wir Ihnen jederzeit zur Verfügung.</p>
-                                            <p>Mit freundlichen Grüßen,<br>Ihr Foodola Team</p>
+                                            <p>Mit freundlichen Grüßen,<br>Ihr ' . htmlspecialchars($APP_NAME) . ' Team</p>
                                         </td>
                                     </tr>
                                 </table>
@@ -368,6 +380,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
            
            
     }else{
+        
          $sql = "UPDATE `orders_zee` SET `status` = '$status' WHERE `id` = $order_id";
     }
 

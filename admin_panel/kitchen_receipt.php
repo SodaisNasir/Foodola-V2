@@ -173,7 +173,7 @@ if ($result_deal && mysqli_num_rows($result_deal) > 0) {
       
     <div class="header">
       <img src="images/logo.png" alt="Logo">
-      <h2>Pizzablitzöstringen.de</h2>
+      <h2><?php echo $APP_NAME?> </h2>
       <div class="big-order">BESTELL-NR: <?php echo $order_id; ?></div>
     </div>
 

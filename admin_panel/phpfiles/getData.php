@@ -5,9 +5,9 @@
 $addonid = $_GET['addon_id'];
 $typeid = $_GET['type_id'];
 $dressingid = $_GET['dressing_id'];
-include_once('../assets/connection.php');
+include('../connection.php');
   $addonz = "SELECT `as_id`, `ao_id`,`ao_title`, `as_name`, `as_price` FROM `addon_sublist` WHERE `ao_id` = $addonid ";
-  $resultz = mysqli_query($con,$addonz);
+  $resultz = mysqli_query($conn,$addonz);
   $no_of_itemsz = mysqli_num_rows($resultz);
   if($no_of_itemsz > 0){
       ?><h6 style="margin-left:25px" class="cardtitle">Addons:</h6> <?php } ?>
@@ -33,7 +33,7 @@ include_once('../assets/connection.php');
             <?php 
             
             $sql = "SELECT `ts_id`, `type_title`, `type_title_user`, `ts_name` FROM `types_sublist` WHERE `type_id` = $typeid";
-            $execute = mysqli_query($con,$sql);
+            $execute = mysqli_query($conn,$sql);
             $no_of_itemst = mysqli_num_rows($execute);
             if($no_of_itemst > 0){
                 ?><h6 style="margin-left:5px;margin-top:15px" class="cardtitle">Types :</h6> <select id="type_box" class="form-control" > <?php } ?>  
@@ -51,7 +51,7 @@ include_once('../assets/connection.php');
 <?php 
  
   $dressingd = "SELECT `ds_id`, `dressing_title`, `dressing_title_user`, `dressing_name` FROM `dressing_sublist` WHERE `dressing_id` = $dressingid";
-  $resultd = mysqli_query($con,$dressingd);
+  $resultd = mysqli_query($conn,$dressingd);
   $no_of_itemsd = mysqli_num_rows($resultd);
   $dressingtittle = mysqli_fetch_array($resultd);
   if($no_of_itemsd > 0){

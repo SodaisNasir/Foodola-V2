@@ -7,6 +7,7 @@ $id = $_POST['id'] ?? '';
 $branch_id = mysqli_real_escape_string($conn, $_POST['branch_id'] ?? '');
 $is_disable = mysqli_real_escape_string($conn, $_POST['is_disable'] ?? '');
 $min_order_amount = mysqli_real_escape_string($conn, $_POST['min_order_amount'] ?? '');
+$discounted_delivery_amount = mysqli_real_escape_string($conn, $_POST['discounted_delivery_amount'] ?? '');
 $area_name = mysqli_real_escape_string($conn, $_POST['area_name'] ?? '');
 
 // Validate required fields (allowing "0" for is_disable)
@@ -23,6 +24,7 @@ $sql = "UPDATE `tbl_areas`
         SET 
             `area_name` = '$area_name',
             `min_order_amount` = '$min_order_amount',
+            `discounted_delivery_amount` = '$discounted_delivery_amount',
             `branch_id` = '$branch_id',
             `is_disable` = '$is_disable'
         WHERE `id` = '$id'";

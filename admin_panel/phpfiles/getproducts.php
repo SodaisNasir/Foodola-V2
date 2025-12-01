@@ -1,13 +1,13 @@
 <?php 
 $i = $_GET['index'];
-include('../assets/connection.php');
+include('../connection.php');
 
 // Fetch all products with sub-category name using JOIN
 $fetch = "SELECT p.id, p.name AS product_name, p.price, s.name AS sub_category 
           FROM products p 
           LEFT JOIN sub_categories s ON p.sub_category_id = s.id"; 
 
-$fetch_exec = mysqli_query($con, $fetch); 
+$fetch_exec = mysqli_query($conn, $fetch); 
 $fetch_num = mysqli_num_rows($fetch_exec); 
 
 echo '<div class="row mb-4 p-3 border rounded" id="row'.$i.'">

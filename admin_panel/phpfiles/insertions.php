@@ -12,10 +12,10 @@ use PHPMailer\PHPMailer\Exception;
 // ini_set('display_errors', 1);
 
 if(isset($_POST['btn_delete_depart'])){
-    include('../assets/connection.php');
+    include('../connection.php');
     $id = $_POST['dpt_id'];
     $sql = "DELETE FROM `departments` WHERE `id` = '$id'";
-    $result = mysqli_query($con, $sql);
+    $result = mysqli_query($conn, $sql);
     
     if($result){
         header("Location:../manage_departments.php?Massage=Sucessfully Deleted");
@@ -26,40 +26,44 @@ if(isset($_POST['btn_delete_depart'])){
 }
 
 if (isset($_POST['btn_update_depart'])) {
+    error_reporting(E_ALL);
+ini_set('display_errors', 1);
+    include('../connection.php');
 
-    include('../assets/connection.php');
+$dpt_id = intval($_POST['dpt_id']);
+    $department_name = mysqli_real_escape_string($conn, $_POST['department_name']);
+    $status = mysqli_real_escape_string($conn, $_POST['status']);
 
-    $dpt_id =  $_POST['dpt_id'];
+    // --- SAFE SUBCATEGORY HANDLING ---
+    if (isset($_POST['sub_category_ids']) && is_array($_POST['sub_category_ids'])) {
+        $subcategory_ids = array_map('intval', $_POST['sub_category_ids']);
+    } else {
+        $subcategory_ids = []; // <-- IMPORTANT: no error if nothing selected
+    }
 
-    $subcategory_ids = [];
-    $department_name = mysqli_real_escape_string($con, $_POST['department_name']);
+    $encoded_ids = mysqli_real_escape_string($conn, json_encode($subcategory_ids));
 
-    $subcategory_ids = array_map('intval', $_POST['sub_category_ids']);
-    $encoded_ids = json_encode($subcategory_ids);
-    $status = mysqli_real_escape_string($con, $_POST['status']);
-  
-
-    $sql = "UPDATE `departments` SET `department_name`='$department_name', `sub_category_ids` = '$encoded_ids', `status` ='$status'   WHERE `id`='$dpt_id'";
-    $result = mysqli_query($con, $sql);
-
+    // Update SQL
+    $sql = "UPDATE `departments` SET `department_name` = '$department_name',`sub_category_ids` = '$encoded_ids',`status` = '$status'WHERE `id` = $dpt_id
+    ";
+   $result = mysqli_query($conn, $sql);
     if ($result) {
      echo "<script>alert('Updated successfully');window.location.href='../manage_departments.php'</script>";
     } else {
-        echo "<script>alert('Error updating table: " . mysqli_error($con) . "');window.location.href='../manage_departments.php'</script>";
+        echo "<script>alert('Error updating table: " . mysqli_error($conn) . "');window.location.href='../manage_departments.php'</script>";
     }
 }
 
 if (isset($_POST['btn_insert_depart'])) {
-//     error_reporting(E_ALL);
-// ini_set('display_errors', 1);
-  include('../assets/connection.php');
+
+  include('../connection.php');
   $department_name = $_POST['department_name'];
   $subcategory_ids = $_POST['sub_category_ids'];
   $decoded_ids =  json_encode($subcategory_ids);
 
     $sql = "INSERT INTO `departments`(`department_name`, `sub_category_ids`,`status`, `created_at`) VALUES ('$department_name', '$decoded_ids', 'active', NOW())";
     
-      $result = mysqli_query($con, $sql);
+      $result = mysqli_query($conn, $sql);
       if ($result) {
           
         header("Location:../manage_departments.php?Massage=Sucessfully Inserted");
@@ -70,12 +74,12 @@ if (isset($_POST['btn_insert_depart'])) {
 
 
 if (isset($_POST['btn_delete_holiday'])) {
-    include('../assets/connection.php'); // Include DB connection
+    include('../connection.php'); // Include DB connection
 
     $id = intval($_POST['id']);
     $query = "DELETE FROM holiday_timings WHERE id = $id";
 
-    if (mysqli_query($con, $query)) {
+    if (mysqli_query($conn, $query)) {
         echo json_encode(['status' => true]);
     } else {
         echo json_encode(['status' => false, 'message' => 'Query failed']);
@@ -85,16 +89,16 @@ if (isset($_POST['btn_delete_holiday'])) {
 
 if (isset($_POST['btnSubmitHolidays'])) {
     
-    include('../assets/connection.php');
+    include('../connection.php');
     foreach ($_POST['holiday_dates'] as $holiday) {
-        $date = mysqli_real_escape_string($con, $holiday['date']);
-        $start1 = mysqli_real_escape_string($con, $holiday['start1']);
-        $end1   = mysqli_real_escape_string($con, $holiday['end1']);
-        $start2 = mysqli_real_escape_string($con, $holiday['start2']);
-        $end2   = mysqli_real_escape_string($con, $holiday['end2']);
+        $date = mysqli_real_escape_string($conn, $holiday['date']);
+        $start1 = mysqli_real_escape_string($conn, $holiday['start1']);
+        $end1   = mysqli_real_escape_string($conn, $holiday['end1']);
+        $start2 = mysqli_real_escape_string($conn, $holiday['start2']);
+        $end2   = mysqli_real_escape_string($conn, $holiday['end2']);
 
         // Optional: check if already exists
-        $check = mysqli_query($con, "SELECT * FROM holiday_timings WHERE date = '$date'");
+        $check = mysqli_query($conn, "SELECT * FROM holiday_timings WHERE date = '$date'");
         if (mysqli_num_rows($check) > 0) {
             // update
             $query = "UPDATE holiday_timings SET start_time_1='$start1', end_time_1='$end1', start_time_2='$start2', end_time_2='$end2' WHERE date='$date'";
@@ -104,7 +108,7 @@ if (isset($_POST['btnSubmitHolidays'])) {
                       VALUES ('$date', '$start1', '$end1', '$start2', '$end2')";
         }
 
-        mysqli_query($con, $query);
+        mysqli_query($conn, $query);
     }
 
          header("Location:../managetimings.php?Massage=Sucessfully updated timings."); 
@@ -116,10 +120,10 @@ if(isset($_POST['btnSubmit_imprint'])){
     $imprint = $_POST['imprint'];
     $id = $_POST['id'];
 
-       include('../assets/connection.php');
+       include('../connection.php');
 
              $sqladd = "UPDATE `imprint` SET `imprint`='$imprint' WHERE `id` = '$id'";
-             $add = mysqli_query($con,$sqladd);
+             $add = mysqli_query($conn,$sqladd);
              if($add){
                  header("Location:../imprint.php?Massage=Sucessfully Updated"); 
            
@@ -131,7 +135,7 @@ if(isset($_POST['btnSubmit_imprint'])){
 }
 if (isset($_POST['btn_update_user'])) {
 
-    include('../assets/connection.php'); // Make sure this defines $con
+    include('../connection.php'); // Make sure this defines $conn
 
     // Get data from form
     $user_id    = $_POST['user_id'];
@@ -141,12 +145,12 @@ if (isset($_POST['btn_update_user'])) {
     $password   = $_POST['password'];
 
     // Optional: sanitize inputs (recommended for security)
-    $user_id    = mysqli_real_escape_string($con, $user_id);
-    $full_name  = mysqli_real_escape_string($con, $full_name);
-    $email      = mysqli_real_escape_string($con, $email);
-    $phone      = mysqli_real_escape_string($con, $phone);
-    $password   = mysqli_real_escape_string($con, $password);
-      $status     = mysqli_real_escape_string($con, $_POST['status']); // new
+    $user_id    = mysqli_real_escape_string($conn, $user_id);
+    $full_name  = mysqli_real_escape_string($conn, $full_name);
+    $email      = mysqli_real_escape_string($conn, $email);
+    $phone      = mysqli_real_escape_string($conn, $phone);
+    $password   = mysqli_real_escape_string($conn, $password);
+      $status     = mysqli_real_escape_string($conn, $_POST['status']); // new
 
 
     // Prepare the query
@@ -163,12 +167,12 @@ if (isset($_POST['btn_update_user'])) {
     ";
     
     
-    $update_result = mysqli_query($con, $update_query);
+    $update_result = mysqli_query($conn, $update_query);
 
  if ($update_result) {
     echo "<script>alert('User updated successfully'); window.location.href='../manageusers.php';</script>";
 } else {
-    echo "<script>alert('Error updating user: " . mysqli_error($con) . "'); window.location.href='../manageusers.php';</script>";
+    echo "<script>alert('Error updating user: " . mysqli_error($conn) . "'); window.location.href='../manageusers.php';</script>";
 }
 
 }
@@ -178,7 +182,7 @@ if (isset($_POST['btn_update_user'])) {
 
 if (isset($_POST['btn_insert_user'])) {
 
-    include('../assets/connection.php');
+    include('../connection.php');
 
     $full_name    = $_POST['full_name'];
     $email        = $_POST['email'];
@@ -192,7 +196,7 @@ if (isset($_POST['btn_insert_user'])) {
 
 
     $check_query = "SELECT `id` FROM `users` WHERE `email` = '$email'";
-    $check_result = mysqli_query($con, $check_query);
+    $check_result = mysqli_query($conn, $check_query);
 
     if (mysqli_num_rows($check_result) > 0) {
         echo "<script>alert('User already exists');window.location.href='../manageusers.php'</script>";
@@ -200,99 +204,99 @@ if (isset($_POST['btn_insert_user'])) {
         $insert_query = "INSERT INTO `users` (`name`, `phone`, `country_code`, `email`, `password`, `role_id`, `status`, `created_at`, `updated_at`) 
         VALUES ('$full_name', '$full_phone', '$country_code', '$email', '$password', '$role_id', '$status', NOW(), NOW())";
 
-        $insert_result = mysqli_query($con, $insert_query);
+        $insert_result = mysqli_query($conn, $insert_query);
 
         if ($insert_result) {
             echo "<script>alert('User inserted successfully');window.location.href='../manageusers.php'</script>";
         } else {
-            echo "<script>alert('Error inserting user: " . mysqli_error($con) . "');window.location.href='../manageusers.php'</script>";
+            echo "<script>alert('Error inserting user: " . mysqli_error($conn) . "');window.location.href='../manageusers.php'</script>";
         }
     }
 }
 
 
 if (isset($_POST['btn_Update_slider'])) {
-    include('../assets/connection.php');
-    $id = mysqli_real_escape_string($con, $_POST['id']);
-    $alt_name = mysqli_real_escape_string($con, $_POST['alt_name']);
-    $MainCat = mysqli_real_escape_string($con, $_POST['MainCat']);
-    $product_id = mysqli_real_escape_string($con, $_POST['product_id']);
+    include('../connection.php');
+    $id = mysqli_real_escape_string($conn, $_POST['id']);
+    $alt_name = mysqli_real_escape_string($conn, $_POST['alt_name']);
+    $MainCat = mysqli_real_escape_string($conn, $_POST['MainCat']);
+    $product_id = mysqli_real_escape_string($conn, $_POST['product_id']);
 
  
     $sql = "UPDATE `sliders` SET `alt_name`='$alt_name',`type`='$MainCat',`product_id`='$product_id' WHERE  `id` = '$id'";
-    $result = mysqli_query($con, $sql);
+    $result = mysqli_query($conn, $sql);
 
     if ($result) {
      echo "<script>alert('Updated successfully');window.location.href='../manageSliders.php'</script>";
     } else {
-        echo "<script>alert('Error updating slider: " . mysqli_error($con) . "');window.location.href='../manageSliders.php'</script>";
+        echo "<script>alert('Error updating slider: " . mysqli_error($conn) . "');window.location.href='../manageSliders.php'</script>";
     }
 }
 
 
 if(isset($_POST['btn_insert_code'])){
 
-    include('../assets/connection.php');
+    include('../connection.php');
     
-    $code  = mysqli_real_escape_string($con, $_POST['code']);
-    $value = mysqli_real_escape_string($con, $_POST['value']);
-    $usage_limit = mysqli_real_escape_string($con, $_POST['usage_limit']);
-    // $used_count = mysqli_real_escape_string($con, $_POST['used_count']);
-    $start_date = mysqli_real_escape_string($con, $_POST['start_date']);
-    $end_date = mysqli_real_escape_string($con, $_POST['end_date']);
-    $status = mysqli_real_escape_string($con, $_POST['status']); 
-    $eligible_users_date = mysqli_real_escape_string($con, $_POST['eligible_users_date']);
-    $min_order = mysqli_real_escape_string($con, $_POST['min_order']);
-    $start_date_order = mysqli_real_escape_string($con, $_POST['start_date_order']); 
-    $end_date_order = mysqli_real_escape_string($con, $_POST['end_date_order']); 
+    $code  = mysqli_real_escape_string($conn, $_POST['code']);
+    $value = mysqli_real_escape_string($conn, $_POST['value']);
+    $usage_limit = mysqli_real_escape_string($conn, $_POST['usage_limit']);
+    // $used_count = mysqli_real_escape_string($conn, $_POST['used_count']);
+    $start_date = mysqli_real_escape_string($conn, $_POST['start_date']);
+    $end_date = mysqli_real_escape_string($conn, $_POST['end_date']);
+    $status = mysqli_real_escape_string($conn, $_POST['status']); 
+    $eligible_users_date = mysqli_real_escape_string($conn, $_POST['eligible_users_date']);
+    $min_order = mysqli_real_escape_string($conn, $_POST['min_order']);
+    $start_date_order = mysqli_real_escape_string($conn, $_POST['start_date_order']); 
+    $end_date_order = mysqli_real_escape_string($conn, $_POST['end_date_order']); 
     
     
  $insert_sql = "INSERT INTO `promo_codes`(`code`, `value`, `usage_limit`, `used_count`, `min_order`, `start_date`, `end_date`,`eligible_users_date`,`start_date_order`, `end_date_order`, `status`) 
                    VALUES ('$code','$value','$usage_limit',0,'$min_order','$start_date','$end_date','$eligible_users_date','$start_date_order', '$end_date_order', '$status')";
 
     
-    $execute = mysqli_query($con, $insert_sql);
+    $execute = mysqli_query($conn, $insert_sql);
     if($execute){
              echo "<script>alert('Promo Code added successfully');window.location.href='../manage_promocode.php'</script>";
     }else{
-         echo "<script>alert('Error inserting codes: " . mysqli_error($con) . "');window.location.href='../manage_promocode.php'</script>";
+         echo "<script>alert('Error inserting codes: " . mysqli_error($conn) . "');window.location.href='../manage_promocode.php'</script>";
     }
 }
 
 
 
 if (isset($_POST['btn_update_code'])) {
-    include('../assets/connection.php');
-    $id = mysqli_real_escape_string($con, $_POST['id']);
-    $code = mysqli_real_escape_string($con, $_POST['code']);
-    $value = mysqli_real_escape_string($con, $_POST['value']);
-    $usage_limit = mysqli_real_escape_string($con, $_POST['usage_limit']);
-    $used_count = mysqli_real_escape_string($con, $_POST['used_count']);
-    $min_order = mysqli_real_escape_string($con, $_POST['min_order']);
-    $start_date = mysqli_real_escape_string($con, $_POST['start_date']);
-    $end_date = mysqli_real_escape_string($con, $_POST['end_date']);
-    $status = mysqli_real_escape_string($con, $_POST['status']);
-    $eligible_users_date = mysqli_real_escape_string($con, $_POST['eligible_users_date']);
-    $start_date_order = mysqli_real_escape_string($con, $_POST['start_date_order']); 
-    $end_date_order = mysqli_real_escape_string($con, $_POST['end_date_order']); 
+    include('../connection.php');
+    $id = mysqli_real_escape_string($conn, $_POST['id']);
+    $code = mysqli_real_escape_string($conn, $_POST['code']);
+    $value = mysqli_real_escape_string($conn, $_POST['value']);
+    $usage_limit = mysqli_real_escape_string($conn, $_POST['usage_limit']);
+    $used_count = mysqli_real_escape_string($conn, $_POST['used_count']);
+    $min_order = mysqli_real_escape_string($conn, $_POST['min_order']);
+    $start_date = mysqli_real_escape_string($conn, $_POST['start_date']);
+    $end_date = mysqli_real_escape_string($conn, $_POST['end_date']);
+    $status = mysqli_real_escape_string($conn, $_POST['status']);
+    $eligible_users_date = mysqli_real_escape_string($conn, $_POST['eligible_users_date']);
+    $start_date_order = mysqli_real_escape_string($conn, $_POST['start_date_order']); 
+    $end_date_order = mysqli_real_escape_string($conn, $_POST['end_date_order']); 
  
     $sql = "UPDATE `promo_codes` SET `code`='$code',`value`='$value',`usage_limit`='$usage_limit',`used_count`='$used_count',`min_order`='$min_order',`start_date`='$start_date',`end_date`='$end_date',`status`='$status', `eligible_users_date` = '$eligible_users_date', `start_date_order`= '$start_date_order', `end_date_order`='$end_date_order' WHERE  `id` = '$id'";
-    $result = mysqli_query($con, $sql);
+    $result = mysqli_query($conn, $sql);
 
     if ($result) {
      echo "<script>alert('Updated successfully');window.location.href='../manage_promocode.php'</script>";
     } else {
-        echo "<script>alert('Error updating codes: " . mysqli_error($con) . "');window.location.href='../manage_promocode.php'</script>";
+        echo "<script>alert('Error updating codes: " . mysqli_error($conn) . "');window.location.href='../manage_promocode.php'</script>";
     }
 }
 
 
 // for the delete of table
 if(isset($_POST['btn_delete_code'])){
-    include('../assets/connection.php');
+    include('../connection.php');
     $id = $_POST['id'];
     $sql = "DELETE FROM `promo_codes` WHERE `id` = '$id'";
-    $result = mysqli_query($con, $sql);
+    $result = mysqli_query($conn, $sql);
     if($result){
         header("Location:../manage_promocode.php?Massage=Sucessfully Deleted");
     }
@@ -302,12 +306,20 @@ if(isset($_POST['btn_delete_code'])){
 
 
 if (isset($_POST['btn_setcashback'])) {
-     include('../assets/connection.php');
+     include('../connection.php');
     $cashback = floatval($_POST['cashback_percenatge']); 
     $cashback_status = isset($_POST['status']) ? 1 : 0;
+    $cap_amount = $_POST['cap_amount'];
+    
+    if($cap_amount){
+        
+        $update_sql = "UPDATE cash_back SET cap_amount='$cap_amount'";
+        
+    }else{
+           $update_sql = "UPDATE cash_back SET cashback_percenatge = '$cashback', status = '$cashback_status'";
+    }
                                     
-    $update_sql = "UPDATE cash_back SET cashback_percenatge = '$cashback', status = '$cashback_status'";
-    if (mysqli_query($con, $update_sql)) {
+    if (mysqli_query($conn, $update_sql)) {
         echo "<script>alert('cashback Updated successfully'); window.location.href='../manage_cashback.php';</script>";
         }
 }
@@ -315,7 +327,7 @@ if (isset($_POST['btn_setcashback'])) {
 
 
 if (isset($_POST['ProID'])) {
-    include('../assets/connection.php');
+    include('../connection.php');
 
     $ProdID = intval($_POST['ProID']); // Use intval for better security
     $target_dir = "../Uploads/";
@@ -335,11 +347,11 @@ if (isset($_POST['ProID'])) {
     }
 
     // Escape $ProdID for use in the SQL query
-    $ProdID = mysqli_real_escape_string($con, $ProdID);
+    $ProdID = mysqli_real_escape_string($conn, $ProdID);
 
     // Get product name and current image
     $get_file_name = "SELECT name, img FROM products WHERE id = '$ProdID'";
-    $result = mysqli_query($con, $get_file_name);
+    $result = mysqli_query($conn, $get_file_name);
 
     if (mysqli_num_rows($result) > 0) {
         $Data = mysqli_fetch_assoc($result);
@@ -362,7 +374,7 @@ if (isset($_POST['ProID'])) {
         if (move_uploaded_file($_FILES["updatedImage"]["tmp_name"], $target_dir . $image_name)) {
             // Update the database with the new image name
             $update = "UPDATE products SET img = '$image_name' WHERE id = '$ProdID'";
-            if (mysqli_query($con, $update)) {
+            if (mysqli_query($conn, $update)) {
                 echo json_encode(['success' => true, 'productId' => $ProdID, 'newImageName' => $image_name]);
             } else {
                 echo json_encode(['success' => false, 'message' => 'Database update failed.']);
@@ -382,14 +394,14 @@ if (isset($_POST['ProID'])) {
 
 if (isset($_POST['btn_update_table'])) {
 
-    include('../assets/connection.php');
+    include('../connection.php');
 
-    $tbl_id = mysqli_real_escape_string($con, $_POST['tbl_id']);
-    $tbl_name = mysqli_real_escape_string($con, $_POST['table_name']);
-    $tbl_seats = mysqli_real_escape_string($con, $_POST['seats']);
-    $tbl_status = mysqli_real_escape_string($con, $_POST['status']);
-    $tbl_min = mysqli_real_escape_string($con, $_POST['min']);
-    $tbl_maximum = mysqli_real_escape_string($con, $_POST['maximum']);
+    $tbl_id = mysqli_real_escape_string($conn, $_POST['tbl_id']);
+    $tbl_name = mysqli_real_escape_string($conn, $_POST['table_name']);
+    $tbl_seats = mysqli_real_escape_string($conn, $_POST['seats']);
+    $tbl_status = mysqli_real_escape_string($conn, $_POST['status']);
+    $tbl_min = mysqli_real_escape_string($conn, $_POST['min']);
+    $tbl_maximum = mysqli_real_escape_string($conn, $_POST['maximum']);
 
 
 
@@ -405,7 +417,7 @@ if (isset($_POST['btn_update_table'])) {
 //             }
 //         }
 //     }
-//     $time_slots_json = mysqli_real_escape_string($con, json_encode($slotsData));
+//     $time_slots_json = mysqli_real_escape_string($conn, json_encode($slotsData));
     
     
     $tbl_img = '';
@@ -449,22 +461,22 @@ if (isset($_POST['btn_update_table'])) {
     }
 
     // Execute query
-    $result = mysqli_query($con, $sql);
+    $result = mysqli_query($conn, $sql);
 
     if ($result) {
      echo "<script>alert('Updated successfully');window.location.href='../manage_tables.php'</script>";
     } else {
-        echo "<script>alert('Error updating table: " . mysqli_error($con) . "');window.location.href='../manage_tables.php'</script>";
+        echo "<script>alert('Error updating table: " . mysqli_error($conn) . "');window.location.href='../manage_tables.php'</script>";
     }
 }
 
 
 // for the delete of table
 if(isset($_POST['btn_delete_tbl'])){
-    include('../assets/connection.php');
+    include('../connection.php');
     $id = $_POST['table_id'];
     $sql = "DELETE FROM `tables` WHERE `id` = '$id'";
-    $result = mysqli_query($con, $sql);
+    $result = mysqli_query($conn, $sql);
     if($result){
         header("Location:../manage_tables.php?Massage=Sucessfully Deleted");
     }else{
@@ -478,7 +490,7 @@ if(isset($_POST['btn_delete_tbl'])){
 if (isset($_POST['btn_insert_table'])) {
 //     error_reporting(E_ALL);
 // ini_set('display_errors', 1);
-  include('../assets/connection.php');
+  include('../connection.php');
 session_start();
   $table_name = $_POST['table_name'];
   $table_seats = $_POST['seats'];
@@ -501,7 +513,7 @@ session_start();
 //             }
 //         }
 //     }
-//     $time_slots_json = mysqli_real_escape_string($con, json_encode($slotsData));
+//     $time_slots_json = mysqli_real_escape_string($conn, json_encode($slotsData));
 
   $target_dir = "../Uploads/";
   $target_file = $target_dir . basename($_FILES["table_image"]["name"]);
@@ -533,7 +545,7 @@ session_start();
 $sql = "INSERT INTO `tables`(`table_name`, `seats`, `table_image`, `branch_id`,`status`,`min`, `maximum`, `created_at`, `updated_at`) 
         VALUES ('$table_name', '$table_seats', '$table_image', '$branch_id', 'available', '$min', '$maximum', NOW(), NOW())";
 
-  $result = mysqli_query($con, $sql);
+  $result = mysqli_query($conn, $sql);
   if ($result) {
 
   header("Location:../manage_tables.php?Massage=Sucessfully Inserted");
@@ -545,7 +557,7 @@ $sql = "INSERT INTO `tables`(`table_name`, `seats`, `table_image`, `branch_id`,`
 
 // for the insertion of Sub Categories
 if (isset($_POST['btnSubmit_insertCategories'])) {
-  include('../assets/connection.php');
+  include('../connection.php');
 //   include('../assets/config.php');
         error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -575,17 +587,17 @@ ini_set('display_errors', 1);
     if (move_uploaded_file($_FILES["CatImage"]["tmp_name"], $target_dir . $filewithnewname)) {
       // echo "The file ". htmlspecialchars( basename( $_FILES["CatImage"]["name"])). " has been uploaded.";
       
-      $cat_name = mysqli_real_escape_string($con, $cat_name);
-$filewithnewname = mysqli_real_escape_string($con, $filewithnewname);
+      $cat_name = mysqli_real_escape_string($conn, $cat_name);
+$filewithnewname = mysqli_real_escape_string($conn, $filewithnewname);
 
       $sql = "INSERT INTO `categories`(`name`, `img`) VALUES ('$cat_name','$filewithnewname')";
-      $result = mysqli_query($con, $sql);
+      $result = mysqli_query($conn, $sql);
 
 
       if ($result) {
         $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
                             VALUES ('pizzablitz', '1' ,NOW(),NOW())";
-        $monitor_update = mysqli_query($con, $monitor_sql);
+        $monitor_update = mysqli_query($conn, $monitor_sql);
 
         if ($monitor_update) {
           header("Location:../viewcategories.php?Massage=Sucessfully added new category.");
@@ -604,14 +616,14 @@ $filewithnewname = mysqli_real_escape_string($con, $filewithnewname);
 }
   
 if(isset($_POST['updateAddonTitle'])){
-      include('../assets/connection.php');
+      include('../connection.php');
 
      $ao_id = $_POST['ao_id'];
     
-    $ao_title = mysqli_real_escape_string($con,$_POST['ao_title']);
+    $ao_title = mysqli_real_escape_string($conn,$_POST['ao_title']);
    
     echo $sql = "UPDATE `addon_list` SET `ao_title`= '$ao_title' WHERE `ao_id` = $ao_id";
-    $update = mysqli_query($con,$sql);
+    $update = mysqli_query($conn,$sql);
     if($update){
          header("Location:../view_addons.php?&Massage=Sucessfully updated Addons.");
     }
@@ -622,7 +634,7 @@ if(isset($_POST['updateAddonTitle'])){
 
 
 if (isset($_POST['btnUpdateImage'])) {
-    include('../assets/connection.php');
+    include('../connection.php');
 
     $CatID = $_POST['CatID'];
     $target_dir = "../Uploads/";
@@ -648,14 +660,14 @@ if (isset($_POST['btnUpdateImage'])) {
         echo "<script>alert('Sorry, your file was not uploaded.')</script>";
     } else {
         $get_file_name = "SELECT `img` FROM `categories` WHERE `id` = $CatID";
-        $ex_file_name = mysqli_query($con, $get_file_name);
+        $ex_file_name = mysqli_query($conn, $get_file_name);
 
         if (mysqli_num_rows($ex_file_name) > 0) {
             $Data = mysqli_fetch_array($ex_file_name);
             if (move_uploaded_file($_FILES["updatedImage"]["tmp_name"], $target_file)) {
             
                 $update_sql = "UPDATE `categories` SET `img`='$newFileName' WHERE `id` = '$CatID'";
-                $exec_update_sql = mysqli_query($con, $update_sql);
+                $exec_update_sql = mysqli_query($conn, $update_sql);
 
                 if ($exec_update_sql) {
                                  header("Location: ../viewcategories.php?Massage=Category Updated Successfully");
@@ -675,7 +687,7 @@ if (isset($_POST['btnUpdateImage'])) {
 
 
 // if(isset($_POST['btnUpdateProdImage'])){
-// include('../assets/connection.php');
+// include('../connection.php');
 //     include('../assets/config.php'); 
  
 //   $ProdID = $_POST['ProID'];
@@ -699,20 +711,20 @@ if (isset($_POST['btnUpdateImage'])) {
 //       echo "<script>alert('Sorry, your file was not uploaded.');window.location.href='../manageproducts.php'</script>";
 //     } else {
 //       $get_file_name = "SELECT  `img` , `name`, `id`  FROM `products` WHERE `id` = $ProdID";
-//       $ex_file_name = mysqli_query($con,$get_file_name);
+//       $ex_file_name = mysqli_query($conn,$get_file_name);
 //       if(mysqli_num_rows($ex_file_name)>0){
 //           $Data = mysqli_fetch_array($ex_file_name);
 //         //   $image_name = $Data['img'];
 //           $image_name = $Data['name']."_".$Data['id'].".".$imageFileType;
 //           if (move_uploaded_file($_FILES["updatedImage"]["tmp_name"], $target_dir.$image_name)) {
 //               $update = "UPDATE `products` SET `img` = '$image_name' WHERE `id` = $ProdID";
-//               $update_ex = mysqli_query($con,$update);
+//               $update_ex = mysqli_query($conn,$update);
 //               echo "The file ". htmlspecialchars( basename( $_FILES["updatedImage"]["name"])). " has been updated.";
                
 //                 if($update){
 //                      $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
 //                                     VALUES ('burgerpoint', '1' ,NOW(),NOW())";
-//                     $monitor_update = mysqli_query($conn, $monitor_sql);
+//                     $monitor_update = mysqli_query($connn, $monitor_sql);
             
 //                     if ($monitor_update) {
 //                         header("Location:../manageproducts.php?&Massage=Sucessfully updated product.");
@@ -736,7 +748,7 @@ if (isset($_POST['btnUpdateImage'])) {
 
 
 // if(isset($_POST['btnUpdateSubCatImage'])){
-// include('../assets/connection.php');
+// include('../connection.php');
 //   session_start();
 //   $CatID = $_POST['CatID'];
 //   $target_dir = "../Uploads/";
@@ -760,7 +772,7 @@ if (isset($_POST['btnUpdateImage'])) {
 //       echo "<script>alert('Sorry, your file was not uploaded.')</script>";
 //     } else {
 //       $get_file_name = "SELECT  `img`  FROM `sub_categories` WHERE `id` = $CatID";
-//       $ex_file_name = mysqli_query($con,$get_file_name);
+//       $ex_file_name = mysqli_query($conn,$get_file_name);
 //       if(mysqli_num_rows($ex_file_name)>0){
 //           $Data = mysqli_fetch_array($ex_file_name);
 //           $image_name = $Data['img'];
@@ -781,7 +793,7 @@ if (isset($_POST['btnUpdateImage'])) {
 
 
 if (isset($_POST['btnUpdateSubCatImage'])) {
-    include('../assets/connection.php');
+    include('../connection.php');
     session_start();
 
     $CatID = $_POST['CatID'];
@@ -806,12 +818,12 @@ if (isset($_POST['btnUpdateSubCatImage'])) {
 
     // Fetch existing image name
     $get_file_name = "SELECT `img` FROM `sub_categories` WHERE `id` = $CatID";
-    $ex_file_name = mysqli_query($con, $get_file_name);
+    $ex_file_name = mysqli_query($conn, $get_file_name);
 
 
         if (move_uploaded_file($_FILES["updatedImage"]["tmp_name"], $target_file)) {
             $update_query = "UPDATE `sub_categories` SET `img` = '$new_image_name' WHERE `id` = $CatID";
-            if (mysqli_query($con, $update_query)) {
+            if (mysqli_query($conn, $update_query)) {
                 header("Location: ../SubCat.php?Message=Successfully updated sub category.");
             } else {
                 echo "<script>alert('Database update failed.')</script>";
@@ -826,11 +838,11 @@ if (isset($_POST['btnUpdateSubCatImage'])) {
 
 if(isset($_POST['BtnSendpush']))
 {
-    include('../assets/connection.php');
+    include('../connection.php');
     $v = $_POST['checkbox'];
     $user_idxx =$_POST['user_id'];
     $purpose = $_POST['purpose'];
-    $cont = mysqli_real_escape_string($con, $_POST['content']);
+    $connt = mysqli_real_escape_string($conn, $_POST['content']);
     $playerId = [];
     $subject = '';
     
@@ -838,18 +850,18 @@ if(isset($_POST['BtnSendpush']))
     {
         $user_id = $i;
         
-        $insert = "INSERT INTO `notification`(`user_id`, `content`, `purpose`) VALUES ($user_id,'$cont','$purpose')";
-         mysqli_query($con,$insert);
+        $insert = "INSERT INTO `notification`(`user_id`, `content`, `purpose`) VALUES ($user_id,'$connt','$purpose')";
+         mysqli_query($conn,$insert);
         
         $sql_get_token = "SELECT `name`, `notification_token` FROM `users` WHERE `id`=$user_id";
-        $ex = mysqli_query($con,$sql_get_token);
+        $ex = mysqli_query($conn,$sql_get_token);
         $Data = mysqli_fetch_array($ex);
          $Data['notification_token'];
         array_push($playerId, $Data['notification_token']);   
     }
-      $content = array
+      $conntent = array
       (
-                    "en" => $cont
+                    "en" => $connt
                     );
                     
 
@@ -858,7 +870,7 @@ if(isset($_POST['BtnSendpush']))
                      'include_player_ids' => $playerId,
                     'data' => array("foo" => "NewMassage","Id" => 1),
                     'large_icon' =>"ic_launcher_round.png",
-                    'contents' => $content
+                    'contents' => $conntent
                 );
 
                 $fields = json_encode($fields);
@@ -881,7 +893,7 @@ if(isset($_POST['BtnSendpush']))
 
 
 if(isset($_POST['BtnOrderPlaced'])){
-    include('../assets/connection.php');
+    include('../connection.php');
     $v = $_POST['checkbox'];
     $product_idxx =$_POST['product_id'];
     $amount_recieved = $_POST['amount_recieved'];
@@ -889,13 +901,13 @@ if(isset($_POST['BtnOrderPlaced'])){
     $payment_type = $_POST['payment_type'];
 
     $insert = "INSERT INTO `order_by_admin`(`product_id`, `amount_recieved`, `amount_return`,`payment_type`) VALUES ('$v','$amount_recieved','$amount_return','$payment_type')";
-    mysqli_query($con,$insert);
+    mysqli_query($conn,$insert);
 
 }
 
 
 if(isset($_POST['btnSubmit_placeorder'])){
-    include('../assets/connection.php');
+    include('../connection.php');
     $user_id = $_POST['user_id'];
     $total_amount =$_POST['total_amount'];
     $amount_recieved = $_POST['amount_recieved'];
@@ -911,14 +923,14 @@ if(isset($_POST['btnSubmit_placeorder'])){
     if($new_user == 1){
         
         $insert_user = "INSERT INTO `users`(`role_id`, `name`, `phone`, `email`, `password`) VALUES (3,'$name','$phone','$email','$password')";
-        $execute_inser_user = mysqli_query($con,$insert_user);
+        $execute_inser_user = mysqli_query($conn,$insert_user);
         
-         $last_id = $con->insert_id;
+         $last_id = $conn->insert_id;
         
         if($execute_inser_user){
             
             $insert = "INSERT INTO `orders`(`user_id`, `status`, `order_total_price`, `payment_type`,`amount_recieved`,`amount_return`) VALUES ($last_id,'neworder',$total_amount,'$payment_type','$amount_recieved','$amount_return')";
-            $result = mysqli_query($con,$insert);
+            $result = mysqli_query($conn,$insert);
             
             
         
@@ -926,7 +938,7 @@ if(isset($_POST['btnSubmit_placeorder'])){
     }else{
         
         $insert_order = "INSERT INTO `orders`(`user_id`, `status`, `order_total_price`, `payment_type`,`amount_recieved`,`amount_return`) VALUES ($user_id,'neworder',$total_amount,'$payment_type','$amount_recieved','$amount_return')";
-        $resultx = mysqli_query($con,$insert_order);
+        $resultx = mysqli_query($conn,$insert_order);
         
         
     }
@@ -941,7 +953,7 @@ if(isset($_POST['btnSubmit_placeorder'])){
 
 
 // if(isset($_POST['btnSubmit_insertSubCategories'])){
-// include('../assets/connection.php');
+// include('../connection.php');
 //   session_start();
 //   $cat_name = $_POST['CatName'];
 //   $main_cat = $_POST['MainCat'];
@@ -969,7 +981,7 @@ if(isset($_POST['btnSubmit_placeorder'])){
 //       if (move_uploaded_file($_FILES["CatImage"]["tmp_name"], $target_dir.$filewithnewname)) {
 //          "The file ". htmlspecialchars( basename( $_FILES["CatImage"]["name"])). " has been uploaded.";
 //         $sql = "INSERT INTO `sub_categories`(`category_id`, `name`, `img`) VALUES ($main_cat,'$cat_name','$filewithnewname')";
-//         $result = mysqli_query($con,$sql);
+//         $result = mysqli_query($conn,$sql);
 //         if($result){
 //           header("Location:../addSubCat.php?Massage=Sucessfully added new category.");
 //         }
@@ -984,11 +996,11 @@ if(isset($_POST['btnSubmit_placeorder'])){
 // }
 
 if (isset($_POST['btnSubmit_insertSubCategories'])) {
-    include('../assets/connection.php');
+    include('../connection.php');
     session_start();
     
-  $cat_name = mysqli_real_escape_string($con, $_POST['CatName']);
-$main_cat = mysqli_real_escape_string($con, $_POST['MainCat']);
+  $cat_name = mysqli_real_escape_string($conn, $_POST['CatName']);
+$main_cat = mysqli_real_escape_string($conn, $_POST['MainCat']);
     $target_dir = "../Uploads/";
 
     // Upload category image
@@ -999,7 +1011,7 @@ $main_cat = mysqli_real_escape_string($con, $_POST['MainCat']);
 
     if ($catImageName && $bannerImageName) {
         $sql = "INSERT INTO `sub_categories`(`category_id`, `name`, `img`, `banner_image`) VALUES ($main_cat, '$cat_name', '$catImageName', '$bannerImageName')";
-        $result = mysqli_query($con, $sql);
+        $result = mysqli_query($conn, $sql);
 
         if ($result) {
             header("Location: ../addSubCat.php?Massage=Sucessfully Added New Sub Category.");
@@ -1049,7 +1061,7 @@ function handleImageUpload($file, $target_dir, $prefix) {
 if (isset($_POST['btnSubmit_insertSliders'])) {
 //                 error_reporting(E_ALL);
 // ini_set('display_errors', 1);
-  include('../assets/connection.php');
+  include('../connection.php');
   session_start();
   
   
@@ -1060,10 +1072,10 @@ if (isset($_POST['btnSubmit_insertSliders'])) {
   $target_file = $target_dir . basename($_FILES["CatImage"]["name"]);
   $uploadOk = 1;
   $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-  $cat_name = mysqli_real_escape_string($con, $cat_name);
-$main_cat = mysqli_real_escape_string($con, $main_cat);
-$filewithnewname = mysqli_real_escape_string($con, $filewithnewname);
-$product_id = mysqli_real_escape_string($con, $product_id);
+  $cat_name = mysqli_real_escape_string($conn, $cat_name);
+$main_cat = mysqli_real_escape_string($conn, $main_cat);
+$filewithnewname = mysqli_real_escape_string($conn, $filewithnewname);
+$product_id = mysqli_real_escape_string($conn, $product_id);
 
   if ($_FILES["CatImage"]["size"] > 500000000) {
     echo "<script>alert('Sorry, your file is too large.')</script>";
@@ -1085,12 +1097,12 @@ $product_id = mysqli_real_escape_string($con, $product_id);
       
       
       $sql = "INSERT INTO `sliders`(`alt_name`, `type`, `img`, `product_id`) VALUES ('$cat_name','$main_cat','$filewithnewname', '$product_id')";
-      $result = mysqli_query($con, $sql);
+      $result = mysqli_query($conn, $sql);
 
       if ($result) {
         $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
                      VALUES ('pizzablitz', '1' ,NOW(),NOW())";
-        $monitor_update = mysqli_query($con, $monitor_sql);
+        $monitor_update = mysqli_query($conn, $monitor_sql);
 
         if ($monitor_update) {
           header("Location:../addslider.php?Massage=Sucessfully added new slider.");
@@ -1109,7 +1121,7 @@ $product_id = mysqli_real_escape_string($con, $product_id);
 
 
 if(isset($_POST['btnSubmit_insertProduct'])){
-include('../assets/connection.php');
+include('../connection.php');
   session_start();
   $addon_name = $_POST['addon_name'];
   $addon_price = $_POST['addon_price'];
@@ -1145,15 +1157,15 @@ include('../assets/connection.php');
          "The file ". htmlspecialchars( basename( $_FILES["ProImage"]["name"])). " has been uploaded.";
          
         $sql = "INSERT INTO `products`(`sub_category_id`, `name`, `description`, `cost`, `price`, `discount`, `qty`,`img`) VALUES ($MainCat,'$ProName','$ProDes',$ProCost,$ProPrice,$ProDiscount,$ProQty,'$filewithnewname')";
-        $result = mysqli_query($con,$sql);
+        $result = mysqli_query($conn,$sql);
         
-        $last_inserted_id = $con->insert_id;
+        $last_inserted_id = $conn->insert_id;
         if($result){
            $combined = array_combine($addon_name, $addon_price);
            
            foreach($combined as $addon_name => $addon_price) {
                 $insert_addon = "INSERT INTO `add_on`(`sub_category_id`,`product_id`, `product_name`, `addon_name`, `addon_price`) VALUES ($MainCat,'$last_inserted_id','$ProName','$addon_name','$addon_price')";
-                $result_addon = mysqli_query($con,$insert_addon);
+                $result_addon = mysqli_query($conn,$insert_addon);
             } 
             
             header("Location:../addnewProduct.php?Massage=Sucessfully added new product.");
@@ -1169,9 +1181,9 @@ include('../assets/connection.php');
         
         
         
-        // $last_id = mysqli_insert_id($con);
+        // $last_id = mysqli_insert_id($conn);
         //  $sql_image = "INSERT INTO `product_images`(`product_id`, `img`) VALUES ($last_id,'$filewithnewname')";
-        // $result_image = mysqli_query($con,$sql_image);
+        // $result_image = mysqli_query($conn,$sql_image);
         
         // if($result){
         //   header("Location:../addnewProduct.php?Massage=Sucessfully added new product.");
@@ -1195,7 +1207,7 @@ include('../assets/connection.php');
 
 // btnSubmit_addDealz
 if(isset($_POST['btnSubmit_addDealz'])){
-     include('../assets/connection.php');
+     include('../connection.php');
      include('../assets/config.php');
      
 
@@ -1207,8 +1219,8 @@ if(isset($_POST['btnSubmit_addDealz'])){
      $DealQty = $_POST['DealQuantity'];
      
      
-     $DealName = mysqli_real_escape_string($con,$_POST['DealName']);
-     $DealDes = mysqli_real_escape_string($con,$_POST['DealDes']);
+     $DealName = mysqli_real_escape_string($conn,$_POST['DealName']);
+     $DealDes = mysqli_real_escape_string($conn,$_POST['DealDes']);
      $DealCost = $_POST['DealCost'];
      $DealPrice = $_POST['DealPrice'];
      $DealQty = $_POST['DealQuantity'];
@@ -1237,9 +1249,9 @@ if(isset($_POST['btnSubmit_addDealz'])){
                     //  `deal_id`
                     $sql = "INSERT INTO `deals`(`deal_name`, `deal_description`, `deal_cost`, `deal_price`, `deal_image`, `deal_items_number`) VALUES
                                         ('$DealName','$DealDes','$DealCost','$DealPrice','$filewithnewname','$DealQty')";
-                    $result = mysqli_query($con,$sql);
+                    $result = mysqli_query($conn,$sql);
                     
-                    $last_inserted_id2 = $con->insert_id;
+                    $last_inserted_id2 = $conn->insert_id;
                     if($result){
                             for($i = 0 ; $i < $DealQty ; $i++ ){
                                 
@@ -1249,7 +1261,7 @@ if(isset($_POST['btnSubmit_addDealz'])){
                                 
                                  $sql_insert_item = "INSERT INTO `deal_items`( `deal_id`, `di_title`, `di_num_free_items`, `deal_subdata`) VALUES
                                                             ('$last_inserted_id2','$dealtitle[$i]','$num_freeitems[$i]','". json_encode($temp) ."')";
-                                 $result_item = mysqli_query($con,$sql_insert_item);
+                                 $result_item = mysqli_query($conn,$sql_insert_item);
                                 
                         
                         }
@@ -1296,7 +1308,7 @@ if(isset($_POST['btnSubmit_test'])){
 
 //btnSubmit_insertDeal
 if(isset($_POST['btnSubmit_insertDeal'])){
-//     include('../assets/connection.php');
+//     include('../connection.php');
     
 //     $dealtitle = $_POST['deal_title'];
 //     $num_freeitems = $_POST['num_free_items'];
@@ -1334,21 +1346,21 @@ if(isset($_POST['btnSubmit_insertDeal'])){
 //         //  `deal_id`
 //         $sql = "INSERT INTO `deals`(`deal_name`, `deal_description`, `deal_cost`, `deal_price`, `deal_image`) VALUES
 //                             ('$DealName','$DealDes','$DealCost','$DealPrice','$filewithnewname')";
-//         $result = mysqli_query($con,$sql);
+//         $result = mysqli_query($conn,$sql);
         
-//         $last_inserted_id2 = $con->insert_id;
+//         $last_inserted_id2 = $conn->insert_id;
 //         if($result){
 //         //   $combined = array_combine($deal_title, $num_freeitems);
            
 //         //   foreach($combined as $deal_title => $num_free_items) {
 //                 for($i = 0; $i < count($z) ; $i++){
 //                 $insert_addon = "INSERT INTO `deal_items`( `deal_id`, `di_title`, `di_num_free_items`) VALUES ('$last_inserted_id2','$dealtitle[$i]','$num_freeitems[$i]')";
-//                 $result_addon = mysqli_query($con,$insert_addon);
-//                 $last_inserted_id3 = $con->insert_id;
+//                 $result_addon = mysqli_query($conn,$insert_addon);
+//                 $last_inserted_id3 = $conn->insert_id;
 //                     foreach($chk_box[$i] as $chk_box_val) {
 //                     //echo $chk_box_val;
 //                     $insert_bt = "INSERT INTO `bt_deal_items`(`di_id`, `dp_id`) VALUES ('$last_inserted_id3','$chk_box_val')";
-//                     $result_bt = mysqli_query($con,$insert_bt);
+//                     $result_bt = mysqli_query($conn,$insert_bt);
 //                     }
 //       //     } 
            
@@ -1401,15 +1413,15 @@ if(isset($_POST['btnSubmit_insertNewProductZ'])){
 //             error_reporting(E_ALL);
 // ini_set('display_errors', 1);
     
-include('../assets/connection.php');
+include('../connection.php');
 include('../assets/config.php'); 
 
   session_start();
 //   $addon_name = $_POST['addon_name'];
 //   $addon_price = $_POST['addon_price'];
 
-  $ProName = mysqli_real_escape_string($con, $_POST['ProName']);
-  $ProDes = mysqli_real_escape_string($con, $_POST['ProDes']);
+  $ProName = mysqli_real_escape_string($conn, $_POST['ProName']);
+  $ProDes = mysqli_real_escape_string($conn, $_POST['ProDes']);
   $ProCost = $_POST['ProCost'];
   $ProPrice = $_POST['ProPrice'];
   $ProQty = $_POST['ProQty']?? 1000;
@@ -1452,11 +1464,11 @@ include('../assets/config.php');
         $sql = "INSERT INTO `products`(`addon_id`,`type_id`,`dressing_id`, `sub_category_id`,`name`, `sku_id`, `description`, `cost`, `price`, `discount`, `qty`,`img`, `tax`, `for_deal_only`) VALUES 
                                         ($addonCat,$typeCat,$dressingCat,'$MainCat','$ProName','$sku_id','$ProDes',$ProCost,$ProPrice,$ProDiscount,$ProQty,'$filewithnewname', '$tax', '$for_deal_only')";
                                         
-        $result = mysqli_query($con,$sql);
+        $result = mysqli_query($conn,$sql);
             if($result){
                  $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
                                 VALUES ('pizzablitz', '1' ,NOW(),NOW())";
-                $monitor_update = mysqli_query($con, $monitor_sql);
+                $monitor_update = mysqli_query($conn, $monitor_sql);
         
                 if ($monitor_update) {
                         header("Location:../insertNewProduct.php?Massage=Sucessfully added new product.");
@@ -1477,7 +1489,7 @@ include('../assets/config.php');
 
 
 if(isset($_POST['btnSubmit_insertMoreAddon'])){
-include('../assets/connection.php');
+include('../connection.php');
   session_start();
    $addon_name = $_POST['addon_name'];
   $addon_price = $_POST['addon_price'];
@@ -1489,7 +1501,7 @@ include('../assets/connection.php');
            
           foreach($combined as $addon_name => $addon_price) {
               echo  $insert_addon = "INSERT INTO `addon_sublist`(`ao_id`, `as_name`, `as_price`) VALUES ('$addon_id','$addon_name','$addon_price')";
-                $result_addon = mysqli_query($con,$insert_addon);
+                $result_addon = mysqli_query($conn,$insert_addon);
             } 
             
            
@@ -1511,7 +1523,7 @@ include('../assets/connection.php');
 
 
 if (isset($_POST['btnSubmit_insertMoreAddonType'])) {
-    include('../assets/connection.php');
+    include('../connection.php');
     session_start();
 
     $addon_names = $_POST['addon_name'] ?? [];
@@ -1519,7 +1531,7 @@ if (isset($_POST['btnSubmit_insertMoreAddonType'])) {
     $addon_id = $_POST['addon_id'] ?? null;
 
         $get_type_sql = "SELECT * FROM types_list WHERE type_id = '$addon_id'";
-        $exec_type = mysqli_query($con, $get_type_sql);
+        $exec_type = mysqli_query($conn, $get_type_sql);
         $type_data = mysqli_fetch_assoc($exec_type);
 
         if (!$type_data) {
@@ -1527,22 +1539,22 @@ if (isset($_POST['btnSubmit_insertMoreAddonType'])) {
             exit();
         }
 
-        $type_title = mysqli_real_escape_string($con, $type_data['type_title']);
-        $type_title_user = mysqli_real_escape_string($con, $type_data['type_title_user']);
+        $type_title = mysqli_real_escape_string($conn, $type_data['type_title']);
+        $type_title_user = mysqli_real_escape_string($conn, $type_data['type_title_user']);
 
         foreach ($addon_names as $index => $add_name) {
             $price = $addon_prices[$index];
 
             // Escape each value
-            $add_name_safe = mysqli_real_escape_string($con, $add_name);
-            $price_safe = mysqli_real_escape_string($con, $price);
+            $add_name_safe = mysqli_real_escape_string($conn, $add_name);
+            $price_safe = mysqli_real_escape_string($conn, $price);
 
             $insert_addontype = "INSERT INTO `types_sublist`(`type_id`, `ts_name`, `price`, `type_title`, `type_title_user`) 
                                  VALUES ('$addon_id', '$add_name_safe', '$price_safe', '$type_title', '$type_title_user')";
-            $result_addon = mysqli_query($con, $insert_addontype);
+            $result_addon = mysqli_query($conn, $insert_addontype);
 
             if (!$result_addon) {
-                echo "<script>alert('Error while inserting: " . mysqli_error($con) . "'); 
+                echo "<script>alert('Error while inserting: " . mysqli_error($conn) . "'); 
                       window.location.href='../update_types.php?id=$addon_id';</script>";
                 exit();
             }
@@ -1566,7 +1578,7 @@ if (isset($_POST['btnSubmit_insertMoreAddonType'])) {
 if (isset($_POST['btnSubmit_insertMoreAddonDressing'])) {
 //     error_reporting(E_ALL);
 // ini_set('display_errors', 1);
-    include('../assets/connection.php');
+    include('../connection.php');
     session_start();
 
     $addon_name = $_POST['addon_name'];
@@ -1577,7 +1589,7 @@ if (isset($_POST['btnSubmit_insertMoreAddonDressing'])) {
 
     // Fetch dressing details once
     $sql = "SELECT * FROM `dressing_list` WHERE `dressing_id`= '$addon_id'";
-    $exec = mysqli_query($con, $sql);
+    $exec = mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($exec) > 0) {
         $data = mysqli_fetch_assoc($exec);
@@ -1588,14 +1600,14 @@ if (isset($_POST['btnSubmit_insertMoreAddonDressing'])) {
         $dressing_title_user = $data['dressing_title_user'];
 
        foreach ($combined as  $addon_name => $addon_price) {
-    $addtype_name_safe = mysqli_real_escape_string($con, $addon_name);
-    $dressing_title_safe = mysqli_real_escape_string($con, $dressing_title);
-    $dressing_title_user_safe = mysqli_real_escape_string($con, $dressing_title_user);
+    $addtype_name_safe = mysqli_real_escape_string($conn, $addon_name);
+    $dressing_title_safe = mysqli_real_escape_string($conn, $dressing_title);
+    $dressing_title_user_safe = mysqli_real_escape_string($conn, $dressing_title_user);
 
     $insert_addontype = "INSERT INTO `dressing_sublist`(`dressing_id`, `dressing_title`, `dressing_title_user`, `dressing_name`, `price`) 
         VALUES ('$addon_id', '$dressing_title_safe', '$dressing_title_user_safe', '$addtype_name_safe', '$addon_price')";
     
-    $result_addon = mysqli_query($con, $insert_addontype);
+    $result_addon = mysqli_query($conn, $insert_addontype);
 }
 
         if ($result_addon) {
@@ -1614,24 +1626,24 @@ if (isset($_POST['btnSubmit_insertMoreAddonDressing'])) {
 
 if(isset($_POST['btnSubmit_insertAddon']))
 {
-include('../assets/connection.php');
+include('../connection.php');
   session_start();
   $addon_name = $_POST['addon_name'];
   $addon_price = $_POST['addon_price'];
-  $addon_title = mysqli_real_escape_string($con,$_POST['addon_title']);
+  $addon_title = mysqli_real_escape_string($conn,$_POST['addon_title']);
   
         if($addon_title){
         $sql = "INSERT INTO `addon_list`(`ao_title`) VALUES ('$addon_title')";
-        $result = mysqli_query($con,$sql);
+        $result = mysqli_query($conn,$sql);
         
-        $last_inserted_id = $con->insert_id;
+        $last_inserted_id = $conn->insert_id;
         if($result){
            $combined = array_combine($addon_name, $addon_price);
            
            foreach($combined as $addon_name => $addon_price) {
-               $addon_NAME  = mysqli_real_escape_string($con,$addon_name);
+               $addon_NAME  = mysqli_real_escape_string($conn,$addon_name);
                 $insert_addon = "INSERT INTO `addon_sublist`(`ao_id`,`ao_title`, `as_name`, `as_price`) VALUES ('$last_inserted_id','$addon_title','$addon_NAME','$addon_price')";
-                $result_addon = mysqli_query($con,$insert_addon);
+                $result_addon = mysqli_query($conn,$insert_addon);
             } 
             
             header("Location:../addAddons.php?Massage=Sucessfully added new Addon.");
@@ -1652,14 +1664,14 @@ include('../assets/connection.php');
 
 if(isset($_POST['btnSubmit_Variation']))
 {
-      include('../assets/connection.php');
+      include('../connection.php');
       
     //   $myarray = array();
       
       session_start();
       $pro_id = $_POST['pro_id'];
       $var_sub_title = $_POST['var_sub_title'];
-      $var_title =  mysqli_real_escape_string($con,$_POST['var_title']);
+      $var_title =  mysqli_real_escape_string($conn,$_POST['var_title']);
       
     //   print_r($pro_id);
     //   die();
@@ -1676,17 +1688,17 @@ if(isset($_POST['btnSubmit_Variation']))
       {
   
             $sql = "INSERT INTO `variation`(`title`) VALUES ('$var_title')";
-            $result = mysqli_query($con,$sql);
+            $result = mysqli_query($conn,$sql);
             
-            $last_inserted_id = $con->insert_id;
+            $last_inserted_id = $conn->insert_id;
             if($result)
             {
                $combined = array_combine($pro_id, $var_sub_title);
                
                foreach($combined as $pro_id => $var_sub_title) {
-                   $var_sub_TILTLE =  mysqli_real_escape_string($con,$var_sub_title);
+                   $var_sub_TILTLE =  mysqli_real_escape_string($conn,$var_sub_title);
                     $insert_var = "INSERT INTO `variation_with_product`(`product_id`, `sub_title`, `var_id`) VALUES ('$pro_id','$var_sub_TILTLE','$last_inserted_id')";
-                    $result_var = mysqli_query($con,$insert_var);
+                    $result_var = mysqli_query($conn,$insert_var);
                 } 
                 
                 header("Location:../addVariation.php?Massage=Sucessfully added new Variation.");
@@ -1711,27 +1723,27 @@ if(isset($_POST['btnSubmit_Variation']))
 
 
 if(isset($_POST['btnSubmit_insertType'])){
-include('../assets/connection.php');
+include('../connection.php');
   session_start();
-  $type_title = mysqli_real_escape_string($con,$_POST['type_title']);
-    $type_title_user = mysqli_real_escape_string($con,$_POST['type_title_user']);
+  $type_title = mysqli_real_escape_string($conn,$_POST['type_title']);
+    $type_title_user = mysqli_real_escape_string($conn,$_POST['type_title_user']);
   $add_type = $_POST['add_type'];
   $add_price = $_POST['add_price'];
 
   
         if($type_title && $type_title_user){
         $sql = "INSERT INTO `types_list` (`type_title`, `type_title_user`) VALUES ('$type_title','$type_title_user')";
-        $result = mysqli_query($con,$sql);
+        $result = mysqli_query($conn,$sql);
         
-        $last_inserted_id = $con->insert_id;
+        $last_inserted_id = $conn->insert_id;
         if($result){
           // $combined = array_combine($add_type);
            
            foreach($add_type as $index => $at) {
                    $price = $add_price[$index];
-               $add_TYPE_NAME =  mysqli_real_escape_string($con,$at);
+               $add_TYPE_NAME =  mysqli_real_escape_string($conn,$at);
                 $insert_types = "INSERT INTO `types_sublist`(`type_id`, `type_title`, `type_title_user`, `ts_name`,`price`) VALUES ('$last_inserted_id','$type_title','$type_title_user','$add_TYPE_NAME', '$price')";
-                $result_types = mysqli_query($con,$insert_types);
+                $result_types = mysqli_query($conn,$insert_types);
             } 
             
             header("Location:../addTypes.php?Massage=Sucessfully added new Type.");
@@ -1751,27 +1763,27 @@ include('../assets/connection.php');
 
 
 if(isset($_POST['btnSubmit_insertDressing'])){
-include('../assets/connection.php');
+include('../connection.php');
   session_start();
-  $type_title = mysqli_real_escape_string($con,$_POST['dressing_title']);
-  $type_title_user = mysqli_real_escape_string($con,$_POST['dressing_title_user']);
+  $type_title = mysqli_real_escape_string($conn,$_POST['dressing_title']);
+  $type_title_user = mysqli_real_escape_string($conn,$_POST['dressing_title_user']);
   $add_type = $_POST['add_dressing'];
   $add_price = $_POST['add_price'];
 
   
         if($type_title && $type_title_user){
         $sql = "INSERT INTO `dressing_list`(`dressing_title`, `dressing_title_user`) VALUES ('$type_title','$type_title_user')";
-        $result = mysqli_query($con,$sql);
+        $result = mysqli_query($conn,$sql);
         
-        $last_inserted_id = $con->insert_id;
+        $last_inserted_id = $conn->insert_id;
         if($result){
           // $combined = array_combine($add_type);
            
            foreach($add_type as $index =>  $at) {
                    $price = $add_price[$index];
-               $dressing_NAME = mysqli_real_escape_string($con,$at);
+               $dressing_NAME = mysqli_real_escape_string($conn,$at);
                 $insert_types = "INSERT INTO `dressing_sublist`(`dressing_id`, `dressing_title`, `dressing_title_user`, `dressing_name`, `price`) VALUES ('$last_inserted_id','$type_title','$type_title_user','$dressing_NAME', '$price')";
-                $result_types = mysqli_query($con,$insert_types);
+                $result_types = mysqli_query($conn,$insert_types);
             } 
             
                header("Location:../addDressing.php?Massage=Sucessfully added new Dressing.");
@@ -1799,7 +1811,7 @@ include('../assets/connection.php');
 
 
 if(isset($_POST['btnSubmit_insertuser'])){
-include('../assets/connection.php');
+include('../connection.php');
   session_start();
   $name = $_POST['name'];
   $email = strtolower($_POST['email']);
@@ -1818,10 +1830,10 @@ include('../assets/connection.php');
          "The file ". htmlspecialchars( basename( $_FILES["img"]["name"])). " has been uploaded.";
          
          $sql = "INSERT INTO `users`(`role_id`,`name`, `email`, `phone`,`profilepic`,`sbscription_status`,`password`) VALUES (2,'$name','$email','$phone','$filewithnewname',0,'$password')";
-        $result = mysqli_query($con,$sql);
-        // $last_id = mysqli_insert_id($con);
+        $result = mysqli_query($conn,$sql);
+        // $last_id = mysqli_insert_id($conn);
         //  $sql_image = "INSERT INTO `product_images`(`product_id`, `img`) VALUES ($last_id,'$filewithnewname')";
-        // $result_image = mysqli_query($con,$sql_image);
+        // $result_image = mysqli_query($conn,$sql_image);
         
         if($result){
           header("Location:../addriders.php?Massage=Sucessfully added new rider.");
@@ -1846,15 +1858,15 @@ if(isset($_POST['updatePoints'])){
     $newzzz = $_POST['newqty'];
     if($Type == "add"){
        $newamount = $newamount + $old_amount;
-       include('../assets/connection.php');
+       include('../connection.php');
        $t=time();
        $transation = $t.$user_id.$newamount;
          $sql = "UPDATE `users` SET `amount` = $newamount  WHERE `id` =$user_id";
-        $update = mysqli_query($con,$sql);
+        $update = mysqli_query($conn,$sql);
         if($update){
             
         $sqltaskMembersx = "SELECT `notification_token` FROM `users` WHERE `id` = '$user_id' ";
-        $taskMembersx = mysqli_query($con,$sqltaskMembersx);
+        $taskMembersx = mysqli_query($conn,$sqltaskMembersx);
         $playerIdx = [];
         $subject = '';
         $newstatus = '';
@@ -1868,13 +1880,13 @@ if(isset($_POST['updatePoints'])){
          
              
                     $order_content = 'TID : '.$transation.' Your wallet has been credited with €'  .$newzzz. '. Your new balance is €' .$newamount.'.';
-                     $contentx = array(
+                     $conntentx = array(
                     "en" => $order_content
                     );
 
                
                     $insert_noti_details = "INSERT INTO `notification`( `user_id`, `content`, `purpose`) VALUES ('$user_id','$order_content','transaction')";
-                    $execute_insert_noti = mysqli_query($con,$insert_noti_details);
+                    $execute_insert_noti = mysqli_query($conn,$insert_noti_details);
                     
                     
                 
@@ -1884,7 +1896,7 @@ if(isset($_POST['updatePoints'])){
                      'include_player_ids' => $playerIdx,
                     'data' => array("foo" => "NewMassage","Id" => $taskid),
                     'large_icon' =>"ic_launcher_round.png",
-                    'contents' => $contentx
+                    'contents' => $conntentx
                 );
 
                 $fields = json_encode($fields);
@@ -1908,7 +1920,7 @@ if(isset($_POST['updatePoints'])){
             
             
              $sqladd = "INSERT INTO `tbl_transaction`(`user_id`, `transaction_id`, `amount`, `old_amount`, `type`, `message`) VALUES ($user_id,$transation,$newamount,$newzzz,'credit','Credited by admin')";
-             $add = mysqli_query($con,$sqladd);
+             $add = mysqli_query($conn,$sqladd);
              if($add){
                  header("Location:../managePoints.php?Massage=Sucessfully updated amount."); 
              }
@@ -1919,16 +1931,16 @@ if(isset($_POST['updatePoints'])){
     }else if($Type == "sub"){
       if($old_amount >= $newamount){
        $newamount = $old_amount - $newamount;
-       include('../assets/connection.php');
+       include('../connection.php');
        $t=time();
        $transation = $t.$user_id.$newamount;
          $sql = "UPDATE `users` SET `amount` = $newamount  WHERE `id` =$user_id";
-        $update = mysqli_query($con,$sql);
+        $update = mysqli_query($conn,$sql);
         if($update){
             
                   
         $sqltaskMembersx = "SELECT `notification_token` FROM `users` WHERE `id` = '$user_id' ";
-        $taskMembersx = mysqli_query($con,$sqltaskMembersx);
+        $taskMembersx = mysqli_query($conn,$sqltaskMembersx);
         $playerIdx = [];
         $subject = '';
         $newstatus = '';
@@ -1942,13 +1954,13 @@ if(isset($_POST['updatePoints'])){
          
              
                     $order_content = 'TID : '.$transation.' Your wallet has been debited with €'  .$newzzz. '. Your new balance is €' .$newamount.'.';
-                     $contentx = array(
+                     $conntentx = array(
                     "en" => $order_content
                     );
 
                
                     $insert_noti_details = "INSERT INTO `notification`( `user_id`, `content`, `purpose`) VALUES ('$user_id','$order_content','transaction')";
-                    $execute_insert_noti = mysqli_query($con,$insert_noti_details);
+                    $execute_insert_noti = mysqli_query($conn,$insert_noti_details);
                     
                 
 
@@ -1958,7 +1970,7 @@ if(isset($_POST['updatePoints'])){
                      'include_player_ids' => $playerIdx,
                     'data' => array("foo" => "NewMassage","Id" => $taskid),
                     'large_icon' =>"ic_launcher_round.png",
-                    'contents' => $contentx
+                    'contents' => $conntentx
                 );
 
                 $fields = json_encode($fields);
@@ -1981,7 +1993,7 @@ if(isset($_POST['updatePoints'])){
             
             
               $sqladd = "INSERT INTO `tbl_transaction`(`user_id`, `transaction_id`, `amount`, `old_amount` ,`type`, `message`) VALUES ($user_id,$transation,$newamount,$newzzz,'debit','Debited by admin')";
-             $add = mysqli_query($con,$sqladd);
+             $add = mysqli_query($conn,$sqladd);
              if($add){
                  header("Location:../managePoints.php?Massage=Sucessfully updated amount."); 
              }
@@ -2006,7 +2018,7 @@ if(isset($_POST['updatePoints'])){
 
 
 if(isset($_POST['btnSubmit_insertFeaturedProduct'])){
-include('../assets/connection.php');
+include('../connection.php');
   session_start();
   $ProName = $_POST['ProName'];
   $ProDes = $_POST['ProDes'];
@@ -2040,10 +2052,10 @@ include('../assets/connection.php');
          "The file ". htmlspecialchars( basename( $_FILES["ProImage"]["name"])). " has been uploaded.";
          
          $sql = "INSERT INTO `featured_products`( `name`, `description`, `cost`, `price`, `discount`, `qty`,`img`) VALUES ('$ProName','$ProDes',$ProCost,$ProPrice,$ProDiscount,$ProQty,'$filewithnewname')";
-        $result = mysqli_query($con,$sql);
-        // $last_id = mysqli_insert_id($con);
+        $result = mysqli_query($conn,$sql);
+        // $last_id = mysqli_insert_id($conn);
         //  $sql_image = "INSERT INTO `product_images`(`product_id`, `img`) VALUES ($last_id,'$filewithnewname')";
-        // $result_image = mysqli_query($con,$sql_image);
+        // $result_image = mysqli_query($conn,$sql_image);
         
         if($result){
           header("Location:../addfeatured.php?Massage=Sucessfully added new product.");
@@ -2061,7 +2073,7 @@ include('../assets/connection.php');
 //     $order_id = $_POST['order_id'];
 //     // $rider_id = $_POST['rider_id'];
 //     $datatime = '';
-//     include('../assets/connection.php');
+//     include('../connection.php');
 //     $sql;
 //     if($status == 'shipped'){
 //         $sql = "UPDATE `orders_zee` SET `status` = '$status'  , `rider_id` = 0   WHERE `id` = $order_id"; 
@@ -2081,12 +2093,12 @@ include('../assets/connection.php');
 //     }
    
    
-//     $update = mysqli_query($con,$sql);
+//     $update = mysqli_query($conn,$sql);
     
      
 
 //     //  $sqltaskMembers = "SELECT `notification_token`,`name` FROM `users` WHERE `id` = $rider_id ";
-//     //     $taskMembers = mysqli_query($con,$sqltaskMembers);
+//     //     $taskMembers = mysqli_query($conn,$sqltaskMembers);
 //     //     $playerId = [];
 //     //     $subject = '';
 //     //     $ryder_name = '';
@@ -2096,7 +2108,7 @@ include('../assets/connection.php');
 //     //             $ryder_name = $row['name'];
 //     //         }
             
-//     //             $content = array(
+//     //             $conntent = array(
 //     //                 "en" => ' You have been assigned for an order: '.$order_id.'.'
 //     //                 );
 
@@ -2105,7 +2117,7 @@ include('../assets/connection.php');
 //     //                  'include_player_ids' => $playerId,
 //     //                 'data' => array("foo" => "NewMassage","Id" => $taskid),
 //     //                 'large_icon' =>"ic_launcher_round.png",
-//     //                 'contents' => $content
+//     //                 'contents' => $conntent
 //     //             );
 
 //     //             $fields = json_encode($fields);
@@ -2126,7 +2138,7 @@ include('../assets/connection.php');
                 
 
 //         $sql_get_user_id ="SELECT `user_id` FROM `orders_zee` WHERE `id` = '$order_id'";
-//         $execute_get_user_id = mysqli_query($con,$sql_get_user_id);
+//         $execute_get_user_id = mysqli_query($conn,$sql_get_user_id);
 //         $user_data = mysqli_fetch_array($execute_get_user_id);
 //         $get_user_id = $user_data['user_id'];
 
@@ -2136,7 +2148,7 @@ include('../assets/connection.php');
         
 //         if($execute_get_user_id){
 //         $sqltaskMembersx = "SELECT `notification_token` FROM `users` WHERE `id` = '$get_user_id' ";
-//         $taskMembersx = mysqli_query($con,$sqltaskMembersx);
+//         $taskMembersx = mysqli_query($conn,$sqltaskMembersx);
 //         $playerIdx = [];
 //         $subject = '';
 //         $newstatus = '';
@@ -2151,7 +2163,7 @@ include('../assets/connection.php');
 //                 if($status == 'pending'){
                     
 //                     $order_content = 'Ihre Bestellung Nr:'  .$order_id. ' wurde angenommen. Die voraussichtliche Lieferzeit für Ihre Bestellung beträgt '.$datetime.".";
-//                      $contentx = array(
+//                      $conntentx = array(
 //                     "en" => $order_content
 //                     );
                             
@@ -2159,12 +2171,12 @@ include('../assets/connection.php');
 //                 }else if($status == 'shipped')
 //                     {
 //                         $order_content = ' Ihre Bestellung Nr: '.$order_id.' ist gewesen '.$status.' zum Reiter '.$ryder_name;
-//                         $contentx = array(
+//                         $conntentx = array(
 //                     "en" => $order_content
 //                     ); 
 //                     }else{
 //                         $order_content = ' Ihre Bestellung Nr: '.$order_id.' ist gewesen '.$status.'.';
-//                       $contentx = array(
+//                       $conntentx = array(
 //                     "en" => $order_content
 //                     );   
                     
@@ -2172,11 +2184,11 @@ include('../assets/connection.php');
 //                 }
                
 //                     $insert_noti_details = "INSERT INTO `notification`( `user_id`, `content`, `purpose`) VALUES ('$get_user_id','$order_content','order')";
-//                     $execute_insert_noti = mysqli_query($con,$insert_noti_details);
+//                     $execute_insert_noti = mysqli_query($conn,$insert_noti_details);
                     
                 
 //     //  $sql_get_appid = "SELECT  * FROM `enviroments`";
-//     //                     $sql = mysqli_query($con,$sql_get_appid);
+//     //                     $sql = mysqli_query($conn,$sql_get_appid);
 //     //                     $data = mysqli_fetch_array($sql);
 //     //                     $app_id = $data['one_signal_appid'] ?? '2de883ec-be41-4820-a517-558beee8b0ac';
                     
@@ -2186,7 +2198,7 @@ include('../assets/connection.php');
 //                      'include_player_ids' => $playerIdx,
 //                     'data' => array("foo" => "NewMassage","Id" => $taskid),
 //                     'large_icon' =>"ic_launcher_round.png",
-//                     'contents' => $contentx
+//                     'contents' => $conntentx
 //                 );
 
 //                 $fields = json_encode($fields);
@@ -2222,7 +2234,7 @@ if (isset($_POST['btnSubmit_Action'])) {
 // ini_set('display_errors', 1);
     $status = $_POST['Action'];
     $order_id = $_POST['order_id'];
-    include('../assets/connection.php');
+    include('../connection.php');
 
     if ($status == 'shipped') {
         $sql = "UPDATE `orders_zee` SET `status` = '$status' WHERE `id` = $order_id";
@@ -2233,19 +2245,19 @@ if (isset($_POST['btnSubmit_Action'])) {
         $time->add(new DateInterval('PT' . $minutes_to_add . 'M'));
         $datetime = $time->format('Y-m-d g:i A');
         $sql = "UPDATE `orders_zee` SET `status` = '$status', `delivered_at` = '$datetime' WHERE `id` = $order_id";
-        $update = mysqli_query($con, $sql);
+        $update = mysqli_query($conn, $sql);
         
         
         
           $get_user_query = "SELECT user_id FROM orders_zee WHERE id = '$order_id'";
-        $result_user = mysqli_query($con, $get_user_query);
+        $result_user = mysqli_query($conn, $get_user_query);
         $row_user = mysqli_fetch_assoc($result_user);
         
         if ($row_user) {
             $user_id = $row_user['user_id'];
         
             $get_email_query = "SELECT email, name FROM users WHERE id = '$user_id'";
-            $result_email = mysqli_query($con, $get_email_query);
+            $result_email = mysqli_query($conn, $get_email_query);
             $row_email = mysqli_fetch_assoc($result_email);
         
             if ($row_email) {
@@ -2263,7 +2275,7 @@ if (isset($_POST['btnSubmit_Action'])) {
                         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                         $mail->Port = 587;
                     
-                        $mail->setFrom('support@foodola.de', 'Foodola');
+                        $mail->setFrom($FROM_EMAIL, $APP_NAME);
                         $mail->addAddress($email); 
                     
                         $mail->isHTML(true);
@@ -2274,7 +2286,7 @@ if (isset($_POST['btnSubmit_Action'])) {
                         $mail->Body = '
                         <html>
                         <head>
-                            <title>Ihre Bestellung wurde angenommen – Foodola</title>
+                            <title>Ihre Bestellung wurde angenommen –' . htmlspecialchars($APP_NAME) . '</title>
                             <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
                             <style>
                                 body {
@@ -2312,20 +2324,20 @@ if (isset($_POST['btnSubmit_Action'])) {
                             </style>
                         </head>
                         <body>
-                            <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://foodola.foodola.shop/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'' . $BASE_URL . 'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
                                 <tr>
                                     <td align="center">
                                         <table width="100%" class="content" style="max-width: 600px;">
                                             <tr>
                                                 <td align="center">
-                                                    <img src="https://foodola.foodola.shop/admin_panel/images/logo.png" alt="Foodola" style="width: 100px; margin-bottom: 20px;">
+                                                    <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="'. htmlspecialchars($APP_NAME) .'" style="width: 100px; margin-bottom: 20px;">
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>
                                                     <h1>Ihre Bestellung wurde angenommen!</h1>
                                                     <p>Hallo <strong>' . htmlspecialchars($name) . '</strong>,</p>
-                                                    <p>Vielen Dank für Ihre Bestellung bei <strong>Foodola</strong>.</p>
+                                                    <p>Vielen Dank für Ihre Bestellung bei <strong>' . htmlspecialchars($APP_NAME) . '</strong>.</p>
                                                     <p><strong>Bestellnummer:</strong> ' . htmlspecialchars($order_id) . '</p>
                                                     <p>Ihre Bestellung wurde erfolgreich angenommen und wird in Kürze bearbeitet.</p>
                                                     <h3>Was kommt als Nächstes?</h3>
@@ -2334,7 +2346,7 @@ if (isset($_POST['btnSubmit_Action'])) {
                                                         <li>Sie erhalten eine Benachrichtigung, sobald Ihre Bestellung unterwegs ist.</li>
                                                     </ul>
                                                     <p>Bei Fragen stehen wir Ihnen jederzeit zur Verfügung.</p>
-                                                    <p>Mit freundlichen Grüßen,<br>Ihr Foodola Team</p>
+                                                     <p>Mit freundlichen Grüßen,<br>Ihr ' . htmlspecialchars($APP_NAME) . ' Team</p>
                                                 </td>
                                             </tr>
                                         </table>
@@ -2361,7 +2373,7 @@ if (isset($_POST['btnSubmit_Action'])) {
     }elseif($status == 'delivered'){
     
             $checkcashback = "SELECT * FROM cash_back WHERE status = 1";
-            $execute = mysqli_query($con, $checkcashback);
+            $execute = mysqli_query($conn, $checkcashback);
             $row = mysqli_fetch_assoc($execute);
             
             if ($row) { // Check if cashback is active
@@ -2369,7 +2381,7 @@ if (isset($_POST['btnSubmit_Action'])) {
             
                 // Check if cashback_status is already 1
                 $check_order_status = "SELECT `cashback_status` FROM `orders_zee` WHERE `id` = '$order_id'";
-                $execute_status = mysqli_query($con, $check_order_status);
+                $execute_status = mysqli_query($conn, $check_order_status);
                 $order_status_row = mysqli_fetch_assoc($execute_status);
             
                if ($order_status_row['cashback_status'] == 1) {
@@ -2379,12 +2391,12 @@ if (isset($_POST['btnSubmit_Action'])) {
                 }
                 // Update order status and set cashback_status to 1
                 $sql = "UPDATE `orders_zee` SET `status` = '$status', `cashback_status` = 1 WHERE `id` = $order_id";
-                $update = mysqli_query($con, $sql);
+                $update = mysqli_query($conn, $sql);
             
                 if ($update) {
                     // Fetch order total price
                     $order_details = "SELECT order_total_price FROM orders_zee WHERE `id` = '$order_id'";
-                    $execute_order = mysqli_query($con, $order_details);
+                    $execute_order = mysqli_query($conn, $order_details);
                     $order_row = mysqli_fetch_assoc($execute_order);
                     $total_order_amount = $order_row['order_total_price'];
             
@@ -2393,13 +2405,13 @@ if (isset($_POST['btnSubmit_Action'])) {
             
                     // Fetch user ID
                     $sql_user = "SELECT `user_id` FROM `orders_zee` WHERE `id` = '$order_id'";
-                    $execute_user = mysqli_query($con, $sql_user);
+                    $execute_user = mysqli_query($conn, $sql_user);
                     $row_user = mysqli_fetch_assoc($execute_user);
                     $user_id = $row_user['user_id'];
             
                     // Add cashback to user wallet
                     $sqlUpdated = "UPDATE `users` SET `amount` = `amount` + $cashback_amount WHERE `id` = '$user_id'";
-                    $amount_added = mysqli_query($con, $sqlUpdated);
+                    $amount_added = mysqli_query($conn, $sqlUpdated);
             
                     // Insert transaction record
                     if ($amount_added) {
@@ -2410,12 +2422,12 @@ if (isset($_POST['btnSubmit_Action'])) {
             
                         $sql = "INSERT INTO `tbl_transaction`(`user_id`, `transaction_id`, `amount`, `type`, `message`, `english_message`) 
                                 VALUES ('$user_id','$transaction_id','$cashback_amount','credit','$transaction_message', '$english_message')";
-                        $ex_sql = mysqli_query($con, $sql);
+                        $ex_sql = mysqli_query($conn, $sql);
                     }
             
                     // Fetch user's notification token
                     $sql_get_user_token = "SELECT `notification_token` FROM `users` WHERE `id` = '$user_id'";
-                    $result = mysqli_query($con, $sql_get_user_token);
+                    $result = mysqli_query($conn, $sql_get_user_token);
                     $row = mysqli_fetch_assoc($result);
                     $token = $row['notification_token'];
                     
@@ -2423,10 +2435,10 @@ if (isset($_POST['btnSubmit_Action'])) {
             }
             
               $sql = "UPDATE `orders_zee` SET `status` = '$status' WHERE `id` = $order_id";
-                $update = mysqli_query($con, $sql);
+                $update = mysqli_query($conn, $sql);
 
                 
-         $content = [
+         $conntent = [
                 "en" => "Sie haben eine Gutschrift von €$cashback_amount in Ihrer Brieftasche als Cashback für die Bestellung (ID: $order_id) erhalten."
             ];
 
@@ -2435,7 +2447,7 @@ if (isset($_POST['btnSubmit_Action'])) {
                         'include_player_ids' => [$token], 
                         'data' => ["foo" => "NewMessage"],
                         'large_icon' => "ic_launcher_round.png",
-                        'contents' => $content
+                        'contents' => $conntent
                     ];
                     
             $fields = json_encode($fields);
@@ -2456,14 +2468,14 @@ if (isset($_POST['btnSubmit_Action'])) {
             curl_close($ch);
             
             
-            $insert_noti_details = "INSERT INTO `notification` (`user_id`, `content`, `purpose`) VALUES ('$user_id', '$content', 'order')";
-            mysqli_query($con, $insert_noti_details);
+            $insert_noti_details = "INSERT INTO `notification` (`user_id`, `content`, `purpose`) VALUES ('$user_id', '$conntent', 'order')";
+            mysqli_query($conn, $insert_noti_details);
             
             
             
                             
             $get_user_query = "SELECT user_id FROM orders_zee WHERE id = '$order_id'";
-            $result_user = mysqli_query($con, $get_user_query);
+            $result_user = mysqli_query($conn, $get_user_query);
             $row_user = mysqli_fetch_assoc($result_user);
             
             if ($row_user) {
@@ -2471,7 +2483,7 @@ if (isset($_POST['btnSubmit_Action'])) {
             
                 // Fetch email and name of user from users table
                 $get_email_query = "SELECT email, name FROM users WHERE id = '$user_id'";
-                $result_email = mysqli_query($con, $get_email_query);
+                $result_email = mysqli_query($conn, $get_email_query);
                 $row_email = mysqli_fetch_assoc($result_email);
             
                 if ($row_email) {
@@ -2489,7 +2501,7 @@ if (isset($_POST['btnSubmit_Action'])) {
                             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                             $mail->Port = 587;
                         
-                            $mail->setFrom('support@foodola.de', 'Foodola');
+                            $mail->setFrom($FROM_EMAIL, $APP_NAME);
                             $mail->addAddress($email); 
                         
                             $mail->isHTML(true);
@@ -2498,7 +2510,7 @@ if (isset($_POST['btnSubmit_Action'])) {
                         $mail->Body = '
                         <html>
                         <head>
-                            <title>Ihre Bestellung wurde geliefert – Foodola</title>
+                            <title>Ihre Bestellung wurde geliefert –' . htmlspecialchars($APP_NAME) . '</title>
                             <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
                             <style>
                                 body {
@@ -2536,13 +2548,13 @@ if (isset($_POST['btnSubmit_Action'])) {
                             </style>
                         </head>
                         <body>
-                            <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'https://foodola.foodola.shop/API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'' . $BASE_URL . 'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
                                 <tr>
                                     <td align="center">
                                         <table width="100%" class="content" style="max-width: 600px;">
                                             <tr>
                                                 <td align="center">
-                                                    <img src="https://foodola.foodola.shop/admin_panel/images/logo.png" alt="Foodola" style="width: 100px; margin-bottom: 20px;">
+                                                    <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="'. htmlspecialchars($APP_NAME) .'" style="width: 100px; margin-bottom: 20px;">
                                                 </td>
                                             </tr>
                                             <tr>
@@ -2552,9 +2564,9 @@ if (isset($_POST['btnSubmit_Action'])) {
                                                     <p>Wir freuen uns, Ihnen mitteilen zu können, dass Ihre Bestellung erfolgreich geliefert wurde.</p>
                                                     <p><strong>Bestellnummer:</strong> #' . htmlspecialchars($order_id) . '</p>
                                                     <h3>Guten Appetit!</h3>
-                                                    <p>Wir hoffen, dass Sie Ihr Essen genießen. Vielen Dank, dass Sie bei <strong>Foodola</strong> bestellt haben.</p>
+                                                    <p>Wir hoffen, dass Sie Ihr Essen genießen. Vielen Dank, dass Sie bei <strong>' . htmlspecialchars($APP_NAME) . '</strong> bestellt haben.</p>
                                                     <p>Wenn Sie Fragen haben oder Feedback geben möchten, stehen wir Ihnen jederzeit zur Verfügung.</p>
-                                                    <p>Mit freundlichen Grüßen,<br>Ihr Foodola Team</p>
+                                                    <p>Mit freundlichen Grüßen,<br>Ihr ' . htmlspecialchars($APP_NAME) . ' Team</p>
                                                 </td>
                                             </tr>
                                         </table>
@@ -2581,13 +2593,13 @@ if (isset($_POST['btnSubmit_Action'])) {
     }
 
     $sql_get_user_id = "SELECT `user_id` FROM `orders_zee` WHERE `id` = '$order_id'";
-    $execute_get_user_id = mysqli_query($con, $sql_get_user_id);
+    $execute_get_user_id = mysqli_query($conn, $sql_get_user_id);
     $user_data = mysqli_fetch_assoc($execute_get_user_id);
     $get_user_id = $user_data['user_id'];
 
     if ($get_user_id) {
         $sqltaskMembersx = "SELECT `notification_token` FROM `users` WHERE `id` = '$get_user_id'";
-        $taskMembersx = mysqli_query($con, $sqltaskMembersx);
+        $taskMembersx = mysqli_query($conn, $sqltaskMembersx);
         $playerIdx = [];
         while ($row = mysqli_fetch_assoc($taskMembersx)) {
             array_push($playerIdx, $row['notification_token']);
@@ -2609,11 +2621,11 @@ if (isset($_POST['btnSubmit_Action'])) {
 };
 
 // Escape values for safe SQL insertion
-$de_content = mysqli_real_escape_string($con, $order_content['de']);
-$en_content = mysqli_real_escape_string($con, $order_content['en']);
+$de_content = mysqli_real_escape_string($conn, $order_content['de']);
+$en_content = mysqli_real_escape_string($conn, $order_content['en']);
 
         $insert_noti_details = "INSERT INTO `notification` (`user_id`, `content`, `german_content`,`purpose`) VALUES ('$get_user_id', '$en_content', '$de_content', 'order')";
-        mysqli_query($con, $insert_noti_details);
+        mysqli_query($conn, $insert_noti_details);
 
         $fields = json_encode([
             'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
@@ -2666,23 +2678,23 @@ $en_content = mysqli_real_escape_string($con, $order_content['en']);
 
 
 if(isset($_POST['updateCategory'])){
-    include('../assets/connection.php');
+    include('../connection.php');
     
-    $ProName = mysqli_real_escape_string($con,$_POST['ProName']);
+    $ProName = mysqli_real_escape_string($conn,$_POST['ProName']);
     $product_id = $_POST['product_id'];
     $sql = "UPDATE `categories` SET `name` = '$ProName' WHERE `id` = $product_id";
-    $update = mysqli_query($con,$sql);
+    $update = mysqli_query($conn,$sql);
     if($update){
          header("Location:../viewcategories.php?Massage=Sucessfully updated category.");
     }
 }
 
 // if(isset($_POST['updateSubCategory'])){
-//      include('../assets/connection.php');
-//     $ProName = mysqli_real_escape_string($con, $_POST['ProName']);
+//      include('../connection.php');
+//     $ProName = mysqli_real_escape_string($conn, $_POST['ProName']);
 //     $product_id = $_POST['product_id'];
 //     $sql = "UPDATE `sub_categories` SET `name` = '$ProName' WHERE `id` = $product_id";
-//     $update = mysqli_query($con,$sql);
+//     $update = mysqli_query($conn,$sql);
 //     if($update){
 //          header("Location:../SubCat.php?Massage=Sucessfully updated sub category.");
 //     }
@@ -2691,8 +2703,8 @@ if(isset($_POST['updateCategory'])){
 if (isset($_POST['updateSubCategory'])) {
 //         error_reporting(E_ALL);
 // ini_set('display_errors', 1);
-  include('../assets/connection.php');
-  $ProName = mysqli_real_escape_string($con, $_POST['ProName']);
+  include('../connection.php');
+  $ProName = mysqli_real_escape_string($conn, $_POST['ProName']);
   $product_id = $_POST['product_id'];
   $banner_image = $_POST['banner_image'];
 
@@ -2706,7 +2718,7 @@ if (isset($_POST['updateSubCategory'])) {
       "The file " . htmlspecialchars(basename($_FILES["banner_image"]["name"])) . " has been uploaded.";
 
       $sql = "UPDATE `sub_categories` SET `name` = '$ProName', `banner_image` = '$filewithnewname' WHERE `id` = $product_id";
-      $update = mysqli_query($con, $sql);
+      $update = mysqli_query($conn, $sql);
       if ($update) {
         header("Location:../SubCat.php?Massage=Sucessfully updated sub category.");
       }
@@ -2720,36 +2732,36 @@ if (isset($_POST['btnSubmit_insertAreas'])) {
     $minorderprice = $_POST['minorderprice'];
     $branch_id = $_POST['branch_id']; 
 
-    include('../assets/connection.php');
+    include('../connection.php');
 
 
     $sql = "INSERT INTO `tbl_areas` (`area_name`, `min_order_amount`, `branch_id`) 
             VALUES ('$PostalCode', '$minorderprice', '$branch_id')";
             
-    $insert = mysqli_query($con, $sql);
+    $insert = mysqli_query($conn, $sql);
 
     if ($insert) {
         header("Location:../addareas.php?Massage=Sucessfully added new area.");
     } else {
-        echo "Error: " . mysqli_error($con);
+        echo "Error: " . mysqli_error($conn);
     }
 }
 
 if(isset($_POST['updateProduct'])){
 //     error_reporting(E_ALL);
 // ini_set('display_errors', 1);
-    include('../assets/connection.php');
+    include('../connection.php');
     include('../assets/config.php'); 
     $product_id = $_POST['product_id'];
-    $ProName = mysqli_real_escape_string($con,$_POST['ProName']);
-    $ProDes = mysqli_real_escape_string($con,$_POST['ProDes']);
+    $ProName = mysqli_real_escape_string($conn,$_POST['ProName']);
+    $ProDes = mysqli_real_escape_string($conn,$_POST['ProDes']);
     $ProCost = $_POST['ProCost'];
     $ProPrice = $_POST['ProPrice'];
     $ProDis = $_POST['ProDis'];
     $features = $_POST['features'];
-    $status = mysqli_real_escape_string($con,$_POST['status']);
-    $tax = mysqli_real_escape_string($con,$_POST['tax']);
-    $sku_id = mysqli_real_escape_string($con,$_POST['sku_id']);
+    $status = mysqli_real_escape_string($conn,$_POST['status']);
+    $tax = mysqli_real_escape_string($conn,$_POST['tax']);
+    $sku_id = mysqli_real_escape_string($conn,$_POST['sku_id']);
     
     
     // $addon = $_POST['addon'];
@@ -2758,13 +2770,13 @@ if(isset($_POST['updateProduct'])){
     
     
     $sql = "UPDATE `products` SET `name`='$ProName',`description`='$ProDes',`cost`=$ProCost,`price`=$ProPrice,`discount`=$ProDis , `features` = '$features',  `status` = '$status', `sku_id`= '$sku_id',     `tax` = '$tax'  WHERE `id`=$product_id";
-    $update = mysqli_query($con,$sql);
+    $update = mysqli_query($conn,$sql);
     
     
     if($update){
          $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
                         VALUES ('pizzablitz', '1' ,NOW(),NOW())";
-        $monitor_update = mysqli_query($con, $monitor_sql);
+        $monitor_update = mysqli_query($conn, $monitor_sql);
 
         if ($monitor_update) {
             header("Location:../manageproducts.php?&Massage=Sucessfully updated product.");
@@ -2781,9 +2793,9 @@ if(isset($_POST['updatefeaturedProduct'])){
     $addon_id = $_POST['product_id'];
     $addon_name = $_POST['Addon_name'];
     $addon_price = $_POST['Addon_price'];
-    include('../assets/connection.php');
+    include('../connection.php');
     $sql = "UPDATE `add_on` SET `addon_name`='$addon_name',`addon_price`='$addon_price' WHERE `id`=$addon_id";
-    $update = mysqli_query($con,$sql);
+    $update = mysqli_query($conn,$sql);
     if($update){
          header("Location:../manage_addons.php?&Massage=Sucessfully updated product.");
     }
@@ -2793,16 +2805,16 @@ if(isset($_POST['updatefeaturedProduct'])){
 // ZEE
 if(isset($_POST['updateSubAddon'])){
     
-    include('../assets/connection.php');
+    include('../connection.php');
     $addon_id = $_POST['as_id'];
     
     $addon_title = $_POST['ao_title'];
     
-    $addon_name = mysqli_real_escape_string($con, $_POST['as_name']);
+    $addon_name = mysqli_real_escape_string($conn, $_POST['as_name']);
     
     $addon_price = $_POST['as_price'];
     $sql = "UPDATE `addon_sublist` SET `ao_title`='$addon_title',`as_name`='$addon_name',`as_price`='$addon_price' WHERE `as_id`=$addon_id";
-    $update = mysqli_query($con,$sql);
+    $update = mysqli_query($conn,$sql);
     if($update){
          header("Location:../view_addons.php?&Massage=Sucessfully updated Addons.");
     }
@@ -2821,13 +2833,13 @@ if(isset($_POST['updateSubAddon'])){
 
 
 if(isset($_POST['updateVariationTitle'])){
-    include('../assets/connection.php');
+    include('../connection.php');
     
     $id = $_POST['id'];
-    $title = mysqli_real_escape_string($con,$_POST['title']);
+    $title = mysqli_real_escape_string($conn,$_POST['title']);
     
     $sql = "UPDATE `variation` SET `title`= '$title' WHERE id = $id";
-    $update = mysqli_query($con,$sql);
+    $update = mysqli_query($conn,$sql);
     if($update){
          header("Location:../managevariations.php?&Massage=Sucessfully updated variation title.");
     }
@@ -2839,7 +2851,7 @@ if(isset($_POST['updateVariationTitle'])){
 
 //updateSubTypes
 if(isset($_POST['updateSubTypes'])){
-    include('../assets/connection.php');
+    include('../connection.php');
     
     $ts_id = $_POST['ts_id'];
      $t_id = $_POST['t_id'];
@@ -2847,11 +2859,11 @@ if(isset($_POST['updateSubTypes'])){
     
     $type_title_user = $_POST['type_title_user'];
     
-    $ts_name = mysqli_real_escape_string($con, $_POST['ts_name']);
-    $type_title = mysqli_real_escape_string($con, $_POST['type_title']);
+    $ts_name = mysqli_real_escape_string($conn, $_POST['ts_name']);
+    $type_title = mysqli_real_escape_string($conn, $_POST['type_title']);
     
     $sql = "UPDATE `types_sublist` SET `type_title`='$type_title',`type_title_user`='$type_title_user',`ts_name`='$ts_name' WHERE `ts_id`=$ts_id";
-    $update = mysqli_query($con,$sql);
+    $update = mysqli_query($conn,$sql);
     if($update){
          header("Location:../update_types.php?id=".$t_id."&Massage=Sucessfully updated Types.");
     }
@@ -2862,17 +2874,17 @@ if(isset($_POST['updateSubTypes'])){
 //updateSubTypes
 if(isset($_POST['updateSubVariation']))
 {
-    include('../assets/connection.php');
+    include('../connection.php');
     
     $id = $_POST['id'];
     $pro_id = $_POST['name'];
-    $sub_title = mysqli_real_escape_string($con, $_POST['sub_title']);
+    $sub_title = mysqli_real_escape_string($conn, $_POST['sub_title']);
     
     // echo $pro_id;
     // die();
     
     $sql = "UPDATE `variation_with_product` SET `product_id`= $pro_id,`sub_title`= '$sub_title' WHERE `id`= $id";
-    $update = mysqli_query($con,$sql);
+    $update = mysqli_query($conn,$sql);
     if($update){
          header("Location:../managevariations.php?&Massage=Sucessfully updated Types.");
     }
@@ -2883,7 +2895,7 @@ if(isset($_POST['updateSubVariation']))
 
 if(isset($_POST['updateSubDressings'])){
     
-    include('../assets/connection.php');
+    include('../connection.php');
     
     $ds_id = $_POST['ds_id'];
      $d_id = $_POST['d_id'];
@@ -2891,11 +2903,11 @@ if(isset($_POST['updateSubDressings'])){
     
      $dressing_title_user = '';
     
-    $dressing_name = mysqli_real_escape_string($con,$_POST['dressing_name']);
-        $dressing_title = mysqli_real_escape_string($con,$_POST['dressing_title']);
+    $dressing_name = mysqli_real_escape_string($conn,$_POST['dressing_name']);
+        $dressing_title = mysqli_real_escape_string($conn,$_POST['dressing_title']);
     
     $sql = "UPDATE `dressing_sublist` SET `dressing_title`='$dressing_title',`dressing_title_user`='$dressing_title_user',`dressing_name`='$dressing_name' WHERE `ds_id`=$ds_id";
-    $update = mysqli_query($con,$sql);
+    $update = mysqli_query($conn,$sql);
     if($update){
          header("Location:../update_dressing.php?id=".$d_id."&Massage=Sucessfully updated Dressing.");
     }
@@ -2907,7 +2919,7 @@ if(isset($_POST['updateSubDressings'])){
 
 if(isset($_POST['updateInventory'])){
     
-    include('../assets/connection.php');
+    include('../connection.php');
     
     $Type = $_POST['Type'];
  
@@ -2916,10 +2928,10 @@ if(isset($_POST['updateInventory'])){
        $product_id= $_POST['product_id'];
        $newqty = $_POST['newqty'] + $availabale_qty;
          $sql = "UPDATE `products` SET `qty` = $newqty Where `id` = $product_id";
-        $update = mysqli_query($con,$sql);
+        $update = mysqli_query($conn,$sql);
         if($update){
              $sqladd = "INSERT INTO `stock_log`(`product_id`, `qty`, `type`) VALUES ($product_id,$newqty,'$Type')";
-             $add = mysqli_query($con,$sqladd);
+             $add = mysqli_query($conn,$sqladd);
              if($add){
                  header("Location:../manageinventory.php?Massage=Sucessfully updated inventory."); 
              }
@@ -2931,12 +2943,12 @@ if(isset($_POST['updateInventory'])){
         $availabale_qty = $_POST['old_qty'];
        $product_id= $_POST['product_id'];
        $newqty = $availabale_qty - $_POST['newqty'];
-       include('../assets/connection.php');
+       include('../connection.php');
          $sql = "UPDATE `products` SET `qty` = $newqty Where `id` = $product_id";
-        $update = mysqli_query($con,$sql);
+        $update = mysqli_query($conn,$sql);
         if($update){
              $sqladd = "INSERT INTO `stock_log`(`product_id`, `qty`, `type`) VALUES ($product_id,$newqty,'$Type')";
-             $add = mysqli_query($con,$sqladd);
+             $add = mysqli_query($conn,$sqladd);
              if($add){
                  header("Location:../manageinventory.php?Massage=Sucessfully updated inventory."); 
              }
@@ -2950,10 +2962,10 @@ if(isset($_POST['updateInventory'])){
 if(isset($_POST['btnSubmit_privacypolicy'])){
     $privacy = $_POST['privacy'];
 
-       include('../assets/connection.php');
+       include('../connection.php');
 
              $sqladd = "INSERT INTO `privacy_policy`(`privacy`) VALUES ('$privacy')";
-             $add = mysqli_query($con,$sqladd);
+             $add = mysqli_query($conn,$sqladd);
              if($add){
                  header("Location:../managePoints.php?Massage=Sucessfully updated points."); 
            
@@ -2983,27 +2995,27 @@ if(isset($_POST['btnSubmit_privacypolicy'])){
 //     // var_dump($_POST);
 //     // die();
 
-//         include('../assets/connection.php');
+//         include('../connection.php');
 //         $sqlupdate1 = "UPDATE `tbl_working_hours` SET `start_time` = '$Mon_start_time' , `end_time` = '$Mon_end_time' WHERE `day` = 'Mon'";
-//         $update = mysqli_query($con,$sqlupdate1);
+//         $update = mysqli_query($conn,$sqlupdate1);
         
 //         $sqlupdate2 = "UPDATE `tbl_working_hours` SET `start_time`= '$Tue_start_time', `end_time`='$Tue_end_time' WHERE day='Tue'";
-//         $update = mysqli_query($con,$sqlupdate2);
+//         $update = mysqli_query($conn,$sqlupdate2);
         
 //         echo $sqlupdate3 = "UPDATE `tbl_working_hours` SET `start_time`='$Wed_start_time', `end_time`='$Wed_end_time' WHERE day='Wed'";
-//         $update = mysqli_query($con,$sqlupdate3);
+//         $update = mysqli_query($conn,$sqlupdate3);
         
 //          $sqlupdate4 = "UPDATE `tbl_working_hours` SET `start_time`='$Thur_start_time', `end_time`='$Thur_end_time' WHERE day='Thu'";
-//         $update = mysqli_query($con,$sqlupdate4);
+//         $update = mysqli_query($conn,$sqlupdate4);
         
 //         echo $sqlupdate5 = "UPDATE `tbl_working_hours` SET `start_time`='$Fri_start_time', `end_time`='$Fri_end_time' WHERE day='Fri'";
-//         $update = mysqli_query($con,$sqlupdate5);
+//         $update = mysqli_query($conn,$sqlupdate5);
         
 //         echo $sqlupdate6 = "UPDATE `tbl_working_hours` SET `start_time`='$Sat_start_time', `end_time`='$Sat_end_time' WHERE day='Sat'";
-//         $update = mysqli_query($con,$sqlupdate6);
+//         $update = mysqli_query($conn,$sqlupdate6);
         
 //         echo $sqlupdate7 = "UPDATE `tbl_working_hours` SET `start_time`='$Sun_start_time', `end_time`='$Sun_end_time' WHERE day='Sun'";
-//         $update = mysqli_query($con,$sqlupdate7);
+//         $update = mysqli_query($conn,$sqlupdate7);
          
 //         if($update){
 //             header("Location:../managetimings.php?Massage=Sucessfully updated timings."); 
@@ -3013,17 +3025,17 @@ if(isset($_POST['btnSubmit_privacypolicy'])){
 
 
 if (isset($_POST['btnSubmit_insertTimings'])) {
-    include('../assets/connection.php');
+    include('../connection.php');
 
     // Get is_open status
     $is_open = isset($_POST['is_open']) ? 1 : 0;
 
     // Update or insert into your settings table
-    $check = mysqli_query($con, "SELECT * FROM `system_setting` LIMIT 1");
+    $check = mysqli_query($conn, "SELECT * FROM `system_setting` LIMIT 1");
     if (mysqli_num_rows($check) > 0) {
-        mysqli_query($con, "UPDATE `system_setting` SET `is_open` = $is_open");
+        mysqli_query($conn, "UPDATE `system_setting` SET `is_open` = $is_open");
     } else {
-        mysqli_query($con, "INSERT INTO `system_setting` (`is_open`) VALUES ($is_open)");
+        mysqli_query($conn, "INSERT INTO `system_setting` (`is_open`) VALUES ($is_open)");
     }
 
     // Days list
@@ -3040,10 +3052,10 @@ if (isset($_POST['btnSubmit_insertTimings'])) {
         $is_holiday = isset($_POST[$dayKey . '_holiday']) ? 1 : 0;
 
         // Check if record exists
-        $check = mysqli_query($con, "SELECT id FROM tbl_working_hours WHERE day = '$day'");
+        $check = mysqli_query($conn, "SELECT id FROM tbl_working_hours WHERE day = '$day'");
         if (mysqli_num_rows($check) > 0) {
             // Update
-            $update = mysqli_query($con, "
+            $update = mysqli_query($conn, "
                 UPDATE tbl_working_hours 
                 SET start_time_1 = '$from1', end_time_1 = '$to1',
                     start_time_2 = '$from2', end_time_2 = '$to2',
@@ -3060,10 +3072,10 @@ if (isset($_POST['btnSubmit_insertTimings'])) {
 if(isset($_POST['btnSubmit_termscondition'])){
     $privacy = $_POST['terms'];
 
-       include('../assets/connection.php');
+       include('../connection.php');
 
              $sqladd = "INSERT INTO `terms_condition`(`terms_condition`) VALUES ('$privacy')";
-             $add = mysqli_query($con,$sqladd);
+             $add = mysqli_query($conn,$sqladd);
              if($add){
                  header("Location:../managePoints.php?Massage=Sucessfully updated points."); 
            
@@ -3076,7 +3088,7 @@ if(isset($_POST['btnSubmit_termscondition'])){
 // function sendMessage($userid){
 //     require 'connection.php';
 //     $sqltaskMembers = "SELECT `id`, `role_id`, `name`, `phone`, `email`, `email_verified_at`, `password`, `notification_token`, `remember_token`, `rewards_token`, `created_at`, `updated_at` FROM `users` WHERE `id` = $userid";
-//         $taskMembers = mysqli_query($con,$sqltaskMembers);
+//         $taskMembers = mysqli_query($conn,$sqltaskMembers);
 //         $playerId = [];
 //         $subject = '';
 //         while($row = mysqli_fetch_array($taskMembers)){
@@ -3084,7 +3096,7 @@ if(isset($_POST['btnSubmit_termscondition'])){
 //                  array_push($playerId, '1913aa90-d6ce-40b5-8480-f17595f18ab6');           
 //             }
             
-//                 $content = array(
+//                 $conntent = array(
 //                     "en" => ' you got new message '.$subject.'.'
 //                     );
 
@@ -3093,7 +3105,7 @@ if(isset($_POST['btnSubmit_termscondition'])){
 //                      'include_player_ids' => $playerId,
 //                     'data' => array("foo" => "NewMassage","Id" => $taskid),
 //                     'large_icon' =>"ic_launcher_round.png",
-//                     'contents' => $content
+//                     'contents' => $conntent
 //                 );
 
 //                 $fields = json_encode($fields);
@@ -3122,7 +3134,7 @@ if(isset($_POST['btnSubmit_termscondition'])){
 
 
 // if (isset($_POST['updateDeals'])) {
-//     include('../assets/connection.php');
+//     include('../connection.php');
 
 //     // Retrieve form data
 //     $deal_id = $_POST['deal_id'];
@@ -3151,7 +3163,7 @@ if(isset($_POST['btnSubmit_termscondition'])){
 //     $sql .= " WHERE `deal_id`='$deal_id'";
 
 //     // Execute the SQL update statement
-//     if (mysqli_query($con, $sql)) {
+//     if (mysqli_query($conn, $sql)) {
 //         // If the update is successful, show an alert and redirect
 //         echo "<script>
 //                 alert('Update successfully');
@@ -3160,13 +3172,13 @@ if(isset($_POST['btnSubmit_termscondition'])){
 //     } else {
 //         // If the update fails, show an error
 //         echo "<script>
-//                 alert('Error updating record: " . mysqli_error($con) . "');
+//                 alert('Error updating record: " . mysqli_error($conn) . "');
 //               </script>";
 //     }
 // }
 
 if (isset($_POST['updateDeals'])) {
-    include('../assets/connection.php');
+    include('../connection.php');
 
     // Deal data
     $deal_id = $_POST['deal_id'];
@@ -3203,7 +3215,7 @@ if (isset($_POST['updateDeals'])) {
     }
     $sql .= " WHERE `deal_id`='$deal_id'";
 
-    $success = mysqli_query($con, $sql);
+    $success = mysqli_query($conn, $sql);
 
     // Update each deal item
 
@@ -3219,7 +3231,7 @@ if (isset($_POST['updateDeals'])) {
                                 `di_num_free_items`='$freeItems', 
                                 `deal_subdata`='$deal_subdata' 
                            WHERE `di_id` = '$itemId'";
-                mysqli_query($con, $update);
+                mysqli_query($conn, $update);
             }
         }
 

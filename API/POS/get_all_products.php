@@ -3,7 +3,7 @@ header("Access-Control-Allow-Origin: *");  // Allow the specific origin
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS"); // Allow specific HTTP methods
 header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Allow specific headers
 header("Content-Type: application/json"); 
-include('connection.php'); 
+include('../connection.php'); 
 
 $product_query = "SELECT * FROM products WHERE `status` = 'Active' AND `for_deal_only` = '0'";
 $product_result = mysqli_query($conn, $product_query);

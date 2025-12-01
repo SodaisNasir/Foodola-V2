@@ -6,8 +6,8 @@ header("Content-Type: application/json");
 
 
 if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC'){
-     $sql = "SELECT `id`, `area_name`,`min_order_amount`, `created_at`, `branch_id`, `is_disable` FROM `tbl_areas`";
-     include('connection.php');
+     $sql = "SELECT `id`, `area_name`,`min_order_amount`, `created_at`, `branch_id`, `is_disable`, `discounted_delivery_amount` FROM `tbl_areas`";
+     include('../connection.php');
      $execute = mysqli_query($conn,$sql);
      if(mysqli_num_rows($execute) > 0){
          $product_array = array();
@@ -16,6 +16,7 @@ if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbq
                         "id"=>$row['id'],
                         "postal_code"=>$row['area_name'],
                         "min_order_price"=>$row['min_order_amount'],
+                        "discounted_delivery_amount"=>$row['discounted_delivery_amount'],
                         "created_at"=>$row['created_at'],
                         "branch_id" => $row['branch_id']
                     ];

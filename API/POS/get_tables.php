@@ -8,7 +8,7 @@ header("Content-Type: application/json");
 // ini_set('display_errors', 1);
 
 if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC') {
-    include('connection.php');
+    include('../connection.php');
 
     $branch_id = mysqli_real_escape_string($conn, $_POST['branch_id']);
     $sql = "SELECT `id`, `table_name`, `seats`, `table_image`, `status`, `created_at`, `occupied_at`, `branch_id`, `min`, `maximum`, `updated_at` FROM `tables` WHERE `branch_id` = '$branch_id'";

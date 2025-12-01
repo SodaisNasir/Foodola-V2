@@ -255,12 +255,12 @@ if ($row = mysqli_fetch_assoc($result)) {
           </div>
 
           <!-- Select Position -->
-          <div class="mb-3">
-            <label for="positionSelect" class="form-label">Set Position</label>
-            <select id="positionSelect" class="form-select" onchange="moveRowToTop(this.value)">
+          <!--<div class="mb-3">-->
+          <!--  <label for="positionSelect" class="form-label">Set Position</label>-->
+          <!--  <select id="positionSelect" class="form-select" onchange="moveRowToTop(this.value)">-->
               <!-- Options filled via JS -->
-            </select>
-          </div>
+          <!--  </select>-->
+          <!--</div>-->
 
           <button type="submit" name="updateCategory" class="btn btn-primary">Submit</button>
         </form>

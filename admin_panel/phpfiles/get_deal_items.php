@@ -2,16 +2,15 @@
 
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
-
-include('../assets/connection.php');
+include('../connection.php');
 
 $deal_id = $_GET['deal_id'];
 
 $sql = "SELECT * FROM deal_items WHERE deal_id = '$deal_id'";
-$res = mysqli_query($con, $sql);
+$res = mysqli_query($conn, $sql);
 
 $allProducts = [];
-$productQuery = mysqli_query($con, "SELECT id, name FROM products");
+$productQuery = mysqli_query($conn, "SELECT id, name FROM products");
 while ($row = mysqli_fetch_assoc($productQuery)) {
     $allProducts[$row['id']] = $row['name'];
 }

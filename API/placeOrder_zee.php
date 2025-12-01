@@ -124,6 +124,9 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
             if ($exec_sql_ins) {
 
                 $no_of_deal = 1;
+                $department_list = [];
+                $addedDepartments = []; // track added department IDs
+                
                 foreach ($order_datails as $details) {
 
                     $deal_id =  $details->deal_id;
@@ -152,7 +155,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
 
                                 $tyy_pes = mysqli_real_escape_string($conn, json_encode($types_array, JSON_UNESCAPED_UNICODE));
                                 $dress_ing = mysqli_real_escape_string($conn, json_encode($dressing_array, JSON_UNESCAPED_UNICODE));
-                                $add_oon = mysqli_real_escape_string($conn, json_encode($addonarray, JSON_UNESCAPED_UNICODE));
+                                $add_oon = mysqli_real_escape_string($conn, json_encode($addons_array, JSON_UNESCAPED_UNICODE));
 
 
                                 $sql_getpro = "SELECT * FROM `products` WHERE `id` = '$product_id'";
@@ -166,12 +169,37 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                 $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`,`product_description`,`additional_notes`, `addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`)
                                                   VALUES ('$last_id','$deal_id','$item_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$add_oon','$tyy_pes','$dress_ing' , $cost , $price , $discount  , $no_of_deal, '$datetime')";
                                 $exec_sql_deal = mysqli_query($conn, $sql_deal);
+                                
+                                
+                                   // Fetch departments for this product
+                                $sub_category_id = intval($product['sub_category_id']);
+                                $sql_department = "SELECT id, department_name FROM departments WHERE JSON_CONTAINS(sub_category_ids, $sub_category_id )";
+                                $res_dep = mysqli_query($conn, $sql_department);
+                           
+                                   if ($res_dep && mysqli_num_rows($res_dep) > 0) {
+                                    while ($dep = mysqli_fetch_assoc($res_dep)) {
+                                
+                                        // Skip if this department_id already exists
+                                        if (in_array($dep['id'], $addedDepartments)) {
+                                            continue;
+                                        }
+                                
+                                        // Add the record
+                                        $department_list[] = [
+                                            "department_id" => $dep['id'],
+                                            "department_name" => $dep['department_name']
+                                        ];
+                                
+                                        // Mark as added
+                                        $addedDepartments[] = $dep['id'];
+                                    }
+                                }
                             }
                         }
                     } else {
                         $product_id = $details->id;
 
-                        $sql_getitems = "SELECT `cost` , `price` , `discount`, `name`, `description` FROM `products` WHERE `id` = $product_id";
+                        $sql_getitems = "SELECT `cost` , `price` , `discount`, `name`, `description`, `sub_category_id` FROM `products` WHERE `id` = $product_id";
                         $ex_get_items = mysqli_query($conn, $sql_getitems);
                         $Data = mysqli_fetch_array($ex_get_items);
                         $cost = $Data['cost'];
@@ -179,6 +207,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         $discount = $Data['discount'];
                         $pro_name = mysqli_real_escape_string($conn, $Data['name']);
                         $pro_decs = mysqli_real_escape_string($conn, $Data['description']);
+                        $pro_subcategory_id = mysqli_real_escape_string($conn, $Data['sub_category_id']);
               
 
                         $quantity = $details->quantity;
@@ -215,7 +244,33 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`, `product_description`,`additional_notes`, `qty` ,`addons`,`types`, `dressing` , `cost` , `price` , `discount_percent`)
                                 VALUES ('$last_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$quantity','$add_oon','$tyy_pes','$dress_ing' , '$cost' , '$price' , '$discount' )";
                         $exec_sql_deal = mysqli_query($conn, $sql_deal);
-                    }
+                        
+                        
+                           // Fetch departments for this product
+    
+                        $sql_department = "SELECT id, department_name FROM departments WHERE JSON_CONTAINS(sub_category_ids, $pro_subcategory_id )";
+                        $res_dep = mysqli_query($conn, $sql_department);
+                        
+              
+                             if ($res_dep && mysqli_num_rows($res_dep) > 0) {
+                                    while ($dep = mysqli_fetch_assoc($res_dep)) {
+                                
+                                        // Skip if this department_id already exists
+                                        if (in_array($dep['id'], $addedDepartments)) {
+                                            continue;
+                                        }
+                                
+                                        // Add the record
+                                        $department_list[] = [
+                                            "department_id" => $dep['id'],
+                                            "department_name" => $dep['department_name']
+                                        ];
+                                
+                                        // Mark as added
+                                        $addedDepartments[] = $dep['id'];
+                                    }
+                            }
+                    }       
                 }
 
 
@@ -322,7 +377,8 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         'status' => "neworder",
                         'created_at' => $datetime,
                         'name' => $user_name,
-                        'order_type' => $order_type
+                        'order_type' => $order_type,
+                        "departments" => $department_list,
                     ];
 
 
@@ -339,7 +395,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                             $options
                         );
 
-                        $channel = 'orders'; // Channel name dynamically based on user ID
+                        $channel = $CHANNEL_1; // Channel name dynamically based on user ID
                         $event   = 'new_order';
                         $data    = [
                             'order_id' => $last_id,
@@ -378,12 +434,12 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;  
                                         $mail->Port = 587;  
                                 
-                                        $mail->setFrom('support@foodola.de', 'Foodola');
-                                        $mail->addAddress('asharifkhan245@gmail.com');
+                                        $mail->setFrom($FROM_EMAIL, $APP_NAME);
+                                        $mail->addAddress($ADMIN_EMAIL);
                                 
                                         $mail->isHTML(true);
                                         
-                                        $mail->Subject = "Neue Bestellung #$last_id – Foodola";
+                                        $mail->Subject = "Neue Bestellung #{$last_id} – " . htmlspecialchars($APP_NAME);
         
                                         $mail->Body = '
                                         <html>
@@ -432,10 +488,10 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                         </head>
                                         <body>
                                             <div class="email-container">
-                                                <div class="header">
-                                                    <img src="https://pizzapazza.foodola.shop/admin_panel/images/logo.png" alt="Foodola" style="width: 100px;">
-                                                    <h2>Neue Bestellung erhalten</h2>
-                                                </div>
+                                             <div class="header">
+                                                <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="' . htmlspecialchars($APP_NAME) . '" style="width: 100px;">
+                                                <h2>Neue Bestellung erhalten</h2>
+                                            </div>
                                                 <div class="order-details">
                                                     <p><strong>Bestellnummer:</strong> ' . $last_id . '</p>
                                                     <p><strong>Kunde:</strong> ' . htmlspecialchars($user_name) . '</p>
@@ -446,10 +502,14 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                                     <p><strong>Zusätzliche Hinweise:</strong> ' . htmlspecialchars($additionalNotes) . '</p>
                                                     <p><strong>Bestelldatum:</strong> ' . htmlspecialchars($datetime) . '</p>
                                         
-                                                    <a class="view-button" href="https://foodola.foodola.shop/admin_panel/order_details.php?order_id=' . $last_id . '" target="_blank">Bestellung anzeigen</a>
+                                                <a class="view-button" href="' . $BASE_URL . 'admin_panel/order_details.php?order_id=' . $last_id
+ . '" target="_blank">
+                                                    Bestellung anzeigen
+                                                </a>
+                                                
                                                 </div>
                                                 <div class="footer">
-                                                    <p>Diese E-Mail wurde automatisch von Foodola generiert.</p>
+                                             <p>Diese E-Mail wurde automatisch von ' . htmlspecialchars($APP_NAME) . ' generiert.</p>
                                                 </div>
                                             </div>
                                         </body>
@@ -554,6 +614,9 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
         if ($exec_sql_ins) {
 
             $no_of_deal = 1;
+            $department_list = [];
+            $addedDepartments = []; // track added department IDs
+            
             foreach ($order_datails as $details) {
 
                 $deal_id =  $details->deal_id;
@@ -583,7 +646,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
 
                             $tyy_pes = mysqli_real_escape_string($conn, json_encode($types_array, JSON_UNESCAPED_UNICODE));
                             $dress_ing = mysqli_real_escape_string($conn, json_encode($dressing_array, JSON_UNESCAPED_UNICODE));
-                            $add_oon = mysqli_real_escape_string($conn, json_encode($addonarray, JSON_UNESCAPED_UNICODE));
+                            $add_oon = mysqli_real_escape_string($conn, json_encode($addons_array, JSON_UNESCAPED_UNICODE));
 
 
                             $sql_getpro = "SELECT * FROM `products` WHERE `id` = '$product_id'";
@@ -597,12 +660,38 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                             $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`,`product_description`,`additional_notes`, `addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`)
                                                   VALUES ('$last_id','$deal_id','$item_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$add_oon','$tyy_pes','$dress_ing' , $cost , $price , $discount  , $no_of_deal, '$datetime')";
                             $exec_sql_deal = mysqli_query($conn, $sql_deal);
+                            
+                            
+                               // Fetch departments for this product
+                                $sub_category_id = intval($product['sub_category_id']);
+                                           $sql_department = "SELECT id, department_name FROM departments WHERE JSON_CONTAINS(sub_category_ids, $sub_category_id )";
+                                $res_dep = mysqli_query($conn, $sql_department);
+                                
+                              
+                                  if ($res_dep && mysqli_num_rows($res_dep) > 0) {
+                                    while ($dep = mysqli_fetch_assoc($res_dep)) {
+                                
+                                        // Skip if this department_id already exists
+                                        if (in_array($dep['id'], $addedDepartments)) {
+                                            continue;
+                                        }
+                                
+                                        // Add the record
+                                        $department_list[] = [
+                                            "department_id" => $dep['id'],
+                                            "department_name" => $dep['department_name']
+                                        ];
+                                
+                                        // Mark as added
+                                        $addedDepartments[] = $dep['id'];
+                                    }
+                            }
                         }
                     }
                 } else {
                     $product_id = $details->id;
 
-                    $sql_getitems = "SELECT `cost` , `price` , `discount`, `name`, `description` FROM `products` WHERE `id` = $product_id";
+                    $sql_getitems = "SELECT `cost` , `price` , `discount`, `name`, `description`, `sub_category_id` FROM `products` WHERE `id` = $product_id";
                     $ex_get_items = mysqli_query($conn, $sql_getitems);
                     $Data = mysqli_fetch_array($ex_get_items);
                     $cost = $Data['cost'];
@@ -610,6 +699,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     $discount = $Data['discount'];
                     $pro_name = mysqli_real_escape_string($conn, $Data['name']);
                     $pro_decs = mysqli_real_escape_string($conn, $Data['description']);
+                     $pro_subcategory_id = mysqli_real_escape_string($conn, $Data['sub_category_id']);
               
 
                     $quantity = $details->quantity;
@@ -646,6 +736,29 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`, `product_description`,`additional_notes`, `qty` ,`addons`,`types`, `dressing` , `cost` , `price` , `discount_percent`)
                                 VALUES ('$last_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$quantity','$add_oon','$tyy_pes','$dress_ing' , '$cost' , '$price' , '$discount' )";
                     $exec_sql_deal = mysqli_query($conn, $sql_deal);
+                    
+                    
+                    $sql_department = "SELECT id, department_name FROM departments WHERE JSON_CONTAINS(sub_category_ids, $pro_subcategory_id )";
+                        $res_dep = mysqli_query($conn, $sql_department);
+              
+                       if ($res_dep && mysqli_num_rows($res_dep) > 0) {
+                                    while ($dep = mysqli_fetch_assoc($res_dep)) {
+                                
+                                        // Skip if this department_id already exists
+                                        if (in_array($dep['id'], $addedDepartments)) {
+                                            continue;
+                                        }
+                                
+                                        // Add the record
+                                        $department_list[] = [
+                                            "department_id" => $dep['id'],
+                                            "department_name" => $dep['department_name']
+                                        ];
+                                
+                                        // Mark as added
+                                        $addedDepartments[] = $dep['id'];
+                                    }
+                            }
                 }
             }
 
@@ -757,7 +870,8 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     'status' => "neworder",
                     'created_at' => $datetime,
                     'name' => $user_name,
-                    'order_type' => $order_type
+                    'order_type' => $order_type,
+                    'departments' => $department_list
                 ];
 
 
@@ -774,7 +888,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         $options
                     );
 
-                    $channel = 'orders'; // Channel name dynamically based on user ID
+                    $channel = $CHANNEL_1; // Channel name dynamically based on user ID
                     $event   = 'new_order';
                     $data    = [
                         'order_id' => $last_id,
@@ -812,12 +926,12 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;  
                                         $mail->Port = 587;  
                                 
-                                        $mail->setFrom('support@foodola.de', 'Foodola');
-                                        $mail->addAddress('asharifkhan245@gmail.com');
+                                        $mail->setFrom($FROM_EMAIL, $APP_NAME);
+                                        $mail->addAddress($ADMIN_EMAIL);
                                 
                                         $mail->isHTML(true);
                                         
-                                        $mail->Subject = "Neue Bestellung #$last_id – Foodola";
+                                      $mail->Subject = "Neue Bestellung #{$last_id} – " . htmlspecialchars($APP_NAME);
         
                                         $mail->Body = '
                                         <html>
@@ -866,10 +980,12 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                         </head>
                                         <body>
                                             <div class="email-container">
+                                            
                                                 <div class="header">
-                                                    <img src="https://pizzapazza.foodola.shop/admin_panel/images/logo.png" alt="Foodola" style="width: 100px;">
+                                                    <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="' . htmlspecialchars($APP_NAME) . '" style="width: 100px;">
                                                     <h2>Neue Bestellung erhalten</h2>
                                                 </div>
+                                                
                                                 <div class="order-details">
                                                     <p><strong>Bestellnummer:</strong> ' . $last_id . '</p>
                                                     <p><strong>Kunde:</strong> ' . htmlspecialchars($user_name) . '</p>
@@ -880,10 +996,12 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                                     <p><strong>Zusätzliche Hinweise:</strong> ' . htmlspecialchars($additionalNotes) . '</p>
                                                     <p><strong>Bestelldatum:</strong> ' . htmlspecialchars($datetime) . '</p>
                                         
-                                                    <a class="view-button" href="https://foodola.foodola.shop/admin_panel/order_details.php?order_id=' . $last_id . '" target="_blank">Bestellung anzeigen</a>
+                                                    <a class="view-button" href="' . $BASE_URL . 'admin_panel/order_details.php?order_id=' . $last_id . '" target="_blank">
+                                                        Bestellung anzeigen
+                                                    </a>
                                                 </div>
                                                 <div class="footer">
-                                                    <p>Diese E-Mail wurde automatisch von Foodola generiert.</p>
+                                                     <p>Diese E-Mail wurde automatisch von ' . htmlspecialchars($APP_NAME) . ' generiert.</p>
                                                 </div>
                                             </div>
                                         </body>

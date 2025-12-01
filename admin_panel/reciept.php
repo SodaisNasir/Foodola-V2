@@ -429,15 +429,16 @@ body {
         
      <div class="header">
         <img src="images/logo.png" alt="Firmenlogo">
-        <h2>Pizzablitzöstringen.de</h2>
+        <h2><?php echo $APP_NAME?></h2>
         
     </div>    
 
-    <div class="company-details">
-      <h3>Kuhngasse 1, 76684 Östringen</h3>
-      <h3>Östringen, Tell:0725326560-61</h3>
-      <h3>Bestellnummer: <?php echo $order_id ?></h3>
-    </div>
+ <div class="company-details">
+    <h3><?php echo $company_address; ?></h3>
+    <h3><?php echo $company_city . ', Tel: ' . $company_phone; ?></h3>
+    <h3>Bestellnummer: <?php echo $order_id; ?></h3>
+</div>
+
 
     <div class="order-info">
     <h3><?php echo htmlspecialchars($datetime); ?></h3>

@@ -255,7 +255,9 @@ if (isset($_POST['update_auth_token'])) {
                                     <span class="mode-label" id="modeLabel"><?= $currentMode == 1 ? 'Live Mode' : 'Sandbox Mode' ?></span>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary">Update Keys</button>
+                       <button type="button" id="startOtpProcess" class="btn btn-primary">
+    Update
+</button>
                         </form>
 
 

@@ -7,7 +7,7 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Content-Type: application/json"); 
 
-include_once('connection.php');
+include_once('../connection.php');
 
 $branch_id = isset($_GET['branch_id']) ? $_GET['branch_id'] : null;
 

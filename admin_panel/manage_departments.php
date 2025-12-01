@@ -7,6 +7,24 @@ if (isset($_GET['Massage'])) {
     $message = $_GET['Massage'];
     echo "<script>alert('$message')</script>";
 }
+
+
+
+
+
+// Get all subcategories assigned to departments
+$subAssigned = [];
+$res = mysqli_query($conn, "SELECT id, sub_category_ids FROM departments");
+while ($row = mysqli_fetch_assoc($res)) {
+    $ids = json_decode($row['sub_category_ids'], true);
+    if(is_array($ids)){
+        foreach($ids as $subId){
+            $subAssigned[$subId] = $row['id']; // map subcategory id => department id
+        }
+    }
+}
+
+
 ?>
 <!DOCTYPE html>
 <html class="loading" lang="en" data-textdirection="ltr">
@@ -140,10 +158,10 @@ if (isset($_GET['Massage'])) {
                                                     $subCategoryBadges = "<span class='badge bg-secondary'>No Subcategories</span>";
                                                 }
                                                 
-                                                $encoded_subcategories = htmlspecialchars($row['sub_category_ids'], ENT_QUOTES);
+                                                 $dataSubs = $row['sub_category_ids']; 
                                                 $departmentNameSafe = htmlspecialchars($departmentName, ENT_QUOTES);
                                                 $statusSafe = htmlspecialchars($status, ENT_QUOTES);
-                                    
+                                               
                                                 echo "<tr>";
                                                 echo "<td>{$sn}</td>";
                                                 echo "<td name='tittlename'>{$departmentName}</td>";
@@ -152,12 +170,18 @@ if (isset($_GET['Massage'])) {
                                                 echo "<td class='text-center'>
                                                         <div class='d-flex justify-content-center gap-2'>
                                                         
-                                                            <button class='btn btn-primary'
-                                                                data-toggle='modal'
-                                                                data-target='#updateTableModal'
-                                                                onclick='openUpdateModalFromBtn({$row['id']}, \"{$departmentNameSafe}\", {$encoded_subcategories}, \"{$statusSafe}\")'>
-                                                                Update
-                                                            </button>
+                                                                    <button class='btn btn-primary'
+                                                                    data-toggle='modal'
+                                                                    data-target='#updateTableModal'
+                                                                    data-id='{$row['id']}'
+                                                                    data-name='{$departmentNameSafe}'
+                                                                    data-status='{$statusSafe}'
+                                                                    data-subs='{$dataSubs}'
+                                                                    onclick='openUpdateModalFromBtn(this)'>
+                                                                    Update
+                                                                </button>
+
+
                                     
                                                             <form action='phpfiles/insertions.php' method='POST' class='m-0 p-0'>
                                                                 <input type='hidden' name='dpt_id' value='{$row['id']}'>
@@ -214,29 +238,23 @@ if (isset($_GET['Massage'])) {
                                     </div>
                                     
                                     
-                                    <div class="form-group">
-                                        <label for="SubCategories">Choose Sub Categories</label>
-                                        <div class="border p-2 rounded" style="max-height: 250px; overflow-y: auto;">
-                                            <?php
-                                            include_once('connection.php');
-                                            $query = "SELECT id, name FROM sub_categories";
-                                            $result = mysqli_query($conn, $query);
-                
-                                            if (mysqli_num_rows($result) > 0) {
-                                                while ($row = mysqli_fetch_assoc($result)) {
-                                                    echo '
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="sub_category_ids[]" value="' . $row['id'] . '" id="subcat_' . $row['id'] . '">
-                                                        <label class="form-check-label" for="subcat_' . $row['id'] . '">' . htmlspecialchars($row['name']) . '</label>
-                                                    </div>';
-                                                }
-                                            } else {
-                                                echo "<p class='text-muted mb-0'>No active subcategories found.</p>";
-                                            }
-                                            ?>
-                                        </div>
-                                        <small class="text-muted">Select one or more subcategories.</small>
-                                    </div>
+                                 <div class="form-group">
+    <label for="SubCategories">Choose Sub Categories</label>
+    <div class="border p-2 rounded" style="max-height: 250px; overflow-y: auto;">
+        <?php
+        $allSubs = mysqli_query($conn, "SELECT id, name FROM sub_categories");
+        while ($sub = mysqli_fetch_assoc($allSubs)) {
+            echo '
+            <div class="form-check" id="subwrap_'.$sub['id'].'">
+                <input class="form-check-input" type="checkbox" name="sub_category_ids[]" value="'.$sub['id'].'" id="subcat_'.$sub['id'].'">
+                <label class="form-check-label" for="subcat_'.$sub['id'].'">'.htmlspecialchars($sub['name']).'</label>
+            </div>';
+        }
+        ?>
+    </div>
+</div>
+
+
                                     
                                     <div class="form-group">
                                         <label for="status">Status</label>
@@ -276,23 +294,34 @@ if (isset($_GET['Massage'])) {
                                     <div class="form-group">
                                         <label for="SubCategories">Choose Sub Categories</label>
                                         <div class="border p-2 rounded" style="max-height: 250px; overflow-y: auto;">
-                                            <?php
-                                            include_once('connection.php');
-                                            $query = "SELECT id, name FROM sub_categories";
-                                            $result = mysqli_query($conn, $query);
-                
-                                            if (mysqli_num_rows($result) > 0) {
-                                                while ($row = mysqli_fetch_assoc($result)) {
-                                                    echo '
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="sub_category_ids[]" value="' . $row['id'] . '" id="subcat_' . $row['id'] . '">
-                                                        <label class="form-check-label" for="subcat_' . $row['id'] . '">' . htmlspecialchars($row['name']) . '</label>
-                                                    </div>';
+                                                <?php
+                                                include_once('connection.php');
+                                                
+                                                $query = "
+                                                    SELECT id, name 
+                                                    FROM sub_categories 
+                                                    WHERE id NOT IN (
+                                                        SELECT CAST(j.value AS UNSIGNED)
+                                                        FROM departments d,
+                                                        JSON_TABLE(d.sub_category_ids, '$[*]' COLUMNS (value INT PATH '$')) AS j
+                                                    )
+                                                ";
+                                                
+                                                $result = mysqli_query($conn, $query);
+                                                
+                                                if (mysqli_num_rows($result) > 0) {
+                                                    while ($row = mysqli_fetch_assoc($result)) {
+                                                        echo '
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" name="sub_category_ids[]" value="' . $row['id'] . '" id="subcat_' . $row['id'] . '">
+                                                            <label class="form-check-label" for="subcat_' . $row['id'] . '">' . htmlspecialchars($row['name']) . '</label>
+                                                        </div>';
+                                                    }
+                                                } else {
+                                                    echo "<p class='text-muted mb-0'>No subcategories available.</p>";
                                                 }
-                                            } else {
-                                                echo "<p class='text-muted mb-0'>No active subcategories found.</p>";
-                                            }
-                                            ?>
+                                                ?>
+
                                         </div>
                                         <small class="text-muted">Select one or more subcategories.</small>
                                     </div>
@@ -348,28 +377,59 @@ if (isset($_GET['Massage'])) {
     <script src="app-assets/js/scripts/datatables/datatable.min.js"></script>
     
 <script>
+function openUpdateModalFromBtn(button) {
 
-function openUpdateModalFromBtn(id, name, subcategories, status) {
+    let id = $(button).data('id');
+    let name = $(button).data('name');
+    let status = $(button).data('status');
+
+    // VERY IMPORTANT — read raw JSON string
+    let subsRaw = $(button).attr('data-subs');
+    let currentSubs = [];
+
+    try {
+        currentSubs = JSON.parse(subsRaw);
+    } catch (e) { currentSubs = []; }
+
+
     $('#dpt_id').val(id);
     $('#DepartmentName').val(name);
-    $('input[name="sub_category_ids[]"]').prop('checked', false);
-    if (Array.isArray(subcategories)) {
-        subcategories.forEach(function(subId) {
-            $('#subcat_' + subId).prop('checked', true);
-        });
-    } else if (typeof subcategories === 'string' && subcategories.length > 0) {
-        try {
-            const parsed = JSON.parse(subcategories);
-            parsed.forEach(function(subId) {
-                $('#subcat_' + subId).prop('checked', true);
-            });
-        } catch (e) {
-            console.error('Invalid subcategories JSON:', subcategories);
-        }
-    }
-    
     $('#status').val(status);
+
+    // STEP 1: Show all subcategories again
+    $('input[name="sub_category_ids[]"]').prop('checked', false);
+    $('input[name="sub_category_ids[]"]').each(function(){
+        $('#subwrap_' + $(this).val()).show();
+    });
+
+    // STEP 2: Collect all subcategory assignments of all departments
+    let assignedToOther = new Set();
+
+    $('button[data-subs]').each(function(){
+        let otherId = $(this).data('id');
+        if (otherId == id) return; // ignore current department
+
+        let raw = $(this).attr('data-subs');
+        try {
+            let arr = JSON.parse(raw);
+            arr.forEach(s => assignedToOther.add(parseInt(s)));
+        } catch (e){}
+    });
+
+    // STEP 3: Hide subcategories assigned to other departments
+    assignedToOther.forEach(function(subId){
+        if (!currentSubs.includes(subId)) {
+            $('#subwrap_' + subId).hide();
+        }
+    });
+
+    // STEP 4: Check current department’s categories
+    currentSubs.forEach(function(subId){
+        $('#subcat_' + subId).prop('checked', true);
+    });
 }
+
+
 
 
 

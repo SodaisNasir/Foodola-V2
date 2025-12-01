@@ -16,7 +16,7 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Access-Control-Allow-Credentials: true");
-include('connection.php');
+include('../connection.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
   http_response_code(200);
@@ -73,6 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result_order) {
       $last_order_id = $conn->insert_id;
       $no_of_deal = 1;
+      $department_list = [];
 
       foreach ($order_details as $details) {
         if ($details['is_deal'] == "yes") {
@@ -107,6 +108,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`, `product_name`,`product_description`,  `qty`, `cost`, `price`, `addons`, `types`, `dressing`, `no_of_deal`, `additional_notes`)VALUES ('$last_order_id', '$deal_id', '$item_id', '$product_id', '$pro_name','$pro_decs', '$deal_qty', '$cost', '$price', '$addons', '$types', '$dressing', '$no_of_deal', '$notes')";
                 $execute_details_insert = mysqli_query($conn, $order_details_insert);
+                
+                
+                   // Fetch departments for this product
+                    $sub_category_id = intval($product['sub_category_id']);
+                               $sql_department = "SELECT id, department_name FROM departments WHERE JSON_CONTAINS(sub_category_ids, $sub_category_id )";
+                    $res_dep = mysqli_query($conn, $sql_department);
+                    
+                    if ($res_dep && mysqli_num_rows($res_dep) > 0) {
+                            while ($dep = mysqli_fetch_assoc($res_dep)) {
+                        
+                                // Skip if this department_id already exists
+                                if (in_array($dep['id'], $addedDepartments)) {
+                                    continue;
+                                }
+                        
+                                // Add the record
+                                $department_list[] = [
+                                    "department_id" => $dep['id'],
+                                    "department_name" => $dep['department_name']
+                                ];
+                        
+                                // Mark as added
+                                $addedDepartments[] = $dep['id'];
+                            }
+                     }
 
 
                 if (!$execute_details_insert) {
@@ -146,6 +172,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`, `product_description` ,`qty`, `cost`, `price`, `addons`, `types`, `dressing`, `additional_notes`) 
                                              VALUES ('$last_order_id', '$product_id', '$pro_name','$pro_decs','$product_qty', '$cost', '$price', '$product_addons', '$product_types', '$product_dressing', '$notes')";
             $execute_details_insert = mysqli_query($conn, $order_details_insert);
+            
+            
+            
+               // Fetch departments for this product
+                    $sub_category_id = intval($product['sub_category_id']);
+                               $sql_department = "SELECT id, department_name FROM departments WHERE JSON_CONTAINS(sub_category_ids, $sub_category_id )";
+                    $res_dep = mysqli_query($conn, $sql_department);
+                    
+                     if ($res_dep && mysqli_num_rows($res_dep) > 0) {
+                            while ($dep = mysqli_fetch_assoc($res_dep)) {
+                        
+                                // Skip if this department_id already exists
+                                if (in_array($dep['id'], $addedDepartments)) {
+                                    continue;
+                                }
+                        
+                                // Add the record
+                                $department_list[] = [
+                                    "department_id" => $dep['id'],
+                                    "department_name" => $dep['department_name']
+                                ];
+                        
+                                // Mark as added
+                                $addedDepartments[] = $dep['id'];
+                            }
+                     }
 
 
             if (!$execute_details_insert) {
@@ -212,7 +264,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'status' => "neworder",
             'created_at' => $datetime,
             'name' => $table['name'],
-            "order_type" => $order_type
+            "order_type" => $order_type,
+            "departments" => $department_list
           ];
 
 
@@ -231,7 +284,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
 
             // prepare notification
-            $channel = 'orders'; // Channel name dynamically based on user ID
+            $channel = $CHANNEL_1; // Channel name dynamically based on user ID
             $event   = 'new_order';
             $data    = [
               'order_id' => $last_order_id,
@@ -335,8 +388,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($result_order) {
 
           $last_order_id = $conn->insert_id;
-
           $no_of_deal = 1;
+          $department_list = [];
+          $addedDepartments = []; // track added department IDs
 
           foreach ($order_details as $details) {
             if ($details['is_deal'] == "yes") {
@@ -371,6 +425,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`, `product_description`, `qty`, `cost`, `price`, `addons`, `types`, `dressing`, `no_of_deal`, `additional_notes`) 
                                                              VALUES ('$last_order_id', '$deal_id', '$item_id', '$product_id', '$pro_name', '$pro_decs', '$deal_qty', '$cost', '$price', '$addons', '$types', '$dressing', '$no_of_deal', '$notes')";
                     $execute_details_insert = mysqli_query($conn, $order_details_insert);
+                    
+                    
+                       // Fetch departments for this product
+                    $sub_category_id = intval($product['sub_category_id']);
+                    $sql_department = "SELECT id, department_name FROM departments WHERE JSON_CONTAINS(sub_category_ids, $sub_category_id )";
+                    $res_dep = mysqli_query($conn, $sql_department);
+                    
+                    if ($res_dep && mysqli_num_rows($res_dep) > 0) {
+                            while ($dep = mysqli_fetch_assoc($res_dep)) {
+                        
+                                // Skip if this department_id already exists
+                                if (in_array($dep['id'], $addedDepartments)) {
+                                    continue;
+                                }
+                        
+                                // Add the record
+                                $department_list[] = [
+                                    "department_id" => $dep['id'],
+                                    "department_name" => $dep['department_name']
+                                ];
+                        
+                                // Mark as added
+                                $addedDepartments[] = $dep['id'];
+                            }
+                     }
 
                     if (!$execute_details_insert) {
                       echo json_encode(array("statusCode" => 201, "message" => "Failed to insert deal order details", "error" => mysqli_error($conn)));
@@ -408,7 +487,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`,`product_description`, `qty`, `cost`, `price`, `addons`, `types`, `dressing`, `additional_notes`) 
                                                      VALUES ('$last_order_id', '$product_id', '$pro_name','$pro_decs', '$product_qty', '$cost', '$price', '$product_addons', '$product_types', '$product_dressing', '$notes')";
                 $execute_details_insert = mysqli_query($conn, $order_details_insert);
-
+                
+                
+     
+                    // Fetch departments for this product
+                    $sub_category_id = intval($product['sub_category_id']);
+                               $sql_department = "SELECT id, department_name FROM departments WHERE JSON_CONTAINS(sub_category_ids, $sub_category_id )";
+                    $res_dep = mysqli_query($conn, $sql_department);
+                    
+                    if ($res_dep && mysqli_num_rows($res_dep) > 0) {
+                            while ($dep = mysqli_fetch_assoc($res_dep)) {
+                        
+                                // Skip if this department_id already exists
+                                if (in_array($dep['id'], $addedDepartments)) {
+                                    continue;
+                                }
+                        
+                                // Add the record
+                                $department_list[] = [
+                                    "department_id" => $dep['id'],
+                                    "department_name" => $dep['department_name']
+                                ];
+                        
+                                // Mark as added
+                                $addedDepartments[] = $dep['id'];
+                            }
+                     }
+                    
+                    
+                    
                 if (!$execute_details_insert) {
                   echo json_encode(array("statusCode" => 201, "message" => "Failed to insert order details", "error" => mysqli_error($conn)));
                   exit;
@@ -527,7 +634,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'status' => "neworder",
             'created_at' => $datetime,
             'name' => $user['name'],
-            "order_type" => $order_type
+            "order_type" => $order_type,
+            "departments" => $department_list,
           ];
 
 
@@ -546,7 +654,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
 
             // prepare notification
-            $channel = 'orders'; // Channel name dynamically based on user ID
+            $channel = $CHANNEL_1; // Channel name dynamically based on user ID
             $event   = 'new_order';
             $data    = [
               'order_id' => $last_order_id,
@@ -584,12 +692,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
 
-            $mail->setFrom('support@foodola.de', 'Foodola');
-            $mail->addAddress('asharifkhan@gmail.com');
+            $mail->setFrom($FROM_EMAIL, $APP_NAME);
+            $mail->addAddress($ADMIN_EMAIL);
 
             $mail->isHTML(true);
 
-            $mail->Subject = "Neue Bestellung #$last_id – Foodola";
+            $mail->Subject = "Neue Bestellung #{$last_order_id} – " . htmlspecialchars($APP_NAME);
 
             $mail->Body = '
                                 <html>
@@ -639,7 +747,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <body>
                                     <div class="email-container">
                                         <div class="header">
-                                            <img src="https://foodola.foodola.shop/admin_panel/images/logo.png" alt="Foodola" style="width: 100px;">
+                                           <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="' . htmlspecialchars($APP_NAME) . '" style="width: 100px;">
                                             <h2>Neue Bestellung erhalten</h2>
                                         </div>
                                         <div class="order-details">
@@ -652,10 +760,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <p><strong>Zusätzliche Hinweise:</strong> ' . htmlspecialchars($additionalNotes) . '</p>
                                             <p><strong>Bestelldatum:</strong> ' . htmlspecialchars($datetime) . '</p>
                                 
-                                            <a class="view-button" href="https://foodola.foodola.shop/admin_panel/order_details.php?order_id=' . $last_order_id . '" target="_blank">Bestellung anzeigen</a>
+                                            <a class="view-button" href="' . $BASE_URL . 'admin_panel/order_details.php?order_id=' . $last_order_id . '" target="_blank">
+                                                    Bestellung anzeigen
+                                            </a>
                                         </div>
                                         <div class="footer">
-                                            <p>Diese E-Mail wurde automatisch von Foodola generiert.</p>
+                                            <p>Diese E-Mail wurde automatisch ' . htmlspecialchars($APP_NAME) . ' generiert.</p>
                                         </div>
                                     </div>
                                 </body>
@@ -664,12 +774,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $mail->send();
           } catch (Exception $e) {
-            $data = [
-              "status" => false,
-              "Response_code" => 500,
-              "Message" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"
-            ];
-            echo json_encode($data);
+            // $data = [
+            //   "status" => false,
+            //   "Response_code" => 500,
+            //   "Message" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"
+            // ];
+            // echo json_encode($data);
           }
         } else {
           echo json_encode(array("statusCode" => 201, "message" => "Failed to create order", "error" => mysqli_error($conn)));
@@ -759,6 +869,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $last_order_id = $conn->insert_id;
 
       $no_of_deal = 1;
+      $department_list = [];
+      $addedDepartments = []; // track added department IDs
       foreach ($order_details as $details) {
         if ($details['is_deal'] == "yes") {
           $deal_id = $details['deal_id'];
@@ -793,6 +905,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`, `product_name`,`product_description`, `qty`, `cost`, `price`, `addons`, `types`, `dressing`, `no_of_deal`, `additional_notes`) 
                                                              VALUES ('$last_order_id', '$deal_id', '$item_id', '$product_id','$pro_name','$pro_decs', '$deal_qty', '$cost', '$price', '$addons', '$types', '$dressing', '$no_of_deal', '$notes')";
                 $execute_details_insert = mysqli_query($conn, $order_details_insert);
+                
+                
+                   // Fetch departments for this product
+                    $sub_category_id = intval($product['sub_category_id']);
+                               $sql_department = "SELECT id, department_name FROM departments WHERE JSON_CONTAINS(sub_category_ids, $sub_category_id )";
+                    $res_dep = mysqli_query($conn, $sql_department);
+                    
+                     if ($res_dep && mysqli_num_rows($res_dep) > 0) {
+                            while ($dep = mysqli_fetch_assoc($res_dep)) {
+                        
+                                // Skip if this department_id already exists
+                                if (in_array($dep['id'], $addedDepartments)) {
+                                    continue;
+                                }
+                        
+                                // Add the record
+                                $department_list[] = [
+                                    "department_id" => $dep['id'],
+                                    "department_name" => $dep['department_name']
+                                ];
+                        
+                                // Mark as added
+                                $addedDepartments[] = $dep['id'];
+                            }
+                     }
 
                 if (!$execute_details_insert) {
                   echo json_encode(array("statusCode" => 201, "message" => "Failed to insert deal order details", "error" => mysqli_error($conn)));
@@ -833,6 +970,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                      VALUES ('$last_order_id', '$product_id', '$pro_name','$pro_decs', '$product_qty', '$cost', '$price', '$product_addons', '$product_types', '$product_dressing', '$notes')";
 
             $execute_details_insert = mysqli_query($conn, $order_details_insert);
+            
+            
+                // Fetch departments for this product
+                    $sub_category_id = intval($product['sub_category_id']);
+                    $sql_department = "SELECT id, department_name FROM departments WHERE JSON_CONTAINS(sub_category_ids, $sub_category_id )";
+                    $res_dep = mysqli_query($conn, $sql_department);
+                    
+                    if ($res_dep && mysqli_num_rows($res_dep) > 0) {
+                            while ($dep = mysqli_fetch_assoc($res_dep)) {
+                        
+                                // Skip if this department_id already exists
+                                if (in_array($dep['id'], $addedDepartments)) {
+                                    continue;
+                                }
+                        
+                                // Add the record
+                                $department_list[] = [
+                                    "department_id" => $dep['id'],
+                                    "department_name" => $dep['department_name']
+                                ];
+                        
+                                // Mark as added
+                                $addedDepartments[] = $dep['id'];
+                            }
+                     }
 
             if (!$execute_details_insert) {
               echo json_encode(array("statusCode" => 201, "message" => "Failed to insert order details", "error" => mysqli_error($conn)));
@@ -947,7 +1109,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'status' => "neworder",
         'created_at' => $datetime,
         'name' => $user['name'],
-        "order_type" => $order_type
+        "order_type" => $order_type,
+        "departments" => $department_list,
       ];
 
 
@@ -967,7 +1130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
 
         // prepare notification
-        $channel = 'orders'; // Channel name 
+        $channel = $CHANNEL_1; // Channel name 
         $event   = 'new_order';
         $data    = [
           'order_id' => $last_order_id,
@@ -986,14 +1149,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       } catch (Exception $e) {
         // Handle Pusher error
         // error_log("Pusher error: " . $e->getMessage());
-        echo "Error triggering notification: " . $e->getMessage();
+        // echo "Error triggering notification: " . $e->getMessage();
       }
-
-
-
-
-
-
 
       $mail = new PHPMailer(true);
 
@@ -1007,12 +1164,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
-        $mail->setFrom('support@foodola.de', 'Foodola');
-        $mail->addAddress('asharifkhan@gmail.com');
+        $mail->setFrom($FROM_EMAIL, $APP_NAME);
+        $mail->addAddress($ADMIN_EMAIL);
 
         $mail->isHTML(true);
 
-        $mail->Subject = "Neue Bestellung #$last_id – Foodola";
+        $mail->Subject = "Neue Bestellung #{$last_order_id} – " . htmlspecialchars($APP_NAME);
 
         $mail->Body = '
                                 <html>
@@ -1062,7 +1219,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <body>
                                     <div class="email-container">
                                         <div class="header">
-                                            <img src="https://foodola.foodola.shop/admin_panel/images/logo.png" alt="Foodola" style="width: 100px;">
+                                           <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="' . htmlspecialchars($APP_NAME) . '" style="width: 100px;">
                                             <h2>Neue Bestellung erhalten</h2>
                                         </div>
                                         <div class="order-details">
@@ -1075,10 +1232,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <p><strong>Zusätzliche Hinweise:</strong> ' . htmlspecialchars($additionalNotes) . '</p>
                                             <p><strong>Bestelldatum:</strong> ' . htmlspecialchars($datetime) . '</p>
                                 
-                                            <a class="view-button" href="https://foodola.foodola.shop/admin_panel/order_details.php?order_id=' . $last_order_id . '" target="_blank">Bestellung anzeigen</a>
+                                            <a class="view-button" href="' . $BASE_URL . 'admin_panel/order_details.php?order_id=' . $last_order_id . '" target="_blank">
+                                                Bestellung anzeigen
+                                            </a>
                                         </div>
                                         <div class="footer">
-                                            <p>Diese E-Mail wurde automatisch von Foodola generiert.</p>
+                                            <p>Diese E-Mail wurde automatisch von ' . htmlspecialchars($APP_NAME) . ' generiert.</p>
                                         </div>
                                     </div>
                                 </body>
@@ -1087,12 +1246,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $mail->send();
       } catch (Exception $e) {
-        $data = [
-          "status" => false,
-          "Response_code" => 500,
-          "Message" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"
-        ];
-        echo json_encode($data);
+        // $data = [
+        //   "status" => false,
+        //   "Response_code" => 500,
+        //   "Message" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"
+        // ];
+        // echo json_encode($data);
       }
     } else {
       echo json_encode(array("statusCode" => 201, "message" => "Failed to create order", "error" => mysqli_error($conn)));

@@ -6,7 +6,7 @@ require __DIR__ . '/../vendor/autoload.php';
 header("Access-Control-Allow-Origin: *"); 
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS"); 
 header("Content-Type: application/json"); 
-include("connection.php");
+include("../connection.php");
 use Pusher\Pusher;
 
 if (!isset($_POST['token'], $_POST['tbl_id'], $_POST['order_details'], $_POST['branch_id'])) {
@@ -55,7 +55,7 @@ if ($token === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEW
                     );
         
                     // prepare notification
-                    $channel = 'orders'; // Channel name dynamically based on user ID
+                    $channel = $CHANNEL_1; // Channel name dynamically based on user ID
                     $event   = 'table_cart_state';
                     $data    = [
                       'cart_items' => $_POST['order_details'],
@@ -105,7 +105,7 @@ if ($token === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEW
                     );
         
                     // prepare notification
-                    $channel = 'orders'; // Channel name dynamically based on user ID
+                    $channel = $CHANNEL_1; // Channel name dynamically based on user ID
                     $event   = 'table_cart_state';
                     $data    = [
                       'cart_items' => $_POST['order_details'],

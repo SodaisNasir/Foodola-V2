@@ -1,112 +1,143 @@
 <?php 
-   include('connection.php');
-  
+include('connection.php');
+
 $pageName = basename($_SERVER['PHP_SELF'], ".php");
 
 switch ($pageName) {
+
     case 'index':
-        $pageTitle = "Analytics | foodola";
+        $pageTitle = "Analytics | " . $APP_NAME;
         break;
+
     case 'addareas':
-        $pageTitle = "Addareas | foodola";
+        $pageTitle = "Addareas | " . $APP_NAME;
         break;
+
     case 'addriders':
-        $pageTitle = "Addriders | foodola";
+        $pageTitle = "Addriders | " . $APP_NAME;
         break;
+
     case 'addmaincat':
-        $pageTitle = "Maincategories | foodola";
+        $pageTitle = "Maincategories | " . $APP_NAME;
         break;
+
     case 'addSubCat':
-        $pageTitle = "Subcategories | foodola";
+        $pageTitle = "Subcategories | " . $APP_NAME;
         break;
+
     case 'insertNewProduct':
-        $pageTitle = "Newproduct | foodola";
+        $pageTitle = "New Product | " . $APP_NAME;
         break;
+
     case 'addVariation':
-        $pageTitle = "Variation | foodola";
+        $pageTitle = "Variation | " . $APP_NAME;
         break;
+
     case 'addAddons':
-        $pageTitle = "Addons | foodola";
-        break;    
+        $pageTitle = "Addons | " . $APP_NAME;
+        break;
+
     case 'addDressing':
-        $pageTitle = "Dressing | foodola";
+        $pageTitle = "Dressing | " . $APP_NAME;
         break;
+
     case 'addTypes':
-        $pageTitle = "Types | foodola";
+        $pageTitle = "Types | " . $APP_NAME;
         break;
+
     case 'insertDeals':
-        $pageTitle = "Deals | foodola";
-        break;    
+        $pageTitle = "Deals | " . $APP_NAME;
+        break;
+
     case 'addslider':
-        $pageTitle = "Sliders | foodola";
-        break;  
-     case 'addprivacypolicy':
-        $pageTitle = "Add-Privacy-Policy | foodola";
-        break;    
+        $pageTitle = "Sliders | " . $APP_NAME;
+        break;
+
+    case 'addprivacypolicy':
+        $pageTitle = "Add Privacy Policy | " . $APP_NAME;
+        break;
+
     case 'addterms_condition':
-        $pageTitle = "Terms-Conditions | foodola";
+        $pageTitle = "Terms & Conditions | " . $APP_NAME;
         break;
+
     case 'manage_pos':
-        $pageTitle = "Manage-Pos | foodola";
+        $pageTitle = "Manage POS | " . $APP_NAME;
         break;
+
     case 'manageriders':
-        $pageTitle = "Manage-Riders | foodola";
-        break;    
+        $pageTitle = "Manage Riders | " . $APP_NAME;
+        break;
+
     case 'manageusers':
-        $pageTitle = "Manage-Users | foodola";
-        break;  
-        
+        $pageTitle = "Manage Users | " . $APP_NAME;
+        break;
+
     case 'managetimings':
-        $pageTitle = "Manage-Timings | foodola";
-        break;      
+        $pageTitle = "Manage Timings | " . $APP_NAME;
+        break;
+
     case 'neworders':
-        $pageTitle = "New-Orders | foodola";
-        break;      
+        $pageTitle = "New Orders | " . $APP_NAME;
+        break;
+
     case 'orders':
-        $pageTitle = "Orders | foodola";
-        break;      
+        $pageTitle = "Orders | " . $APP_NAME;
+        break;
+
     case 'manageinventory':
-        $pageTitle = "Manage-Inventory | foodola";
-        break;      
+        $pageTitle = "Manage Inventory | " . $APP_NAME;
+        break;
+
     case 'manageAreas':
-        $pageTitle = "Manage-Areas | foodola";
-        break;      
+        $pageTitle = "Manage Areas | " . $APP_NAME;
+        break;
+
     case 'manageproducts':
-        $pageTitle = "Manage-Products | foodola";
-        break;      
+        $pageTitle = "Manage Products | " . $APP_NAME;
+        break;
+
     case 'managevariations':
-        $pageTitle = "Manage-Variations | foodola";
-        break;      
+        $pageTitle = "Manage Variations | " . $APP_NAME;
+        break;
+
     case 'view_dressing':
-        $pageTitle = "Manage-Dressing | foodola";
+        $pageTitle = "Manage Dressing | " . $APP_NAME;
         break;
+
     case 'view_types':
-        $pageTitle = "Manage-Types | foodola";
+        $pageTitle = "Manage Types | " . $APP_NAME;
         break;
+
     case 'view_deals':
-        $pageTitle = "Manage-Deals | foodola";
+        $pageTitle = "Manage Deals | " . $APP_NAME;
         break;
+
     case 'viewcategories':
-        $pageTitle = "Manage-Catagories | foodola";
-        break;       
+        $pageTitle = "Manage Categories | " . $APP_NAME;
+        break;
+
     case 'SubCat':
-        $pageTitle = "Manage-Sub-Catagories | foodola";
-        break;                                      
+        $pageTitle = "Manage Sub Categories | " . $APP_NAME;
+        break;
+
     case 'manageSliders':
-        $pageTitle = "Manage-Sliders | foodola";
+        $pageTitle = "Manage Sliders | " . $APP_NAME;
         break;
+
     case 'managePoints':
-        $pageTitle = "Manage-Points | foodola";
+        $pageTitle = "Manage Points | " . $APP_NAME;
         break;
+
     case 'SendNotifications':
-        $pageTitle = "Notifications | foodola";
-        break;   
+        $pageTitle = "Notifications | " . $APP_NAME;
+        break;
+
     case 'view_addons':
-        $pageTitle = "Manage-Addons | foodola";
-        break;     
+        $pageTitle = "Manage Addons | " . $APP_NAME;
+        break;
+
     default:
-        $pageTitle = "foodola";
+        $pageTitle = $APP_NAME;
 }
-
-
 ?>

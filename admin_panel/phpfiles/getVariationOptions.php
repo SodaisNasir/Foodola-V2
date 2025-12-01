@@ -1,9 +1,9 @@
 <?php 
-    include('../assets/connection.php');
+include('../connection.php');
 
     // Fetch products from the 'products' table
     $fetch = "SELECT `id`, `name`, `sub_category_id` FROM `products`"; 
-    $fetch_exec = mysqli_query($con, $fetch); 
+    $fetch_exec = mysqli_query($conn, $fetch); 
     $fetch_num = mysqli_num_rows($fetch_exec); 
 
     if($fetch_num > 0) { 
@@ -13,7 +13,7 @@
             
 
             $sub_category_query = "SELECT `name` FROM `sub_categories` WHERE `id` = $sub_category_id";
-            $sub_category_exec = mysqli_query($con, $sub_category_query);
+            $sub_category_exec = mysqli_query($conn, $sub_category_query);
             $sub_category = mysqli_fetch_array($sub_category_exec);
 
 
