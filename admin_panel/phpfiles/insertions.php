@@ -866,7 +866,7 @@ if(isset($_POST['BtnSendpush']))
                     
 
                 $fields = array(
-                    'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
+                    'app_id' => $ONE_SIGNAL_APP_ID,
                      'include_player_ids' => $playerId,
                     'data' => array("foo" => "NewMassage","Id" => 1),
                     'large_icon' =>"ic_launcher_round.png",
@@ -877,7 +877,7 @@ if(isset($_POST['BtnSendpush']))
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
                 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8',
-                                                              'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'));
+                                                               "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"));
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
                 curl_setopt($ch, CURLOPT_HEADER, FALSE);
                 curl_setopt($ch, CURLOPT_POST, TRUE);
@@ -1892,7 +1892,7 @@ if(isset($_POST['updatePoints'])){
                 
                         
                 $fields = array(
-                     'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
+                     'app_id' => $ONE_SIGNAL_APP_ID,
                      'include_player_ids' => $playerIdx,
                     'data' => array("foo" => "NewMassage","Id" => $taskid),
                     'large_icon' =>"ic_launcher_round.png",
@@ -1905,7 +1905,7 @@ if(isset($_POST['updatePoints'])){
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
                 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8',
-                                                              'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'));
+                                                               "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"));
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
                 curl_setopt($ch, CURLOPT_HEADER, FALSE);
                 curl_setopt($ch, CURLOPT_POST, TRUE);
@@ -1966,7 +1966,7 @@ if(isset($_POST['updatePoints'])){
 
                     
                 $fields = array(
-                       'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
+                       'app_id' => $ONE_SIGNAL_APP_ID,
                      'include_player_ids' => $playerIdx,
                     'data' => array("foo" => "NewMassage","Id" => $taskid),
                     'large_icon' =>"ic_launcher_round.png",
@@ -1979,7 +1979,7 @@ if(isset($_POST['updatePoints'])){
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
      curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8',
-                                                              'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'));
+                                                               "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"));
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
                 curl_setopt($ch, CURLOPT_HEADER, FALSE);
                 curl_setopt($ch, CURLOPT_POST, TRUE);
@@ -2068,166 +2068,6 @@ include('../connection.php');
 
 
 }
-// if(isset($_POST['btnSubmit_Action'])){
-//     $status = $_POST['Action'];
-//     $order_id = $_POST['order_id'];
-//     // $rider_id = $_POST['rider_id'];
-//     $datatime = '';
-//     include('../connection.php');
-//     $sql;
-//     if($status == 'shipped'){
-//         $sql = "UPDATE `orders_zee` SET `status` = '$status'  , `rider_id` = 0   WHERE `id` = $order_id"; 
-//     }else if($status == 'pending'){
-//         date_default_timezone_set('Europe/Berlin');
-//         $minutes_to_add = 45;
-//         $time = new DateTime();
-//         $time->add(new DateInterval('PT' . $minutes_to_add . 'M'));
-//         $datetime = $time->format('Y-m-d g:i A');
- 
-//         $sql = "UPDATE `orders_zee` SET `status` = '$status'  , `delivered_at` = '$datetime' WHERE `id` = $order_id";
-//         //yahan bhi call kr sakty hain
-//         // include_once('reciept.php');
-//     }
-//     else{
-//         $sql = "UPDATE `orders_zee` SET `status` = '$status' WHERE `id` = '$order_id'";
-//     }
-   
-   
-//     $update = mysqli_query($conn,$sql);
-    
-     
-
-//     //  $sqltaskMembers = "SELECT `notification_token`,`name` FROM `users` WHERE `id` = $rider_id ";
-//     //     $taskMembers = mysqli_query($conn,$sqltaskMembers);
-//     //     $playerId = [];
-//     //     $subject = '';
-//     //     $ryder_name = '';
-//     //     while($row = mysqli_fetch_array($taskMembers)){
-//     //     	     $order_id ;
-//     //              array_push($playerId, $row['notification_token']);   
-//     //             $ryder_name = $row['name'];
-//     //         }
-            
-//     //             $conntent = array(
-//     //                 "en" => ' You have been assigned for an order: '.$order_id.'.'
-//     //                 );
-
-//     //             $fields = array(
-//     //                  'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
-//     //                  'include_player_ids' => $playerId,
-//     //                 'data' => array("foo" => "NewMassage","Id" => $taskid),
-//     //                 'large_icon' =>"ic_launcher_round.png",
-//     //                 'contents' => $conntent
-//     //             );
-
-//     //             $fields = json_encode($fields);
-               
-
-//     //             $ch = curl_init();
-//     //             curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
-//     //             curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8',
-//     //                                                       'Authorization: Basic ODU5ZDhiZjAtOWRkZS00NDIyLWI0ZWItOTYxMDc5YzQzMGIz'));
-//     //             curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-//     //             curl_setopt($ch, CURLOPT_HEADER, FALSE);
-//     //             curl_setopt($ch, CURLOPT_POST, TRUE);
-//     //             curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-//     //             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);    
-
-//     //              $response = curl_exec($ch);
-//     //             curl_close($ch);
-                
-
-//         $sql_get_user_id ="SELECT `user_id` FROM `orders_zee` WHERE `id` = '$order_id'";
-//         $execute_get_user_id = mysqli_query($conn,$sql_get_user_id);
-//         $user_data = mysqli_fetch_array($execute_get_user_id);
-//         $get_user_id = $user_data['user_id'];
-
-        
-
-        
-        
-//         if($execute_get_user_id){
-//         $sqltaskMembersx = "SELECT `notification_token` FROM `users` WHERE `id` = '$get_user_id' ";
-//         $taskMembersx = mysqli_query($conn,$sqltaskMembersx);
-//         $playerIdx = [];
-//         $subject = '';
-//         $newstatus = '';
-        
-//         while($row = mysqli_fetch_array($taskMembersx)){
-        	     
-//                  array_push($playerIdx, $row['notification_token']);
-                
-//             }
-            
-//             $order_content = '';
-//                 if($status == 'pending'){
-                    
-//                     $order_content = 'Ihre Bestellung Nr:'  .$order_id. ' wurde angenommen. Die voraussichtliche Lieferzeit für Ihre Bestellung beträgt '.$datetime.".";
-//                      $conntentx = array(
-//                     "en" => $order_content
-//                     );
-                            
-
-//                 }else if($status == 'shipped')
-//                     {
-//                         $order_content = ' Ihre Bestellung Nr: '.$order_id.' ist gewesen '.$status.' zum Reiter '.$ryder_name;
-//                         $conntentx = array(
-//                     "en" => $order_content
-//                     ); 
-//                     }else{
-//                         $order_content = ' Ihre Bestellung Nr: '.$order_id.' ist gewesen '.$status.'.';
-//                       $conntentx = array(
-//                     "en" => $order_content
-//                     );   
-                    
-                    
-//                 }
-               
-//                     $insert_noti_details = "INSERT INTO `notification`( `user_id`, `content`, `purpose`) VALUES ('$get_user_id','$order_content','order')";
-//                     $execute_insert_noti = mysqli_query($conn,$insert_noti_details);
-                    
-                
-//     //  $sql_get_appid = "SELECT  * FROM `enviroments`";
-//     //                     $sql = mysqli_query($conn,$sql_get_appid);
-//     //                     $data = mysqli_fetch_array($sql);
-//     //                     $app_id = $data['one_signal_appid'] ?? '2de883ec-be41-4820-a517-558beee8b0ac';
-                    
-//                 $fields = array(
-//                      'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
-//                     //  'app_id' => $app_id,
-//                      'include_player_ids' => $playerIdx,
-//                     'data' => array("foo" => "NewMassage","Id" => $taskid),
-//                     'large_icon' =>"ic_launcher_round.png",
-//                     'contents' => $conntentx
-//                 );
-
-//                 $fields = json_encode($fields);
-               
-
-//                 $ch = curl_init();
-//                 curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
-//       curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8',
-//                                                               'Authorization: Basic ODU5ZDhiZjAtOWRkZS00NDIyLWI0ZWItOTYxMDc5YzQzMGIz'));
-//                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-//                 curl_setopt($ch, CURLOPT_HEADER, FALSE);
-//                 curl_setopt($ch, CURLOPT_POST, TRUE);
-//                 curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-//                 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);    
-
-//                  $response = curl_exec($ch);
-//                 curl_close($ch);
-//         }        
-                
-                
-  
-    
-//     if($update){
-//          header("Location:../order_details.php?order_id=".$order_id."&Massage=Sucessfully updated order.");
-//     }
-    
-    
-// }
-
 
 if (isset($_POST['btnSubmit_Action'])) {
 //             error_reporting(E_ALL);
@@ -2270,8 +2110,8 @@ if (isset($_POST['btnSubmit_Action'])) {
                         $mail->isSMTP();
                         $mail->Host = 'smtp.gmail.com';
                         $mail->SMTPAuth = true;
-                        $mail->Username = 'boundedsocial@gmail.com'; 
-                        $mail->Password = 'iwumjedakkbledwe';
+                        $mail->Username = $MAIL_USERNAME; 
+                        $mail->Password = $MAIL_PASSWORD;
                         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                         $mail->Port = 587;
                     
@@ -2443,7 +2283,7 @@ if (isset($_POST['btnSubmit_Action'])) {
             ];
 
             $fields = [
-                        'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
+                        'app_id' => $ONE_SIGNAL_APP_ID,
                         'include_player_ids' => [$token], 
                         'data' => ["foo" => "NewMessage"],
                         'large_icon' => "ic_launcher_round.png",
@@ -2456,7 +2296,7 @@ if (isset($_POST['btnSubmit_Action'])) {
             curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json; charset=utf-8',
-            'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'
+             "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
             ]);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
             curl_setopt($ch, CURLOPT_HEADER, FALSE);
@@ -2496,8 +2336,8 @@ if (isset($_POST['btnSubmit_Action'])) {
                             $mail->isSMTP();
                             $mail->Host = 'smtp.gmail.com';
                             $mail->SMTPAuth = true;
-                            $mail->Username = 'boundedsocial@gmail.com'; 
-                            $mail->Password = 'iwumjedakkbledwe';
+                            $mail->Username = $MAIL_USERNAME; 
+                            $mail->Password = $MAIL_PASSWORD;
                             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                             $mail->Port = 587;
                         
@@ -2628,7 +2468,7 @@ $en_content = mysqli_real_escape_string($conn, $order_content['en']);
         mysqli_query($conn, $insert_noti_details);
 
         $fields = json_encode([
-            'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
+            'app_id' => $ONE_SIGNAL_APP_ID,
             'include_player_ids' => $playerIdx,
             'data' => ["foo" => "NewMassage", "Id" => $order_id],
             'large_icon' => "ic_launcher_round.png",
@@ -2639,7 +2479,7 @@ $en_content = mysqli_real_escape_string($conn, $order_content['en']);
         curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json; charset=utf-8',
-            'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'
+             "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
         ]);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
@@ -3085,97 +2925,7 @@ if(isset($_POST['btnSubmit_termscondition'])){
 
     
 }
-// function sendMessage($userid){
-//     require 'connection.php';
-//     $sqltaskMembers = "SELECT `id`, `role_id`, `name`, `phone`, `email`, `email_verified_at`, `password`, `notification_token`, `remember_token`, `rewards_token`, `created_at`, `updated_at` FROM `users` WHERE `id` = $userid";
-//         $taskMembers = mysqli_query($conn,$sqltaskMembers);
-//         $playerId = [];
-//         $subject = '';
-//         while($row = mysqli_fetch_array($taskMembers)){
-//         	     $subject =  $row['firstname'];
-//                  array_push($playerId, '1913aa90-d6ce-40b5-8480-f17595f18ab6');           
-//             }
-            
-//                 $conntent = array(
-//                     "en" => ' you got new message '.$subject.'.'
-//                     );
 
-//                 $fields = array(
-//                     'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
-//                      'include_player_ids' => $playerId,
-//                     'data' => array("foo" => "NewMassage","Id" => $taskid),
-//                     'large_icon' =>"ic_launcher_round.png",
-//                     'contents' => $conntent
-//                 );
-
-//                 $fields = json_encode($fields);
-               
-
-//                 $ch = curl_init();
-//                 curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
-//                 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8',
-//                                                           'Authorization: Basic ODU5ZDhiZjAtOWRkZS00NDIyLWI0ZWItOTYxMDc5YzQzMGIz'));
-//                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-//                 curl_setopt($ch, CURLOPT_HEADER, FALSE);
-//                 curl_setopt($ch, CURLOPT_POST, TRUE);
-//                 curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-//                 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);    
-
-//                  $response = curl_exec($ch);
-//                 curl_close($ch);
-
-               
-
-
-        
-           
-               
-// }
-
-
-// if (isset($_POST['updateDeals'])) {
-//     include('../connection.php');
-
-//     // Retrieve form data
-//     $deal_id = $_POST['deal_id'];
-//     $deal_name = $_POST['deal_name'];
-//     $deal_description = $_POST['deal_description'];
-//     $deal_cost = $_POST['deal_cost'];
-//     $deal_price = $_POST['deal_price'];
-//     $deal_items_number = $_POST['deal_items_number'];
-//     $status = $_POST['status'];
-
-//     // Check for image upload
-//     $image_path = '';
-//     if (isset($_FILES['deal_image']) && $_FILES['deal_image']['error'] == 0) {
-//         $target_dir = "../Uploads/";
-//         $image_path = $target_dir . basename($_FILES['deal_image']['name']);
-//         move_uploaded_file($_FILES['deal_image']['tmp_name'], $image_path);
-//     }
-
-//     // Prepare SQL update statement
-//     $sql = "UPDATE `deals` SET `deal_name`='$deal_name', `deal_description`='$deal_description', `deal_cost`='$deal_cost', `deal_price`='$deal_price', `deal_items_number`='$deal_items_number', `status`='$status'";
-    
-//     if ($image_path) {
-//         $sql .= ", `deal_image`='$image_path'";
-//     }
-    
-//     $sql .= " WHERE `deal_id`='$deal_id'";
-
-//     // Execute the SQL update statement
-//     if (mysqli_query($conn, $sql)) {
-//         // If the update is successful, show an alert and redirect
-//         echo "<script>
-//                 alert('Update successfully');
-//                 window.location.href='../view_deals.php';
-//               </script>";
-//     } else {
-//         // If the update fails, show an error
-//         echo "<script>
-//                 alert('Error updating record: " . mysqli_error($conn) . "');
-//               </script>";
-//     }
-// }
 
 if (isset($_POST['updateDeals'])) {
     include('../connection.php');

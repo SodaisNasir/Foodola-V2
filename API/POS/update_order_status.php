@@ -71,8 +71,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $mail->isSMTP();
                         $mail->Host = 'smtp.gmail.com';
                         $mail->SMTPAuth = true;
-                        $mail->Username = 'boundedsocial@gmail.com'; 
-                        $mail->Password = 'iwumjedakkbledwe';
+                        $mail->Username = $MAIL_USERNAME; 
+                        $mail->Password = $MAIL_PASSWORD;
                         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                         $mail->Port = 587;
                     
@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $mail->Body = '
                         <html>
                         <head>
-                            <title>Ihre Bestellung wurde angenommen – Foodola</title>
+                            <title>Ihre Bestellung wurde angenommen – ' . htmlspecialchars($APP_NAME) . '</title>
                             <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
                             <style>
                                 body {
@@ -237,7 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ];
                     
             $fields = [
-                        'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
+                        'app_id' => $ONE_SIGNAL_APP_ID,
                         'include_player_ids' => [$token], 
                         'data' => ["foo" => "NewMessage"],
                         'large_icon' => "ic_launcher_round.png",
@@ -250,7 +250,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json; charset=utf-8',
-            'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'
+            "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
             ]);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
             curl_setopt($ch, CURLOPT_HEADER, FALSE);
@@ -284,8 +284,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $mail->isSMTP();
                             $mail->Host = 'smtp.gmail.com';
                             $mail->SMTPAuth = true;
-                            $mail->Username = 'boundedsocial@gmail.com'; 
-                            $mail->Password = 'iwumjedakkbledwe';
+                            $mail->Username = $MAIL_USERNAME; 
+                            $mail->Password = $MAIL_PASSWORD;
                             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                             $mail->Port = 587;
                         
@@ -367,12 +367,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $mail->send();
     
                         } catch (Exception $e) {
-                            $data = [
-                                "status" => false,
-                                "Response_code" => 500,
-                                "Message" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"
-                            ];
-                            echo json_encode($data);
+                            // $data = [
+                            //     "status" => false,
+                            //     "Response_code" => 500,
+                            //     "Message" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"
+                            // ];
+                            // echo json_encode($data);
                         }
 
                 }
@@ -422,7 +422,7 @@ echo json_encode($response);
 
 function sendNotification($playerIds, $content) {
     $fields = [
-        'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
+        'app_id' => $ONE_SIGNAL_APP_ID,
         'include_player_ids' => $playerIds,
         'data' => ["foo" => "NewMessage", "Id" => "taskid"],
         'large_icon' => "ic_launcher_round.png",
@@ -435,7 +435,7 @@ function sendNotification($playerIds, $content) {
     curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Content-Type: application/json; charset=utf-8',
-        'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'
+        "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
     ]);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
     curl_setopt($ch, CURLOPT_HEADER, FALSE);

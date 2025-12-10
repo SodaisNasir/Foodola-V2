@@ -95,10 +95,10 @@ try {
     $options = ['cluster' => 'mt1', 'useTLS' => true];
 
     $pusher = new Pusher(
-        'a1964c3ac950c1a0cdf5',   // KEY
-        'a711ec3a4b827eb6bcc5',  // SECRET
-        '1982652',               // APP ID
-        $options
+    $PUSHER_APP_KEY,    // App key 
+    $PUSHER_SECRET_KEY, // App secret 
+    $PUSHER_APP_ID,     // App ID 
+    $options
     );
 
     $data = [

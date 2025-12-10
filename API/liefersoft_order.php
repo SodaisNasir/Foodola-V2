@@ -22,9 +22,9 @@
 
 // // Login to Liefersoft
 // $login_payload = [
-//     "login" => "Foodola_62c79640-2cf5-4c19-beba-f12827f646d9",
-//     "password" => "CQocw1BOaSR9CVAffaIQcI1BGXWC1uvjD5T8JuNhzDURCsacSt",
-//     "companyId" => "228727d6-8910-4b85-8938-4010e7e4d4bd"
+//     "login" => $LIEFERSOFT_LOGIN,
+//     "password" => $LIEFERSOFT_PASSWORD,
+//     "companyId" => $LIEFERSOFT_COMPANY_ID
 // ];
 // $ch = curl_init("https://api.liefersoft.de/login");
 // curl_setopt_array($ch, [

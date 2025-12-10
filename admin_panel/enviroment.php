@@ -1,66 +1,104 @@
 <?php include('assets/header.php') ?>
 
 <?php 
-
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
 
- include_once('connection.php');
-
-  
-  $currentMode = 0;
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $currentMode = isset($_POST['mode']) && $_POST['mode'] === '1' ? 1 : 0;
-
-    // Update all key values
-    foreach ($_POST as $key => $value) {
-        if ($key !== 'submit' && $key !== 'mode') {
-            $safeKey = mysqli_real_escape_string($conn, $key);
-            $safeValue = mysqli_real_escape_string($conn, $value);
-            $query = "UPDATE enviroments SET key_value = '$safeValue' WHERE key_name = '$safeKey' AND mode = $currentMode";
-            mysqli_query($conn, $query);
-        }
-    }
-
-    // Optionally: update all rows' mode if you want to switch mode globally
-    mysqli_query($conn, "UPDATE enviroments SET mode = $currentMode");
-}
-
-
-$sql = "SELECT key_name, key_value, mode FROM enviroments";
-$result = mysqli_query($conn, $sql);
-
-$apiKeys = [];
-$currentMode = 0; // default to Sandbox
-
-if ($result && mysqli_num_rows($result) > 0) {
-    while ($row = mysqli_fetch_assoc($result)) {
-        $apiKeys[] = $row;
-        if (isset($row['mode'])) {
-            $currentMode = $row['mode']; // assuming mode is same for all rows
-        }
-    }
-}
-
+include_once('connection.php');
 
 
 if (isset($_POST['update_auth_token'])) {
-    $token = $_POST['auth_token'];
-    $authTokenId = $_POST['auth_token_id']; 
+    $token = $conn->real_escape_string($_POST['auth_token']);
+    $authTokenId = intval($_POST['auth_token_id']);
 
     $updateSql = "UPDATE auth_token SET token = '$token' WHERE id = $authTokenId";
-     $result  = mysqli_query($conn,$updateSql);
-        if ($result === true) {
-            header('location:enviroment.php');
-        } else {
-              echo "Error updating record: " . $conn->error;
-        }
-
-    $conn->close();
+    $res  = mysqli_query($conn, $updateSql);
+    if ($res) {
+        header('Location: enviroment.php');
+        exit;
+    } else {
+        echo "<div class='alert alert-danger'>Error updating token: " . htmlspecialchars($conn->error) . "</div>";
+    }
 }
 
- 
+/* -------------------------
+   Handle Keys Update (POST)
+   This will be called after OTP verification (modal submit)
+   ------------------------- */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['update_auth_token'])) {
 
+    // read paypal and pixel modes from form - default 0
+    $paypalMode = isset($_POST['paypal_mode']) && $_POST['paypal_mode'] === '1' ? 1 : 0;
+    $pixelMode  = isset($_POST['pixel_mode']) && $_POST['pixel_mode'] === '1' ? 1 : 0;
+
+    // 1) Update PayPal keys' mode (apply to any key_name starting with paypal_)
+    $paypalMode = intval($paypalMode);
+    $updatePaypalModeSql = "UPDATE enviroments SET mode = $paypalMode WHERE key_name LIKE 'paypal_%'";
+    mysqli_query($conn, $updatePaypalModeSql);
+
+    // 2) Update Pixel key's mode
+    // We expect a pixel row named 'pixel_key' or 'pixel_mode' or similar.
+    // We'll try both: update key_name = 'pixel_key' and key_name = 'pixel_mode' if exist
+    $pixelMode = intval($pixelMode);
+    mysqli_query($conn, "UPDATE enviroments SET mode = $pixelMode WHERE key_name = 'pixel_key'");
+    mysqli_query($conn, "UPDATE enviroments SET mode = $pixelMode WHERE key_name = 'pixel_mode'");
+
+    // 3) Update all other keys' key_value from form values
+    foreach ($_POST as $key => $value) {
+        // Skip control fields
+        if (in_array($key, ['startOtpProcess','entered_otp','actual_otp','api_data','paypal_mode','pixel_mode','update_auth_token','auth_token','auth_token_id'])) continue;
+
+        // Only update if this corresponds to a enviroments key
+        $safeKey = $conn->real_escape_string($key);
+        $safeValue = $conn->real_escape_string($value);
+
+        // Update all rows with this key_name (works if multiple rows exist)
+        $updateSql = "UPDATE enviroments SET key_value = '$safeValue' WHERE key_name = '$safeKey'";
+        mysqli_query($conn, $updateSql);
+    }
+
+    // After update redirect to avoid resubmission
+    header('Location: enviroment.php');
+    exit;
+}
+
+/* -------------------------
+   Load keys for display
+   ------------------------- */
+$sql = "SELECT id, key_name, key_value, mode FROM enviroments ORDER BY key_name ASC";
+$result = mysqli_query($conn, $sql);
+
+$apiKeys = [];
+$paypalMode = 0;
+$pixelMode = 0;
+
+// If there are explicit rows like 'pixel_mode' or 'paypal_client_key' we'll pick modes accordingly
+if ($result && mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $apiKeys[] = $row;
+
+        // Establish modes (prefer specific keys)
+        if ($row['key_name'] === 'paypal_client_key' && isset($row['mode'])) {
+            $paypalMode = intval($row['mode']);
+        }
+        if ($row['key_name'] === 'pixel_key' && isset($row['mode'])) {
+            $pixelMode = intval($row['mode']);
+        }
+        // If there's a dedicated 'pixel_mode' key_name with key_value 0/1, prefer it
+        if ($row['key_name'] === 'pixel_mode') {
+            // Some setups store pixel_mode as key_value rather than mode column
+            if ($row['key_value'] !== null && $row['key_value'] !== '') {
+                $pixelMode = intval($row['key_value']);
+            } elseif (isset($row['mode'])) {
+                $pixelMode = intval($row['mode']);
+            }
+        }
+    }
+}
+
+// For safety, ensure variables exist
+$paypalMode = isset($paypalMode) ? intval($paypalMode) : 0;
+$pixelMode  = isset($pixelMode) ? intval($pixelMode) : 0;
 
 ?>
 
@@ -202,63 +240,118 @@ if (isset($_POST['update_auth_token'])) {
                     <h4 class="card-title">Manage API Keys</h4>
                 </div>
                 <div class="card-body">
-                    <form method="POST">
-                        <label>Update Authentication Token</label>
-                        <div class="form-group d-flex align-items-center">
-                            <?php 
-                                $authTokenId = 1;
-                                $authToken = '';
-                                $sql = "SELECT token FROM auth_token WHERE id = $authTokenId";
-                                $result = $conn->query($sql);
+                    <!-- AUTH TOKEN FORM -->
+      <!-- AUTH TOKEN FORM -->
+<form method="POST" class="mb-3">
+  <label>Update Authentication Token</label>
+  <div class="form-group d-flex align-items-center">
+    <?php
+      $authTokenId = 1;
+      $authToken = '';
+      $sqlt = "SELECT token FROM auth_token WHERE id = $authTokenId LIMIT 1";
+      $rest = $conn->query($sqlt);
+      if ($rest && $rest->num_rows > 0) {
+          $rowt = $rest->fetch_assoc();
+          $authToken = $rowt['token'];
+      }
+    ?>
+    <input type="hidden" name="auth_token_id" value="<?php echo $authTokenId; ?>">
+    <input type="text" class="form-control w-50" id="auth_token" name="auth_token" value="<?php echo htmlspecialchars($authToken); ?>" required>
+    <button type="button" onclick="generatePassword()" class="btn btn-outline-primary ml-2">Generate Password</button>
+  </div>
+  <button type="submit" name="update_auth_token" class="btn btn-primary">Update Auth Token</button>
+</form>
 
-                                if ($result && $result->num_rows > 0) {
-                                    $row = $result->fetch_assoc();
-                                    $authToken = $row['token'];
-                                }
-                            ?>
-                            <input type="hidden" name="auth_token_id" value="<?php echo $authTokenId; ?>">
-                            <input type="text" class="form-control w-50" id="auth_token" name="auth_token" value="<?php echo htmlspecialchars($authToken); ?>" required>
-                            <button type="button" onclick="generatePassword()" class="btn btn-outline-primary ml-2">Generate Password</button>
-                        </div>
-                        <button type="submit" name="update_auth_token" class="btn btn-primary">Update Auth Token</button>
-                    </form>
-                    
-                    
-                    <form method="POST" id="apiKeyForm">
-                            <div class="row d-flex flex-column">
-                        
-                                <?php foreach ($apiKeys as $apiKey): 
-                                    $keyName = $apiKey['key_name'];
-                                    $keyValue = $apiKey['key_value'];
-                                ?>
-                                    <div class="col-md-6 d-flex flex-column justify-content-center align-items-center">
-                                        <div class="form-group w-100">
-                                            <label for="<?= $keyName ?>">
-                                                <?= ucwords(str_replace('_', ' ', $keyName)) ?>
-                                            </label>
-                        
-                                            <input type="text" class="form-control"
-                                                   id="<?= $keyName ?>"
-                                                   name="<?= $keyName ?>"
-                                                   value="<?= htmlspecialchars($keyValue) ?>"
-                                                   required>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
-                        
-                                <!-- Toggle Switch -->
-                                <div class="mb-4 d-flex align-items-center">
-                                    <label class="switch-toggle">
-                                        <input type="checkbox" id="modeSwitch" name="mode" value="1" <?= $currentMode == 1 ? 'checked' : '' ?>>
-                                        <span class="slider"></span>
-                                    </label>
-                                    <span class="mode-label" id="modeLabel"><?= $currentMode == 1 ? 'Live Mode' : 'Sandbox Mode' ?></span>
-                                </div>
-                            </div>
-                       <button type="button" id="startOtpProcess" class="btn btn-primary">
-    Update
-</button>
-                        </form>
+
+<!-- API KEYS FORM -->
+<form method="POST" id="apiKeyForm">
+
+  <div class="row">
+
+    <?php 
+    $paypalKeys = ['paypal_client_key','paypal_secret_key','paypal_merchant_id'];
+    $pixelKeys  = ['pixel_key','pixel_secret','pixel_mode'];
+
+    // ----------- OTHER KEYS -------------
+    foreach ($apiKeys as $apiKey):
+        if (in_array($apiKey['key_name'], $paypalKeys)) continue;
+        if (in_array($apiKey['key_name'], $pixelKeys)) continue;
+
+        $keyName = $apiKey['key_name'];
+        $keyValue = $apiKey['key_value'];
+    ?>
+      <div class="col-md-6 mb-2">
+        <div class="form-group">
+          <label><?= ucwords(str_replace('_',' ', $keyName)) ?></label>
+          <input type="text" class="form-control" name="<?= htmlspecialchars($keyName) ?>" value="<?= htmlspecialchars($keyValue) ?>">
+        </div>
+      </div>
+    <?php endforeach; ?>
+
+  </div>
+
+
+  <!-- ---------------- PAYPAL KEYS ---------------- -->
+  <h5 class="mt-3 mb-2">PayPal</h5>
+  <div class="row">
+    <?php foreach ($apiKeys as $apiKey):
+      if (!in_array($apiKey['key_name'], $paypalKeys)) continue;
+      $keyName = $apiKey['key_name'];
+      $keyValue = $apiKey['key_value'];
+    ?>
+      <div class="col-md-6 mb-2">
+        <div class="form-group">
+          <label><?= ucwords(str_replace('_',' ', $keyName)) ?></label>
+          <input type="text" class="form-control" name="<?= htmlspecialchars($keyName) ?>" value="<?= htmlspecialchars($keyValue) ?>">
+        </div>
+      </div>
+    <?php endforeach; ?>
+  </div>
+
+  <!-- PayPal Mode Toggle (AFTER PAYPAL KEYS) -->
+  <div class="mb-3 d-flex align-items-center">
+    <label class="switch-toggle">
+      <input type="checkbox" id="paypalMode" name="paypal_mode" value="1" <?= $paypalMode == 1 ? 'checked' : '' ?>>
+      <span class="slider"></span>
+    </label>
+    <span class="mode-label" id="paypalLabel"><?= $paypalMode == 1 ? 'Live Mode' : 'Sandbox Mode' ?></span>
+  </div>
+
+
+
+  <!-- ---------------- PIXEL KEYS ---------------- -->
+  <h5 class="mt-3 mb-2">Pixel</h5>
+  <div class="row">
+    <?php foreach ($apiKeys as $apiKey):
+      if (!in_array($apiKey['key_name'], $pixelKeys)) continue;
+
+      $keyName = $apiKey['key_name'];
+      $keyValue = $apiKey['key_value'];
+    ?>
+      <div class="col-md-6 mb-2">
+        <div class="form-group">
+          <label><?= ucwords(str_replace('_',' ', $keyName)) ?></label>
+          <input type="text" class="form-control" name="<?= htmlspecialchars($keyName) ?>" value="<?= htmlspecialchars($keyValue) ?>">
+        </div>
+      </div>
+    <?php endforeach; ?>
+  </div>
+
+  <!-- Pixel Mode Toggle (AFTER PIXEL KEYS) -->
+  <div class="mb-3 d-flex align-items-center">
+    <label class="switch-toggle">
+      <input type="checkbox" id="pixelMode" name="pixel_mode" value="1" <?= $pixelMode == 1 ? 'checked' : '' ?>>
+      <span class="slider"></span>
+    </label>
+    <span class="mode-label" id="pixelLabel"><?= $pixelMode == 1 ? 'Live Mode' : 'Test Mode' ?></span>
+  </div>
+
+
+  <!-- Update button triggers OTP flow -->
+  <button type="button" id="startOtpProcess" class="btn btn-primary">Update</button>
+
+</form>
+
 
 
                     

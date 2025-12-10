@@ -86,9 +86,9 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
         // Send Pusher notification
         try {
             $pusher = new Pusher(
-                'a1964c3ac950c1a0cdf5', // App key
-                'a711ec3a4b827eb6bcc5', // App secret
-                '1982652',              // App ID
+                $PUSHER_APP_KEY, // App key
+                $PUSHER_SECRET_KEY, // App secret
+                $PUSHER_APP_ID,              // App ID
                 ['cluster' => 'mt1', 'useTLS' => true]
             );
             $pusher->trigger($cHANNEL_2, 'new_reservation', $inserted_row);

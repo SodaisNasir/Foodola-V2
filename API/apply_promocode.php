@@ -246,7 +246,7 @@ function sendPushNotification($notification_token, $promo_value, $promo_code) {
         $content = "Sie haben $$promo_value auf Ihr Konto aus dem Promo-Code $promo_code erhalten!";
     
     $fields = json_encode([
-        'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
+        'app_id' => $ONE_SIGNAL_APP_ID,
         'include_player_ids' => [$notification_token],
         'data' => ["type" => "promo_code_applied"],
         'large_icon' => "ic_launcher_round.png",
@@ -257,7 +257,7 @@ function sendPushNotification($notification_token, $promo_value, $promo_code) {
     curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Content-Type: application/json; charset=utf-8',
-        'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'
+         "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
     ]);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
     curl_setopt($ch, CURLOPT_HEADER, FALSE);

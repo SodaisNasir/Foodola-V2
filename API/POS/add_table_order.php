@@ -48,9 +48,9 @@ if ($token === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEW
                     ];
         
                     $pusher = new Pusher(
-                      'a1964c3ac950c1a0cdf5',    // App key from Pusher dashboard
-                      'a711ec3a4b827eb6bcc5', // App secret from Pusher dashboard
-                      '1982652',     // App ID from Pusher dashboard
+                      $PUSHER_APP_KEY,    // App key 
+                      $PUSHER_SECRET_KEY, // App secret 
+                      $PUSHER_APP_ID,     // App ID 
                       $options
                     );
         
@@ -98,9 +98,9 @@ if ($token === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEW
                     ];
         
                     $pusher = new Pusher(
-                      'a1964c3ac950c1a0cdf5',    // App key from Pusher dashboard
-                      'a711ec3a4b827eb6bcc5', // App secret from Pusher dashboard
-                      '1982652',     // App ID from Pusher dashboard
+                    $PUSHER_APP_KEY,    // App key 
+                      $PUSHER_SECRET_KEY, // App secret 
+                      $PUSHER_APP_ID,     // App ID 
                       $options
                     );
         

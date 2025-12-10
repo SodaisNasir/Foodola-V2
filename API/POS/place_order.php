@@ -73,7 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result_order) {
       $last_order_id = $conn->insert_id;
       $no_of_deal = 1;
-      $department_list = [];
+      $addedDepartments = [];
+$department_list = [];
 
       foreach ($order_details as $details) {
         if ($details['is_deal'] == "yes") {
@@ -277,10 +278,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
 
             $pusher = new Pusher(
-              'a1964c3ac950c1a0cdf5',    // App key from Pusher dashboard
-              'a711ec3a4b827eb6bcc5', // App secret from Pusher dashboard
-              '1982652',     // App ID from Pusher dashboard
-              $options
+                $PUSHER_APP_KEY,    // App key 
+                $PUSHER_SECRET_KEY, // App secret 
+                $PUSHER_APP_ID,     // App ID 
+                $options
             );
 
             // prepare notification
@@ -596,7 +597,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           );
 
           $fields = array(
-            'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
+            'app_id' => $ONE_SIGNAL_APP_ID,
             'include_player_ids' => $allRecipients,
             'data' => array("foo" => "NewMassage", "Id" => $taskid),
             'large_icon' => "ic_launcher_round.png",
@@ -610,7 +611,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
           curl_setopt($ch, CURLOPT_HTTPHEADER, array(
             'Content-Type: application/json; charset=utf-8',
-            'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'
+             "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
           ));
           curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
           curl_setopt($ch, CURLOPT_HEADER, FALSE);
@@ -647,10 +648,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
 
             $pusher = new Pusher(
-              'a1964c3ac950c1a0cdf5',    // App key from Pusher dashboard
-              'a711ec3a4b827eb6bcc5', // App secret from Pusher dashboard
-              '1982652',     // App ID from Pusher dashboard
-              $options
+            $PUSHER_APP_KEY,    // App key 
+            $PUSHER_SECRET_KEY, // App secret 
+            $PUSHER_APP_ID,     // App ID 
+            $options
             );
 
             // prepare notification
@@ -687,8 +688,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mail->isSMTP();
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
-            $mail->Username = 'boundedsocial@gmail.com';
-            $mail->Password = 'iwumjedakkbledwe';
+            $mail->Username = $MAIL_USERNAME;
+            $mail->Password = $MAIL_PASSWORD;
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
 
@@ -1072,7 +1073,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       );
 
       $fields = array(
-        'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
+        'app_id' => $ONE_SIGNAL_APP_ID,
         'include_player_ids' => $allRecipients,
         'data' => array("foo" => "NewMassage", "Id" => $taskid),
         'large_icon' => "ic_launcher_round.png",
@@ -1086,7 +1087,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
       curl_setopt($ch, CURLOPT_HTTPHEADER, array(
         'Content-Type: application/json; charset=utf-8',
-        'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'
+         "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
       ));
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
       curl_setopt($ch, CURLOPT_HEADER, FALSE);
@@ -1123,10 +1124,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
 
         $pusher = new Pusher(
-          'a1964c3ac950c1a0cdf5',    // App key 
-          'a711ec3a4b827eb6bcc5', // App secret 
-          '1982652',     // App ID from Pusher 
-          $options
+            $PUSHER_APP_KEY,    // App key 
+            $PUSHER_SECRET_KEY, // App secret 
+            $PUSHER_APP_ID,     // App ID 
+            $options
         );
 
         // prepare notification
@@ -1159,8 +1160,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'boundedsocial@gmail.com';
-        $mail->Password = 'iwumjedakkbledwe';
+        $mail->Username = $MAIL_USERNAME;
+        $mail->Password = $MAIL_PASSWORD;
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 

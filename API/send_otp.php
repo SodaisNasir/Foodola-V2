@@ -3,7 +3,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 header('Content-Type: application/json');
-
+include('connection.php'); 
 // Include PHPMailer classes
 require 'PHPMailer-master/src/Exception.php';
 require 'PHPMailer-master/src/PHPMailer.php';
@@ -23,13 +23,13 @@ try {
     $mail->isSMTP();
     $mail->Host = 'smtp.gmail.com';                     // Use your SMTP server
     $mail->SMTPAuth = true;
-    $mail->Username = 'boundedsocial@gmail.com';        // Your SMTP username
-    $mail->Password = 'iwumjedakkbledwe';               // App password (NOT Gmail password)
+    $mail->Username = $MAIL_USERNAME;        // Your SMTP username
+    $mail->Password = $MAIL_PASSWORD;               // App password (NOT Gmail password)
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail->Port = 587;
 
     // Set sender
-    $mail->setFrom('boundedsocial@gmail.com', 'API OTP System');
+    $mail->setFrom($FROM_EMAIL, 'API OTP System');
 
     // Add multiple recipients
     $mail->addAddress($admin_email_1);

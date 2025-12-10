@@ -20,8 +20,8 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';  
         $mail->SMTPAuth = true;
-        $mail->Username = 'boundedsocial@gmail.com'; 
-        $mail->Password = 'iwumjedakkbledwe';
+        $mail->Username = $MAIL_USERNAME; 
+        $mail->Password = $MAIL_PASSWORD;
 
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;  
         $mail->Port = 587;  

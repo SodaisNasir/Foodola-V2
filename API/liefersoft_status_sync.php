@@ -1,4 +1,4 @@
-// <?php
+ <?php
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
 // header('Content-Type: application/json');
@@ -14,9 +14,9 @@
 // // // === Helper functions ===
 // function getLiefersoftToken() {
 //     $login_payload = [
-//         "login" => "Foodola_62c79640-2cf5-4c19-beba-f12827f646d9",
-//         "password" => "CQocw1BOaSR9CVAffaIQcI1BGXWC1uvjD5T8JuNhzDURCsacSt",
-//         "companyId" => "228727d6-8910-4b85-8938-4010e7e4d4bd"
+//         "login" => $LIEFERSOFT_LOGIN,
+//         "password" => $LIEFERSOFT_PASSWORD,
+//         "companyId" => $LIEFERSOFT_COMPANY_ID
 //     ];
 
 //     $ch = curl_init("https://api.liefersoft.de/login");
@@ -48,7 +48,7 @@
 
 // function sendNotification($playerIds, $content) {
 //     $fields = [
-//         'app_id' => "04869310-bf7c-4e9d-9ec9-faf58aac8168",
+//         'app_id' => $ONE_SIGNAL_APP_ID,
 //         'include_player_ids' => $playerIds,
 //         'data' => ["foo" => "NewMessage"],
 //         'large_icon' => "ic_launcher_round.png",
@@ -59,7 +59,7 @@
 //     curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
 //     curl_setopt($ch, CURLOPT_HTTPHEADER, [
 //         'Content-Type: application/json; charset=utf-8',
-//         'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'
+//          "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
 //     ]);
 //     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 //     curl_setopt($ch, CURLOPT_HEADER, FALSE);
@@ -141,8 +141,8 @@
 //                 $mail->isSMTP();
 //                 $mail->Host = 'smtp.gmail.com';
 //                 $mail->SMTPAuth = true;
-//                 $mail->Username = 'boundedsocial@gmail.com';
-//                 $mail->Password = 'iwumjedakkbledwe';
+//                 $mail->Username = $MAIL_USERNAME;
+//                 $mail->Password = $MAIL_PASSWORD;
 //                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
 //                 $mail->Port = 587;
 
@@ -268,8 +268,8 @@
 //                 $mail->isSMTP();
 //                 $mail->Host = 'smtp.gmail.com';
 //                 $mail->SMTPAuth = true;
-//                 $mail->Username = 'boundedsocial@gmail.com';
-//                 $mail->Password = 'iwumjedakkbledwe';
+//                 $mail->Username = $MAIL_USERNAME;
+//                 $mail->Password = $MAIL_PASSWORD;
 //                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
 //                 $mail->Port = 587;
 
@@ -373,8 +373,8 @@
 //             $mail->isSMTP();
 //             $mail->Host = 'smtp.gmail.com';
 //             $mail->SMTPAuth = true;
-//             $mail->Username = 'boundedsocial@gmail.com';
-//             $mail->Password = 'iwumjedakkbledwe';
+//             $mail->Username = $MAIL_USERNAME;
+//             $mail->Password = $MAIL_PASSWORD;
 //             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
 //             $mail->Port = 587;
 

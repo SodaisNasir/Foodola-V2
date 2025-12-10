@@ -133,12 +133,12 @@
           <div class="content-header-left col-md-9 col-12 mb-2">
             <div class="row breadcrumbs-top">
               <div class="col-12">
-                <h2 class="content-header-title float-left mb-0">New Orders</h2>
+                <h2 class="content-header-title float-left mb-0">Orders</h2>
                 <div class="breadcrumb-wrapper col-12">
                   <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="index.php">Home</a>
                     </li>
-                    <li class="breadcrumb-item active">New Orders
+                    <li class="breadcrumb-item active">Orders
                     </li>
                   </ol>
                 </div>
@@ -232,8 +232,11 @@ if (isset($_SESSION['branch_id'])) {
             }
         }
 
-        $price = number_format($row['order_total_price'], 2);
-        $shipping_cost = number_format($row['Shipping_Cost'], 2);
+  $order_total = is_numeric($row['order_total_price']) ? $row['order_total_price'] : 0;
+$shipping_total = is_numeric($row['Shipping_Cost']) ? $row['Shipping_Cost'] : 0;
+
+$price = number_format((float)$order_total, 2);
+$shipping_cost = number_format((float)$shipping_total, 2);
         // Prepare and display the order row
         echo "<tr>";
         echo "<td>{$sn}</td>";
