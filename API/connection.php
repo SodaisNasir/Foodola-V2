@@ -1,28 +1,28 @@
 <?php
 
 // APP CONFIGRUATION
-$APP_NAME = "Foodola";
-$BASE_URL = "https://foodola.foodola.shop/";
-$FACEBOOK_URL = "https://facebook.com/foodola";
-$INSTAGRAM_URL  = "https://instagram.com/foodola";
-$TWITTER_URL  = "https://twitter.com/foodola";
-$company_address = "Kuhngasse 1, 76684 Östringen";
-$company_city    = "Östringen";
-$company_phone   = "07253 26560-61";
+$APP_NAME = "Super Pizza";
+$BASE_URL = "http://superpizza.foodola.shop/";
+$FACEBOOK_URL = "https://facebook.com/superpizza";
+$INSTAGRAM_URL  = "https://instagram.com/superpizza";
+$TWITTER_URL  = "https://twitter.com/superpizza";
+$company_address = "Kaiserallee 37, 76133 Karlsruhe";
+$company_city    = "Karlsruhe";
+$company_phone   = "080020207702";
 
 
 // PUSHER CONFIGRUATION
 $PUSHER_APP_KEY = "a1964c3ac950c1a0cdf5";
 $PUSHER_SECRET_KEY = "a711ec3a4b827eb6bcc5";
 $PUSHER_APP_ID ="1982652";
-$CHANNEL_1 = "orders";
-$CHANNEL_2 = "reservations";
+$CHANNEL_1 = "superpizza_orders";
+$CHANNEL_2 = "superpizza_reservations";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "bjwzeusrakgeawfn";
-$FROM_EMAIL = "support@foodola.de";
+$FROM_EMAIL = "support@superpizza.de";
 $ADMIN_EMAIL = "boundedsocial@gmail.com";
 
 
@@ -39,9 +39,9 @@ $LIEFERSOFT_COMPANY_ID = "228727d6-8910-4b85-8938-4010e7e4d4bd";
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE='u772850971_foodola';
-$DB_USERNAME='u772850971_foodola';
-$DB_PASSWORD=']f0Hy^78Uf0s';
+$DB_DATABASE='u772850971_superpizza';
+$DB_USERNAME='u772850971_superpizza';
+$DB_PASSWORD='>dYp1x6Ch';
 
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
