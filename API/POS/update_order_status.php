@@ -357,12 +357,102 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         } catch (Exception $e) {
                             // If email fails, ignore silently or log $mail->ErrorInfo
                         }
-                    } // end if $user_row
-                } // end if $update
+                    } 
+                } 
             } else {
                 // cashback not active: still update order status to delivered (if you want to mark delivered even if cashback disabled)
                 $sql = "UPDATE `orders_zee` SET `status` = 'delivered' WHERE `id` = " . intval($order_id);
                 mysqli_query($conn, $sql);
+                     $user_id = $order_status_row['user_id'];
+                  // send OneSignal notification (if token exists)
+                    $sql_get_user_token = "SELECT `notification_token`, `email`, `name` FROM `users` WHERE `id` = '" . mysqli_real_escape_string($conn, $user_id) . "'";
+                    $result = mysqli_query($conn, $sql_get_user_token);
+                    $user_row = mysqli_fetch_assoc($result);
+
+                    if ($user_row) {
+                        $email = $user_row['email'];
+                        $name = $user_row['name'];
+                        // send delivered email to user
+                        $mail = new PHPMailer(true);
+
+                        try {
+                            $mail->isSMTP();
+                            $mail->Host = 'smtp.gmail.com';
+                            $mail->SMTPAuth = true;
+                            $mail->Username = $MAIL_USERNAME;
+                            $mail->Password = $MAIL_PASSWORD;
+                            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                            $mail->Port = 587;
+
+                            $mail->setFrom($FROM_EMAIL, $APP_NAME);
+                            if ($email) {
+                                $mail->addAddress($email);
+                            }
+
+                            $mail->isHTML(true);
+                            $mail->Subject = "Ihre Bestellung wurde geliefert";
+
+                            // NOTE: replaced $user_name with $name (fixed undefined variable)
+                            $mail->Body = '
+                            <html>
+                            <head>
+                                <title>Ihre Bestellung wurde geliefert – ' . htmlspecialchars($APP_NAME) . '</title>
+                                <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+                                <style>
+                                    body {
+                                        font-family: "Poppins", Arial, sans-serif;
+                                        line-height: 1.6;
+                                        color: #333;
+                                        padding: 20px;
+                                        background-color: #f7f7f7;
+                                    }
+                                    .content {
+                                        background-color: rgba(255, 255, 255, 0.95);
+                                        padding: 20px;
+                                        border-radius: 8px;
+                                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                                    }
+                                    h1 { color: #2B2B29; font-size: 28px; margin-bottom: 10px; }
+                                    h3 { color: #2B2B29; font-size: 20px; margin-top: 20px; }
+                                    p, li { color: #555; font-size: 16px; margin: 8px 0; }
+                                    a { color: #F2AF34; text-decoration: none; }
+                                </style>
+                            </head>
+                            <body>
+                                <table width="100%" cellpadding="0" cellspacing="0" style="background-image:  url(\'' . $BASE_URL . 'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                                    <tr>
+                                        <td align="center">
+                                            <table width="100%" class="content" style="max-width: 600px;">
+                                                <tr>
+                                                    <td align="center">
+                                                        <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="'. htmlspecialchars($APP_NAME) .'" style="width: 100px; margin-bottom: 20px;">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <h1>Ihre Bestellung wurde geliefert!</h1>
+                                                        <p>Hallo <strong>' . htmlspecialchars($name) . '</strong>,</p>
+                                                        <p>Wir freuen uns, Ihnen mitteilen zu können, dass Ihre Bestellung erfolgreich geliefert wurde.</p>
+                                                        <p><strong>Bestellnummer:</strong> #' . htmlspecialchars($order_id) . '</p>
+                                                        <h3>Guten Appetit!</h3>
+                                                        <p>Wir hoffen, dass Sie Ihr Essen genießen. Vielen Dank, dass Sie bei <strong>' . htmlspecialchars($APP_NAME) . '</strong> bestellt haben.</p>
+                                                        <p>Wenn Sie Fragen haben oder Feedback geben möchten, stehen wir Ihnen jederzeit zur Verfügung.</p>
+                                                        <p>Mit freundlichen Grüßen,<br>Ihr ' . htmlspecialchars($APP_NAME) . ' Team</p>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </body>
+                            </html>';
+
+                            $mail->send();
+
+                        } catch (Exception $e) {
+                            // If email fails, ignore silently or log $mail->ErrorInfo
+                        }
+                    }
             }
         } else {
             // order not found
