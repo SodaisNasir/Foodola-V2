@@ -26,8 +26,8 @@ if(isset($_POST['btn_delete_depart'])){
 }
 
 if (isset($_POST['btn_update_depart'])) {
-    error_reporting(E_ALL);
-ini_set('display_errors', 1);
+//     error_reporting(E_ALL);
+// ini_set('display_errors', 1);
     include('../connection.php');
 
 $dpt_id = intval($_POST['dpt_id']);
@@ -2461,8 +2461,8 @@ if (isset($_POST['btnSubmit_Action'])) {
 };
 
 // Escape values for safe SQL insertion
-$de_content = mysqli_real_escape_string($conn, $order_content['de']);
-$en_content = mysqli_real_escape_string($conn, $order_content['en']);
+        $de_content = mysqli_real_escape_string($conn, $order_content['de']);
+        $en_content = mysqli_real_escape_string($conn, $order_content['en']);
 
         $insert_noti_details = "INSERT INTO `notification` (`user_id`, `content`, `german_content`,`purpose`) VALUES ('$get_user_id', '$en_content', '$de_content', 'order')";
         mysqli_query($conn, $insert_noti_details);
@@ -2472,7 +2472,7 @@ $en_content = mysqli_real_escape_string($conn, $order_content['en']);
             'include_player_ids' => $playerIdx,
             'data' => ["foo" => "NewMassage", "Id" => $order_id],
             'large_icon' => "ic_launcher_round.png",
-            'contents' => ["en" => $order_content]
+            'contents' => ["en" => $de_content]
         ]);
 
         $ch = curl_init();

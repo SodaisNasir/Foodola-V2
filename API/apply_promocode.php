@@ -243,7 +243,8 @@ if (mysqli_query($conn, $update_sql)) {
 
 // Function to send push notification via OneSignal
 function sendPushNotification($notification_token, $promo_value, $promo_code) {
-        $content = "Sie haben $$promo_value auf Ihr Konto aus dem Promo-Code $promo_code erhalten!";
+    global $ONE_SIGNAL_APP_ID, $ONE_SIGNAL_AUTH_KEY;
+    $content = "Sie haben $$promo_value auf Ihr Konto aus dem Promo-Code $promo_code erhalten!";
     
     $fields = json_encode([
         'app_id' => $ONE_SIGNAL_APP_ID,

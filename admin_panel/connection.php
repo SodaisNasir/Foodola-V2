@@ -18,8 +18,7 @@ $FROM_EMAIL = "support@foodola.de";
 
 // ONESIGNAL CONFIGRUATION
 $ONE_SIGNAL_APP_ID = "04869310-bf7c-4e9d-9ec9-faf58aac8168";
-$ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy";
-
+$ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebnd2bkiffvrgujk434p5si37nspbhido5elmhsw7ztuuzhcjledmy7nwwpuvenl3x2t7n32qxr5d52ni";
 
 
 
