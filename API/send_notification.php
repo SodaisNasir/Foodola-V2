@@ -8,6 +8,7 @@ include("connection.php");
 
 function sendNotification($notification_token)
 {
+        global $ONE_SIGNAL_APP_ID, $ONE_SIGNAL_AUTH_KEY;
     $playerIds = is_array($notification_token) ? $notification_token : [$notification_token];
 
     $content = array(
@@ -19,7 +20,7 @@ function sendNotification($notification_token)
     //                     $data = mysqli_fetch_array($sql);
     //                     $app_id = $data['one_signal_appid'];
     $fields = array(
-        'app_id' => '04869310-bf7c-4e9d-9ec9-faf58aac8168', // Ensure this is correct
+        'app_id' => $ONE_SIGNAL_APP_ID, // Ensure this is correct
         // 'app_id' => $app_id, // Ensure this is correct
         'include_player_ids' => $playerIds,
         'data' => array("foo" => "NewMessage"),
@@ -36,7 +37,7 @@ function sendNotification($notification_token)
     //     'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebndohgjidlvpeo7en2ev5vls473qc26gslgf4tvpouj6t4in75jdztefftz5c52matdxdsstnomodc3a'
     // ));
      curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8',
-                                                              'Authorization: Basic  os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'));
+                                                                      "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
     curl_setopt($ch, CURLOPT_HEADER, FALSE);
     curl_setopt($ch, CURLOPT_POST, TRUE);

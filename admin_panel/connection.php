@@ -17,7 +17,7 @@ $FROM_EMAIL = "support@superpizza.de";
 
 // ONESIGNAL CONFIGRUATION
 $ONE_SIGNAL_APP_ID = "04869310-bf7c-4e9d-9ec9-faf58aac8168";
-$ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebnclfc4oqliauivexgu7qoyppngwkiegxicusimonu42xsjtiaamlk2fqo2ykzbmx2rtpzfsvt22mvkq";
+$ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebndv4tpuahlbusgva3p6eutn2x652nleaiuwtlm27le3ugia7aaeb3ikpob2alnlj2pqawjlsb7g2x3q";
 
 
 
