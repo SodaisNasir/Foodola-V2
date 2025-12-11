@@ -1,28 +1,28 @@
 <?php
 
 // APP CONFIGRUATION
-$APP_NAME = "Foodola";
-$BASE_URL = "https://foodola.foodola.shop/";
-$FACEBOOK_URL = "https://facebook.com/foodola";
-$INSTAGRAM_URL  = "https://instagram.com/foodola";
-$TWITTER_URL  = "https://twitter.com/foodola";
+$APP_NAME = "Pizza Blitz";
+$BASE_URL = "https://xn--pizzablitzstringen-m3b.de/pizza_blitz/";
+$FACEBOOK_URL = "https://facebook.com/pizzablitzstringen";
+$INSTAGRAM_URL  = "https://instagram.com/pizzablitzstringen";
+$TWITTER_URL  = "https://twitter.com/pizzablitzstringen";
 $company_address = "Kuhngasse 1, 76684 Östringen";
 $company_city    = "Östringen";
-$company_phone   = "07253 26560-61";
+$company_phone   = "0725326560-61";
 
 
 // PUSHER CONFIGRUATION
 $PUSHER_APP_KEY = "a1964c3ac950c1a0cdf5";
 $PUSHER_SECRET_KEY = "a711ec3a4b827eb6bcc5";
 $PUSHER_APP_ID ="1982652";
-$CHANNEL_1 = "orders";
-$CHANNEL_2 = "reservations";
+$CHANNEL_1 = "pizzablitz_orders";
+$CHANNEL_2 = "pizzablitz_reservations";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "bjwzeusrakgeawfn";
-$FROM_EMAIL = "support@foodola.de";
+$FROM_EMAIL = "support@pizzablitz.de";
 $ADMIN_EMAIL = "boundedsocial@gmail.com";
 
 
@@ -39,9 +39,9 @@ $LIEFERSOFT_COMPANY_ID = "228727d6-8910-4b85-8938-4010e7e4d4bd";
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE='u772850971_foodola';
-$DB_USERNAME='u772850971_foodola';
-$DB_PASSWORD=']f0Hy^78Uf0s';
+$DB_DATABASE='u772850971_pizza_blitz';
+$DB_USERNAME='u772850971_zee';
+$DB_PASSWORD='I8hGVk6o^';
 
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
