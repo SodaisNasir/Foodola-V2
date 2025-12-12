@@ -2,17 +2,16 @@
 
 
 // APP CONFIGRUATION
-$APP_NAME = "Foodola";
-$BASE_URL = "https://foodola.foodola.shop/";
-$company_address = "Kuhngasse 1, 76684 Östringen";
-$company_city    = "Östringen";
-$company_phone   = "07253 26560-61";
-
+$APP_NAME = "Haveli Restaurant";
+$BASE_URL = "https://havelirestaurant.foodola.shop/";
+$company_address = "Von-Behring-Strasse 276297 Stutensee";
+$company_city    = "Karlsruhe";
+$company_phone   = "072447424450";
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "bjwzeusrakgeawfn";
-$FROM_EMAIL = "support@foodola.de";
+$FROM_EMAIL = "support@havelirestaurant.de";
 
 
 
@@ -24,9 +23,9 @@ $ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebndv4tpuahlbusgva3p6eut
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE='u772850971_foodola';
-$DB_USERNAME='u772850971_foodola';
-$DB_PASSWORD=']f0Hy^78Uf0s';
+$DB_DATABASE='u772850971_haveli';
+$DB_USERNAME='u772850971_haveli';
+$DB_PASSWORD='#7!~s>I|nV';
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
 
