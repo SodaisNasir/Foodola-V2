@@ -2,7 +2,7 @@
 
 // APP CONFIGRUATION
 $APP_NAME = "Kohinoor Indian";
-$BASE_URL = "https://kohinoorindian.foodola.shop/";
+$BASE_URL = "https://kohinoorindian-ka.de/";
 $FACEBOOK_URL = "https://facebook.com/kohinoorindian";
 $INSTAGRAM_URL  = "https://instagram.com/kohinoorindian";
 $TWITTER_URL  = "https://twitter.com/kohinoorindian";
@@ -39,9 +39,9 @@ $LIEFERSOFT_COMPANY_ID = "228727d6-8910-4b85-8938-4010e7e4d4bd";
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE='u772850971_kohinoorindian';
-$DB_USERNAME='u772850971_kohinoorindian';
-$DB_PASSWORD='2I=iOz;AYQG';
+$DB_DATABASE='u772850971_kohinoorindia';
+$DB_USERNAME='u772850971_kohinoorindia';
+$DB_PASSWORD='K6t=rSTy3u3~';
 
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
