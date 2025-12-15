@@ -1,28 +1,28 @@
 <?php
 
 // APP CONFIGRUATION
-$APP_NAME = "Foodola";
-$BASE_URL = "https://foodola.foodola.shop/";
-$FACEBOOK_URL = "https://facebook.com/foodola";
-$INSTAGRAM_URL  = "https://instagram.com/foodola";
-$TWITTER_URL  = "https://twitter.com/foodola";
-$company_address = "Kuhngasse 1, 76684 Östringen";
-$company_city    = "Östringen";
-$company_phone   = "07253 26560-61";
+$APP_NAME = "Pizza Day Night";
+$BASE_URL = "https://daynightka.de/";
+$FACEBOOK_URL = "https://facebook.com/daynightka";
+$INSTAGRAM_URL  = "https://instagram.com/daynightka";
+$TWITTER_URL  = "https://twitter.com/daynightka";
+$company_address = "Pizza Day Night";
+$company_city    = "Karlsruhe";
+$company_phone   = "0721 8601726";
 
 
 // PUSHER CONFIGRUATION
 $PUSHER_APP_KEY = "a1964c3ac950c1a0cdf5";
 $PUSHER_SECRET_KEY = "a711ec3a4b827eb6bcc5";
 $PUSHER_APP_ID ="1982652";
-$CHANNEL_1 = "orders";
-$CHANNEL_2 = "reservations";
+$CHANNEL_1 = "daynight_orders";
+$CHANNEL_2 = "daynight_reservations";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "bjwzeusrakgeawfn";
-$FROM_EMAIL = "support@foodola.de";
+$FROM_EMAIL = "support@daynight.de";
 $ADMIN_EMAIL = "boundedsocial@gmail.com";
 
 
@@ -39,9 +39,9 @@ $LIEFERSOFT_COMPANY_ID = "228727d6-8910-4b85-8938-4010e7e4d4bd";
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE='u772850971_foodola';
-$DB_USERNAME='u772850971_foodola';
-$DB_PASSWORD=']f0Hy^78Uf0s';
+$DB_DATABASE='u772850971_daynight';
+$DB_USERNAME='u772850971_daynight';
+$DB_PASSWORD='K*@7g0^g$3x0';
 
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
