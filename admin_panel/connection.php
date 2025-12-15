@@ -4,15 +4,15 @@
 // APP CONFIGRUATION
 $APP_NAME = "Jb's Pizza";
 $BASE_URL = "https://jbpizza.foodola.shop/";
-$company_address = "Kuhngasse 1, 76684 Östringen";
-$company_city    = "Östringen";
-$company_phone   = "07253 26560-61";
+$company_address = "Nußloch Walldorfer Str. 18, 69226";
+$company_city    = "Nußloch";
+$company_phone   = "06224 9257707";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "bjwzeusrakgeawfn";
-$FROM_EMAIL = "support@foodola.de";
+$FROM_EMAIL = "support@jbpizza.de";
 
 
 
@@ -24,9 +24,9 @@ $ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebndv4tpuahlbusgva3p6eut
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE='u772850971_foodola';
-$DB_USERNAME='u772850971_foodola';
-$DB_PASSWORD=']f0Hy^78Uf0s';
+$DB_DATABASE='u772850971_jbpizza';
+$DB_USERNAME='u772850971_jbpizza';
+$DB_PASSWORD='+i2L1C~mxK^';
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
 
