@@ -1,28 +1,28 @@
 <?php
 
 // APP CONFIGRUATION
-$APP_NAME = "Foodola";
-$BASE_URL = "https://foodola.foodola.shop/";
-$FACEBOOK_URL = "https://facebook.com/foodola";
-$INSTAGRAM_URL  = "https://instagram.com/foodola";
-$TWITTER_URL  = "https://twitter.com/foodola";
-$company_address = "Kuhngasse 1, 76684 Östringen";
-$company_city    = "Östringen";
-$company_phone   = "07253 26560-61";
+$APP_NAME = "Broadway Pizza & Kebab";
+$BASE_URL = "https://broadwaypizza.de/";
+$FACEBOOK_URL = "https://facebook.com/broadwaypizza";
+$INSTAGRAM_URL  = "https://instagram.com/broadwaypizza";
+$TWITTER_URL  = "https://twitter.com/broadwaypizza";
+$company_address = "Industriestraße 24A, 76767 Hagenbach";
+$company_city    = "Hagenbach";
+$company_phone   = "07273 9359582";
 
 
 // PUSHER CONFIGRUATION
 $PUSHER_APP_KEY = "a1964c3ac950c1a0cdf5";
 $PUSHER_SECRET_KEY = "a711ec3a4b827eb6bcc5";
 $PUSHER_APP_ID ="1982652";
-$CHANNEL_1 = "orders";
-$CHANNEL_2 = "reservations";
+$CHANNEL_1 = "broadway_orders";
+$CHANNEL_2 = "broadway_reservations";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "bjwzeusrakgeawfn";
-$FROM_EMAIL = "support@foodola.de";
+$FROM_EMAIL = "support@broadwaypizza.de";
 $ADMIN_EMAIL = "boundedsocial@gmail.com";
 
 
@@ -39,9 +39,9 @@ $LIEFERSOFT_COMPANY_ID = "228727d6-8910-4b85-8938-4010e7e4d4bd";
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE='u772850971_foodola';
-$DB_USERNAME='u772850971_foodola';
-$DB_PASSWORD=']f0Hy^78Uf0s';
+$DB_DATABASE='u772850971_broadwaypizza';
+$DB_USERNAME='u772850971_broadwaypizza';
+$DB_PASSWORD='B:Ou?Y+0p4q';
 
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
