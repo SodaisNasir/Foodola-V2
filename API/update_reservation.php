@@ -79,7 +79,7 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
 
                     // ================= PENDING TEMPLATE =================
                     if ($status === "pending") {
-                        $mail->Subject = "Ihre Reservierungsanfrage bei".$APP_NAME;
+                        $mail->Subject = "Ihre Reservierungsanfrage bei -".$APP_NAME;
                         $mail->Body = '
                         <html>
                         <body style="font-family: Poppins, Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px; background-color: #f7f7f7;">
@@ -111,7 +111,7 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
 
                     // ================= CONFIRMED TEMPLATE =================
                     if ($status === "confirmed") {
-                        $mail->Subject = "Ihre Reservierung wurde bestätigt –".$APP_NAME;
+                        $mail->Subject = "Ihre Reservierung wurde bestätigt –".$APP_NAME ;
                         $mail->Body = '
                         <html>
                         <body style="font-family: Poppins, Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px; background-color: #f7f7f7;">
