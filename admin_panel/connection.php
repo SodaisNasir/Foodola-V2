@@ -2,8 +2,8 @@
 
 
 // APP CONFIGRUATION
-$APP_NAME = "Foodola";
-$BASE_URL = "https://foodola.foodola.shop/";
+$APP_NAME = "Jb's Pizza";
+$BASE_URL = "https://jbpizza.foodola.shop/";
 $company_address = "Kuhngasse 1, 76684 Östringen";
 $company_city    = "Östringen";
 $company_phone   = "07253 26560-61";
