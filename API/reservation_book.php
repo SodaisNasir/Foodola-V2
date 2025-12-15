@@ -1,12 +1,23 @@
 <?php
+// error_reporting(E_ALL); 
+// ini_set('display_errors', 1);
 header("Access-Control-Allow-Origin: *"); 
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS"); 
 header("Content-Type: application/json"); 
+
+require 'PHPMailer-master/src/PHPMailer.php';
+require 'PHPMailer-master/src/SMTP.php';
+require 'PHPMailer-master/src/Exception.php';
+
+
+
 
 include('connection.php');
 require __DIR__ . '/vendor/autoload.php';
 
 use Pusher\Pusher;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC') {
 
@@ -74,7 +85,7 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
         $inserted_row = mysqli_fetch_assoc($result);
 
         // Fetch user details
-        $user_sql = "SELECT `id`, `name`, `phone` FROM `users` WHERE `id` = '$user_id'";
+        $user_sql = "SELECT `id`, `name`, `email`,`phone` FROM `users` WHERE `id` = '$user_id'";
         $user_res = mysqli_query($conn, $user_sql);
         $user = mysqli_fetch_assoc($user_res);
 
@@ -82,6 +93,7 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
         $inserted_row['table_name'] = $table['table_name'];
         $inserted_row['user_name']  = $user['name'];
         $inserted_row['user_phone'] = $user['phone'];
+        $inserted_row['user_email'] = $user['email'];
 
         // Send Pusher notification
         try {
@@ -91,10 +103,83 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                 $PUSHER_APP_ID,              // App ID
                 ['cluster' => 'mt1', 'useTLS' => true]
             );
-            $pusher->trigger($cHANNEL_2, 'new_reservation', $inserted_row);
+            $pusher->trigger($CHANNEL_2, 'new_reservation', $inserted_row);
         } catch (Exception $e) {
             error_log("Pusher error: " . $e->getMessage());
         }
+        
+        $email = $user['email'];
+        $name  = $user['name'];
+
+        $mail = new PHPMailer(true);
+
+               try {
+                            $mail->isSMTP();
+                            $mail->Host = 'smtp.gmail.com';
+                            $mail->SMTPAuth = true;
+                            $mail->Username = $MAIL_USERNAME;
+                            $mail->Password = $MAIL_PASSWORD;
+                            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                            $mail->Port = 587;
+                        
+                            $mail->setFrom($FROM_EMAIL, $APP_NAME);
+                            $mail->addAddress($email);
+                            $mail->isHTML(true);
+                        
+                            // Updated Subject
+                          $mail->Subject = 'Willkommen bei ' . htmlspecialchars($APP_NAME) . ' – Ihr Kundenkonto wurde erfolgreich erstellt';
+
+                        
+                            // Updated Email Body
+                            $mail->Body = '
+                            <html>
+                            <body style="font-family: Poppins, Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px; background-color: #f7f7f7;">
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\''.$BASE_URL.'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                                <tr><td align="center">
+                                    <table width="100%" class="content" style="max-width: 600px; background-color: rgba(255,255,255,0.95); padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                        <tr><td align="center">
+                                            <img src="'.$BASE_URL.'admin_panel/images/logo.png" alt="'.htmlspecialchars($APP_NAME).'" style="width: 100px; margin-bottom: 20px;">
+                                        </td></tr>
+                        
+                                        <tr><td>
+                                            <p>Sehr geehrte/r '.htmlspecialchars($name).',</p>
+                        
+                                            <p>wir freuen uns, Sie bei <strong>'.htmlspecialchars($APP_NAME).'</strong> begrüßen zu dürfen.<br>
+                                            Vielen Dank für die Erstellung Ihres Kundenkontos auf unserer Website.</p>
+                        
+                                            <p><strong>Mit Ihrem persönlichen Konto haben Sie nun die Möglichkeit:</strong></p>
+                        
+                                            <ul>
+                                                <li>Bequem und jederzeit Tischreservierungen online vorzunehmen</li>
+                                                <li>Ihre Reservierungen schnell zu verwalten</li>
+                                                <li>Wichtige Informationen und exklusive Neuigkeiten zu erhalten</li>
+                                            </ul>
+                        
+                                            <p>Unser Ziel ist es, Ihnen einen reibungslosen Service sowie ein authentisches, hochwertiges indisches Gastronomie-Erlebnis zu bieten.</p>
+                        
+                                            <p>Für Rückfragen stehen wir Ihnen selbstverständlich jederzeit zur Verfügung.</p>
+                        
+                                            <p>
+                                            📞 <strong>Telefon:</strong>'.htmlspecialchars($company_phone).'<br>
+                                            📍 <strong>Adresse:</strong>' .htmlspecialchars($company_address).'<br>
+                                            🌐 <strong>Website:</strong> '.htmlspecialchars($BASE_URL).'
+                                            </p>
+                        
+                                            <p>Wir danken Ihnen für Ihr Vertrauen und freuen uns auf Ihren Besuch.</p>
+                        
+                                            <p>Mit freundlichen Grüßen<br><strong>Ihr '.htmlspecialchars($APP_NAME).' Team</strong></p>
+                                        </td></tr>
+                                    </table>
+                                </td></tr>
+                            </table>
+                            </body>
+                            </html>';
+                        
+                            $mail->send();
+                        
+                        } catch (Exception $e) {
+                            // error handling
+                        }
 
         echo json_encode(['status' => true, 'message' => 'Reservation booked successfully', 'data' => $inserted_row]);
     } else {
