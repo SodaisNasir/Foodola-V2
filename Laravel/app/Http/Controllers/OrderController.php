@@ -14,6 +14,7 @@ use App\Models\Products;
 use App\Models\Sub_Categories;
 use App\Models\Addon_list;
 use App\Models\Addon_sublist;
+use App\Models\Area;
 use App\Models\Dressing_list;
 use App\Models\Dressing_sublist;
 use App\Models\Types_list;
@@ -100,6 +101,7 @@ class OrderController extends Controller
             //     $success['message']='Pending Orders found Successfully';
             //     return response()->json(['success' => $success], $this->successStatus);
             if ($request->status === 'neworder') {
+                
                 $order = Orders_Zee::where('status', '=', 'neworder')->orderBy('id', 'DESC')->get();
                 if ($order->count() > 0) {
                     $data = [];
@@ -113,7 +115,30 @@ class OrderController extends Controller
                             if ($od->deal_id === null || $od->deal_id == '0') {
                                 // Handle products not associated with a deal
                                 if ($od->product_id != null) {
-                                    $od['product_details'] = Products::find($od->product_id);
+                                    
+                                    
+                                            $product = Products::find($od->product_id);
+                                        
+                                            if ($product) {
+                                        
+                                                $dept = DB::table('departments')
+                                                    ->whereJsonContains('sub_category_ids', (int) $product->sub_category_id)
+                                                    ->select('id', 'department_name')
+                                                    ->first();
+                                        
+                                                // Merge department into product object
+                                                if ($dept) {
+                                                    $product->department_id   = $dept->id;
+                                                    $product->department_name = $dept->department_name;
+                                                } else {
+                                                    $product->department_id   = null;
+                                                    $product->department_name = null;
+                                                }
+                                            }
+                                    
+                                        $od['product_details'] = $product;
+                                    
+                                    
                                 }
                                 $dealsByDealId['product'][] = $od; // Store products directly
                             } else {
@@ -128,7 +153,31 @@ class OrderController extends Controller
                                 }
 
                                 if ($od->product_id != null) {
-                                    $od['product_details'] = Products::find($od->product_id);
+                                       $product = Products::find($od->product_id);
+
+                                        if ($product) {
+                                    
+                                            $dept = DB::table('departments')
+                                                ->whereJsonContains('sub_category_ids', (int) $product->sub_category_id)
+                                                ->select('id', 'department_name')
+                                                ->first();
+                                    
+                                            if ($dept) {
+                                                $product->department_id   = $dept->id;
+                                                $product->department_name = $dept->department_name;
+                                            } else {
+                                                $product->department_id   = null;
+                                                $product->department_name = null;
+                                            }
+                                        }
+                                    
+                                        $od['product_details'] = $product;
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
                                     if ($od->deal_item_id != null && $od->deal_item_id != '0') {
                                         $od['deal_item_details'] = Deal_Items::where('di_id', $od->deal_item_id)->first();
                                     }
@@ -149,7 +198,41 @@ class OrderController extends Controller
                         $dealsByDealId['deals'] = $dealsArray;
                         $o['userDetails'] = User::where('id', $o->user_id)->first();
                         $o['order_details'] = $dealsByDealId;
+                        
+                
                         $o['qr_code'] = "base64_image_" . $o->id . ".svg";
+                        
+                        
+                            $department_list = [];
+                            $addedDepartments = [];
+                            
+                            foreach ($order_details as $od) {
+                                    $product = DB::table('products')->where('id', $od->product_id)->first();
+                                         if ($product) {
+                                    
+                                        $subCategoryId = (int) $product->sub_category_id;
+                                    
+                                        $departments = DB::table('departments')->whereJsonContains('sub_category_ids', $subCategoryId)->select('id', 'department_name')->get();
+                                    
+                                        foreach ($departments as $dep) {
+                                    
+                                            if (in_array($dep->id, $addedDepartments)) {
+                                                continue;
+                                            }
+                                    
+                                            $department_list[] = [
+                                                'department_id'   => $dep->id,
+                                                'department_name' => $dep->department_name,
+                                            ];
+                                    
+                                            $addedDepartments[] = $dep->id;
+                                        }
+                                    }
+                            
+                                
+                            }
+                            $o['departments'] = $department_list;
+                        
                         $data[] = $o;
                     }
 
@@ -177,9 +260,59 @@ class OrderController extends Controller
                             if ($od->deal_id === null || $od->deal_id == '0') {
                                 // Handle products not associated with a deal
                                 if ($od->product_id != null) {
-                                    $od['product_details'] = Products::find($od->product_id);
+                                    // $od['product_details'] = Products::find($od->product_id);
+                                    
+                                        $product = Products::find($od->product_id);
+                                    
+                                        if ($product) {
+                                    
+                                            $dept = DB::table('departments')
+                                                ->whereJsonContains('sub_category_ids', (int) $product->sub_category_id)
+                                                ->select('id', 'department_name')
+                                                ->first();
+                                    
+                                            // Merge department into product object
+                                            if ($dept) {
+                                                $product->department_id   = $dept->id;
+                                                $product->department_name = $dept->department_name;
+                                            } else {
+                                                $product->department_id   = null;
+                                                $product->department_name = null;
+                                            }
+                                        }
+                                    
+                                        $od['product_details'] = $product;
                                 }
                                 $dealsByDealId['product'][] = $od; // Store products directly
+                                
+                                
+                                
+                                    $product = DB::table('products')->where('id', $od->product_id)->first();
+
+                                    $department_list = [];
+                                    $addedDepartments = [];
+                                    
+                                    if ($product) {
+                                        $subCategoryId = (int) $product->sub_category_id;
+                                        $departments = DB::table('departments')->whereJsonContains('sub_category_ids', $subCategoryId)->select('id', 'department_name')->get();
+                                        foreach ($departments as $dep) {
+                                    
+                                            if (in_array($dep->id, $addedDepartments)) {
+                                                continue;
+                                            }
+                                    
+                                            $department_list[] = [
+                                                'department_id'   => $dep->id,
+                                                'department_name' => $dep->department_name,
+                                            ];
+                                    
+                                            $addedDepartments[] = $dep->id;
+                                        }
+                                    }
+                                    
+                                    $o['departments'] = $department_list;
+                                
+                                
                             } else {
                                 // Handle deals and associated products
                                 $dealKey = $od->deal_id;
@@ -192,7 +325,28 @@ class OrderController extends Controller
                                 }
 
                                 if ($od->product_id != null) {
-                                    $od['product_details'] = Products::find($od->product_id);
+                                    // $od['product_details'] = Products::find($od->product_id);
+                                    
+                                        $product = Products::find($od->product_id);
+                                    
+                                        if ($product) {
+                                    
+                                            $dept = DB::table('departments')
+                                                ->whereJsonContains('sub_category_ids', (int) $product->sub_category_id)
+                                                ->select('id', 'department_name')
+                                                ->first();
+                                    
+                                            // Merge department into product object
+                                            if ($dept) {
+                                                $product->department_id   = $dept->id;
+                                                $product->department_name = $dept->department_name;
+                                            } else {
+                                                $product->department_id   = null;
+                                                $product->department_name = null;
+                                            }
+                                        }
+                                    
+                                        $od['product_details'] = $product;
                                     if ($od->deal_item_id != null && $od->deal_item_id != '0') {
                                         $od['deal_item_details'] = Deal_Items::where('di_id', $od->deal_item_id)->first();
                                     }
@@ -214,6 +368,42 @@ class OrderController extends Controller
                         $o['userDetails'] = User::where('id', $o->user_id)->first();
                         $o['order_details'] = $dealsByDealId;
                         $o['qr_code'] = "base64_image_" . $o->id . ".svg";
+                        
+                        
+                        
+                        
+                      $department_list = [];
+                            $addedDepartments = [];
+                            
+                            foreach ($order_details as $od) {
+                                    $product = DB::table('products')->where('id', $od->product_id)->first();
+                                         if ($product) {
+                                    
+                                        $subCategoryId = (int) $product->sub_category_id;
+                                    
+                                        $departments = DB::table('departments')->whereJsonContains('sub_category_ids', $subCategoryId)->select('id', 'department_name')->get();
+                                    
+                                        foreach ($departments as $dep) {
+                                    
+                                            if (in_array($dep->id, $addedDepartments)) {
+                                                continue;
+                                            }
+                                    
+                                            $department_list[] = [
+                                                'department_id'   => $dep->id,
+                                                'department_name' => $dep->department_name,
+                                            ];
+                                    
+                                            $addedDepartments[] = $dep->id;
+                                        }
+                                    }
+                            
+                                
+                            }
+                            $o['departments'] = $department_list;
+                        
+                        
+                        
                         $data[] = $o;
                     }
 
@@ -239,7 +429,28 @@ class OrderController extends Controller
                             if ($od->deal_id === null || $od->deal_id == '0') {
 
                                 if ($od->product_id != null) {
-                                    $od['product_details'] = Products::find($od->product_id);
+                                    // $od['product_details'] = Products::find($od->product_id);
+                                    
+                                    $product = Products::find($od->product_id);
+                                
+                                    if ($product) {
+                                
+                                        $dept = DB::table('departments')
+                                            ->whereJsonContains('sub_category_ids', (int) $product->sub_category_id)
+                                            ->select('id', 'department_name')
+                                            ->first();
+                                
+                                        // Merge department into product object
+                                        if ($dept) {
+                                            $product->department_id   = $dept->id;
+                                            $product->department_name = $dept->department_name;
+                                        } else {
+                                            $product->department_id   = null;
+                                            $product->department_name = null;
+                                        }
+                                    }
+                                
+                                    $od['product_details'] = $product;
                                 }
 
                                 $dealsByDealId['product'][] = $od; // Store in an array since it can have multiple products
@@ -256,7 +467,30 @@ class OrderController extends Controller
                                 // Check if product_id is not null
                                 if ($od->product_id != null) {
                                     // Add product details to the corresponding deal entry
-                                    $product = Products::find($od->product_id);
+                                    // $product = Products::find($od->product_id);
+                                    
+                                        $product = Products::find($od->product_id);
+                                    
+                                        if ($product) {
+                                    
+                                            $dept = DB::table('departments')
+                                                ->whereJsonContains('sub_category_ids', (int) $product->sub_category_id)
+                                                ->select('id', 'department_name')
+                                                ->first();
+                                    
+                                            // Merge department into product object
+                                            if ($dept) {
+                                                $product->department_id   = $dept->id;
+                                                $product->department_name = $dept->department_name;
+                                            } else {
+                                                $product->department_id   = null;
+                                                $product->department_name = null;
+                                            }
+                                        }
+                                    
+                                        $od['product_details'] = $product;
+                                    
+                                    
                                     $od['products_items'] = $product;
                                     if ($od->deal_item_id != null && $od->deal_item_id != '0') {
                                         // Add deal item details to the corresponding deal entry
@@ -267,11 +501,6 @@ class OrderController extends Controller
                                     // $dealsByDealId['deals']['deal_product']['product_items'][] = 
                                 }
 
-
-
-
-
-
                                 // $data_o['deals'][] = $od; // Store in an array since it can have multiple deals
 
                             }
@@ -279,6 +508,38 @@ class OrderController extends Controller
 
                         $o['order_details'] = $dealsByDealId;
                         $o['qr_code'] = "base64_image_" . $o->id . ".svg";
+                        
+                        
+                        
+                                            $department_list = [];
+                            $addedDepartments = [];
+                            
+                            foreach ($order_details as $od) {
+                                    $product = DB::table('products')->where('id', $od->product_id)->first();
+                                         if ($product) {
+                                    
+                                        $subCategoryId = (int) $product->sub_category_id;
+                                    
+                                        $departments = DB::table('departments')->whereJsonContains('sub_category_ids', $subCategoryId)->select('id', 'department_name')->get();
+                                    
+                                        foreach ($departments as $dep) {
+                                    
+                                            if (in_array($dep->id, $addedDepartments)) {
+                                                continue;
+                                            }
+                                    
+                                            $department_list[] = [
+                                                'department_id'   => $dep->id,
+                                                'department_name' => $dep->department_name,
+                                            ];
+                                    
+                                            $addedDepartments[] = $dep->id;
+                                        }
+                                    }
+                            
+                                
+                            }
+                        $o['departments'] = $department_list;
                         $data[] = $o;
                     }
 
@@ -304,7 +565,26 @@ class OrderController extends Controller
                             if ($od->deal_id === null || $od->deal_id == '0') {
 
                                 if ($od->product_id != null) {
-                                    $od['product_details'] = Products::find($od->product_id);
+                                    // $od['product_details'] = Products::find($od->product_id);
+                                       $product = Products::find($od->product_id);
+
+                                        if ($product) {
+                                    
+                                            $dept = DB::table('departments')
+                                                ->whereJsonContains('sub_category_ids', (int) $product->sub_category_id)
+                                                ->select('id', 'department_name')
+                                                ->first();
+                                    
+                                            if ($dept) {
+                                                $product->department_id   = $dept->id;
+                                                $product->department_name = $dept->department_name;
+                                            } else {
+                                                $product->department_id   = null;
+                                                $product->department_name = null;
+                                            }
+                                        }
+                                    
+                                        $od['product_details'] = $product;
                                 }
 
                                 $dealsByDealId['product'][] = $od; // Store in an array since it can have multiple products
@@ -321,7 +601,26 @@ class OrderController extends Controller
                                 // Check if product_id is not null
                                 if ($od->product_id != null) {
                                     // Add product details to the corresponding deal entry
-                                    $product = Products::find($od->product_id);
+                                    // $product = Products::find($od->product_id
+                                       $product = Products::find($od->product_id);
+
+                                    if ($product) {
+                                
+                                        $dept = DB::table('departments')
+                                            ->whereJsonContains('sub_category_ids', (int) $product->sub_category_id)
+                                            ->select('id', 'department_name')
+                                            ->first();
+                                
+                                        if ($dept) {
+                                            $product->department_id   = $dept->id;
+                                            $product->department_name = $dept->department_name;
+                                        } else {
+                                            $product->department_id   = null;
+                                            $product->department_name = null;
+                                        }
+                                    }
+                                
+                                    $od['product_details'] = $product;
                                     $od['products_items'] = $product;
                                     if ($od->deal_item_id != null && $od->deal_item_id != '0') {
                                         // Add deal item details to the corresponding deal entry
@@ -344,6 +643,36 @@ class OrderController extends Controller
 
                         $o['order_details'] = $dealsByDealId;
                         $o['qr_code'] = "base64_image_" . $o->id . ".svg";
+                         $product = DB::table('products')->where('id', $od->product_id)->first();
+
+                $department_list = [];
+                $addedDepartments = [];
+                
+                if ($product) {
+                
+                    $subCategoryId = (int) $product->sub_category_id;
+                
+                    $departments = DB::table('departments')
+                        ->whereJsonContains('sub_category_ids', $subCategoryId)
+                        ->select('id', 'department_name')
+                        ->get();
+                
+                    foreach ($departments as $dep) {
+                
+                        if (in_array($dep->id, $addedDepartments)) {
+                            continue;
+                        }
+                
+                        $department_list[] = [
+                            'department_id'   => $dep->id,
+                            'department_name' => $dep->department_name,
+                        ];
+                
+                        $addedDepartments[] = $dep->id;
+                    }
+                }
+                
+                $o['departments'] = $department_list;
                         $data[] = $o;
                     }
 
@@ -492,7 +821,7 @@ private function sendNotification(array $playerIds, array $content)
     curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Content-Type: application/json; charset=utf-8',
-        'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'
+        'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebndv4tpuahlbusgva3p6eutn2x652nleaiuwtlm27le3ugia7aaeb3ikpob2alnlj2pqawjlsb7g2x3q'
     ]);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
     curl_setopt($ch, CURLOPT_HEADER, FALSE);
@@ -559,7 +888,7 @@ private function getOrderContentMessage($status, $orderId, $deliveredAt = null, 
                 curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
                 curl_setopt($ch, CURLOPT_HTTPHEADER, array(
                     'Content-Type: application/json; charset=utf-8',
-                    'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebnd7ohwrgq5huhen2yfaytan73n45db4ovkcrwwdr2g4xsmwa3flzui3ih3pk65hgjfsjxo2vwnnagwy'
+                    'Authorization: Basic os_v2_app_asdjgef7prhj3hwj7l2yvlebndv4tpuahlbusgva3p6eutn2x652nleaiuwtlm27le3ugia7aaeb3ikpob2alnlj2pqawjlsb7g2x3q'
                 ));
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
                 curl_setopt($ch, CURLOPT_HEADER, FALSE);
@@ -1169,6 +1498,27 @@ public function store_addon(Request $request)
     
     
     
+    
+    public function departments(){
+        
+        $dept = DB::table('departments')->get();
+        
+        if($dept->count() > 0){
+            
+            $success['status'] = 200;
+            $success['message'] = "Departments found successfully";
+            $success['data'] = $dept;
+            
+            
+            return response()->json(['success' => $success]);
+        }else{
+            
+            $error['status'] = 400;
+            $error['message'] = "No departments found";
+            
+            return response()->json(['error' => $error]);
+        }
+    }
     
 
 }
