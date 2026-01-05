@@ -541,7 +541,7 @@ $(document).ready(function () {
         const area_name = row.find('[data-field="area_name"]').text().trim();
         const min_order_amount = row.find('[data-field="min_order_amount"]').text().trim();
         const discounted_delivery_amount = row.find('[data-field="discounted_delivery_amount"]').text().trim();
-        const branch_id = row.find('[data-field="branch_id"]').text().trim();
+        const branch_id = row.find('[data-field="branch_id"]').val();
         const is_disable = row.find('[data-field="is_disable"]').val();
 
         const dataToSend = {
