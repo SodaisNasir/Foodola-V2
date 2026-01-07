@@ -70,10 +70,50 @@ function isDeptProduct($sub_ids, $sub_category_id) {
 <meta charset="UTF-8">
 <title>Küchenbon — <?php echo htmlspecialchars($dept_name); ?></title>
 <style>
+@media print {
+  .button {
+    display: none;
+  }
+
+  @page {
+    margin: 0; /* Removes all page margins */
+  }
+
+html, body {
+  background: none;
+  margin: 0 !important;
+  padding: 0 1mm !important; /* 🟢 super tiny space on both sides */
+  width: calc(100% - 2mm);   /* keeps total width consistent */
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 18px;
+}
+
+
+  .receipt-container {
+    width: 100%; /* Use full printable width */
+    max-width: 80mm; /* Limit width if needed */
+    margin: 0; /* No auto centering */
+    /*padding: 10px;*/
+    text-align: center;
+    box-shadow: none;
+    border: none;
+  }
+}
 body { font-family: Arial; font-size:14px; background:#fff; margin:0; }
-.receipt-container { max-width:80mm; margin:0 auto; }
+.receipt-container { max-width:80mm;}
 .header{text-align:center;}
-.big-order{font-size:22px;font-weight:bold;background:#000;color:#fff;padding:4px 0;margin:5px 0;}
+.big-order{
+    font-size:22px;
+    font-weight:900;
+    padding:6px 0;
+    margin:6px 0;
+    text-align:center;
+    letter-spacing:1px;
+
+    border-top:4px solid #000;
+    border-bottom:4px solid #000;
+}
+
 .dept-title{text-align:center;font-size:18px;font-weight:bold;margin:10px 0;}
 .details{text-align:center;margin-bottom:10px;}
 .details p{margin:2px 0;font-size:13px;}
@@ -92,7 +132,7 @@ td{padding:3px;font-size:13px;vertical-align:top;}
 <body>
 <div class="receipt-container">
     <div class="header">
-        <img src="images/logo.png" width="50">
+        <!--<img src="images/logo.png" width="50">-->
         <h2><?php echo $APP_NAME ?></h2>
         <div class="big-order">BESTELL-NR: <?php echo $order_id; ?></div>
     </div>
