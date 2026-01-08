@@ -465,7 +465,7 @@ body {
         <h3>Adresse: 
             <?php echo htmlspecialchars(
               
-               
+               ($data['Shipping_address'] ?? '') . ' ' . 
                  ($data['Shipping_address_2'] ?? '') . ' ' . 
                    ($data['Shipping_city'] ?? '') . ' ' .  
                 ($data['Shipping_postal_code'] ?? '') 
