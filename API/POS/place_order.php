@@ -380,9 +380,11 @@ $department_list = [];
 
         // Insert order details
         $sql_order = "INSERT INTO `orders_zee`(`user_id`, `status`, `payment_type`, `order_total_price`, `payment_status`, `Shipping_address`, `Shipping_address_2`, 
-                            `Shipping_city`, `Shipping_postal_code`, `Shipping_Cost`, `branch_id`, `addtional_notes`, `total_netto_tax`, `total_metto_tax`, `total_discount`,`payment_method`, `transaction_id`, `platform`, `ordersheduletype`, `sheduletime`, `created_at`) 
-                          VALUES ($last_user_id, '$order_status', '$payment_type', '$total_amount', '$paymentstatus', '$Shipping_address', '$Shipping_address_2', 
-                            '$Shipping_city', '$Shipping_postal_code', '$shipping_cost', '$branch_id', '$additional_notes', '$total_netto_tax', '$total_metto_tax', '$total_discount', '$payment_method', '$transaction_id', '$platform','$ordersheduletype', '$sheduletime', '$datetime')";
+                            `Shipping_city`, `Shipping_postal_code`, `Shipping_Cost`, `branch_id`, `addtional_notes`, `total_netto_tax`, `total_metto_tax`,`order_type`, `total_discount`,`payment_method`, `transaction_id`, `platform`, `ordersheduletype`, `sheduletime`, `created_at`) 
+                          VALUES ($last_user_id, '$order_status', '$payment_type', '$total_amount', '$paymentstatus', '$street', '$House_number', 
+                            '$name', '$Shipping_postal_code', '$shipping_cost', '$branch_id', '$additional_notes', '$total_netto_tax','$total_metto_tax','$order_type','$total_discount', '$payment_method', '$transaction_id', '$platform','$ordersheduletype', '$sheduletime', '$datetime')";
+                            
+                            
 
         $result_order = mysqli_query($conn, $sql_order);
 
@@ -861,8 +863,8 @@ $department_list = [];
                     `payment_status`, `Shipping_address`, `Shipping_address_2`, 
                     `Shipping_city`, `Shipping_postal_code`, `Shipping_Cost`,`branch_id`, `addtional_notes`, `total_netto_tax`, `total_metto_tax`, `order_type`, `total_discount`, `payment_method`, `transaction_id`, `platform`, `ordersheduletype`, `sheduletime`, `created_at`) 
             VALUES ($user_id, '$order_status', '$payment_type', '$total_amount', 
-                    '$paymentstatus', '$Shipping_address', '$Shipping_address_2', 
-                    '$Shipping_city', '$Shipping_postal_code', '$shipping_cost', '$branch_id', '$additional_notes', '$total_netto_tax', '$total_metto_tax', '$order_type', '$total_discount', '$payment_method', '$transaction_id', '$platform','$ordersheduletype', '$sheduletime', '$datetime')";
+                    '$paymentstatus', '$street', '$House_number', 
+                    '$name', '$Shipping_postal_code', '$shipping_cost', '$branch_id', '$additional_notes', '$total_netto_tax', '$total_metto_tax', '$order_type', '$total_discount', '$payment_method', '$transaction_id', '$platform','$ordersheduletype', '$sheduletime', '$datetime')";
 
     $result = mysqli_query($conn, $sql);
 
