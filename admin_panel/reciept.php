@@ -465,9 +465,10 @@ body {
         <h3>Adresse: 
             <?php echo htmlspecialchars(
               
-               ($data['Shipping_address'] ?? '') . ' ' . 
+               
+                 ($data['Shipping_address'] ?? '') . ' ' . 
                  ($data['Shipping_address_2'] ?? '') . ' ' . 
-                   ($data['Shipping_city'] ?? '') . ' ' .  
+                //   ($data['Shipping_city'] ?? '') . ' ' .  
                 ($data['Shipping_postal_code'] ?? '') 
             
             
@@ -475,7 +476,10 @@ body {
             ); ?>
         </h3>
          
-        <h3><?php echo ("Klingeln name:".   ($data['Shipping_area'] ?? ''))?></h3>  
+        <h3>
+        Klingeln name: <?= !empty($data['Shipping_area']) ? $data['Shipping_area'] : ($data['Shipping_city'] ?? '') ?>
+        </h3>
+
         <h3><?php echo ("Zusatzinformation:".   ($data['Shipping_state'] ?? ''))?></h3>  
     <?php endif; ?>
    
