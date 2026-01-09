@@ -6,9 +6,9 @@ $BASE_URL = "https://burgerpointgraben.de/";
 $FACEBOOK_URL = "https://facebook.com/burgerpointgraben";
 $INSTAGRAM_URL  = "https://instagram.com/burgerpointgraben";
 $TWITTER_URL  = "https://twitter.com/burgerpointgraben";
-$company_address = "Burger Point Heimservice";
-$company_city    = "Karlsruhe";
-$company_phone   = "0721 95975992";
+$company_address = "Mannheimer Str. 80, 76676";
+$company_city    = "Graben-Neudorf";
+$company_phone   = "07255 3969621";
 
 
 // PUSHER CONFIGRUATION

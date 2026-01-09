@@ -4,9 +4,9 @@
 // APP CONFIGRUATION
 $APP_NAME = "Burger Point Graben";
 $BASE_URL = "https://burgerpointgraben.de/";
-$company_address = "Burger Point Heimservice";
-$company_city    = "Karlsruhe";
-$company_phone   = "0721 95975992";
+$company_address = "Mannheimer Str. 80, 76676";
+$company_city    = "Graben-Neudorf";
+$company_phone   = "07255 3969621";
 
 
 // MAIL CONFIGRUATION
