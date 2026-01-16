@@ -60,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $ordersheduletype = $_POST['ordersheduletype'];
   $sheduletime = $_POST['sheduletime'] . ":00";
   $reservation_id = $_POST['reservation_id'];
+  
 
 
   date_default_timezone_set('Europe/Berlin');
@@ -377,7 +378,12 @@ $department_list = [];
             exit;
           }
         }
-
+            if($platform==='website'){
+                      $street =  $_POST['Shipping_address_2'];
+                      $House_number = $_POST['city'];
+                      $name =  $_POST['Shipping_area'];
+                      
+                  }
         // Insert order details
         $sql_order = "INSERT INTO `orders_zee`(`user_id`, `status`, `payment_type`, `order_total_price`, `payment_status`, `Shipping_address`, `Shipping_address_2`, 
                             `Shipping_city`, `Shipping_postal_code`, `Shipping_Cost`, `branch_id`, `addtional_notes`, `total_netto_tax`, `total_metto_tax`,`order_type`, `total_discount`,`payment_method`, `transaction_id`, `platform`, `ordersheduletype`, `sheduletime`, `created_at`) 
@@ -792,6 +798,26 @@ $department_list = [];
       }
     }
   } else {
+      
+      
+       $sql_user = "SELECT * FROM `users` WHERE `id` = '$user_id'";
+      $exec_sql_user = mysqli_query($conn, $sql_user);
+
+      if ($exec_sql_user && mysqli_num_rows($exec_sql_user) > 0) {
+        $user = mysqli_fetch_array($exec_sql_user, MYSQLI_ASSOC);
+      }
+      
+        if($platform==='website'){
+          $street =  $_POST['Shipping_address_2'];
+          $House_number = $_POST['city'];
+          $name =  $_POST['Shipping_area'];
+          
+         }else if($platform==='pos'){
+             $street =  $_POST['street'];
+            $House_number = $_POST['house_no'];
+            $name = $user['name'];
+         }
+
 
     if ($wallet_balance) {
       $sql_check_wallet = "SELECT `amount` FROM `users` WHERE `id` = '$user_id'";
