@@ -1,11 +1,11 @@
-<?php 
+<?php
 
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
 include('connection.php');
-header("Access-Control-Allow-Origin: *"); 
-header("Access-Control-Allow-Methods: POST, GET, OPTIONS"); 
-header("Content-Type: application/json"); 
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Content-Type: application/json");
 
 require 'PHPMailer-master/src/PHPMailer.php';
 require 'PHPMailer-master/src/SMTP.php';
@@ -16,7 +16,7 @@ use PHPMailer\PHPMailer\Exception;
 
 
 if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC') {
-    
+
     if (empty($_POST['reservation_id'])) {
         echo json_encode(['status' => false, 'message' => 'reservation_id is required']);
         exit;
@@ -34,7 +34,7 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
     // UPDATE RESERVATION STATUS
     $update_sql = "UPDATE `reservations` SET `status`='$status', `reservation_fees`='$reservation_fees' WHERE `id`='$id'";
     $exec_update_sql = mysqli_query($conn, $update_sql);
-        
+
     if ($exec_update_sql) {
 
         // FETCH USER, TABLE, RESERVATION DATA
@@ -72,34 +72,34 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                     $mail->Password = $MAIL_PASSWORD;
                     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                     $mail->Port = 587;
-                
+
                     $mail->setFrom($FROM_EMAIL, $APP_NAME);
                     $mail->addAddress($email);
                     $mail->isHTML(true);
 
                     // ================= PENDING TEMPLATE =================
                     if ($status === "pending") {
-                        $mail->Subject = "Ihre Reservierungsanfrage bei -".$APP_NAME;
+                        $mail->Subject = "Ihre Reservierungsanfrage bei " . $APP_NAME;
                         $mail->Body = '
                         <html>
                         <body style="font-family: Poppins, Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px; background-color: #f7f7f7;">
-                        <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\''.$BASE_URL.'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                        <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'' . $BASE_URL . 'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
                             <tr><td align="center">
                                 <table width="100%" class="content" style="max-width: 600px; background-color: rgba(255,255,255,0.95); padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                                     <tr><td align="center">
-                                        <img src="'.$BASE_URL.'admin_panel/images/logo.png" alt="'.htmlspecialchars($APP_NAME).'" style="width: 100px; margin-bottom: 20px;">
+                                        <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="' . htmlspecialchars($APP_NAME) . '" style="width: 100px; margin-bottom: 20px;">
                                     </td></tr>
                                     <tr><td>
-                                        <p>Sehr geehrte Frau '.htmlspecialchars($name).',</p>
-                                        <p>Vielen Dank für Ihre Reservierung bei <strong>'.$APP_NAME.'</strong>.<br>
+                                        <p>Sehr geehrte Frau ' . htmlspecialchars($name) . ',</p>
+                                        <p>Vielen Dank für Ihre Reservierung bei <strong>' . $APP_NAME . '</strong>.<br>
                                         Wir werden Ihnen so schnell wie möglich eine Bestätigungs-E-Mail für Ihre Reservierung zusenden.</p>
                                         <p>
-                                        <strong>Datum:</strong> '.$reservation_date.'<br>
-                                        <strong>Uhrzeit:</strong> '.$reservation_time.' Uhr<br>
-                                        <strong>Personenanzahl:</strong> '.$persons.' Personen
+                                        <strong>Datum:</strong> ' . $reservation_date . '<br>
+                                        <strong>Uhrzeit:</strong> ' . $reservation_time . ' Uhr<br>
+                                        <strong>Personenanzahl:</strong> ' . $persons . ' Personen
                                         </p>
                                         <p>Bei Fragen oder Änderungswünschen stehen wir Ihnen jederzeit gerne zur Verfügung.</p>
-                                        <p>Mit freundlichen Grüßen,<br>Ihr '.$APP_NAME.' Team</p>
+                                        <p>Mit freundlichen Grüßen,<br>Ihr ' . $APP_NAME . ' Team</p>
                                     </td></tr>
                                 </table>
                             </td></tr>
@@ -111,28 +111,28 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
 
                     // ================= CONFIRMED TEMPLATE =================
                     if ($status === "confirmed") {
-                        $mail->Subject = "Ihre Reservierung wurde bestätigt –".$APP_NAME ;
+                        $mail->Subject = "Ihre Reservierung wurde bestätigt " . $APP_NAME;
                         $mail->Body = '
                         <html>
                         <body style="font-family: Poppins, Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px; background-color: #f7f7f7;">
-                        <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\''.$BASE_URL.'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                        <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'' . $BASE_URL . 'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
                             <tr><td align="center">
                                 <table width="100%" class="content" style="max-width: 600px; background-color: rgba(255,255,255,0.95); padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                                     <tr><td align="center">
-                                        <img src="'.$BASE_URL.'admin_panel/images/logo.png" alt="'.htmlspecialchars($APP_NAME).'" style="width: 100px; margin-bottom: 20px;">
+                                        <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="' . htmlspecialchars($APP_NAME) . '" style="width: 100px; margin-bottom: 20px;">
                                     </td></tr>
                                     <tr><td>
-                                        <p>Sehr geehrte Frau '.htmlspecialchars($name).',</p>
-                                        <p>Vielen Dank für Ihre Reservierung bei <strong>'.$APP_NAME.'</strong>.<br>
+                                        <p>Sehr geehrte Frau ' . htmlspecialchars($name) . ',</p>
+                                        <p>Vielen Dank für Ihre Reservierung bei <strong>' . $APP_NAME . '</strong>.<br>
                                         Gerne bestätigen wir Ihnen Ihre Reservierung wie folgt:</p>
                                         <p>
-                                        <strong>Datum:</strong> '.$reservation_date.'<br>
-                                        <strong>Uhrzeit:</strong> '.$reservation_time.' Uhr<br>
-                                        <strong>Personenanzahl:</strong> '.$persons.' Personen
+                                        <strong>Datum:</strong> ' . $reservation_date . '<br>
+                                        <strong>Uhrzeit:</strong> ' . $reservation_time . ' Uhr<br>
+                                        <strong>Personenanzahl:</strong> ' . $persons . ' Personen
                                         </p>
                                         <p>Wir freuen uns, Sie bei uns im Restaurant begrüßen zu dürfen.<br>
                                         Bei Fragen oder Änderungswünschen stehen wir Ihnen jederzeit gerne zur Verfügung.</p>
-                                        <p>Mit freundlichen Grüßen,<br>Ihr '.$APP_NAME.' Team</p>
+                                        <p>Mit freundlichen Grüßen,<br>Ihr ' . $APP_NAME . ' Team</p>
                                     </td></tr>
                                 </table>
                             </td></tr>
@@ -142,6 +142,49 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                         $mail->send();
                     }
 
+                    // ================= Cancelled TEMPLATE =================
+                    if ($status === 'cancelled') {
+
+                        $mail->Subject = 'Stornierung Ihrer Reservierung';
+
+                        $mail->Body = '
+                                <html>
+                                <body style="font-family: Poppins, Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px; background-color: #f7f7f7;">
+                                <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'' . $BASE_URL . 'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                                    <tr><td align="center">
+                                        <table width="100%" class="content" style="max-width: 600px; background-color: rgba(255,255,255,0.95); padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                            <tr><td align="center">
+                                                <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="' . htmlspecialchars($APP_NAME) . '" style="width: 100px; margin-bottom: 20px;">
+                                            </td></tr>
+                            
+                                        <tr>
+                                            <td>
+                                                <p>Sehr geehrte ' . htmlspecialchars($name) . ' ,</p>
+                
+                                                <p>
+                                                    leider müssen wir Ihre Reservierung am 
+                                                    <strong>' . $reservation_date . '</strong> um 
+                                                    <strong>' . $reservation_time . ' Uhr</strong> stornieren.
+                                                    Wir bitten die Unannehmlichkeiten zu entschuldigen.
+                                                </p>
+                
+                                                <p>
+                                                    Gerne nehmen wir jederzeit eine neue Reservierung für Sie entgegen
+                                                    oder helfen Ihnen, einen alternativen Termin zu finden.
+                                                    Sie können uns telefonisch kontaktieren.
+                                                </p>
+                
+                                                <p>
+                                                    Mit freundlichen Grüßen<br>
+                                                    Ihr ' . $APP_NAME . ' Team
+                                                </p>
+                                            </td>
+                                        </tr>
+                                </table>
+                                </body>
+                                </html>';
+                        $mail->send();
+                    }
                 } catch (Exception $e) {
                     echo json_encode([
                         "status" => false,
@@ -157,12 +200,9 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
         mysqli_query($conn, $sql_update_table);
 
         echo json_encode(['status' => true, 'message' => 'Status updated and email sent successfully']);
-
     } else {
         echo json_encode(['status' => false, 'message' => 'Database error: ' . mysqli_error($conn)]);
     }
-
 } else {
     echo json_encode(['status' => false, 'message' => 'Unauthorized']);
 }
-?>

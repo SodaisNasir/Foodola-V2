@@ -468,7 +468,7 @@ body {
                
                  ($data['Shipping_address'] ?? '') . ' ' . 
                  ($data['Shipping_address_2'] ?? '') . ' ' . 
-                //   ($data['Shipping_city'] ?? '') . ' ' .  
+                  ($data['Shipping_city'] ?? '') . ' ' .  
                 ($data['Shipping_postal_code'] ?? '') 
             
             
