@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\InventoryController;
 use Illuminate\Http\Request;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Route;
@@ -69,12 +70,42 @@ Route::get('qrcode-with-color', function () {
 Route::post('/add-product', [OrderController::class, 'store_product']);
 Route::post('/add-areas', [OrderController::class, 'add_areas']);
 
-Route::post('/add-sub-categories', [OrderController::class,'store_sub_categories']);
-Route::post('/store-addon', [OrderController::class,'store_addon']);
-Route::post('/store-dressing', [OrderController::class,'store_dressing']);
-Route::post('/store-types', [OrderController::class,'store_types']);
+Route::post('/add-sub-categories', [OrderController::class, 'store_sub_categories']);
+Route::post('/store-addon', [OrderController::class, 'store_addon']);
+Route::post('/store-dressing', [OrderController::class, 'store_dressing']);
+Route::post('/store-types', [OrderController::class, 'store_types']);
 
 
 
 Route::post('accounts', [AdminController::class, 'accounts']);
-Route::get('/departments', [OrderController::class,'departments']);
+Route::get('/departments', [OrderController::class, 'departments']);
+
+
+
+// Inventry System Routes
+Route::prefix('inventory')->group(function () {
+    Route::post('/store-unit', [InventoryController::class, 'store_unit']);
+    Route::get('/units', [InventoryController::class, 'units']);
+    Route::post('/update-unit/{id}', [InventoryController::class, 'update_unit']);
+    Route::post('/delete-unit/{id}', [InventoryController::class, 'delete_unit']);
+
+    Route::post('/store-raw-product', [InventoryController::class, 'store_raw_products']);
+    Route::get('/raw-products', [InventoryController::class, 'raw_products']);
+    Route::post('/update-raw-product/{id}', [InventoryController::class, 'update_raw_product']);
+    Route::post('/delete-raw-product/{id}', [InventoryController::class, 'delete_raw_product']);
+
+    Route::post('/store-vendor', [InventoryController::class, 'store_vendor']);
+    Route::get('/vendors', [InventoryController::class, 'vendors']);
+    Route::post('/update-vendor/{id}', [InventoryController::class, 'update_vendor']);
+    Route::get('/delete-vendor/{id}', [InventoryController::class, 'delete-vendor']);
+
+    Route::post('/store-purchase-order', [InventoryController::class, 'store_purchase_order']);
+    Route::get('/purchase-orders', [InventoryController::class, 'purchase_orders']);
+    Route::post('/update-purchase-order/{id}', [InventoryController::class, 'update_purchase_order']);
+    Route::post('/delete-purchase-order/{id}', [InventoryController::class, 'delete_purchase_order']);
+    Route::get('/purchase-order/{id}', [InventoryController::class, 'purchase_order']);
+
+    Route::post('/scan-qr-code', [InventoryController::class, 'scan_qr_code']);
+
+
+});
