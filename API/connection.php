@@ -21,7 +21,7 @@ $CHANNEL_2 = "pizzatime_reservations";
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
-$MAIL_PASSWORD = "bjwzeusrakgeawfn";
+$MAIL_PASSWORD = "elliakydnklqykpv";
 $FROM_EMAIL = "support@pizzatime.de";
 $ADMIN_EMAIL = "boundedsocial@gmail.com";
 

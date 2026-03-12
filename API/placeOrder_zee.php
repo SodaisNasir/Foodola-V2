@@ -525,7 +525,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                             "Response_code" => 500,
                                             "Message" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"
                                         ];
-                                        echo json_encode($data);
+                                        // echo json_encode($data);
                                 }
                 }
             }
@@ -1017,7 +1017,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                             "Response_code" => 500,
                                             "Message" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"
                                         ];
-                                        echo json_encode($data);
+                                        // echo json_encode($data);
                                 }
             }
         }
