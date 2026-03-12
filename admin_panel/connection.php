@@ -11,8 +11,8 @@ $company_phone   = "07253 26560-61";
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
-$MAIL_PASSWORD = "bjwzeusrakgeawfn";
-$FROM_EMAIL = "support@foodola.de";
+$MAIL_PASSWORD = "elliakydnklqykpv";
+$FROM_EMAIL = "support@pizzasofort.de";
 
 
 

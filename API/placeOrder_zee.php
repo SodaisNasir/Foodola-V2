@@ -514,19 +514,18 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                             </div>
                                         </body>
                                         </html>';
-        
-                                      
-                                
-                                        $mail->send();
-                    
-                                } catch (Exception $e) {
-                                    $data = [
-                                            "status" => false,
-                                            "Response_code" => 500,
-                                            "Message" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"
-                                        ];
-                                        echo json_encode($data);
-                                }
+
+
+
+                        $mail->send();
+                    } catch (Exception $e) {
+                        $data = [
+                            "status" => false,
+                            "Response_code" => 500,
+                            "Message" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"
+                        ];
+                        // echo json_encode($data);
+                    }
                 }
             }
         } else {
@@ -1006,19 +1005,18 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                             </div>
                                         </body>
                                         </html>';
-        
-                                      
-                                
-                                        $mail->send();
-                    
-                                } catch (Exception $e) {
-                                    $data = [
-                                            "status" => false,
-                                            "Response_code" => 500,
-                                            "Message" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"
-                                        ];
-                                        echo json_encode($data);
-                                }
+
+
+
+                    $mail->send();
+                } catch (Exception $e) {
+                    $data = [
+                        "status" => false,
+                        "Response_code" => 500,
+                        "Message" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"
+                    ];
+                    // echo json_encode($data);
+                }
             }
         }
     }

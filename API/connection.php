@@ -21,8 +21,8 @@ $CHANNEL_2 = "reservations";
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
-$MAIL_PASSWORD = "bjwzeusrakgeawfn";
-$FROM_EMAIL = "support@foodola.de";
+$MAIL_PASSWORD = "elliakydnklqykpv";
+$FROM_EMAIL = "support@pizzasofort.de";
 $ADMIN_EMAIL = "boundedsocial@gmail.com";
 
 
