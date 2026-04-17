@@ -73,16 +73,16 @@ if ($people < $table['min'] || $people > $table['maximum']) {
 }
 
 /* ===================== INSERT ===================== */
-$insert_sql = "
+echo $insert_sql = "
 INSERT INTO reservations
 (user_id, table_id, reservation_date, start_time, end_time, duration_minutes, people, status, created_at)
 VALUES
 ('$user_id','$table_id','$reservation_date','$start_time','$end_time','$duration_minutes','$people','$status',NOW())
 ";
 
-if (!mysqli_query($conn, $insert_sql)) {
-    exit(json_encode(['status' => false, 'message' => 'Failed to create reservation']));
-}
+// if (!mysqli_query($conn, $insert_sql)) {
+//     exit(json_encode(['status' => false, 'message' => 'Failed to create reservation']));
+// }
 
 $inserted_id = mysqli_insert_id($conn);
 

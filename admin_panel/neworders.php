@@ -1,4 +1,10 @@
-<?php include('assets/header.php') ?>
+<?php 
+
+include('assets/header.php');
+
+include('phpfiles/function.php');
+
+?>
 <!DOCTYPE html>
 
 <?php

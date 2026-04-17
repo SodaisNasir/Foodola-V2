@@ -11,6 +11,133 @@ use PHPMailer\PHPMailer\Exception;
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
 
+if (isset($_POST['btn_insert_pro_timing'])) {
+
+  include('../connection.php');
+  $timing_name = $_POST['timing_name'];
+  $start_time = $_POST['start_time'];
+  $end_time = $_POST['end_time'];
+  $status = $_POST['status'];
+
+
+    $sql = "INSERT INTO `product_timings`(`timing_name`, `start_time`, `end_time`, `status`) VALUES ('$timing_name','$start_time','$end_time','$status')";
+    
+      $result = mysqli_query($conn, $sql);
+      if ($result) {
+          
+        header("Location:../manage_product_timmings.php?Massage=Sucessfully Inserted");
+      }else {
+        echo "<script>alert('Sorry, there was an error uploading your file.');window.location.href='../manage_product_timmings.php'</script>";
+      }
+}
+if (isset($_POST['btn_update_pro_timing'])) {
+//     error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+    include('../connection.php');
+
+    $id = $_POST['timing_id'];
+    $timing_name = $_POST['timing_name'];
+    $start_time = $_POST['start_time'];
+    $end_time = $_POST['end_time'];
+    $status = $_POST['status'];
+
+  
+    // Update SQL
+    $sql = "UPDATE `product_timings` SET `timing_name`='$timing_name',`start_time`='$start_time',`end_time`='$end_time',`status`='$status' WHERE `id` = '$id'";
+    
+    
+   $result = mysqli_query($conn, $sql);
+    if ($result) {
+     echo "<script>alert('Updated successfully');window.location.href='../manage_product_timmings.php'</script>";
+    } else {
+        echo "<script>alert('Error updating table: " . mysqli_error($conn) . "');window.location.href='../manage_product_timmings.php'</script>";
+    }
+}
+if(isset($_POST['btn_delete_time'])){
+    include('../connection.php');
+    $id = $_POST['ti_id'];
+    $sql = "DELETE FROM `product_timings` WHERE `id` = '$id'";
+    $result = mysqli_query($conn, $sql);
+    
+    if($result){
+        header("Location:../manage_product_timmings.php?Massage=Sucessfully Deleted");
+    }else{
+        echo "<script>alert('Sorry, there was an error uploading your file.');window.location.href='../manage_product_timmings.php'</script>";
+    }
+
+}
+
+
+
+
+if(isset($_POST['btn_delete_cart'])){
+    include('../connection.php');
+    $id = $_POST['crt_id'];
+    $sql = "DELETE FROM `cart_discounts` WHERE `id` = '$id'";
+    $result = mysqli_query($conn, $sql);
+    
+    if($result){
+        header("Location:../manage_cartdiscount.php?Massage=Sucessfully Deleted");
+    }else{
+        echo "<script>alert('Sorry, there was an error uploading your file.');window.location.href='../manage_cartdiscount.php'</script>";
+    }
+
+}
+if (isset($_POST['btn_update_cartdiscount'])) {
+//     error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+    include('../connection.php');
+
+    $id = $_POST['cart_discount_id'];
+    $cart_value = $_POST['cart_value'];
+    $discount_type = $_POST['discount_type'];
+    $no_item = $_POST['no_item'];
+    $status = $_POST['status'];
+    $message = $_POST['message'];
+
+  
+    $product_ids = isset($_POST['product_ids']) 
+        ? json_encode($_POST['product_ids']) 
+        : json_encode([]);
+
+
+    // Update SQL
+    $sql = "UPDATE `cart_discounts` SET `cart_value`='$cart_value',`discount_type`='$discount_type',`product_ids`='$product_ids',`no_item`='$no_item',`status`='$status', `message` = '$message' WHERE `id` = '$id'";
+    
+    
+   $result = mysqli_query($conn, $sql);
+    if ($result) {
+     echo "<script>alert('Updated successfully');window.location.href='../manage_cartdiscount.php'</script>";
+    } else {
+        echo "<script>alert('Error updating table: " . mysqli_error($conn) . "');window.location.href='../manage_cartdiscount.php'</script>";
+    }
+}
+if (isset($_POST['btn_insert_cartdiscount'])) {
+
+  include('../connection.php');
+  $cart_value = $_POST['cart_value'];
+  $discount_type = $_POST['discount_type'];
+  $product_ids = $_POST['product_ids'];
+  $no_item = $_POST['no_item'];
+  $status = $_POST['status'];
+  $message = $_POST['message'];
+  
+  $encoded_ids = json_encode($product_ids);
+
+
+    $sql = "INSERT INTO `cart_discounts`( `cart_value`, `discount_type`, `product_ids`, `no_item`, `status`, `message`) VALUES ('$cart_value','$discount_type','$encoded_ids','$no_item','$status', '$message')";
+    
+      $result = mysqli_query($conn, $sql);
+      if ($result) {
+          
+        header("Location:../manage_cartdiscount.php?Massage=Sucessfully Inserted");
+      }else {
+        echo "<script>alert('Sorry, there was an error uploading your file.');window.location.href='../manage_cartdiscount.php'</script>";
+      }
+}
+
+
+
 if(isset($_POST['btn_delete_depart'])){
     include('../connection.php');
     $id = $_POST['dpt_id'];
@@ -24,7 +151,6 @@ if(isset($_POST['btn_delete_depart'])){
     }
 
 }
-
 if (isset($_POST['btn_update_depart'])) {
 //     error_reporting(E_ALL);
 // ini_set('display_errors', 1);
@@ -53,7 +179,6 @@ $dpt_id = intval($_POST['dpt_id']);
         echo "<script>alert('Error updating table: " . mysqli_error($conn) . "');window.location.href='../manage_departments.php'</script>";
     }
 }
-
 if (isset($_POST['btn_insert_depart'])) {
 
   include('../connection.php');
@@ -248,11 +373,12 @@ if(isset($_POST['btn_insert_code'])){
     $eligible_users_date = mysqli_real_escape_string($conn, $_POST['eligible_users_date']);
     $min_order = mysqli_real_escape_string($conn, $_POST['min_order']);
     $start_date_order = mysqli_real_escape_string($conn, $_POST['start_date_order']); 
-    $end_date_order = mysqli_real_escape_string($conn, $_POST['end_date_order']); 
+    $end_date_order = mysqli_real_escape_string($conn, $_POST['end_date_order']);
+        $user_order_value = mysqli_real_escape_string($conn, $_POST['user_order_value']);
     
     
- $insert_sql = "INSERT INTO `promo_codes`(`code`, `value`, `usage_limit`, `used_count`, `min_order`, `start_date`, `end_date`,`eligible_users_date`,`start_date_order`, `end_date_order`, `status`) 
-                   VALUES ('$code','$value','$usage_limit',0,'$min_order','$start_date','$end_date','$eligible_users_date','$start_date_order', '$end_date_order', '$status')";
+ $insert_sql = "INSERT INTO `promo_codes`(`code`, `value`, `usage_limit`, `used_count`, `min_order`, `start_date`, `end_date`,`eligible_users_date`,`start_date_order`, `end_date_order`, `user_order_value`,`status`) 
+                   VALUES ('$code','$value','$usage_limit',0,'$min_order','$start_date','$end_date','$eligible_users_date','$start_date_order', '$end_date_order','$user_order_value', '$status')";
 
     
     $execute = mysqli_query($conn, $insert_sql);
@@ -279,8 +405,9 @@ if (isset($_POST['btn_update_code'])) {
     $eligible_users_date = mysqli_real_escape_string($conn, $_POST['eligible_users_date']);
     $start_date_order = mysqli_real_escape_string($conn, $_POST['start_date_order']); 
     $end_date_order = mysqli_real_escape_string($conn, $_POST['end_date_order']); 
+    $user_order_value = mysqli_real_escape_string($conn, $_POST['user_order_value']);
  
-    $sql = "UPDATE `promo_codes` SET `code`='$code',`value`='$value',`usage_limit`='$usage_limit',`used_count`='$used_count',`min_order`='$min_order',`start_date`='$start_date',`end_date`='$end_date',`status`='$status', `eligible_users_date` = '$eligible_users_date', `start_date_order`= '$start_date_order', `end_date_order`='$end_date_order' WHERE  `id` = '$id'";
+    $sql = "UPDATE `promo_codes` SET `code`='$code',`value`='$value',`usage_limit`='$usage_limit',`used_count`='$used_count',`min_order`='$min_order',`start_date`='$start_date',`end_date`='$end_date',`status`='$status', `eligible_users_date` = '$eligible_users_date', `start_date_order`= '$start_date_order', `end_date_order`='$end_date_order',`user_order_value` = '$user_order_value' WHERE  `id` = '$id'";
     $result = mysqli_query($conn, $sql);
 
     if ($result) {
@@ -859,8 +986,8 @@ if(isset($_POST['BtnSendpush']))
          $Data['notification_token'];
         array_push($playerId, $Data['notification_token']);   
     }
-      $conntent = array
-      (
+              $conntent = array
+              (
                     "en" => $connt
                     );
                     
@@ -887,6 +1014,279 @@ if(isset($_POST['BtnSendpush']))
                 $response = curl_exec($ch);
                 curl_close($ch);
                 header("Location:../SendNotifications.php?Massage=Sucessfully sent notification.");
+    
+}
+
+if(isset($_POST['BtnSendGift']))
+{
+    include('../connection.php');
+    $selectedusers = $_POST['checkbox'];
+    $given_points = number_format($_POST['given_points'],2);
+    $connt = mysqli_real_escape_string($conn, $_POST['content']);
+    $campaign_tittle = trim($_POST['campaign_tittle']);
+    $users = [];
+    
+    
+    $create_campaign_sql = "INSERT INTO `tbl_campaigns`(`campaign_tittle`, `points`) VALUES ('$campaign_tittle', $given_points)";
+    $create_campaign = mysqli_query($conn,$create_campaign_sql);
+    $last_id = mysqli_insert_id($conn);
+    
+    foreach($selectedusers as $userid)
+    {
+        
+        $sql_users = "SELECT `name`, `notification_token` , `amount` , `email` FROM `users` WHERE `id`=$userid";
+        $ex = mysqli_query($conn,$sql_users);
+        $Data = mysqli_fetch_array($ex);
+         $token  = $Data['notification_token'];
+         $name  = $Data['name'];
+         $email  = $Data['email'];
+         $current_amount  = $Data['amount'];
+         if($token != null && $token != ''){
+            array_push($users, $Data['notification_token']);   
+         }
+        
+        $new_amount = number_format(($given_points +  $current_amount), 2);
+        
+        $sql_update_user = "UPDATE `users` SET `amount` ='$new_amount' WHERE `id` =$userid";
+        $ex_update = mysqli_query($conn,$sql_update_user);
+        if($ex_update){
+            $randomNumber = random_int(100000, 999999);
+            $english_message = "You are awarded with €$given_points by $APP_NAME";
+            $german_message = "Sie wurden vom $APP_NAME mit €$given_points ausgezeichnet.";
+            $sql_transaction = "INSERT INTO `tbl_transaction`(`user_id`, `transaction_id`, `amount`, `type`, `message`, `english_message`, `transaction_type`) VALUES ($userid,'$randomNumber', $given_points, 'credit','$german_message','$english_message','wallet')";
+            $ex = mysqli_query($conn,$sql_transaction);
+            
+            
+            $sql_campaign = "INSERT INTO `tbl_campaigns_details`(`campaign_id`, `email`, `user_id`) VALUES ('$last_id' ,'$email' ,'$userid')";
+            $ex_campaign = mysqli_query($conn,$sql_campaign);
+            
+           
+        }
+        
+    }
+    if (!empty($users)) {
+        $conntent = array
+          (
+                "en" => $connt
+                );
+        $fields = array(
+            'app_id' => $ONE_SIGNAL_APP_ID,
+             'include_player_ids' => $users,
+            'data' => array("foo" => "NewMassage","Id" => 1),
+            'large_icon' =>"ic_launcher_round.png",
+            'contents' => $conntent
+        );
+    
+        $fields = json_encode($fields);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8',
+                                                      "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_HEADER, FALSE);
+        curl_setopt($ch, CURLOPT_POST, TRUE);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);    
+    
+        $response = curl_exec($ch);
+        curl_close($ch);
+        header("Location:../marketing_tool.php?Massage=Sucessfully sent points.");
+    }
+}
+
+if(isset($_GET['SendEmailButton']))
+{
+    include('../connection.php');
+    $campaign_id = $_GET['campaign_id'];
+    $sql = "SELECT details.id , details.email , `campaign_id` , `emails_sent` , users.name , campaigns.points FROM `tbl_campaigns_details` as details INNER JOIN users ON users.id = details.user_id INNER JOIN tbl_campaigns as campaigns on details.campaign_id = campaigns.id WHERE details.status = 0 AND `campaign_id` = $campaign_id LIMIT 1; ";
+    $ex = mysqli_query($conn,$sql);
+    while($row = mysqli_fetch_array($ex)){
+        $name = $row['name'];
+        $email = $row['email'];
+        $emails_sent = $row['emails_sent'];
+        $id = $row['id'];
+        $points = $row['points'];
+        
+                    $mail = new PHPMailer(true);
+
+                    try {
+
+                        $mail->isSMTP();
+                        $mail->Host = 'smtp.hostinger.com';
+                        $mail->SMTPAuth = true;
+                        $mail->Username = 'info@foodola.shop';
+                        $mail->Password = 'md4bZ4]y';
+                        $mail->SMTPSecure = 'TLS';
+                        $mail->Port = 587;
+
+                        $mail->setFrom('info@foodola.shop', $APP_NAME);
+                        $mail->addAddress($email);
+
+                        $mail->isHTML(true);
+
+                        $mail->Subject = "You have a news from " . htmlspecialchars($APP_NAME);
+                        
+                         $template = '
+                            <html>
+                            <head>
+                                <title>News from ' . htmlspecialchars($APP_NAME) . ' !</title>
+
+                                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+                                <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+                                <style>
+                                    body {
+                                        font-family: "Poppins", Arial, sans-serif;
+                                        line-height: 1.6;
+                                        color: #333;
+                                        padding: 20px;
+                                        background-color: #f7f7f7;
+                                    }
+                                    .content {
+                                        background-color: rgba(255, 255, 255, 0.95);
+                                        padding: 20px;
+                                        border-radius: 8px;
+                                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                                    }
+                                    h1 {
+                                        color: #2B2B29;
+                                        font-size: 28px;
+                                        margin-bottom: 10px;
+                                    }
+                                    h3 {
+                                        color: #2B2B29;
+                                        font-size: 20px;
+                                        margin-top: 20px;
+                                    }
+                                    p, li {
+                                        color: #555;
+                                        font-size: 16px;
+                                        margin: 8px 0;
+                                    }
+                                    a {
+                                        color: #F2AF34;
+                                        text-decoration: none;
+                                    }
+                                    .social-icons img {
+                                        margin: 0 5px;
+                                        width: 35px;
+                                        height: 35px;
+                                        transition: all 0.3s;
+                                    }
+                                    .social-icons img:hover {
+                                        opacity: 0.7;
+                                    }
+                                    /* Mobile adjustments */
+                                    @media (max-width: 768px) {
+                                        h1 {
+                                            font-size: 24px;
+                                        }
+                                        h3, p {
+                                            font-size: 14px;
+                                        }
+                                        .content {
+                                            padding: 15px;
+                                        }
+                                        .social-icons {
+                                            text-align: center;
+                                            margin-top: 10px;
+                                        }
+                                        .social-icons img {
+                                            width: 30px;
+                                            height: 30px;
+                                        }
+                                        table {
+                                            background-image: none;
+                                            background-color: #f7f7f7;
+                                        }
+                                    }
+                                </style>
+                            </head>
+                            <body>
+                                <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'' . $BASE_URL . 'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+                                    <tr>
+                                        <td align="center">
+                                            <table width="100%" class="content" style="max-width: 600px;">
+                                                <tr>
+                                                    <td align="center">
+                                                        <!-- Logo Section -->
+                                                        <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="'. htmlspecialchars($APP_NAME) .'" style="width: 100px; margin-bottom: 20px;">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                   <td>
+                                                       <h1>Lieber '. htmlspecialchars($APP_NAME) . ' Nutzer – Du hast ein Geschenk erhalten 🍕🎉</h1>
+                                                        <p>Hallo ' . htmlspecialchars($name) . ',</p>
+                                                        <p>wir haben heute eine kleine Überraschung für dich! 🎉<br>
+                                                        Als Dankeschön für deine Treue haben wir dir ['.htmlspecialchars($points).' '.htmlspecialchars($APP_NAME).' Coins] geschenkt – ganz ohne Bedingungen. 💛<br>
+                                                        👉 Dein Vorteil: Nutze deine Coins bei deiner nächsten Bestellung und spare direkt beim Bezahlen.
+                                                        </p>
+                                                
+                                                        
+                                                
+                                                        <h3>Aber aufgepasst ⏳</h3>
+                                                        <ul>
+                                                            <li>Diese Aktion ist nur für kurze Zeit gültig. Verpasse also nicht die Chance, dir dein Lieblingsessen günstiger zu sichern!</li>
+                                                        </ul>
+                                                        
+                                                        
+                                                        <h3>Warum warten/h3>
+                                                        <ul>
+                                                            <li>Bestelle jetzt und löse dein Geschenk direkt ein 🍕🍔</li>
+                                                        </ul>
+                                                        
+                                                 
+                                                        <li>👀 <a href="' .$BASE_URL. '">Jetzt bestellen</a> und finde deine Favoriten</li>
+                                                
+                                                        <p>Wir freuen uns darauf, dich wieder zu beliefern!</p>
+                                                
+                                                        <h4>Bleib mit uns in Kontakt:</h4>
+                                                        <p>Verpasse keine Aktion und keine Neuigkeit – folge uns auf Social Media!</p>
+                                                        <div class="social-icons">
+                                                            <a href="' . htmlspecialchars($FACEBOOK_URL) . '" target="_blank">
+                                                                <img src="https://foodola.foodola.shop/API/uploads/facebook_logo.png" alt="Facebook">
+                                                            </a>
+                                                            <a href="' . htmlspecialchars($INSTAGRAM_URL) . '" target="_blank">
+                                                                <img src="https://foodola.foodola.shop/API/uploads/instagram_logo.png" alt="Instagram">
+                                                            </a>
+                                                            <a href="' . htmlspecialchars($TWITTER_URL) . '" target="_blank">
+                                                                <img src="https://foodola.foodola.shop/API/uploads/twitter_logo.png" alt="Twitter">
+                                                            </a>
+                                                        </div>
+                                                
+                                                        <p>Guten Appetit & viel Spaß beim Genießen!<br><strong>Dein ' . htmlspecialchars($APP_NAME) . ' Team 🍕</strong></p>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </body>
+                            </html>
+                            ';
+                        
+                        
+                        
+
+                        $mail->Body = $template;
+                        $mail->send();
+                        $emails_sent = (int)$emails_sent + 1;
+                        $updateSQL = "UPDATE `tbl_campaigns_details` SET `status` = 1 , `emails_sent` = $emails_sent WHERE `id` = $id";
+                        $exUpdate = mysqli_query($conn,$updateSQL);
+                        $data = [
+                        "status" => 200,
+                        "Message" => "Email sent successfully"
+                        ];
+                        echo json_encode($data);
+                        
+                    } catch (Exception $e) {
+                        $data = [
+                            "status" => 500,
+                            "Message" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"
+                        ];
+                        echo json_encode($data);
+                    }
+        
+    }
     
 }
 
@@ -1410,8 +1810,8 @@ if(isset($_POST['btnSubmit_insertDeal'])){
 
 if(isset($_POST['btnSubmit_insertNewProductZ'])){
     
-//             error_reporting(E_ALL);
-// ini_set('display_errors', 1);
+            error_reporting(E_ALL);
+ini_set('display_errors', 1);
     
 include('../connection.php');
 include('../assets/config.php'); 
@@ -1433,6 +1833,7 @@ include('../assets/config.php');
   $sku_id = $_POST['sku_id'];
   $tax = $_POST['tax'];
   $for_deal_only = $_POST['for_deal_only'];
+  $time_id = $_POST['time_id'];
   
   
   
@@ -1461,8 +1862,7 @@ include('../assets/config.php');
          "The file ". htmlspecialchars( basename( $_FILES["ProImage"]["name"])). " has been uploaded.";
          
          
-        $sql = "INSERT INTO `products`(`addon_id`,`type_id`,`dressing_id`, `sub_category_id`,`name`, `sku_id`, `description`, `cost`, `price`, `discount`, `qty`,`img`, `tax`, `for_deal_only`) VALUES 
-                                        ($addonCat,$typeCat,$dressingCat,'$MainCat','$ProName','$sku_id','$ProDes',$ProCost,$ProPrice,$ProDiscount,$ProQty,'$filewithnewname', '$tax', '$for_deal_only')";
+        $sql = "INSERT INTO `products`(`addon_id`,`type_id`,`dressing_id`, `sub_category_id`,`name`, `sku_id`, `description`, `cost`, `price`, `discount`, `qty`,`img`, `tax`, `for_deal_only`,`time_id`) VALUES ('$addonCat','$typeCat','$dressingCat','$MainCat','$ProName','$sku_id','$ProDes','$ProCost','$ProPrice','$ProDiscount','$ProQty','$filewithnewname', '$tax', '$for_deal_only', '$time_id')";
                                         
         $result = mysqli_query($conn,$sql);
             if($result){

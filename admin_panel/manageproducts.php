@@ -1,4 +1,7 @@
 <?php
+
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
 include('assets/header.php');
 if (isset($_GET['Massage'])) {
 
@@ -277,6 +280,8 @@ if (isset($_GET['Massage'])) {
                                                         <th>Dressing</th>
                                                         <th>Product Visibility</th>
                                                         <th>Image</th>
+                                                        <th>Allergy Description</th>
+                                                        <th>Time</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
@@ -289,6 +294,7 @@ $addonOptions = [];
 $typeOptions = [];
 $dressingOptions = [];
 $subCategoryOptions = [];
+$proTimeOptions = [];
 
 $addonRes = mysqli_query($conn, "SELECT ao_id, ao_title FROM addon_list");
 while ($row = mysqli_fetch_assoc($addonRes)) {
@@ -310,6 +316,12 @@ while ($row = mysqli_fetch_assoc($subCatRes)) {
     $subCategoryOptions[] = $row;
 }
 
+
+$proTimeRes = mysqli_query($conn, "SELECT `id`, `timing_name`, `start_time`, `end_time`, `status` FROM `product_timings` WHERE `status` = 'active'");
+while ($row = mysqli_fetch_assoc($proTimeRes)) {
+    $proTimeOptions[] = $row;
+}
+
 // Main product query
 $sql = "
     SELECT
@@ -318,7 +330,7 @@ $sql = "
         p.features, p.name AS proname, p.sku_id,
         p.description, p.cost, p.img, p.price,
         p.status, p.discount, p.qty, p.tax,p.for_deal_only,
-        p.addon_id, p.type_id, p.dressing_id,
+        p.addon_id, p.type_id, p.dressing_id, p.allergy_description, p.time_id,
         al.ao_title, tl.type_title, dl.dressing_title
     FROM products p
     INNER JOIN sub_categories sc ON sc.id = p.sub_category_id
@@ -346,6 +358,9 @@ if (isset($conn)) {
             $imgurl = htmlspecialchars($row['img']);
             $for_deal_only = htmlspecialchars($row['for_deal_only']);
             $imagePath = "Uploads/" . $imgurl;
+            $allergyDescription = htmlspecialchars($row['allergy_description']);
+              $time_id = htmlspecialchars($row['time_id']);
+            $disabled = ($for_deal_only == '3') ? 'disabled' : '';
 
             echo "<tr id='sortableBody' data-id='{$productId}'> ";
             echo "<td class='drag-handle'>☰</td>";
@@ -394,7 +409,7 @@ if (isset($conn)) {
             echo "</select></td>";
 
             // Addon Dropdown
-            echo "<td  class='border border-5' style='min-width: 200px;'  data-field='addon_id'><select class='form-control status-select'>";
+            echo "<td  class='border border-5' style='min-width: 200px;'  data-field='addon_id'><select class='form-control status-select' $disabled>";
             echo "<option value='-1'>None</option>";
             foreach ($addonOptions as $option) {
                 $selected = ($option['ao_id'] == $row['addon_id']) ? 'selected' : '';
@@ -403,7 +418,7 @@ if (isset($conn)) {
             echo "</select></td>";
 
             // Type Dropdown
-            echo "<td class='border border-5' style='min-width: 200px;'   data-field='type_id' ><select class='form-control status-select'>";
+            echo "<td class='border border-5' style='min-width: 200px;'   data-field='type_id' ><select class='form-control status-select' $disabled>";
             echo "<option value='-1'>None</option>";
             foreach ($typeOptions as $option) {
                 $selected = ($option['type_id'] == $row['type_id']) ? 'selected' : '';
@@ -412,7 +427,7 @@ if (isset($conn)) {
             echo "</select></td>";
 
             // Dressing Dropdown
-            echo "<td class='border border-5' style='min-width: 200px;' data-field='dressing_id' ><select class='form-control status-select' >";
+            echo "<td class='border border-5' style='min-width: 200px;' data-field='dressing_id' ><select class='form-control status-select' $disabled>";
             echo "<option value='-1'>None</option>";
             foreach ($dressingOptions as $option) {
                 $selected = ($option['dressing_id'] == $row['dressing_id']) ? 'selected' : '';
@@ -422,16 +437,14 @@ if (isset($conn)) {
             
 
             
-                  echo "<td class='border border-5' style='min-width: 200px;' data-field='for_deal_only'>
+        echo "<td class='border border-5' style='min-width: 200px;' data-field='for_deal_only'>
           <select class='form-control status-select'  >
             <option value='0'" . ($for_deal_only == '0' ? ' selected' : '') . ">Regular Product</option>
             <option value='1'" . ($for_deal_only == '1' ? ' selected' : '') . ">Only for Deals</option>
+            <option value='2'" . ($for_deal_only == '2' ? ' selected' : '') . ">Only for POS</option>
+            <option value='3'" . ($for_deal_only == '3' ? ' selected' : '') . ">Only for Free</option>
           </select>
         </td>";
-            
-            
-            
-            
 
             // Image
             echo "<td class='border border-5'>
@@ -441,14 +454,32 @@ if (isset($conn)) {
                 </label>
                 <input type='file' id='fileUpload{$productId}' data-id='{$productId}' class='d-none fileInput'>
               </td>";
+              
+              
+            echo "<td class='editable description-short border border-5' contenteditable='true' data-field='allergy_description'>{$allergyDescription}</td>"; 
+            
+                  echo "<td class='border border-5' style='min-width: 300px;' data-field='time_id'>";
+                echo "<select class='form-control status-select' data-id='{$row['id']}' name='pro_time'>";
+                
+                echo "<option value=''>-- Select Timing --</option>";
+                
+                foreach ($proTimeOptions as $option) {
+                
+                    $selected = ($option['id'] == $time_id) ? 'selected' : '';
+                
+                    echo "<option value='{$option['id']}' $selected>
+                            {$option['timing_name']} ({$option['start_time']} - {$option['end_time']})
+                          </option>";
+                }
+                
+                echo "</select>";
+                echo "</td>";
 
             // Actions
             echo "<td>
                     <button class='btn btn-success save-btn' style='display:none; margin-bottom: 5px;'>Save</button>
                
                   </td>";
-
-                //  <button class='btn btn-primary' onclick=\"openAddMore('{$productId}', '{$productName}', '{$row['subname']}', '{$cost}', '{$price}', '{$discount}', '{$description}', '{$skuId}')\">Update</button>
 
 
 
@@ -495,6 +526,8 @@ if (isset($conn)) {
                                                         <th>Dressing</th>
                                                         <th>Product Visibility</th>
                                                         <th>Image</th>
+                                                        <th>Allergy Description</th>
+                                                        <th>Time</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </tfoot>
@@ -505,128 +538,22 @@ if (isset($conn)) {
                             </div>
                         </div>
                     </div>
+                    
+                    
+                    
                     <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
-  <div id="orderToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="d-flex">
-      <div class="toast-body" id="orderToastBody">
-        <!-- Message will be injected here -->
-      </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-    </div>
-  </div>
-</div>
+                      <div id="orderToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                          <div class="toast-body" id="orderToastBody">
+                            <!-- Message will be injected here -->
+                          </div>
+                          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                      </div>
+                    </div>
 
                 </section>
                 
-      
-                
-                <div id="myModal" class="modal">
-                    <div class="modal-content-base modal-content-Updated2"> <span onclick="closeModel(1)" class="close">&times;</span>
-                        <h2>Update Image</h2>
-                        <br>
-                        <form id="updateImageForm" method="POST" enctype="multipart/form-data">
-                            <input type="hidden" id="ProID" name="ProID"> <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label for="updatedImageFile">Select Image:</label>
-                                        <div class="controls">
-                                            <input type="file" id="updatedImageFile" name="updatedImage" required class="form-control-file" accept="image/*" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                             <div class="modal-footer" style="border-top: none; padding-top: 15px;"> <button type="submit" class="btn btn-primary">Submit</button>
-                                 <button type="button" class="btn btn-secondary" onclick="closeModel(1)">Cancel</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <div id="myModal_Add" class="modal" tabindex="-1" role="dialog">
-                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                        <div class="modal-content modal-content-base modal-content-Updated"> <div class="modal-header">
-                                <h5 class="modal-title">Update Product Details</h5>
-                                <span onclick="closeModel(2)" class="close">&times;</span>
-                            </div>
-                            <div class="modal-body">
-                                <form method="POST" action="phpfiles/insertions.php" enctype="multipart/form-data">
-                                    <input type="hidden" name="product_id" id="product_id" value=""> <div class="form-group">
-                                        <label for="ProName">Product Name</label>
-                                        <input class="form-control" type="text" name="ProName" id="ProName" placeholder="Enter product name" required>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="ProDes">Product Description</label>
-                                        <textarea class="form-control" name="ProDes" id="ProDes" rows="3" placeholder="Enter product description"></textarea>
-                                    </div>
-
-                                    <div class="row"> <div class="col-md-6">
-                                             <div class="form-group">
-                                                <label for="ProCost">Cost</label>
-                                                <input class="form-control"  type="number" name="ProCost" id="ProCost" placeholder="Enter Cost" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="ProPrice">Price</label>
-                                                <input class="form-control"  type="number" name="ProPrice" id="ProPrice" placeholder="Enter Price" required>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                             <div class="form-group">
-                                                <label for="sku_id">SKU ID</label>
-                                                <input class="form-control" type="text" name="sku_id" id="sku_id" placeholder="Enter SKU">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="ProDis">Discount (%)</label>
-                                                <input class="form-control" type="number" step="0.01" min="0" max="100" name="ProDis" id="ProDis" placeholder="Enter Discount Percentage">
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                    <div class="row">
-                                         <div class="col-md-4">
-                                            <div class="form-group">
-                                                 <label for="features">Featured Product</label>
-                                                <select name="features" id="features" class="form-control">
-                                                    <option value="No">No</option>
-                                                    <option value="Yes">Yes</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="status">Status</label>
-                                                <select name="status" id="status" class="form-control">
-                                                    <option value="Active">Active</option>
-                                                    <option value="Inactive">Inactive</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                         <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="tax">Tax Rate</label>
-                                                <select name="tax" id="tax" class="form-control">
-                                                    <option value="0">0%</option>
-                                                    <option value="7">7%</option>
-                                                    <option value="19">19%</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="modal-footer" style="border-top: none; padding-top: 15px;">
-                                        <button type="submit" name="updateProduct" class="btn btn-primary">Save Changes</button>
-                                         <button type="button" class="btn btn-secondary" onclick="closeModel(2)">Cancel</button>
-                                    </div>
-                                </form>
-                            </div></div></div></div></div> </div> </div> <div class="sidenav-overlay"></div>
                             
     <div class="drag-target"></div>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -658,188 +585,36 @@ if (isset($conn)) {
     <!-- END: Page JS-->
 
       <script>
-        // --- Modal Handling ---
-var modalImageUpdate = document.getElementById("myModal"); // Image update modal
-var modalDetailsUpdate = document.getElementById("myModal_Add"); // Detailed update modal
-
-        // Function to open the image update modal
-function openimagemodel(id) {
-            if (modalImageUpdate) {
-                document.getElementById('ProID').value = id; // Set the hidden ProID input
-                modalImageUpdate.style.display = "block";
-            } else {
-                console.error("Image update modal not found");
-            }
-        }
-
-        // Function to open the detailed product update modal
-function openAddMore(id, proname, /* subname, */ cost, price, discount, des, sku_id /* Add other params as needed */) {
-             if (modalDetailsUpdate) {
-
-                document.getElementById('product_id').value = id;
-                document.getElementById('ProName').value = proname;
-                document.getElementById('ProDes').value = des; 
-                document.getElementById('ProCost').value = cost;
-                document.getElementById('ProPrice').value = price;
-                document.getElementById('ProDis').value = discount;
-                document.getElementById('sku_id').value = sku_id;
-
-
-
-                modalDetailsUpdate.style.display = "block";
-            } else {
-                console.error("Details update modal not found");
-            }
-        }
-
-        // Function to close modals
-function closeModel(id) {
-            if (id === 1 && modalImageUpdate) {
-                modalImageUpdate.style.display = "none";
-                 // Optional: Reset the form inside the image modal when closed
-                 if(document.getElementById('updateImageForm')) {
-                    document.getElementById('updateImageForm').reset();
-                 }
-            } else if (id === 2 && modalDetailsUpdate) {
-                modalDetailsUpdate.style.display = "none";
-                 // Optional: Reset the form inside the details modal when closed
-                 // Be careful if you want edits to persist if reopened without saving
-            }
-        }
-        // Close modal if clicking outside of the modal content
-window.onclick = function(event) {
-if (event.target === modalImageUpdate) {
-    closeModel(1);
-    } else if (event.target === modalDetailsUpdate) {
-        closeModel(2);
-    }
-}
-
-        // --- AJAX Form Submission for Image Update ---
-const updateImageForm = document.getElementById('updateImageForm');
-if (updateImageForm) {
-            updateImageForm.onsubmit = function(e) {
-                e.preventDefault(); // Prevent default form submission
-
-                const formData = new FormData(this); // Create FormData object
-                const productId = formData.get('ProID'); // Get the product ID
-
-                // Basic validation: Check if a file is selected
-                const fileInput = document.getElementById('updatedImageFile');
-                if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
-                    alert('Please select an image file to upload.');
-                    return; // Stop submission if no file selected
+        function toggle(status, id) {
+                    const action = status === 'Active' ? 'Deactivate' : 'Activate';
+                     if (!confirm(`Are you sure you want to ${action} this product?`)) {
+                         return; // Stop if user cancels
+                     }
+                    const req = new XMLHttpRequest();
+                     // Ensure the path and parameters are correct for your Actions.php script
+                    const newStatus = status === 'Active' ? 'Inactive' : 'Active'; // Determine the new status
+                    req.open("GET", `assets/Actions.php?FunctionName=ToggleCampaignPro&id=${encodeURIComponent(id)}&status=${encodeURIComponent(newStatus)}`, true);
+                     req.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // Good practice
+                    req.send();
+                    req.onreadystatechange = function() {
+                        if (req.readyState === 4) { // Request finished
+                            if (req.status === 200) { // And successful
+                                alert('Status has been updated!');
+                                 // Consider updating the status text/button dynamically instead of reloading
+                                location.reload(); // Reloads the whole page
+                            } else {
+                                alert('Error updating status. Status: ' + req.status);
+                                 console.error("Error toggling status:", req.responseText);
+                            }
+                        }
+                    };
+                    req.onerror = function() {
+                        alert('Network error during status toggle.');
+                    };
                 }
 
 
-                const xhr = new XMLHttpRequest();
-                // IMPORTANT: Use the correct path to your PHP handler script
-                xhr.open('POST', 'phpfiles/insertions.php', true); // Make sure this path is correct
-
-                xhr.onload = function() {
-                    if (xhr.status >= 200 && xhr.status < 300) { // Check for successful status codes
-                         try {
-                              const response = JSON.parse(xhr.responseText);
-                              if (response.success) {
-                                 // Find the image element in the table using the data-id attribute
-                                 const imgElement = document.querySelector(`img[data-id='${productId}']`);
-                                 if (imgElement) {
-                                      // Update the image source with a cache-busting query parameter
-                                      // Assuming response.newImageName contains just the filename
-                                      imgElement.src = `Uploads/${response.newImageName}?t=${new Date().getTime()}`;
-                                      console.log(`Image updated visually for product ID ${productId}`);
-                                  } else {
-                                      console.warn(`Image element for product ID ${productId} not found in the table.`);
-                                  }
-                                  alert('Image updated successfully!');
-                                  closeModel(1); // Close the modal on success
-                             } else {
-                                  // Display the error message from the PHP script
-                                  alert('Error updating image: ' + (response.message || 'Unknown error'));
-                              }
-                         } catch (jsonError) {
-                              console.error("Error parsing JSON response:", jsonError);
-                              console.error("Raw response:", xhr.responseText);
-                              alert('An error occurred while processing the server response. Check the console.');
-                         }
-                    } else {
-                         // Handle HTTP errors (e.g., 404 Not Found, 500 Internal Server Error)
-                        console.error("HTTP Error:", xhr.status, xhr.statusText);
-                        console.error("Raw response:", xhr.responseText); // Log raw response for debugging
-                        alert(`An error occurred: ${xhr.status} ${xhr.statusText}. Please check the server logs or network tab.`);
-                    }
-                };
-
-                xhr.onerror = function() {
-                    // Handle network errors (e.g., connection refused)
-                    alert('Network request failed. Please check your connection or the server status.');
-                     console.error("XHR onerror triggered");
-                };
-
-                // Add a header to indicate an AJAX request (optional, but good practice)
-                 xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-                xhr.send(formData); // Send FormData
-            };
-} else {
-            console.warn("Image update form ('updateImageForm') not found.");
-        }
-
-function deleteRow(id) {
-             if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
-                return; // Stop if user cancels
-            }
-            const req = new XMLHttpRequest();
-            // Ensure the path and parameters are correct for your Actions.php script
-            req.open("GET", "assets/Actions.php?FunctionName=DeleteCampaignPro&id=" + encodeURIComponent(id), true);
-            req.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // Good practice
-            req.send();
-            req.onreadystatechange = function() {
-                if (req.readyState === 4) { // Request finished
-                    if (req.status === 200) { // And successful
-                        alert('Row has been deleted!');
-                        // Consider removing the row from the table dynamically instead of reloading
-                         location.reload(); // Reloads the whole page
-                    } else {
-                        alert('Error deleting row. Status: ' + req.status);
-                         console.error("Error deleting:", req.responseText);
-                    }
-                }
-            };
-             req.onerror = function() {
-                alert('Network error during deletion.');
-            };
-        }
-function toggle(status, id) {
-            const action = status === 'Active' ? 'Deactivate' : 'Activate';
-             if (!confirm(`Are you sure you want to ${action} this product?`)) {
-                 return; // Stop if user cancels
-             }
-            const req = new XMLHttpRequest();
-             // Ensure the path and parameters are correct for your Actions.php script
-            const newStatus = status === 'Active' ? 'Inactive' : 'Active'; // Determine the new status
-            req.open("GET", `assets/Actions.php?FunctionName=ToggleCampaignPro&id=${encodeURIComponent(id)}&status=${encodeURIComponent(newStatus)}`, true);
-             req.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // Good practice
-            req.send();
-            req.onreadystatechange = function() {
-                if (req.readyState === 4) { // Request finished
-                    if (req.status === 200) { // And successful
-                        alert('Status has been updated!');
-                         // Consider updating the status text/button dynamically instead of reloading
-                        location.reload(); // Reloads the whole page
-                    } else {
-                        alert('Error updating status. Status: ' + req.status);
-                         console.error("Error toggling status:", req.responseText);
-                    }
-                }
-            };
-            req.onerror = function() {
-                alert('Network error during status toggle.');
-            };
-        }
-
-
-$(document).ready(function () {
+        $(document).ready(function () {
         var table = $('#example').DataTable(
                 {
                 dom: 'Bfrtip',
@@ -894,6 +669,10 @@ $(document).ready(function () {
     $(document).on('change', '.status-select', function () {
         $(this).closest('tr').find('.save-btn').show();
     });
+    
+    $(document).on('change', '.time-input', function () {
+    $(this).closest('tr').find('.save-btn').show();
+});
 
     $(document).on('change', '.fileInput', function () {
         const fileInput = this;
@@ -926,15 +705,22 @@ $(document).ready(function () {
         const pro_feature = row.find('[data-field="features"] select').val();
         const pro_status = row.find('[data-field="status"] select').val();
         const pro_tax = row.find('[data-field="tax"] select').val();
-        const addon_id = row.find('[data-field="addon_id"] select').val();
-        const type_id = row.find('[data-field="type_id"] select').val();
-        const dressing_id = row.find('[data-field="dressing_id"] select').val();
+        let addon_id = row.find('[data-field="addon_id"] select').val();
+        let type_id = row.find('[data-field="type_id"] select').val();
+        let dressing_id = row.find('[data-field="dressing_id"] select').val();
         const sub_category_id = row.find('[data-field="sub_category_id"] select').val();
         const for_deal_only = row.find('[data-field="for_deal_only"] select').val();
+        const allergy_description = row.find('[data-field="allergy_description"]').text().trim();
+        const time_id = row.find('[data-field="time_id"] select').val();
 
         if (!id || pro_name === '') {
             alert('Product ID or Name is missing.');
             return;
+        }
+        if (for_deal_only == "3") {
+            addon_id = '-1';
+            type_id = '-1';
+            dressing_id = '-1';
         }
 
         const formData = new FormData();
@@ -953,6 +739,9 @@ $(document).ready(function () {
         formData.append('dressing_id', dressing_id);
         formData.append('sub_category_id', sub_category_id);
         formData.append('for_deal_only', for_deal_only);
+        formData.append('allergy_description', allergy_description);
+        formData.append('time_id', time_id);
+        
 
         if (selectedFiles[id]) {
             formData.append('product_image', selectedFiles[id]);
@@ -1029,14 +818,11 @@ function sendOrderToServer(orderArray) {
     }
   });
 }
-
-
-
-
     const addonOptions = <?= json_encode($addonOptions) ?>;
     const typeOptions = <?= json_encode($typeOptions) ?>;
     const dressingOptions = <?= json_encode($dressingOptions) ?>;
     const subCategoryOptions = <?= json_encode($subCategoryOptions) ?>;
+    const proTimeOptions = <?= json_encode($proTimeOptions) ?>;
     const imgUrl = <?= json_encode($imagePath = "Uploads/" ) ?>;
     
 
@@ -1058,7 +844,7 @@ $('#subCategorySelect').on('change', function () {
         `);
 
         $.ajax({
-            url: '../API/get_products_by_categoryzz.php',
+            url: '../API/productsbycategories.php',
             method: 'POST',
             data: {
                 token: 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC',
@@ -1069,6 +855,7 @@ $('#subCategorySelect').on('change', function () {
                 if (res.status && res.data.length > 0) {
                     let html = '';
                          res.data.forEach((item, index) => {
+                                                 const disabled = item.for_deal_only == 3 ? 'disabled' : '';
                             html += `
                             <tr data-id="${item.product_id}">
                                 echo "<td class='drag-handle'>☰</td>";
@@ -1106,7 +893,7 @@ $('#subCategorySelect').on('change', function () {
                                     </select>
                                 </td>
                                 <td class='border border-5' style='min-width: 200px;'  data-field='addon_id'>
-                                    <select class="form-control status-select">
+                                    <select class="form-control status-select" ${disabled}>
                                         <option value="-1">None</option>
                                         ${addonOptions.map(opt => `
                                             <option value="${opt.ao_id}" ${opt.ao_id == item.addons[0]?.ao_id ? 'selected' : ''}>${opt.ao_title}</option>
@@ -1114,7 +901,7 @@ $('#subCategorySelect').on('change', function () {
                                     </select>
                                 </td>
                                 <td class='border border-5' style='min-width: 200px;'   data-field='type_id'>
-                                    <select class="form-control status-select">
+                                    <select class="form-control status-select" ${disabled}>
                                         <option value="-1">None</option>
                                         ${typeOptions.map(opt => `
                                             <option value="${opt.type_id}" ${opt.type_id == item.types[0]?.type_id ? 'selected' : ''}>${opt.type_title}</option>
@@ -1122,7 +909,7 @@ $('#subCategorySelect').on('change', function () {
                                     </select>
                                 </td>
                                 <td class='border border-5' style='min-width: 200px;' data-field='dressing_id'>
-                                    <select class="form-control status-select">
+                                    <select class="form-control status-select" ${disabled}>
                                         <option value="-1">None</option>
                                         ${dressingOptions.map(opt => `
                                             <option value="${opt.dressing_id}" ${opt.dressing_id == item.dressing[0]?.dressing_id ? 'selected' : ''}>${opt.dressing_title}</option>
@@ -1132,15 +919,41 @@ $('#subCategorySelect').on('change', function () {
                                 <td class='border border-5' style='min-width: 200px;' data-field='for_deal_only'>
                                     <select class="form-control status-select">
                                         <option value="0" ${item.for_deal_only == 0 ? 'selected' : ''}>Regular Product</option>
-                                        <option value="1" ${item.for_deal_only == 1 ? 'selected' : ''}>Only for Deals</option>
+<option value="1" ${item.for_deal_only == 1 ? 'selected' : ''}>Only for Deals</option>
+<option value="2" ${item.for_deal_only == 2 ? 'selected' : ''}>Only for Pos</option>
+<option value="3" ${item.for_deal_only == 3 ? 'selected' : ''}>Only for Free</option>
+                                        
                                     </select>
                                 </td>
+                                
+                                
+                                
                                 <td class='border border-5'>
                                     <label for="fileUpload${item.product_id}" style="cursor: pointer;">
                                         <img class="image-clickable" src="${'Uploads/'+item.img}" width="80" height="80" style="object-fit: cover; border-radius: 8px;">
                                     </label>
                                     <input type="file" id="fileUpload${item.product_id}" data-id="${item.product_id}" class="d-none fileInput">
                                 </td>
+                                
+                                  <!-- Allergy Description -->
+                                    <td class="editable border-5" contenteditable="true" data-field="allergy_description">
+                                        ${item.allergy_description ?? ''}
+                                    </td>
+                                
+                                    <td class='border border-5' style='min-width: 300px;' data-field='time_id'>
+    <select class="form-control status-select" data-id="${item.id}">
+        <option value="">-- Select Timing --</option>
+
+        ${proTimeOptions.map(opt => `
+            <option value="${opt.id}" 
+                ${opt.id == item.time_id ? 'selected' : ''}>
+                ${opt.timing_name} (${opt.start_time} - ${opt.end_time})
+            </option>
+        `).join('')}
+    </select>
+</td>
+                                </td>
+                                    
                                 <td><button class="btn btn-success save-btn" style="display:none;">Save</button></td>
                             </tr>
                             
@@ -1162,16 +975,52 @@ $('#subCategorySelect').on('change', function () {
     }
 });
 
+// Product visibility change
+$(document).on('change', '[data-field="for_deal_only"] select', function () {
 
+    const row = $(this).closest('tr');
+    const visibility = $(this).val();
 
+    const addon = row.find('[data-field="addon_id"] select');
+    const type = row.find('[data-field="type_id"] select');
+    const dressing = row.find('[data-field="dressing_id"] select');
 
- // End $(document).ready
+    if (visibility == "3") {
 
+        addon.prop('disabled', true).val('-1');
+        type.prop('disabled', true).val('-1');
+        dressing.prop('disabled', true).val('-1');
+
+    } else {
+
+        addon.prop('disabled', false);
+        type.prop('disabled', false);
+        dressing.prop('disabled', false);
+
+    }
+
+    row.find('.save-btn').show();
+});
+
+$(document).ready(function(){
+
+    $('#sortableBody tr').each(function(){
+
+        const row = $(this);
+        const visibility = row.find('[data-field="for_deal_only"] select').val();
+
+        if (visibility == "3"){
+
+            row.find('[data-field="addon_id"] select').prop('disabled', true);
+            row.find('[data-field="type_id"] select').prop('disabled', true);
+            row.find('[data-field="dressing_id"] select').prop('disabled', true);
+
+        }
+
+    });
+
+});
 
     </script>
-    
-    
-    
-
 </body>
 </html>

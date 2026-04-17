@@ -5,12 +5,29 @@
 // ini_set('display_errors', 1);
 
 include('connection.php');
-
+mysqli_query($conn, "SET time_zone = '+01:00'");
 if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC'){
  
     $category_id = $_POST['category_id'];
     
-$select_user_restuarant = "SELECT * FROM `products` WHERE `sub_category_id` = '$category_id' AND `status` = 'Active' AND `for_deal_only` = '0' ORDER BY `sort_order` ASC";
+$select_user_restuarant = "
+SELECT p.*, pt.start_time, pt.end_time
+FROM products p
+LEFT JOIN product_timings pt 
+       ON p.time_id = pt.id 
+       AND pt.status = 'active'
+
+WHERE p.sub_category_id = '$category_id'
+AND p.status = 'Active'
+AND p.for_deal_only = '0'
+AND (
+        p.time_id IS NULL
+        OR pt.id IS NULL
+        OR CURTIME() BETWEEN pt.start_time AND pt.end_time
+    )
+
+ORDER BY p.sort_order ASC
+";
     $execute_restuarant = mysqli_query($conn,$select_user_restuarant);
     
     if(mysqli_num_rows($execute_restuarant) > 0){
@@ -150,6 +167,9 @@ $select_user_restuarant = "SELECT * FROM `products` WHERE `sub_category_id` = '$
                         "addons"=>$addon != null ? $addon : [],
                         "types"=>$type != null ? $type : [],
                         "dressing"=>$dressing != null ? $dressing : [],
+                        "allergy_description" => $row['allergy_description'],
+                        "start_time" => $row['start_time'],
+                        "end_time" => $row['end_time']
                      
                     ];
                     

@@ -163,7 +163,7 @@ body {
       </tr>
       <tr>
         <td class="label">Dauer</td>
-        <td><?php echo $reservation['duration_minutes']; ?> Minuten</td>
+        <td><?php echo $reservation['duration_minutes']; ?> Minutennn</td>
       </tr>
       <tr>
         <td class="label">Personen</td>

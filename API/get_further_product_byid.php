@@ -8,7 +8,7 @@ if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqa
     $productid = $_POST['product_id'];
     
     $select_product = "SELECT `id`, `addon_id`, `type_id`, `dressing_id`, `sub_category_id`, `name`, `description`, `cost`, 
-    `price`, `discount`, `qty`, `img`, `features`,`tax` , `created_at`, `updated_at` FROM 
+    `price`, `discount`, `qty`, `img`, `features`,`tax` , `created_at`, `updated_at`, `allergy_description` FROM 
     `products` WHERE  `id` = '$productid'";   
      $execute_products = mysqli_query($conn,$select_product);
     
@@ -141,6 +141,7 @@ if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqa
                         "discount"=>$rows['discount'],
                         "qty"=>$rows['qty'],
                         "image"=>$finalImage,
+                        "allergy_description"=>$rows['allergy_description'],
                         "addons"=>$addon != null ? $addon : [],
                         "type"=>$type != null ? $type : [],
                         "dressing"=>$dressing != null ? $dressing : [],

@@ -1,4 +1,8 @@
-<?php include('assets/header.php') ?>
+<?php 
+include('assets/header.php');
+
+include('phpfiles/function.php');
+?>
 <!DOCTYPE html>
 
 <?php
@@ -232,24 +236,24 @@ if (isset($_GET['Massage'])) {
                     }
                     
                     
-                    $sqlSettings = "SELECT * FROM `system_setting` LIMIT 1";
-                    $resultSettings = mysqli_query($conn, $sqlSettings);
+                    // $sqlSettings = "SELECT * FROM `system_setting` LIMIT 1";
+                    // $resultSettings = mysqli_query($conn, $sqlSettings);
                     
-                    if ($row = mysqli_fetch_assoc($resultSettings)) {
-                        $currency = json_decode($row['currency'], true); // decode as array
-                        $currency_sign = $currency['sign'];
-                        $currency_position = $currency['position'];
-                    }
+                    // if ($row = mysqli_fetch_assoc($resultSettings)) {
+                    //     $currency = json_decode($row['currency'], true); // decode as array
+                    //     $currency_sign = $currency['sign'];
+                    //     $currency_position = $currency['position'];
+                    // }
                     
                     
-                    function formatCurrency($amount, $sign, $position = "left") {
-                        $formatted = number_format($amount, 2);
-                        if ($position === "left") {
-                            return $sign . $formatted;
-                        } else {
-                            return $formatted . $sign;
-                        }
-                    }
+                    // function formatCurrency($amount, $sign, $position = "left") {
+                    //     $formatted = number_format($amount, 2);
+                    //     if ($position === "left") {
+                    //         return $sign . $formatted;
+                    //     } else {
+                    //         return $formatted . $sign;
+                    //     }
+                    // }
 
 
                   }
@@ -257,7 +261,7 @@ if (isset($_GET['Massage'])) {
                   <div class="mt-3">
                     <div class="d-flex justify-content-between">
                       <p><strong>Order Type:</strong> <?php echo $orderType; ?></p>
-                 <p><strong>Shipping Cost:</strong> <?php echo formatCurrency($shippingCost, $currency_sign, $currency_position); ?></p>
+                 <p><strong>Shipping Cost:</strong> <?php echo formatCurrency($shippingCost); ?></p>
                     </div>
                     <div class="d-flex justify-content-between">
                         
@@ -268,13 +272,13 @@ if (isset($_GET['Massage'])) {
                     <?php if($table_id){ ?>
                       <p><strong>Table Name:</strong> <?php echo htmlspecialchars($table_name); ?></p>
                     <?php }?>  
-                      <p><strong>Total Discount:</strong> <?php echo formatCurrency($total_discount, $currency_sign, $currency_position); ?></p>
+                      <p><strong>Total Discount:</strong> <?php echo formatCurrency($total_discount); ?></p>
                     </div>
                     
                     
                     <div class="d-flex justify-content-between">
                       <p class="w-50"><strong>Customer Address:</strong> <?php echo  $address_2 . ', ' . $postal_code . ', ' . $shipping_area . ', ' . $shipping_city . ', ' . $shipping_state; ?></p>
-                     <p><strong>Order Total:</strong> <?php echo formatCurrency($order_total, $currency_sign, $currency_position); ?></p>
+                     <p><strong>Order Total:</strong> <?php echo formatCurrency($order_total); ?></p>
                     </div>
                     
                     
@@ -339,7 +343,7 @@ if (isset($_GET['Massage'])) {
                 $order_id = $_GET['order_id'];
 
                 $sql = "SELECT o.id, o.order_total_price, od.additional_notes, od.id AS order_detail_id, od.order_id, od.deal_id, od.deal_item_id,
-                        od.product_id, od.qty, od.addons, od.types, od.dressing, od.product_name, od.price, p.description, p.cost, p.img  
+                        od.product_id, od.qty, od.addons, od.types, od.dressing, od.product_name, od.price, p.description,od.is_free, p.cost, p.img  
                         FROM `orders_zee` o 
                         INNER JOIN `order_details_zee` od ON od.order_id = o.id 
                         INNER JOIN `products` p ON p.id = od.product_id 
@@ -407,21 +411,27 @@ if (isset($_GET['Massage'])) {
                             if (!is_array($addons)) {
                                 $addons = [];
                             }
+                            
+                            
+                            $price = $row['price'];
+                            if ($row['is_free']) {
+                                $price = 0;
+                            }
 
                             echo "<tr>
                                     <td>" . $index++ . "</td>
                                     <td>" . htmlspecialchars($row['product_name']) . "</td>
                                     <td>" . (!empty($row['additional_notes']) ? htmlspecialchars($row['additional_notes']) : '-') . "</td>
                                     <td>" . htmlspecialchars($row['qty']) . "</td>
-                                    <td>" . formatCurrency($row['cost'], $currency_sign, $currency_position) . "</td>
-                                    <td>" . formatCurrency($row['price'], $currency_sign, $currency_position) . "</td>
+                                    <td>" . formatCurrency($row['cost']) . "</td>
+                                    <td>" . formatCurrency($price, $currency_sign, $currency_position) . "</td>
                                     <td>";
 
                              if (count($addons) > 0 && !empty($addons)) {
                                 foreach ($addons as $addon) {
                                     echo htmlspecialchars($addon->as_name) 
                                         . " X " . htmlspecialchars($addon->quantity) 
-                                        . " " . formatCurrency($addon->as_price, $currency_sign, $currency_position) 
+                                        . " " . formatCurrency($addon->as_price) 
                                         . "<br>";
                                 }
                             } else {
@@ -435,7 +445,7 @@ if (isset($_GET['Massage'])) {
                                 $total_addon += $addon->as_price * $addon->quantity;
                             }
                             
-                            echo formatCurrency($total_addon, $currency_sign, $currency_position) . "</td><td>";
+                            echo formatCurrency($total_addon) . "</td><td>";
 
                                  if (is_array($types) && !empty($types)) {
                                     $hasValidType = false;
@@ -514,15 +524,15 @@ if (isset($_GET['Massage'])) {
                                     <td>" . (!empty($row['additional_notes']) ? htmlspecialchars($row['additional_notes']) : '-') . "</td>
                                     <td>" . htmlspecialchars($deal_item['di_title']) . "</td>
                                     <td>" . htmlspecialchars($row['product_name']) . "</td>
-                                    <td>" . formatCurrency($deal_d['deal_cost'], $currency_sign, $currency_position) . "</td>
-                                    <td>" . formatCurrency($deal_d['deal_price'], $currency_sign, $currency_position) . "</td>
+                                    <td>" . formatCurrency($deal_d['deal_cost']) . "</td>
+                                    <td>" . formatCurrency($deal_d['deal_price']) . "</td>
                                     <td>";
 
                         if (is_array($addons) && !empty($addons)) {
                             foreach ($addons as $addon) {
                                 echo htmlspecialchars($addon->as_name) 
                                     . " X " . htmlspecialchars($addon->quantity) . " " 
-                                    . formatCurrency($addon->price, $currency_sign, $currency_position) 
+                                    . formatCurrency($addon->price) 
                                     . "<br>";
                             }
                         } else {
@@ -539,7 +549,7 @@ if (isset($_GET['Massage'])) {
                                     $val_addon_total += $total_addon;
                                 }
                             }
-                            echo formatCurrency($val_addon_total, $currency_sign, $currency_position) . "</td><td>";
+                            echo formatCurrency($val_addon_total) . "</td><td>";
 
                             if (is_array($types) && !empty($types)) {
                                 foreach ($types as $type) {
@@ -575,7 +585,7 @@ if (isset($_GET['Massage'])) {
                             <table class='table'>
                                 <tr>
                                     <th class='text-center' colspan='9' style='font-weight:bold; font-size:16px'>Subtotal</th>
-                            <td style='font-weight:bold; font-size:16px'>" . formatCurrency($final_total, $currency_sign, $currency_position) . "</td>
+                            <td style='font-weight:bold; font-size:16px'>" . formatCurrency($final_total) . "</td>
 
                                 </tr>
                             </table>

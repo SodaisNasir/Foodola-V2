@@ -88,9 +88,8 @@ body { font-family: Arial; font-size:14px; background:#fff; margin:0; }
     font-weight:900;
     padding:6px 0;
     margin:6px 0;
-    text-align:center;
-    letter-spacing:1px;
 
+    letter-spacing:1px;
     border-top:4px solid #000;
     border-bottom:4px solid #000;
 }
@@ -103,32 +102,39 @@ table{width:100%;border-collapse:collapse;}
 td{padding:3px;font-size:13px;vertical-align:top;}
 .qty{text-align:right;font-weight:bold;width:40px;}
 .item-name{font-weight:bold;}
-.item-options{font-size:12px;margin-left:8px;line-height:1.2;}
+.item-options{font-size:20px;margin-left:8px;line-height:1.2;}
 .footer{margin-top:15px;border-top:1px dashed #000;padding-top:10px;text-align:center;font-size:13px;font-weight:bold;}
-.highlight-dept{background:#f0f0f0;padding:2px 4px;border-left:3px solid #000;margin-bottom:3px;}
+.highlight-dept{background:#f0f0f0;padding:2px 4px;border-left:3px solid #000;margin-bottom:3px;font-size:20px;text-align:left}
 thead td{font-weight:bold;text-align:left;padding:3px;font-size:13px;}
 </style>
 </head>
 <body>
 <div class="receipt-container">
+    <p style="text-align:left"><?php echo date('d.m.Y H:i'); ?></p>
     <div class="header">
+        
         <!--<img src="images/logo.png" width="50">-->
-        <h2><?php echo $APP_NAME?></h2>
-        <div class="big-order">Tisch: <?php echo $table_id; ?></div>
-        <div class="dept-title"><?php echo htmlspecialchars($dept_name); ?></div>
+        <!--<h2><?php echo $APP_NAME?></h2>-->
+     <div class="big-order" style="display:flex; justify-content:space-between; padding-right:10px;">
+        <div>Tisch: <?php echo $table_id ?></div>
+        <div style="text-align:right;">
+            <?php echo htmlspecialchars($dept_name); ?>
+        </div>
+    </div>
+
     </div>
 
     <div class="details">
-        <p><strong>Datum:</strong> <?php echo date('d.m.Y H:i'); ?></p>
+        
         <?php if ($user_data): ?>
-            <p><strong>Kunde:</strong> <?php echo htmlspecialchars($user_data['name']); ?></p>
-            <?php if (!empty($user_data['phone'])): ?>
-                <p><strong>Tel:</strong> <?php echo htmlspecialchars($user_data['phone']); ?></p>
-            <?php endif; ?>
+            <!--<p><strong>Kunde:</strong> <?php echo htmlspecialchars($user_data['name']); ?></p>-->
+            <!--<?php if (!empty($user_data['phone'])): ?>-->
+            <!--    <p><strong>Tel:</strong> <?php echo htmlspecialchars($user_data['phone']); ?></p>-->
+            <!--<?php endif; ?>-->
         <?php endif; ?>
     </div>
 
-    <div class="order-details-header">KÜCHENBESTELLUNG</div>
+    <!--<div class="order-details-header">KÜCHENBESTELLUNG</div>-->
 
     <table>
     <thead>
@@ -188,6 +194,11 @@ thead td{font-weight:bold;text-align:left;padding:3px;font-size:13px;}
             else:
                 // Single product
                 $prod_sub_id = $item['sub_category_id'] ?? 0;
+                $prod_id = $item['id'] ?? 0;
+                $sql = "SELECT `sku_id` FROM `products` WHERE `id` = $prod_id";
+                $getitemSKU = mysqli_query($conn,$sql);
+                $itemData = mysqli_fetch_assoc($getitemSKU);
+                $sku = $itemData['sku_id'];
                 $show_product = false;
                 if ($sub_ids) {
                     $sub_ids_arr = json_decode($sub_ids, true);
@@ -201,7 +212,7 @@ thead td{font-weight:bold;text-align:left;padding:3px;font-size:13px;}
     ?>
                 <tr>
                     <td class="highlight-dept">
-                        <?php echo htmlspecialchars($item['name']); ?>
+                        <?php echo htmlspecialchars($item['name']." (".$sku).")"; ?>
                         <div class="item-options">
                             <?php if (!empty($item['addons'])) foreach ($item['addons'] as $a) echo "x{$a['quantity']} {$a['as_name']}<br>"; ?>
                             <?php if (!empty($item['types'])) foreach ($item['types'] as $t) echo "{$t['ts_name']}<br>"; ?>
@@ -221,10 +232,10 @@ thead td{font-weight:bold;text-align:left;padding:3px;font-size:13px;}
     </tbody>
     </table>
 
-    <div class="footer">
-        <p>Gesamtanzahl Artikel: <?php echo $total_items; ?></p>
-        <p>Vielen Dank!</p>
-    </div>
+    <!--<div class="footer">-->
+    <!--    <p>Gesamtanzahl Artikel: <?php echo $total_items; ?></p>-->
+    <!--    <p>Vielen Dank!</p>-->
+    <!--</div>-->
 </div>
 <script>window.onload = () => window.print();</script>
 </body>

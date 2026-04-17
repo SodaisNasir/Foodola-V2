@@ -1,4 +1,10 @@
-<?php include('assets/header.php') ?>
+<?php 
+
+include('assets/header.php');
+
+include('phpfiles/function.php');
+
+?>
 <!DOCTYPE html>
 
 <?php
@@ -243,9 +249,9 @@ $shipping_cost = number_format((float)$shipping_total, 2);
         echo "<td>{$row['id']}</td>";
         echo "<td>" . ($user_name ?? '-') . "</td>";  // Show name or "-" if not available
         echo "<td>{$row['order_type']}</td>";
-        echo "<td style='min-width:100px;'>€ {$price}</td>";
+        echo "<td style='min-width:100px;'>" . formatCurrency($price) . "</td>";
         echo "<td style='min-width:200px;'>{$row['created_at']}</td>";
-        echo "<td>€ {$shipping_cost}</td>";
+        echo "<td>" . formatCurrency($shipping_cost) . "</td>";
         echo "<td>{$row['payment_type']}</td>";
         if($row['status'] === 'canceled'){
             echo "<td style='color:red'>Canceled</td>";

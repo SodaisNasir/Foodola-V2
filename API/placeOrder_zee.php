@@ -21,7 +21,6 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
     $Shipping_city = str_replace("undefined", "", $_POST['Shipping_city']);
     $Shipping_area = str_replace("undefined", "", $_POST['Shipping_area']);
     $Shipping_state = str_replace("undefined", "", $_POST['Shipping_state']);
-    $order_total_price = $_POST['order_total_price'];
     $payment_type =  $_POST['payment_type'];
     $payment_method = $_POST['payment_method'];
     $transaction_id = $_POST['transaction_id'];
@@ -30,6 +29,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
     $addtional_notes = $_POST['addtional_notes'];
     $Shipping_postal_code = str_replace("undefined", "", $_POST['Shipping_postal_code']);
     $Shipping_cost = $_POST['Shipping_cost'];
+    $order_total_price = number_format(($_POST['order_total_price'] + $Shipping_cost), 2);
     $order_datails  = json_decode($_POST['order_datails']);
     $total_netto_tax = $_POST['total_netto_tax'];
     $total_metto_tax = $_POST['$total_metto_tax'] ?? 0.00;
@@ -61,8 +61,8 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         "Response_code" => 400,
                         "Message" => "Insufficient wallet balance"
                     ];
-                    
-         
+
+
                     echo json_encode($response);
                     exit;
                 }
@@ -75,25 +75,25 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
 
                 // $transaction_message = "Abzug von €$wallet_balance vom Guthaben";
                 // $english_message = "Deduction of €$wallet_balance from the balance.";
-                            
-                    $sql_msg = "SELECT `id`, `message_key`, `message_en`, `message_de` FROM `messages` WHERE `message_key` = 'deduct_wallet_balance'";
-                    $exec_sql_msg = mysqli_query($conn, $sql_msg);
-                    $data = mysqli_fetch_array($exec_sql_msg);
-                                    
-          
-                    $replacements = [
-                        '{{wallet_balance}}' => $wallet_balance
-                    ];
-                                    
-                    $message_en = str_replace(array_keys($replacements), array_values($replacements), $data['message_en']);
-                    $message_de = str_replace(array_keys($replacements), array_values($replacements), $data['message_de']);
-                                    
-                
+
+                $sql_msg = "SELECT `id`, `message_key`, `message_en`, `message_de` FROM `messages` WHERE `message_key` = 'deduct_wallet_balance'";
+                $exec_sql_msg = mysqli_query($conn, $sql_msg);
+                $data = mysqli_fetch_array($exec_sql_msg);
+
+
+                $replacements = [
+                    '{{wallet_balance}}' => $wallet_balance
+                ];
+
+                $message_en = str_replace(array_keys($replacements), array_values($replacements), $data['message_en']);
+                $message_de = str_replace(array_keys($replacements), array_values($replacements), $data['message_de']);
+
+
 
                 $rand_id  = rand(000000, 10000000);
                 $sql = "INSERT INTO `tbl_transaction`(`user_id`, `transaction_id`, `amount`, `type`, `message`, `english_message`) VALUES ('$user_id', '$rand_id','$wallet_balance','debit','$message_de', '$message_en')";
-                
-    
+
+
                 $ex_sql = mysqli_query($conn, $sql);
             } else {
                 // If amount column is not found
@@ -126,7 +126,10 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                 $no_of_deal = 1;
                 $department_list = [];
                 $addedDepartments = []; // track added department IDs
-                
+
+    
+
+
                 foreach ($order_datails as $details) {
 
                     $deal_id =  $details->deal_id;
@@ -134,7 +137,40 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     $deal_items_array = $details->deal_items;
                     $additionalNotes = mysqli_real_escape_string($conn, $details->additionalNotes);
                     $no_of_deal++;
+                
+                    
+                    
                     if ($isDeal == "yes") {
+                        $sql_getitems = "SELECT `deal_cost`, `deal_price` FROM `deals` WHERE `deal_id` = $deal_id";
+                        $ex_get_items = mysqli_query($conn, $sql_getitems);
+                        $Data = mysqli_fetch_array($ex_get_items);
+                        $cost = $Data['deal_cost'];
+                        $price = $Data['deal_price'];
+                        $discount = 0;
+                        
+                        $additional_discount = 0;
+                                    
+                          if (!empty($wallet_balance) && $order_total_price > 0) {
+            
+                            $product_total_price = $price;
+                            foreach ($details->deal_items as $dealItem) {
+
+                                     foreach ($dealItem->items_products as $itemsOfProducts) {
+
+                                         foreach ($itemsOfProducts->addons as $addons) {
+                                             
+                                                $product_total_price += $addons->as_price *$addons->quantity ;
+                                            }
+                      
+                                    }
+                   
+                              }
+                           
+                            $totalinitial = ($order_total_price + $wallet_balance) - $Shipping_cost;
+                            $ratio = $product_total_price / $totalinitial;
+                            $additional_discount = round(($wallet_balance * $ratio), 2);
+                        }  
+                        $additional_discount_inserted = 0;
                         foreach ($deal_items_array as $itemsOfDeals) {
                             $item_id = $itemsOfDeals->item_id;
                             $items_products = $itemsOfDeals->items_products;
@@ -143,15 +179,9 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                 $addons_array = $itemsOfProducts->addons;
                                 $types_array = $itemsOfProducts->types;
                                 $dressing_array = $itemsOfProducts->dressing;
+                                 $is_free = $itemsOfProducts->is_free;
 
-                                $sql_getitems = "SELECT `deal_cost`, `deal_price` FROM `deals` WHERE `deal_id` = $deal_id";
-                                $ex_get_items = mysqli_query($conn, $sql_getitems);
-                                $Data = mysqli_fetch_array($ex_get_items);
-                                $cost = $Data['deal_cost'];
-                                $price = $Data['deal_price'];
-                                $discount = 0;
-
-
+                            
 
                                 $tyy_pes = mysqli_real_escape_string($conn, json_encode($types_array, JSON_UNESCAPED_UNICODE));
                                 $dress_ing = mysqli_real_escape_string($conn, json_encode($dressing_array, JSON_UNESCAPED_UNICODE));
@@ -163,33 +193,45 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                 $product = mysqli_fetch_array($ex_get_pro);
                                 $pro_name = mysqli_real_escape_string($conn, $product['name']);
                                 $pro_decs = mysqli_real_escape_string($conn, $product['description']);
-              
+                                $pro_price = mysqli_real_escape_string($conn, $product['price']);
+                                $pro_discount = 0;
+
+                               
+                                //adding this to not add value in DB multiple times to make the calcuation easy for reporting.
+                                if($additional_discount_inserted === 1){
+                                  $additional_discount = 0;
+                                  $price = 0;
+                                  $cost = 0;
+                                }
+                        
+
+
 
                                 //print_r($tyy_pes); 
-                                $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`,`product_description`,`additional_notes`, `addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`)
-                                                  VALUES ('$last_id','$deal_id','$item_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$add_oon','$tyy_pes','$dress_ing' , $cost , $price , $discount  , $no_of_deal, '$datetime')";
+                                $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`,`product_description`,`additional_notes`, `addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`, `additional_discount`,`is_free`)
+                                                  VALUES ('$last_id','$deal_id','$item_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$add_oon','$tyy_pes','$dress_ing' , '$cost' , '$price', '$pro_discount', '$no_of_deal', '$datetime', '$additional_discount', '$is_free' )";
                                 $exec_sql_deal = mysqli_query($conn, $sql_deal);
-                                
-                                
-                                   // Fetch departments for this product
+                                $additional_discount_inserted = 1;
+
+                                // Fetch departments for this product
                                 $sub_category_id = intval($product['sub_category_id']);
                                 $sql_department = "SELECT id, department_name FROM departments WHERE JSON_CONTAINS(sub_category_ids, $sub_category_id )";
                                 $res_dep = mysqli_query($conn, $sql_department);
-                           
-                                   if ($res_dep && mysqli_num_rows($res_dep) > 0) {
+
+                                if ($res_dep && mysqli_num_rows($res_dep) > 0) {
                                     while ($dep = mysqli_fetch_assoc($res_dep)) {
-                                
+
                                         // Skip if this department_id already exists
                                         if (in_array($dep['id'], $addedDepartments)) {
                                             continue;
                                         }
-                                
+
                                         // Add the record
                                         $department_list[] = [
                                             "department_id" => $dep['id'],
                                             "department_name" => $dep['department_name']
                                         ];
-                                
+
                                         // Mark as added
                                         $addedDepartments[] = $dep['id'];
                                     }
@@ -197,6 +239,9 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                             }
                         }
                     } else {
+
+
+
                         $product_id = $details->id;
 
                         $sql_getitems = "SELECT `cost` , `price` , `discount`, `name`, `description`, `sub_category_id` FROM `products` WHERE `id` = $product_id";
@@ -208,22 +253,30 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         $pro_name = mysqli_real_escape_string($conn, $Data['name']);
                         $pro_decs = mysqli_real_escape_string($conn, $Data['description']);
                         $pro_subcategory_id = mysqli_real_escape_string($conn, $Data['sub_category_id']);
-              
+
 
                         $quantity = $details->quantity;
                         $addons_array = $details->addons;
                         $types_array = $details->types;
                         $dressing_array = $details->dressing;
+                         $is_free = $details->is_free;
                         $additionalNotes = mysqli_real_escape_string($conn, $details->additionalNotes);
 
                         $add_oons = (json_encode(($addons_array)));
                         $addonarray = array();
+                        $addonsTotal = 0;
                         foreach ($addons_array as $ao) {
                             $as_id = $ao->as_id;
                             $sql_fetch_name = "SELECT `as_name` FROM `addon_sublist` WHERE `as_id` = $as_id";
                             mysqli_set_charset($conn, "utf8");
                             $r = mysqli_query($conn, $sql_fetch_name);
                             $data_addon = mysqli_fetch_array($r);
+                            
+                            $addonprice = (float)($ao->as_price ?? 0);
+                            $addonqty   = (int)($ao->quantity ?? 0);
+                            
+                            $addonsTotal += $addonprice * $addonqty;
+                            
                             $temp = [
                                 "as_id" => $ao->as_id,
                                 "as_name" =>  trim($data_addon['as_name']),
@@ -241,127 +294,143 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
 
 
 
-                        $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`, `product_description`,`additional_notes`, `qty` ,`addons`,`types`, `dressing` , `cost` , `price` , `discount_percent`)
-                                VALUES ('$last_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$quantity','$add_oon','$tyy_pes','$dress_ing' , '$cost' , '$price' , '$discount' )";
+                        
+                        $additional_discount = 0;
+                    
+                        if (!empty($wallet_balance) && $order_total_price > 0) {
+            
+                            $quantity = $details->quantity;
+                            
+                            $product_total_price = ($price * $quantity  - ($discount/100 * ($price * $quantity)))+ $addonsTotal;
+                            
+                                 
+                           
+                            $totalinitial = ($order_total_price + $wallet_balance) - $Shipping_cost;
+                            $ratio = $product_total_price / $totalinitial;
+                            $additional_discount = round(($wallet_balance * $ratio), 2);
+                        }  
+
+                        $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`, `product_description`,`additional_notes`, `qty` ,`addons`,`types`, `dressing` , `cost` , `price` , `discount_percent`,`additional_discount`,`is_free`)
+                                VALUES ('$last_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$quantity','$add_oon','$tyy_pes','$dress_ing' , '$cost' , '$price' , '$discount', '$additional_discount', '$is_free' )";
                         $exec_sql_deal = mysqli_query($conn, $sql_deal);
-                        
-                        
-                           // Fetch departments for this product
-    
+
+
+                        // Fetch departments for this product
+
                         $sql_department = "SELECT id, department_name FROM departments WHERE JSON_CONTAINS(sub_category_ids, $pro_subcategory_id )";
                         $res_dep = mysqli_query($conn, $sql_department);
-                        
-              
-                             if ($res_dep && mysqli_num_rows($res_dep) > 0) {
-                                    while ($dep = mysqli_fetch_assoc($res_dep)) {
-                                
-                                        // Skip if this department_id already exists
-                                        if (in_array($dep['id'], $addedDepartments)) {
-                                            continue;
-                                        }
-                                
-                                        // Add the record
-                                        $department_list[] = [
-                                            "department_id" => $dep['id'],
-                                            "department_name" => $dep['department_name']
-                                        ];
-                                
-                                        // Mark as added
-                                        $addedDepartments[] = $dep['id'];
-                                    }
+
+
+                        if ($res_dep && mysqli_num_rows($res_dep) > 0) {
+                            while ($dep = mysqli_fetch_assoc($res_dep)) {
+
+                                // Skip if this department_id already exists
+                                if (in_array($dep['id'], $addedDepartments)) {
+                                    continue;
+                                }
+
+                                // Add the record
+                                $department_list[] = [
+                                    "department_id" => $dep['id'],
+                                    "department_name" => $dep['department_name']
+                                ];
+
+                                // Mark as added
+                                $addedDepartments[] = $dep['id'];
                             }
-                    }       
+                        }
+                    }
                 }
 
 
                 if ($exec_sql_deal) {
-                   // Send notification to user (already done)
-                        $data_array = array();
-                        $order_info = array();
-                        
-                        // $data = ["status" => true, "Response_code" => 200, "Message" => "Order has been placed.", "Order_id" => $last_id];
-                        
-                        $sql_msg = "SELECT `id`, `message_key`, `message_en`, `message_de` FROM `messages` WHERE `message_key` = 'order_success'";
-                        $exec_sql_msg = mysqli_query($conn, $sql_msg);
-                        $data = mysqli_fetch_array($exec_sql_msg);
-                        
-                        // Replace placeholders like {{id}} with actual values
-                        $replacements = [
-                            '{{order_id}}' => $last_id
-                        ];
-                        
-                        $message_en = str_replace(array_keys($replacements), array_values($replacements), $data['message_en']);
-                        $message_de = str_replace(array_keys($replacements), array_values($replacements), $data['message_de']);
-                        
-                        
-                        $data = ["status" => true,"Response_code" => 200,"message_en" => $message_en, "message_de" => $message_de];
-                        
-                        
-                        array_push($data_array, $data);
-                        echo json_encode($data_array);
-                        
-                        // Insert into notifications table
-                        $insert_noti_details = "INSERT INTO `notification`( `user_id`, `content`, `purpose`) VALUES ('$user_id','Ihre Bestellung wurde erfolgreich aufgegeben','order')";
-                        mysqli_query($conn, $insert_noti_details);
-                        
-                        // Fetch user notification token
-                        $sqltaskMembers = "SELECT orders.id , users.name, users.notification_token FROM `orders_zee` AS orders INNER JOIN users AS users On users.id = orders.user_id WHERE orders.id = $last_id";
-                        $taskMembers = mysqli_query($conn, $sqltaskMembers);
-                        $playerId = [];
-                        $user_name = "";
-                        
-                        while ($row = mysqli_fetch_array($taskMembers)) {
-                            $order_id =  $row['id'];
-                            $user_name = $row['name'];
-                            if (!empty($row['notification_token'])) {
-                                $playerId[] = $row['notification_token'];
-                            }
+                    // Send notification to user (already done)
+                    $data_array = array();
+                    $order_info = array();
+
+                    // $data = ["status" => true, "Response_code" => 200, "Message" => "Order has been placed.", "Order_id" => $last_id];
+
+                    $sql_msg = "SELECT `id`, `message_key`, `message_en`, `message_de` FROM `messages` WHERE `message_key` = 'order_success'";
+                    $exec_sql_msg = mysqli_query($conn, $sql_msg);
+                    $data = mysqli_fetch_array($exec_sql_msg);
+
+                    // Replace placeholders like {{id}} with actual values
+                    $replacements = [
+                        '{{order_id}}' => $last_id
+                    ];
+
+                    $message_en = str_replace(array_keys($replacements), array_values($replacements), $data['message_en']);
+                    $message_de = str_replace(array_keys($replacements), array_values($replacements), $data['message_de']);
+
+
+                    $data = ["status" => true, "Response_code" => 200, "message_en" => $message_en, "message_de" => $message_de];
+
+
+                    array_push($data_array, $data);
+                    echo json_encode($data_array);
+
+                    // Insert into notifications table
+                    $insert_noti_details = "INSERT INTO `notification`( `user_id`, `content`, `purpose`) VALUES ('$user_id','Ihre Bestellung wurde erfolgreich aufgegeben','order')";
+                    mysqli_query($conn, $insert_noti_details);
+
+                    // Fetch user notification token
+                    $sqltaskMembers = "SELECT orders.id , users.name, users.notification_token FROM `orders_zee` AS orders INNER JOIN users AS users On users.id = orders.user_id WHERE orders.id = $last_id";
+                    $taskMembers = mysqli_query($conn, $sqltaskMembers);
+                    $playerId = [];
+                    $user_name = "";
+
+                    while ($row = mysqli_fetch_array($taskMembers)) {
+                        $order_id =  $row['id'];
+                        $user_name = $row['name'];
+                        if (!empty($row['notification_token'])) {
+                            $playerId[] = $row['notification_token'];
                         }
-                        
-                        // ✅ Fetch admin notification tokens
-                        $adminTokens = [];
-                        $select_admin_sql = "SELECT `notification_token` FROM `users` WHERE `role_id` = '1'";
-                        $admin_result = mysqli_query($conn, $select_admin_sql);
-                        
-                        while ($admin_row = mysqli_fetch_assoc($admin_result)) {
-                            if (!empty($admin_row['notification_token'])) {
-                                $adminTokens[] = $admin_row['notification_token'];
-                            }
+                    }
+
+                    // ✅ Fetch admin notification tokens
+                    $adminTokens = [];
+                    $select_admin_sql = "SELECT `notification_token` FROM `users` WHERE `role_id` = '1'";
+                    $admin_result = mysqli_query($conn, $select_admin_sql);
+
+                    while ($admin_row = mysqli_fetch_assoc($admin_result)) {
+                        if (!empty($admin_row['notification_token'])) {
+                            $adminTokens[] = $admin_row['notification_token'];
                         }
-                        
-                        // ✅ Merge user and admin tokens
-                        $allRecipients = array_merge($playerId, $adminTokens);
-                        
-                        // ✅ Build OneSignal payload
-                        $content = array(
-                            "en" => 'Ihre Bestellnummer: ' . $last_id . ' im Wert von ' . ($order_total_price + $Shipping_cost) . '€ wurde erfolgreich aufgegeben und wird in den nächsten 45 bis 60 Minuten geliefert.'
-                        );
-                        
-                        $fields = array(
-                            'app_id' => $ONE_SIGNAL_APP_ID,
-                            'include_player_ids' => $allRecipients,
-                            'data' => array("foo" => "NewMassage", "Id" => $taskid),
-                            'large_icon' => "ic_launcher_round.png",
-                            'contents' => $content
-                        );
-                        
-                        $fields = json_encode($fields);
-                        
-                        // Send notification using cURL
-                        $ch = curl_init();
-                        curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
-                        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                            'Content-Type: application/json; charset=utf-8',
-                             "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
-                        ));
-                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-                        curl_setopt($ch, CURLOPT_HEADER, FALSE);
-                        curl_setopt($ch, CURLOPT_POST, TRUE);
-                        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-                        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-                        
-                        $response = curl_exec($ch);
-                        curl_close($ch);
+                    }
+
+                    // ✅ Merge user and admin tokens
+                    $allRecipients = array_merge($playerId, $adminTokens);
+
+                    // ✅ Build OneSignal payload
+                    $content = array(
+                        "en" => 'Ihre Bestellnummer: ' . $last_id . ' im Wert von ' . ($order_total_price + $Shipping_cost) . '€ wurde erfolgreich aufgegeben und wird in den nächsten 45 bis 60 Minuten geliefert.'
+                    );
+
+                    $fields = array(
+                        'app_id' => $ONE_SIGNAL_APP_ID,
+                        'include_player_ids' => $allRecipients,
+                        'data' => array("foo" => "NewMassage", "Id" => $taskid),
+                        'large_icon' => "ic_launcher_round.png",
+                        'contents' => $content
+                    );
+
+                    $fields = json_encode($fields);
+
+                    // Send notification using cURL
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                        'Content-Type: application/json; charset=utf-8',
+                        "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
+                    ));
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+                    curl_setopt($ch, CURLOPT_HEADER, FALSE);
+                    curl_setopt($ch, CURLOPT_POST, TRUE);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+
+                    $response = curl_exec($ch);
+                    curl_close($ch);
 
 
 
@@ -414,34 +483,34 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         // error_log("Pusher error: " . $e->getMessage());
                         echo "Error triggering notification: " . $e->getMessage();
                     }
-                    
-                    
-                    
-                    
-                    
-                    
-                                  // sending mail to resturant owner
-                
-                            $mail = new PHPMailer(true);
-        
-                            try {
-                                
-                                        $mail->isSMTP();
-                                        $mail->Host = 'smtp.gmail.com';  
-                                        $mail->SMTPAuth = true;
-                                        $mail->Username = $MAIL_USERNAME; 
-                                        $mail->Password = $MAIL_PASSWORD;
-                                        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;  
-                                        $mail->Port = 587;  
-                                
-                                        $mail->setFrom($FROM_EMAIL, $APP_NAME);
-                                        $mail->addAddress($ADMIN_EMAIL);
-                                
-                                        $mail->isHTML(true);
-                                        
-                                        $mail->Subject = "Neue Bestellung #{$last_id} – " . htmlspecialchars($APP_NAME);
-        
-                                        $mail->Body = '
+
+
+
+
+
+
+                    // sending mail to resturant owner
+
+                    $mail = new PHPMailer(true);
+
+                    try {
+
+                        $mail->isSMTP();
+                        $mail->Host = 'smtp.gmail.com';
+                        $mail->SMTPAuth = true;
+                        $mail->Username = $MAIL_USERNAME;
+                        $mail->Password = $MAIL_PASSWORD;
+                        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                        $mail->Port = 587;
+
+                        $mail->setFrom($FROM_EMAIL, $APP_NAME);
+                        $mail->addAddress($ADMIN_EMAIL);
+
+                        $mail->isHTML(true);
+
+                        $mail->Subject = "Neue Bestellung #{$last_id} – " . htmlspecialchars($APP_NAME);
+
+                        $mail->Body = '
                                         <html>
                                         <head>
                                             <title>Neue Bestellung erhalten</title>
@@ -496,14 +565,14 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                                     <p><strong>Bestellnummer:</strong> ' . $last_id . '</p>
                                                     <p><strong>Kunde:</strong> ' . htmlspecialchars($user_name) . '</p>
                                                     <p><strong>Adresse:</strong> ' . htmlspecialchars($address) . '</p>
-                                                    <p><strong>Gesamtpreis:</strong> €' . number_format(($order_total_price + $Shipping_cost), 2) . '</p>
+                                                    <p><strong>Gesamtpreis:</strong> €' . number_format(($order_total_price), 2) . '</p>
                                                     <p><strong>Versandkosten:</strong> €' . number_format($Shipping_cost, 2) . '</p>
                                                     <p><strong>Zahlungsart:</strong> ' . htmlspecialchars($payment_type) . '</p>
                                                     <p><strong>Zusätzliche Hinweise:</strong> ' . htmlspecialchars($additionalNotes) . '</p>
                                                     <p><strong>Bestelldatum:</strong> ' . htmlspecialchars($datetime) . '</p>
                                         
                                                 <a class="view-button" href="' . $BASE_URL . 'admin_panel/order_details.php?order_id=' . $last_id
- . '" target="_blank">
+                            . '" target="_blank">
                                                     Bestellung anzeigen
                                                 </a>
                                                 
@@ -568,24 +637,23 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
 
                 // $transaction_message = "Abzug von €$wallet_balance vom Guthaben";
                 //  $english_message = "Deduction of €$wallet_balance from the balance.";
-                
+
                 $sql_msg = "SELECT `id`, `message_key`, `message_en`, `message_de` FROM `messages` WHERE `message_key` = 'deduct_wallet_balance'";
                 $exec_sql_msg = mysqli_query($conn, $sql_msg);
                 $data = mysqli_fetch_array($exec_sql_msg);
-                                    
+
                 $replacements = [
                     '{{wallet_balance}}' => $wallet_balance
                 ];
-                                    
+
                 $message_en = str_replace(array_keys($replacements), array_values($replacements), $data['message_en']);
                 $message_de = str_replace(array_keys($replacements), array_values($replacements), $data['message_de']);
-                                    
-            
+
+
                 $rand_id  = rand(000000, 10000000);
-                
+
                 $sql = "INSERT INTO `tbl_transaction`(`user_id`, `transaction_id`, `amount`, `type`, `message`, `english_message`) VALUES ('$user_id', '$rand_id','$wallet_balance','debit','$message_de', '$message_en')";
                 $ex_sql = mysqli_query($conn, $sql);
-                
             } else {
                 // If amount column is not found
                 $response = [
@@ -615,7 +683,47 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
             $no_of_deal = 1;
             $department_list = [];
             $addedDepartments = []; // track added department IDs
-            
+
+
+
+            $total_products_price = 0;
+
+            foreach ($order_datails as $details) {
+
+                // -------- NORMAL PRODUCT --------
+                if ($details->is_deal !== "yes") {
+
+                    $pro_id = $details->id;
+                    $qty    = $details->quantity;
+
+                    $sql = "SELECT price FROM products WHERE id = $pro_id";
+                    $res = mysqli_query($conn, $sql);
+                    $row = mysqli_fetch_assoc($res);
+
+                    $total_products_price += ($row['price'] * $qty);
+                }
+
+                // -------- DEAL (ITEM PRODUCTS) --------
+                if ($details->is_deal === "yes") {
+
+                    foreach ($details->deal_items as $dealItem) {
+
+                        foreach ($dealItem->items_products as $product) {
+
+                            $prod_id = $product->prod_id;
+                            $qty     = $details->quantity ?? 1;
+
+                            $sql = "SELECT price FROM products WHERE id = $prod_id";
+                            $res = mysqli_query($conn, $sql);
+                            $row = mysqli_fetch_assoc($res);
+
+                            $total_products_price += ($row['price'] * $qty);
+                        }
+                    }
+                }
+            }
+
+
             foreach ($order_datails as $details) {
 
                 $deal_id =  $details->deal_id;
@@ -623,8 +731,48 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                 $deal_items_array = $details->deal_items;
                 $additionalNotes = mysqli_real_escape_string($conn, $details->additionalNotes);
                 
+                
+
+
                 $no_of_deal++;
                 if ($isDeal == "yes") {
+                    
+                    $sql_getitems = "SELECT `deal_cost`, `deal_price` FROM `deals` WHERE `deal_id` = $deal_id";
+                    $ex_get_items = mysqli_query($conn, $sql_getitems);
+                    $Data = mysqli_fetch_array($ex_get_items);
+                    $cost = $Data['deal_cost'];
+                    $price = $Data['deal_price'];
+                    $discount = 0;
+                    
+                    
+                     $additional_discount = 0;
+                                
+                      if (!empty($wallet_balance) && $order_total_price > 0) {
+        
+                        $product_total_price = $price;
+                        foreach ($deal_items_array as $dealItem) {
+                             $items_products = $dealItem->items_products;
+                                foreach ($items_products as $itemsOfProducts) {
+                                    $addons_array = $itemsOfProducts->addons;
+                                     foreach ($addons_array as $addons) {
+                                            $addonprice = isset($addons->as_price) ? (float)$addons->as_price : 0;
+                                            $addonqty   = isset($addons->quantity) ? (int)$addons->quantity : 0;
+                    
+                                            $product_total_price += ($addonprice * $qty);
+                                        }
+                  
+                                 }
+               
+                          }
+                       
+                        $totalinitial = ($order_total_price + $wallet_balance) - $Shipping_cost;
+                        $ratio = $product_total_price / $totalinitial;
+                        $additional_discount = round(($wallet_balance * $ratio), 2);
+                    }  
+                    
+                    
+                    
+                    $additional_discount_inserted = 0;
                     foreach ($deal_items_array as $itemsOfDeals) {
                         $item_id = $itemsOfDeals->item_id;
                         $items_products = $itemsOfDeals->items_products;
@@ -633,14 +781,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                             $addons_array = $itemsOfProducts->addons;
                             $types_array = $itemsOfProducts->types;
                             $dressing_array = $itemsOfProducts->dressing;
-
-                            $sql_getitems = "SELECT `deal_cost`, `deal_price` FROM `deals` WHERE `deal_id` = $deal_id";
-                            $ex_get_items = mysqli_query($conn, $sql_getitems);
-                            $Data = mysqli_fetch_array($ex_get_items);
-                            $cost = $Data['deal_cost'];
-                            $price = $Data['deal_price'];
-                            $discount = 0;
-
+                            $is_free = $itemsOfProducts->is_free;
 
 
                             $tyy_pes = mysqli_real_escape_string($conn, json_encode($types_array, JSON_UNESCAPED_UNICODE));
@@ -653,37 +794,50 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                             $product = mysqli_fetch_array($ex_get_pro);
                             $pro_name = mysqli_real_escape_string($conn, $product['name']);
                             $pro_decs = mysqli_real_escape_string($conn, $product['description']);
-              
+                            $pro_price = mysqli_real_escape_string($conn, $product['price']);
+                            $pro_discount = 0;
+                            
+                            
+                            //adding this to not add value in DB multiple times to make the calcuation easy for reporting.
+                            if($additional_discount_inserted === 1){
+                              $additional_discount = 0;
+                              $price = 0;
+                              $cost = 0;
+                            }
 
+                           
+                            $additional_discount_inserted = 1;
+                        
+                     
                             //print_r($tyy_pes); 
-                            $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`,`product_description`,`additional_notes`, `addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`)
-                                                  VALUES ('$last_id','$deal_id','$item_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$add_oon','$tyy_pes','$dress_ing' , $cost , $price , $discount  , $no_of_deal, '$datetime')";
+                            $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`,`product_description`,`additional_notes`, `addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`,`additional_discount`,`is_free` )
+                                                  VALUES ('$last_id','$deal_id','$item_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$add_oon','$tyy_pes','$dress_ing' , '$cost', '$price', '$pro_discount','$no_of_deal', '$datetime', '$additional_discount', '$is_free')";
                             $exec_sql_deal = mysqli_query($conn, $sql_deal);
-                            
-                            
-                               // Fetch departments for this product
-                                $sub_category_id = intval($product['sub_category_id']);
-                                           $sql_department = "SELECT id, department_name FROM departments WHERE JSON_CONTAINS(sub_category_ids, $sub_category_id )";
-                                $res_dep = mysqli_query($conn, $sql_department);
-                                
-                              
-                                  if ($res_dep && mysqli_num_rows($res_dep) > 0) {
-                                    while ($dep = mysqli_fetch_assoc($res_dep)) {
-                                
-                                        // Skip if this department_id already exists
-                                        if (in_array($dep['id'], $addedDepartments)) {
-                                            continue;
-                                        }
-                                
-                                        // Add the record
-                                        $department_list[] = [
-                                            "department_id" => $dep['id'],
-                                            "department_name" => $dep['department_name']
-                                        ];
-                                
-                                        // Mark as added
-                                        $addedDepartments[] = $dep['id'];
+
+
+                            // Fetch departments for this product
+                            $sub_category_id = intval($product['sub_category_id']);
+                            $sql_department = "SELECT id, department_name FROM departments WHERE JSON_CONTAINS(sub_category_ids, $sub_category_id )";
+                            $res_dep = mysqli_query($conn, $sql_department);
+
+
+                            if ($res_dep && mysqli_num_rows($res_dep) > 0) {
+                                while ($dep = mysqli_fetch_assoc($res_dep)) {
+
+                                    // Skip if this department_id already exists
+                                    if (in_array($dep['id'], $addedDepartments)) {
+                                        continue;
                                     }
+
+                                    // Add the record
+                                    $department_list[] = [
+                                        "department_id" => $dep['id'],
+                                        "department_name" => $dep['department_name']
+                                    ];
+
+                                    // Mark as added
+                                    $addedDepartments[] = $dep['id'];
+                                }
                             }
                         }
                     }
@@ -698,23 +852,33 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     $discount = $Data['discount'];
                     $pro_name = mysqli_real_escape_string($conn, $Data['name']);
                     $pro_decs = mysqli_real_escape_string($conn, $Data['description']);
-                     $pro_subcategory_id = mysqli_real_escape_string($conn, $Data['sub_category_id']);
-              
+                    $pro_subcategory_id = mysqli_real_escape_string($conn, $Data['sub_category_id']);
+
 
                     $quantity = $details->quantity;
                     $addons_array = $details->addons;
                     $types_array = $details->types;
                     $dressing_array = $details->dressing;
                     $additionalNotes = mysqli_real_escape_string($conn, $details->additionalNotes);
+                    $is_free = $details->is_free;
 
                     $add_oons = (json_encode(($addons_array)));
                     $addonarray = array();
+                    $addonsTotal = 0;
                     foreach ($addons_array as $ao) {
                         $as_id = $ao->as_id;
                         $sql_fetch_name = "SELECT `as_name` FROM `addon_sublist` WHERE `as_id` = $as_id";
                         mysqli_set_charset($conn, "utf8");
                         $r = mysqli_query($conn, $sql_fetch_name);
                         $data_addon = mysqli_fetch_array($r);
+                        
+                         $addonprice = (float)($ao->as_price ?? 0);
+                        $addonqty   = (int)($ao->quantity ?? 0);
+                            
+                        $addonsTotal += $addonprice * $addonqty;
+                        
+                        
+                        
                         $temp = [
                             "as_id" => $ao->as_id,
                             "as_name" =>  trim($data_addon['as_name']),
@@ -730,130 +894,145 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     $dress_ing = mysqli_real_escape_string($conn, json_encode($dressing_array, JSON_UNESCAPED_UNICODE));
                     $add_oon = mysqli_real_escape_string($conn, json_encode($addonarray, JSON_UNESCAPED_UNICODE));
 
+                    $additional_discount = 0;
 
+                   
+                    
+                    if (!empty($wallet_balance) && $order_total_price > 0) {
+        
+                        $quantity = $details->quantity;
+                        
+                        $product_total_price = ($price * $quantity  - ($discount/100 * ($price * $quantity)))+ $addonsTotal;
+                        
+                             
+                       
+                        $totalinitial = ($order_total_price + $wallet_balance) - $Shipping_cost;
+                        $ratio = $product_total_price / $totalinitial;
+                        $additional_discount = round(($wallet_balance * $ratio), 2);
+                    }  
 
-                    $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`, `product_description`,`additional_notes`, `qty` ,`addons`,`types`, `dressing` , `cost` , `price` , `discount_percent`)
-                                VALUES ('$last_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$quantity','$add_oon','$tyy_pes','$dress_ing' , '$cost' , '$price' , '$discount' )";
+                    $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`, `product_description`,`additional_notes`, `qty` ,`addons`,`types`, `dressing` , `cost` , `price` , `discount_percent`, `additional_discount`, `is_free`)
+                                VALUES ('$last_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$quantity','$add_oon','$tyy_pes','$dress_ing' , '$cost' , '$price' , '$discount', '$additional_discount','$is_free' )";
                     $exec_sql_deal = mysqli_query($conn, $sql_deal);
-                    
-                    
+
+
                     $sql_department = "SELECT id, department_name FROM departments WHERE JSON_CONTAINS(sub_category_ids, $pro_subcategory_id )";
-                        $res_dep = mysqli_query($conn, $sql_department);
-              
-                       if ($res_dep && mysqli_num_rows($res_dep) > 0) {
-                                    while ($dep = mysqli_fetch_assoc($res_dep)) {
-                                
-                                        // Skip if this department_id already exists
-                                        if (in_array($dep['id'], $addedDepartments)) {
-                                            continue;
-                                        }
-                                
-                                        // Add the record
-                                        $department_list[] = [
-                                            "department_id" => $dep['id'],
-                                            "department_name" => $dep['department_name']
-                                        ];
-                                
-                                        // Mark as added
-                                        $addedDepartments[] = $dep['id'];
-                                    }
+                    $res_dep = mysqli_query($conn, $sql_department);
+
+                    if ($res_dep && mysqli_num_rows($res_dep) > 0) {
+                        while ($dep = mysqli_fetch_assoc($res_dep)) {
+
+                            // Skip if this department_id already exists
+                            if (in_array($dep['id'], $addedDepartments)) {
+                                continue;
                             }
+
+                            // Add the record
+                            $department_list[] = [
+                                "department_id" => $dep['id'],
+                                "department_name" => $dep['department_name']
+                            ];
+
+                            // Mark as added
+                            $addedDepartments[] = $dep['id'];
+                        }
+                    }
                 }
             }
 
 
             if ($exec_sql_deal) {
-                
-                
-                    $data_array = array();
-                    $order_info = array();
-                    // $data = ["status" => true, "Response_code" => 200, "Message" => "Order has been placed.", "Order_id" => $last_id];
-                    
-                    $sql_msg = "SELECT `id`, `message_key`, `message_en`, `message_de` FROM `messages` WHERE `message_key` = 'order_success'";
-                    $exec_sql_msg = mysqli_query($conn, $sql_msg);
-                    $data = mysqli_fetch_array($exec_sql_msg);
-                        
-                        // Replace placeholders like {{id}} with actual values
-                    $replacements = [
-                        '{{order_id}}' => $last_id
-                    ];
-                        
-                    $message_en = str_replace(array_keys($replacements), array_values($replacements), $data['message_en']);
-                    $message_de = str_replace(array_keys($replacements), array_values($replacements), $data['message_de']);
-                        
-                        
-                    $data = ["status" => true,"Response_code" => 200,"message_en" => $message_en, "message_de" => $message_de];
-                        
-                    
-                    
-                    
-                    
-                    
-                    array_push($data_array, $data);
-                    echo json_encode($data_array);
-                    
-                    // Insert into notifications table
-                    $insert_noti_details = "INSERT INTO `notification`( `user_id`, `content`, `purpose`) VALUES ('$user_id','Ihre Bestellung wurde erfolgreich aufgegeben','order')";
-                    mysqli_query($conn, $insert_noti_details);
-                    
-                    // Fetch user notification token
-                    $sqltaskMembers = "SELECT orders.id , users.name, users.notification_token FROM `orders_zee` AS orders INNER JOIN users AS users On users.id = orders.user_id WHERE orders.id = $last_id";
-                    $taskMembers = mysqli_query($conn, $sqltaskMembers);
-                    $playerId = [];
-                    $user_name = "";
-                    
-                    while ($row = mysqli_fetch_array($taskMembers)) {
-                        $order_id =  $row['id'];
-                        $user_name = $row['name'];
-                        if (!empty($row['notification_token'])) {
-                            $playerId[] = $row['notification_token'];
-                        }
+
+
+                $data_array = array();
+                $order_info = array();
+                // $data = ["status" => true, "Response_code" => 200, "Message" => "Order has been placed.", "Order_id" => $last_id];
+
+                $sql_msg = "SELECT `id`, `message_key`, `message_en`, `message_de` FROM `messages` WHERE `message_key` = 'order_success'";
+                $exec_sql_msg = mysqli_query($conn, $sql_msg);
+                $data = mysqli_fetch_array($exec_sql_msg);
+
+                // Replace placeholders like {{id}} with actual values
+                $replacements = [
+                    '{{order_id}}' => $last_id
+                ];
+
+                $message_en = str_replace(array_keys($replacements), array_values($replacements), $data['message_en']);
+                $message_de = str_replace(array_keys($replacements), array_values($replacements), $data['message_de']);
+
+
+                $data = ["status" => true, "Response_code" => 200, "message_en" => $message_en, "message_de" => $message_de];
+
+
+
+
+
+
+                array_push($data_array, $data);
+                echo json_encode($data_array);
+
+                // Insert into notifications table
+                $insert_noti_details = "INSERT INTO `notification`( `user_id`, `content`, `purpose`) VALUES ('$user_id','Ihre Bestellung wurde erfolgreich aufgegeben','order')";
+                mysqli_query($conn, $insert_noti_details);
+
+                // Fetch user notification token
+                $sqltaskMembers = "SELECT orders.id , users.name, users.notification_token FROM `orders_zee` AS orders INNER JOIN users AS users On users.id = orders.user_id WHERE orders.id = $last_id";
+                $taskMembers = mysqli_query($conn, $sqltaskMembers);
+                $playerId = [];
+                $user_name = "";
+
+                while ($row = mysqli_fetch_array($taskMembers)) {
+                    $order_id =  $row['id'];
+                    $user_name = $row['name'];
+                    if (!empty($row['notification_token'])) {
+                        $playerId[] = $row['notification_token'];
                     }
-                    
-                    // ✅ Fetch admin notification tokens
-                    $adminTokens = [];
-                    $select_admin_sql = "SELECT `notification_token` FROM `users` WHERE `role_id` = '1' AND `notification_token` IS NOT NULL";
-                    $admin_result = mysqli_query($conn, $select_admin_sql);
-                    
-                    while ($admin_row = mysqli_fetch_assoc($admin_result)) {
-                        if (!empty($admin_row['notification_token'])) {
-                            $adminTokens[] = $admin_row['notification_token'];
-                        }
+                }
+
+                // ✅ Fetch admin notification tokens
+                $adminTokens = [];
+                $select_admin_sql = "SELECT `notification_token` FROM `users` WHERE `role_id` = '1' AND `notification_token` IS NOT NULL";
+                $admin_result = mysqli_query($conn, $select_admin_sql);
+
+                while ($admin_row = mysqli_fetch_assoc($admin_result)) {
+                    if (!empty($admin_row['notification_token'])) {
+                        $adminTokens[] = $admin_row['notification_token'];
                     }
-                    
-                    // ✅ Merge user and admin tokens
-                    $allRecipients = array_merge($playerId, $adminTokens);
-                    
-                    // ✅ Build OneSignal payload
-                    $content = array(
-                        "en" => 'Ihre Bestellnummer: ' . $last_id . ' im Wert von ' . ($order_total_price + $Shipping_cost) . '€ wurde erfolgreich aufgegeben und wird in den nächsten 45 bis 60 Minuten geliefert.'
-                    );
-                    
-                    $fields = array(
-                        'app_id' => $ONE_SIGNAL_APP_ID,
-                        'include_player_ids' => $allRecipients,
-                        'data' => array("foo" => "NewMassage", "Id" => $taskid),
-                        'large_icon' => "ic_launcher_round.png",
-                        'contents' => $content
-                    );
-                    
-                    $fields = json_encode($fields);
-                    
-                    // Send notification using cURL
-                    $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                        'Content-Type: application/json; charset=utf-8',
-                         "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
-                    ));
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-                    curl_setopt($ch, CURLOPT_HEADER, FALSE);
-                    curl_setopt($ch, CURLOPT_POST, TRUE);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-                    
-                    $response = curl_exec($ch);
-                    curl_close($ch);
+                }
+
+                // ✅ Merge user and admin tokens
+                $allRecipients = array_merge($playerId, $adminTokens);
+
+                // ✅ Build OneSignal payload
+                $content = array(
+                    "en" => 'Ihre Bestellnummer: ' . $last_id . ' im Wert von ' . ($order_total_price + $Shipping_cost) . '€ wurde erfolgreich aufgegeben und wird in den nächsten 45 bis 60 Minuten geliefert.'
+                );
+
+                $fields = array(
+                    'app_id' => $ONE_SIGNAL_APP_ID,
+                    'include_player_ids' => $allRecipients,
+                    'data' => array("foo" => "NewMassage", "Id" => $taskid),
+                    'large_icon' => "ic_launcher_round.png",
+                    'contents' => $content
+                );
+
+                $fields = json_encode($fields);
+
+                // Send notification using cURL
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                    'Content-Type: application/json; charset=utf-8',
+                    "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
+                ));
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+                curl_setopt($ch, CURLOPT_HEADER, FALSE);
+                curl_setopt($ch, CURLOPT_POST, TRUE);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+
+                $response = curl_exec($ch);
+                curl_close($ch);
 
 
 
@@ -906,33 +1085,33 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     // error_log("Pusher error: " . $e->getMessage());
                     echo "Error triggering notification: " . $e->getMessage();
                 }
-                
-                
-                
-                
-                
-                                  // sending mail to resturant owner
-                
-                            $mail = new PHPMailer(true);
-        
-                            try {
-                                
-                                        $mail->isSMTP();
-                                        $mail->Host = 'smtp.gmail.com';  
-                                        $mail->SMTPAuth = true;
-                                        $mail->Username = $MAIL_USERNAME; 
-                                        $mail->Password = $MAIL_PASSWORD;
-                                        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;  
-                                        $mail->Port = 587;  
-                                
-                                        $mail->setFrom($FROM_EMAIL, $APP_NAME);
-                                        $mail->addAddress($ADMIN_EMAIL);
-                                
-                                        $mail->isHTML(true);
-                                        
-                                      $mail->Subject = "Neue Bestellung #{$last_id} – " . htmlspecialchars($APP_NAME);
-        
-                                        $mail->Body = '
+
+
+
+
+
+                // sending mail to resturant owner
+
+                $mail = new PHPMailer(true);
+
+                try {
+
+                    $mail->isSMTP();
+                    $mail->Host = 'smtp.gmail.com';
+                    $mail->SMTPAuth = true;
+                    $mail->Username = $MAIL_USERNAME;
+                    $mail->Password = $MAIL_PASSWORD;
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                    $mail->Port = 587;
+
+                    $mail->setFrom($FROM_EMAIL, $APP_NAME);
+                    $mail->addAddress($ADMIN_EMAIL);
+
+                    $mail->isHTML(true);
+
+                    $mail->Subject = "Neue Bestellung #{$last_id} – " . htmlspecialchars($APP_NAME);
+
+                    $mail->Body = '
                                         <html>
                                         <head>
                                             <title>Neue Bestellung erhalten</title>

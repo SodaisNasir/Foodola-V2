@@ -3,6 +3,8 @@
 // ini_set('display_errors', 1);
 include_once('connection.php');
 
+include_once('phpfiles/function.php');
+
 date_default_timezone_set('Europe/Berlin');
 $order_id = intval($_GET['order_id']); // Sanitize input
 $minutes_to_add = 0;
@@ -36,13 +38,13 @@ function getOrderData($conn, $order_id)
                            o.Shipping_address, o.Shipping_state , o.Shipping_address_2, o.Shipping_city, o.Shipping_area, o.Shipping_postal_code,
                            od.id AS order_detail_id, o.total_discount, o.order_type, o.payment_method, o.ordersheduletype,
                            o.sheduletime, od.order_id, od.deal_id, od.deal_item_id, od.product_id, od.qty, od.addons, od.types,
-                           od.dressing, od.additional_notes, p.name, p.description, p.img, od.price, od.cost, od.discount_percent, o.created_at, o.total_netto_tax, o.total_metto_tax
+                           od.dressing, od.additional_notes,od.is_free, p.name, p.description, p.img, od.price, od.cost, od.discount_percent, o.created_at, o.total_netto_tax, o.total_metto_tax
                            FROM `orders_zee` o
                            INNER JOIN `order_details_zee` od ON od.order_id = o.id
                            INNER JOIN `products` p ON p.id = od.product_id
                            WHERE o.id = " . $order_id . " AND od.deal_id = 0";
 
-  $base_sql_deals = "SELECT od.no_of_deal, od.qty, od.cost, od.price, od.additional_notes, de.deal_name, o.order_total_price, o.payment_type, o.Shipping_Cost, o.Shipping_address, o.Shipping_address_2,
+  $base_sql_deals = "SELECT od.no_of_deal, od.qty, od.cost, od.price, od.additional_notes,od.is_free, de.deal_name, o.order_total_price, o.payment_type, o.Shipping_Cost, o.Shipping_address, o.Shipping_address_2,
                           o.Shipping_city, o.Shipping_state , o.Shipping_area, o.Shipping_postal_code, o.total_discount, o.order_type,
                           o.payment_method, o.ordersheduletype, o.sheduletime, o.total_netto_tax, o.total_metto_tax
                           FROM `orders_zee` o
@@ -155,14 +157,24 @@ if ($row = mysqli_fetch_assoc($resultSettings)) {
     $currency_position = $currency['position'];
 }
 
-function formatCurrency($amount, $sign, $position = "left") {
-    $formatted = number_format($amount, 2);
-    if ($position === "left") {
-        return $sign . $formatted;
-    } else {
-        return $formatted . $sign;
-    }
-}
+// function formatCurrency($amount, $sign, $position = "left") {
+//     // $formatted = number_format($amount, 2);
+//     // if ($position === "left") {
+//     //     return $sign . $formatted;
+//     // } else {
+//     //     return $formatted . $sign;
+//     // }
+    
+//     $locale = $options['locale'] ?? 'de_DE';
+//     $currency = $options['currency'] ?? 'EUR';
+
+//     $formatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
+
+//     return $formatter->formatCurrency($amount, $currency);
+    
+    
+    
+// }
 
 
 
@@ -434,53 +446,49 @@ body {
     </div>    
 
  <div class="company-details">
-    <h3><?php echo $company_address; ?></h3>
-    <h3><?php echo $company_city . ', Tel: ' . $company_phone; ?></h3>
-    <h3>Bestellnummer: <?php echo $order_id; ?></h3>
+    <div><?php echo $company_address; ?></div>
+    <div><?php echo $company_city . ', Tel: ' . $company_phone; ?></div>
+    <div>Bestellnummer: <?php echo $order_id; ?></div>
 </div>
 
-
+    <div>--------------------------------------------------</div>
     <div class="order-info">
-    <h3><?php echo htmlspecialchars($datetime); ?></h3>
+    <div><?php echo htmlspecialchars($datetime); ?></div>
 
     <?php if (!empty($data['phone'])) : ?>
-        <h3>Telefon: <?php echo htmlspecialchars($data['phone']); ?></h3>
+        <div><?php echo htmlspecialchars($data['phone']); ?></div>
     <?php endif; ?>
 
     <?php if ($has_table_id): ?>
-        <h3>Tabellenname: <?php echo htmlspecialchars($table_name); ?></h3>
+        <div>Tabellenname: <?php echo htmlspecialchars($table_name); ?></div>
     <?php endif; ?>
 
-    <?php if (!empty($data['email'])): ?>
-        <h3>E-Mail: <?php echo htmlspecialchars($data['email']); ?></h3>
-    <?php endif; ?>
 
        <?php if (!empty($data['cxname'])): ?>
-        <h3>Name: <?php echo htmlspecialchars($data['cxname']); ?></h3>
+        <div><?php echo htmlspecialchars($data['cxname']); ?></div>
     <?php endif; ?>
 
 
     <?php if ($data['order_type'] == 'delivery'): ?>
        
-        <h3>Adresse: 
+        <div>Adresse: 
             <?php echo htmlspecialchars(
               
                
                  ($data['Shipping_address'] ?? '') . ' ' . 
                  ($data['Shipping_address_2'] ?? '') . ' ' . 
-                  ($data['Shipping_city'] ?? '') . ' ' .  
                 ($data['Shipping_postal_code'] ?? '') 
             
             
                   //bell name   Shipping_city
             ); ?>
-        </h3>
+        </div>
          
-        <h3>
+        <div>
         Klingeln name: <?= !empty($data['Shipping_area']) ? $data['Shipping_area'] : ($data['Shipping_city'] ?? '') ?>
-        </h3>
-
-        <h3><?php echo ("Zusatzinformation:".   ($data['Shipping_state'] ?? ''))?></h3>  
+        </div>
+    
+        <div><?php echo (($data['Shipping_state']  != ''? "Info: ".$data['Shipping_state']: ''))?></div>  
     <?php endif; ?>
    
     <?php if (!empty($data['addtional_notes'])): ?>
@@ -488,21 +496,26 @@ body {
     <?php endif; ?>
 
     <?php if (!empty($data['order_type'])): ?>
-        <h3>Auftragsart: 
-            <?php echo htmlspecialchars($data['order_type']); ?>
+        <div>Auftragsart: 
+            <?php echo $data['order_type'] === 'delivery' ? "Lieferung" : "Abholen"; ?>
             <?php if ( $data['ordersheduletype'] == 'orderlater'): ?>
                 @ <?php echo htmlspecialchars($data['sheduletime']); ?>
             <?php endif; ?>
-        </h3>
+        </div>
+        
+    <?php if($data['payment_type'] != ''){ ?>
+    <div >
+      Zahlungsmodus: <?php echo $data['payment_type'] === 'cash' ? "Cash" : 'Online' ?> </div>
+     <?php } ?>    
     <?php endif; ?>
 </div>
-
+    <div>--------------------------------------------------</div>
     <div class="order-details-header">
       <h1>Bestelldetails</h1>
     </div>
 
     <div class="item-details">
-        
+    
   <table style="width: 100%; border-collapse: collapse;">
     <thead>
       <tr>
@@ -520,13 +533,16 @@ body {
       if ($result && mysqli_num_rows($result) > 0) {
         mysqli_data_seek($result, 0);
         while ($value = mysqli_fetch_assoc($result)) {
-          $addons = json_decode($value['addons']);
-          $dressing = json_decode($value['dressing']);
-          $types = json_decode($value['types']);
-          $basePrice =  $value['price'] ;
-          $totalAmount += $basePrice * $value['qty'];
+        $addons   = json_decode($value['addons']);
+        $dressing = json_decode($value['dressing']);
+        $types    = json_decode($value['types']);
 
-          $addonforinner = 0;
+        $basePrice = $value['price'];
+        if ($value['is_free']) {
+            $basePrice = 0;
+        }
+        $totalAmount += $basePrice * $value['qty'];
+        $addonforinner = 0;
       ?>
           <tr>
             <td>x<?php echo htmlspecialchars($value['qty']); ?></td>
@@ -568,6 +584,8 @@ body {
               <?php
               $total_product_price = number_format(($basePrice + $addonforinner) * $value['qty'], 2, '.', '');
             //   echo htmlspecialchars($total_product_price);
+               
+                
             echo formatCurrency($total_product_price, $currency_sign, $currency_position);
               $finalTotal += $total_product_price;
               ?>
@@ -580,6 +598,9 @@ body {
       if ($result_deal && mysqli_num_rows($result_deal) > 0) {
         mysqli_data_seek($result_deal, 0);
         while ($value = mysqli_fetch_assoc($result_deal)) {
+            
+            
+            
       ?>
           <tr>
             <td>x<?php echo htmlspecialchars($value['qty']); ?></td>
@@ -590,14 +611,14 @@ body {
                   <?php
                   $no = $value['no_of_deal'];
                   $sql_sub = $has_table_id ?
-                    "SELECT o.id, od.deal_item_id, od.product_id, od.qty, od.addons, od.types, od.dressing, p.name, od.price, od.additional_notes, dl.di_num_free_items
+                    "SELECT o.id, od.deal_item_id, od.product_id, od.qty, od.addons, od.types, od.dressing,od.is_free, p.name, od.price, od.additional_notes, dl.di_num_free_items
                      FROM `orders_zee` o
                      INNER JOIN `order_details_zee` od ON od.order_id = o.id
                      INNER JOIN `products` p ON p.id = od.product_id
                      INNER JOIN deal_items dl ON dl.di_id = od.deal_item_id
                      WHERE o.id = $order_id AND od.deal_id > 0 AND od.no_of_deal = $no"
                     :
-                    "SELECT o.id, od.deal_item_id, od.product_id, od.qty, od.addons, od.types, od.dressing, od.additional_notes, p.name, od.price, dl.di_num_free_items
+                    "SELECT o.id, od.deal_item_id, od.product_id, od.qty, od.addons, od.types, od.dressing, od.additional_notes,od.is_free, p.name, od.price, dl.di_num_free_items
                      FROM `orders_zee` o
                      INNER JOIN `order_details_zee` od ON od.order_id = o.id
                      INNER JOIN `products` p ON p.id = od.product_id
@@ -709,6 +730,14 @@ if (!empty($reservation_id)) {
     $grand_total -= $reservation_fees; 
 }
 
+
+$shippingTax = $shipping - $shipping/1.19;
+$updated_tax_19 = $shippingTax + $tax_19 ;
+
+
+
+
+
 ?>
 
 
@@ -725,16 +754,16 @@ if (!empty($reservation_id)) {
   </li>
 <?php } ?>
 
+
+
     <li><span>MwSt. (7%):</span><span><?php echo formatCurrency($tax_7, $currency_sign, $currency_position); ?></span></li>
-    <li><span>MwSt. (19%):</span><span><?php echo formatCurrency($tax_19, $currency_sign, $currency_position); ?></span></li>
+    <li><span>MwSt. (19%):</span><span><?php echo formatCurrency($updated_tax_19, $currency_sign, $currency_position); ?></span></li>
     <li><span>Gesamt:</span><span><?php echo formatCurrency($grand_total, $currency_sign, $currency_position); ?></span></li>
   </ul>
 </div>
 
 
-
-    <div class="payment-method-info">
-      Zahlungsmethode: <?php echo htmlspecialchars($data['payment_type'] ?? 'N/A'); ?> </div>
+    
 
     <div class="footer-message">
       <p>Vielen Dank für Ihren Einkauf!</p>

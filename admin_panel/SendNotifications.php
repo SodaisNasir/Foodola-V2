@@ -180,7 +180,6 @@
         <tr>
             <th><input type="checkbox" id="select-all" /> Select All</th>
             <th>S no.</th>
-            <th>Customer Id</th>
             <th>Customer Name</th>
             <th>Phone</th>
             <th>Email</th>
@@ -190,7 +189,7 @@
     <tbody>
         <?php
         include_once('connection.php');
-        $sql="SELECT `id`, `role_id`, `name`, `phone`, `email`, `email_verified_at`, `password`, `notification_token`, `remember_token`, `rewards_token`, `created_at`, `updated_at` FROM `users` WHERE `role_id` = 3 && `notification_token` != 'null'";
+        $sql="SELECT u.id, u.role_id, u.name, u.phone, u.email, u.notification_token, MAX(o.created_at) AS last_order_date, SUM( CASE WHEN o.created_at >= NOW() - INTERVAL 30 DAY THEN o.order_total_price ELSE 0 END ) AS last_30_days_total FROM users u LEFT JOIN orders_zee o ON o.user_id = u.id WHERE u.role_id = 3 AND u.notification_token IS NOT NULL GROUP BY u.id; ";
         $result = mysqli_query($conn,$sql);
         $index = 0;
         while($row = mysqli_fetch_array($result)) {
@@ -198,7 +197,6 @@
             echo "<tr>";
             echo "<td><input type='checkbox' class='user-checkbox' name='checkbox[]' value='{$row['id']}' /></td>";
             echo "<td>{$sn}</td>";
-            echo "<td>{$row['id']}</td>";
             echo "<td>{$row['name']}</td>";
             echo "<td>{$row['phone']}</td>";
             echo "<td>{$row['email']}</td>";
@@ -212,7 +210,6 @@
         <tr>
             <th>Select All</th>
             <th>S no.</th>
-            <th>Customer Id</th>
             <th>Customer Name</th>
             <th>Phone</th>
             <th>Email</th>

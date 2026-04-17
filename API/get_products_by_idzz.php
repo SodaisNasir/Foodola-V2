@@ -134,6 +134,7 @@ $select_dressing_title = "SELECT `dressing_id`, `dressing_title`, `dressing_titl
                         "discount"=>$rows['discount'],
                         "qty"=>$rows['qty'],
                         "image"=>$rows['img'],
+                        "allergy_description" => $rows['allergy_description'],
                         "addons"=>$addon != null ? $addon : [],
                         "types"=>$type != null ? $type : [],
                         "dressing"=>$dressing != null ? $dressing : [],
