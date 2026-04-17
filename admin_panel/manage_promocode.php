@@ -182,6 +182,7 @@ if (isset($_GET['Massage'])) {
                           <th>Start Date</th>
                           <th>End Date</th>
                           <th>Eligible Date</th>
+                          <th>User Order Value</th>
                           <th>Status</th>
                           <th>Actions</th>
                         </tr>
@@ -205,13 +206,14 @@ if (isset($_GET['Massage'])) {
                           echo "<td>{$row['start_date']}</td>";
                           echo "<td>{$row['end_date']}</td>";
                           echo "<td>" . ($row['eligible_users_date'] ?? '-') . "</td>";
+                          echo "<td>{$row['user_order_value']}</td>";
                           echo "<td>{$row['status']}</td>";
 
 
 
                           echo "<td class='d-flex justify-content-around'>
                                         <i class='bi bi-pencil-square' style='cursor: pointer;' data-toggle='modal' data-target='#updateTableModal'  
-                                           onclick='openUpdateModal(\"{$row['id']}\", \"{$row['code']}\", \"{$row['value']}\", \"{$row['usage_limit']}\", \"{$row['used_count']}\", \"{$row['min_order']}\", \"{$row['start_date']}\", \"{$row['end_date']}\", \"{$row['status']}\", \"{$row['eligible_users_date']}\", \"{$row['start_date_order']}\", \"{$row['end_date_order']}\")'>
+                                           onclick='openUpdateModal(\"{$row['id']}\", \"{$row['code']}\", \"{$row['value']}\", \"{$row['usage_limit']}\", \"{$row['used_count']}\", \"{$row['min_order']}\", \"{$row['start_date']}\", \"{$row['end_date']}\", \"{$row['status']}\", \"{$row['eligible_users_date']}\", \"{$row['start_date_order']}\", \"{$row['end_date_order']}\", \"{$row['user_order_value']}\")'>
                                         </i>
 
                                         <form action='phpfiles/insertions.php' method='POST' onsubmit='return confirm(\"Are you sure you want to delete this promo code?\")'>
@@ -238,6 +240,7 @@ if (isset($_GET['Massage'])) {
                           <th>Start Date</th>
                           <th>End Date</th>
                           <th>Eligible Date</th>
+                          <th>User Order Value</th>
                           <th>Status</th>
                           <th>Actions</th>
                         </tr>
@@ -319,6 +322,13 @@ if (isset($_GET['Massage'])) {
                         <input type="number" class="form-control" id="minOrder" name="min_order" required>
                       </div>
                     </div>
+                    
+                    
+                    <div class="col-md-12">
+                        <div class="form-group">
+                        <label for="user_order_value">User Order Value</label>
+                        <input type="number" class="form-control" id="user_order_value" name="user_order_value" required>
+                    </div>
                       
                     </div>
                   </div>
@@ -338,6 +348,11 @@ if (isset($_GET['Massage'])) {
                   </div>
 
 
+
+                    
+                    
+                    
+                    </div>
                   <div class="form-group">
                     <label for="Status">Status</label>
                     <select class="form-control" id="Status" name="status" >
@@ -419,6 +434,15 @@ if (isset($_GET['Massage'])) {
                         <input type="number" class="form-control" id="minOrder" name="min_order">
                       </div>
                         </div>  
+                        
+                          <div class="col-md-12">
+                        <div class="form-group">
+                        <label for="user_order_value">User Order Value</label>
+                        <input type="number" class="form-control" id="user_order_value" name="user_order_value" required>
+                    </div>
+                    
+                    
+                </div>
                     </div>
                   </div>
 
@@ -435,7 +459,8 @@ if (isset($_GET['Massage'])) {
                       <input type="date" class="form-control" id="eligible_users_date" name="eligible_users_date">
                     </div>
                   </div>
-
+                   
+                    
              
 
                   <div class="form-group">
@@ -497,7 +522,7 @@ if (isset($_GET['Massage'])) {
   </script>
 
   <script>
-    function openUpdateModal(id, code, value, usage_limit, used_count, min_order, start_date, end_date, status, eligible_users_date, start_date_order, end_date_order) {
+    function openUpdateModal(id, code, value, usage_limit, used_count, min_order, start_date, end_date, status, eligible_users_date, start_date_order, end_date_order, user_order_value) {
       $('#id').val(id);
       $('#Code').val(code);
       $('#Value').val(value);
@@ -510,6 +535,7 @@ if (isset($_GET['Massage'])) {
       $('#eligible_users_date').val(eligible_users_date);
       $('#start_date_order').val(start_date_order);
       $('#end_date_order').val(end_date_order);
+      $('#user_order_value').val(user_order_value);
      
       
       

@@ -20,6 +20,11 @@ $type_id = mysqli_real_escape_string($conn, $_POST['type_id'] ?? '');
 $dressing_id = mysqli_real_escape_string($conn, $_POST['dressing_id'] ?? '');
 $sub_category_id = mysqli_real_escape_string($conn, $_POST['sub_category_id'] ?? '');
 $for_deal_only = mysqli_real_escape_string($conn, $_POST['for_deal_only'] ?? '');
+$allergy_desc = mysqli_real_escape_string($conn, $_POST['allergy_description'] ?? '');
+// $start_time = $_POST['start_time'];
+// $end_time = $_POST['end_time'];;
+$time_id = mysqli_real_escape_string($conn, $_POST['time_id'] ?? ''); 
+
 
 $image_path = '';
 
@@ -69,7 +74,11 @@ $sql = "UPDATE `products` SET
     `type_id`='$type_id',
     `dressing_id`='$dressing_id',
     `sub_category_id`='$sub_category_id',
-    `for_deal_only`='$for_deal_only'";
+    `for_deal_only`='$for_deal_only',
+    `allergy_description` = '$allergy_desc',
+    `time_id` = '$time_id'
+
+    ";
 
 
 if ($image_path !== '') {

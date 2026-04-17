@@ -180,6 +180,48 @@ if ($exc_user_usage) {
     }
 } 
 
+
+
+
+
+
+
+$order_total_query = "SELECT SUM(order_total_price) as total_spent FROM orders_zee WHERE user_id = '$user_id' AND status = 'delivered'";
+$order_total_result = mysqli_query($conn, $order_total_query);
+$order_total_row = mysqli_fetch_assoc($order_total_result);
+$total_spent = $order_total_row['total_spent'] ?? 0;
+
+// Check promo code minimum order value
+$min_order_value = $promo['user_order_value'] ?? 0; // replace with actual column name
+
+if ($min_order_value > 0 && $total_spent < $min_order_value) {
+
+    $sql_msg = "SELECT `id`, `message_key`, `message_en`, `message_de`
+                FROM `messages`
+                WHERE `message_key` = 'min_order_value_not_met'";
+    $exec_sql_msg = mysqli_query($conn, $sql_msg);
+    $data = mysqli_fetch_array($exec_sql_msg);
+    $replacements = [
+        '{{min_order_value}}' => number_format($min_order_value, 2),
+        '{{total_spent}}' => round($total_spent, 2)
+    ];
+
+    $message_en = str_replace(array_keys($replacements), array_values($replacements), $data['message_en']);
+    $message_de = str_replace(array_keys($replacements), array_values($replacements), $data['message_de']);
+
+    echo json_encode([
+        "status" => false,
+        "message_en" => $message_en,
+        "message_de" => $message_de
+    ]);
+
+    exit; 
+}
+
+
+
+
+
 // Update user's amount
 $update_sql = "UPDATE users SET amount = amount + $promo_value WHERE id = '$user_id'";
 

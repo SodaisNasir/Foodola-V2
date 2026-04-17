@@ -13,6 +13,8 @@
 
 // // // === Helper functions ===
 // function getLiefersoftToken() {
+    
+// include('connection.php');
 //     $login_payload = [
 //         "login" => $LIEFERSOFT_LOGIN,
 //         "password" => $LIEFERSOFT_PASSWORD,
@@ -462,5 +464,10 @@
 
 // }
 
-// // // Final response
-// echo json_encode(["status" => true,"updatedOrders" => $updatedOrders,"message" => count($updatedOrders) ? "Statuses updated, emails & notifications processed" : "No status changes"]);
+// echo json_encode([
+//     "status" => true,
+//     "updatedOrders" => $updatedOrders,
+//     "message" => (!empty($updatedOrders) && is_array($updatedOrders))
+//         ? "Statuses updated, emails & notifications processed"
+//         : "No status changes"
+// ]);

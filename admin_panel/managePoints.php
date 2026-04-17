@@ -2,7 +2,8 @@
 <!DOCTYPE html>
 
 <?php
-
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
   if(isset($_GET['Massage'])){
       if($_GET['Massage'] == 'Sucessfully updated amount.'){
          echo "<script>alert('Sucessfully updated amount.')</script>";
@@ -183,32 +184,57 @@
                                         <th>Phone</th>
                                         <th>Email</th>
                                         <th>Current Balance</th>
+                                        <th>Total Order Value</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                      <?php
-                                      include_once('connection.php');
-                                      $sql="SELECT `id`, `role_id`, `name`, `phone`, `email`, `email_verified_at`, `password`, `notification_token`, `remember_token`, `amount` ,  `rewards_token`, `created_at`, `updated_at` FROM `users` WHERE `role_id` = 3";
-                                      $result = mysqli_query($conn,$sql);
-                                      $index = 0;
-                                      while($row = mysqli_fetch_array($result)){
-                                          $sn = $index+1;
-                                          echo "<tr>";
-                                            echo "<td>{$sn}</td>";
-                                            echo "<td>{$row['id']}</td>";
-                                            echo "<td name='name'>{$row['name']}</td>";
-                                           
-                                            echo "<td name='phone'>{$row['phone']}</td>";
-                                            echo "<td name='email'>{$row['email']}</td>";
-                                            echo "<td name='rewards_token'>{$row['amount']}</td>";
-                                          echo "<td><button class='btn btn-primary' onclick='openAddMore({$row['id']},{$row['amount']})' >Update</button>
-                                             </td>";
-                                          echo "</tr>";
-                                          $index++;
-                                      }
-                                      
-                                      ?>
+                                     <?php
+include_once('connection.php');
+
+$sql = "
+SELECT 
+    u.id,
+    u.role_id,
+    u.name,
+    u.phone,
+    u.email,
+    u.amount,
+    IFNULL(SUM(CASE WHEN o.status = 'delivered' THEN o.order_total_price ELSE 0 END), 0) AS total_completed_orders
+FROM users u
+LEFT JOIN orders_zee o 
+    ON u.id = o.user_id
+WHERE u.role_id = 3
+GROUP BY u.id, u.role_id, u.name, u.phone, u.email, u.amount
+";
+
+$result = mysqli_query($conn, $sql);
+$index = 0;
+
+while($row = mysqli_fetch_assoc($result)){
+
+    $sn = $index + 1;
+
+    echo "<tr>";
+    echo "<td>{$sn}</td>";
+    echo "<td>{$row['id']}</td>";
+    echo "<td>{$row['name']}</td>";
+    echo "<td>{$row['phone']}</td>";
+    echo "<td>{$row['email']}</td>";
+    echo "<td>{$row['amount']}</td>";
+  echo "<td>" . round($row['total_completed_orders'], 2) . "</td>";
+
+    echo "<td>
+        <button class='btn btn-primary' 
+        onclick='openAddMore({$row['id']},{$row['amount']})'>
+        Update
+        </button>
+    </td>";
+    echo "</tr>";
+
+    $index++;
+}
+?>
                                     
                                 </tbody>
                                 <tfoot>
@@ -219,6 +245,7 @@
                                         <th>Phone</th>
                                         <th>Email</th>
                                         <th>Current Balance</th>
+                                        <th>Total Order Value</th>
                                         <th>Action</th>
                                     </tr>
                                 </tfoot>

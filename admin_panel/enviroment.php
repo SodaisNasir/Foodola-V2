@@ -240,7 +240,6 @@ $pixelMode  = isset($pixelMode) ? intval($pixelMode) : 0;
                     <h4 class="card-title">Manage API Keys</h4>
                 </div>
                 <div class="card-body">
-                    <!-- AUTH TOKEN FORM -->
       <!-- AUTH TOKEN FORM -->
 <form method="POST" class="mb-3">
   <label>Update Authentication Token</label>
@@ -271,11 +270,15 @@ $pixelMode  = isset($pixelMode) ? intval($pixelMode) : 0;
     <?php 
     $paypalKeys = ['paypal_client_key','paypal_secret_key','paypal_merchant_id'];
     $pixelKeys  = ['pixel_key','pixel_secret','pixel_mode'];
+    $stripeKeys = ['stripe_client_key','stripe_secret_key'];
+    $liefersoftKeys = ['liefersoft_company_key', 'liefersoft_login_key', 'liefersoft_password_key'];
 
     // ----------- OTHER KEYS -------------
     foreach ($apiKeys as $apiKey):
         if (in_array($apiKey['key_name'], $paypalKeys)) continue;
         if (in_array($apiKey['key_name'], $pixelKeys)) continue;
+        if (in_array($apiKey['key_name'], $stripeKeys)) continue;
+        if (in_array($apiKey['key_name'], $liefersoftKeys)) continue;
 
         $keyName = $apiKey['key_name'];
         $keyValue = $apiKey['key_value'];
@@ -291,8 +294,27 @@ $pixelMode  = isset($pixelMode) ? intval($pixelMode) : 0;
   </div>
 
 
+  <!-- ---------------- Stripe KEYS ---------------- -->
+  <h5 class="mb-2">Stripe</h5>
+  <div class="row">
+    <?php foreach ($apiKeys as $apiKey):
+      if (!in_array($apiKey['key_name'], $stripeKeys)) continue;
+      $keyName = $apiKey['key_name'];
+      $keyValue = $apiKey['key_value'];
+    ?>
+      <div class="col-md-6 mb-2">
+        <div class="form-group">
+          <label><?= ucwords(str_replace('_',' ', $keyName)) ?></label>
+          <input type="text" class="form-control" name="<?= htmlspecialchars($keyName) ?>" value="<?= htmlspecialchars($keyValue) ?>">
+        </div>
+      </div>
+    <?php endforeach; ?>
+  </div>
+
+
+
   <!-- ---------------- PAYPAL KEYS ---------------- -->
-  <h5 class="mt-3 mb-2">PayPal</h5>
+  <h5 class="mb-2">PayPal</h5>
   <div class="row">
     <?php foreach ($apiKeys as $apiKey):
       if (!in_array($apiKey['key_name'], $paypalKeys)) continue;
@@ -309,7 +331,7 @@ $pixelMode  = isset($pixelMode) ? intval($pixelMode) : 0;
   </div>
 
   <!-- PayPal Mode Toggle (AFTER PAYPAL KEYS) -->
-  <div class="mb-3 d-flex align-items-center">
+  <div class=" d-flex align-items-center">
     <label class="switch-toggle">
       <input type="checkbox" id="paypalMode" name="paypal_mode" value="1" <?= $paypalMode == 1 ? 'checked' : '' ?>>
       <span class="slider"></span>
@@ -320,7 +342,7 @@ $pixelMode  = isset($pixelMode) ? intval($pixelMode) : 0;
 
 
   <!-- ---------------- PIXEL KEYS ---------------- -->
-  <h5 class="mt-3 mb-2">Pixel</h5>
+  <h5 class=" mt-2 mb-2">Pixel</h5>
   <div class="row">
     <?php foreach ($apiKeys as $apiKey):
       if (!in_array($apiKey['key_name'], $pixelKeys)) continue;
@@ -345,6 +367,50 @@ $pixelMode  = isset($pixelMode) ? intval($pixelMode) : 0;
     </label>
     <span class="mode-label" id="pixelLabel"><?= $pixelMode == 1 ? 'Live Mode' : 'Test Mode' ?></span>
   </div>
+  
+  
+<!-- ---------------- LIEFERSOFT KEYS ---------------- -->
+<h5 class="mt-2 mb-2">Liefersoft</h5>
+
+<!-- Company ID Row -->
+<div class="row mb-2">
+    <div class="col-md-6">
+        <label>Company Id</label>
+        <input type="text" class="form-control" name="liefersoft_company_key" 
+               value="<?php
+                   $val = '';
+                   foreach ($apiKeys as $k) { if($k['key_name'] == 'liefersoft_company_key') { $val = $k['key_value']; break; } }
+                   echo htmlspecialchars($val);
+               ?>" 
+               placeholder="Enter Company Key">
+    </div>
+</div>
+
+<!-- Login & Password Row -->
+<div class="row mb-2">
+    <div class="col-md-6">
+        <label>Login</label>
+        <input type="text" class="form-control" name="liefersoft_login_key" 
+               value="<?php
+                   $val = '';
+                   foreach ($apiKeys as $k) { if($k['key_name'] == 'liefersoft_login_key') { $val = $k['key_value']; break; } }
+                   echo htmlspecialchars($val);
+               ?>" 
+               placeholder="Enter Login Key">
+    </div>
+
+    <div class="col-md-6">
+        <label>Password</label>
+        <input type="text" class="form-control" name="liefersoft_password_key" 
+               value="<?php
+                   $val = '';
+                   foreach ($apiKeys as $k) { if($k['key_name'] == 'liefersoft_password_key') { $val = $k['key_value']; break; } }
+                   echo htmlspecialchars($val);
+               ?>" 
+               placeholder="Enter Password Key">
+    </div>
+</div>
+
 
 
   <!-- Update button triggers OTP flow -->
