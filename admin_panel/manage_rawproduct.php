@@ -104,6 +104,7 @@ if (isset($_GET['Massage'])) {
                                                         <th>Unit</th>
                                                         <th>Sku</th>
                                                         <th>Stock</th>
+                                                        <th>Cost</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
@@ -126,6 +127,7 @@ if (isset($_GET['Massage'])) {
                                                             <td><?= $units['name'] ?></td>
                                                             <td><?= $row['sku'] ?></td>
                                                             <td><?= $row['current_stock'] ?></td>
+                                                            <td><?= $row['cost'] ?></td>
                                                             <td>
                                                                 <button
                                                                     class="btn btn-primary btn-edit  btn-sm"
@@ -208,8 +210,16 @@ if (isset($_GET['Massage'])) {
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Company Name</label>
-                                        <input type="text" name="company_name" class="form-control" required>
+                                        <label>Company</label>
+                                        <select name="vendor_id" class="form-control" required>
+                                            <?php
+                                            $sql_vendors = "SELECT * FROM vendors";
+                                            $exec_sql_vendor = mysqli_query($conn, $sql_vendors);
+                                            while ($vendor = mysqli_fetch_assoc($exec_sql_vendor)) {
+                                                echo "<option value='{$vendor['id']}'>{$vendor['company_name']}</option>";
+                                            }
+                                            ?>
+                                        </select>
                                     </div>
 
                                 </div>
@@ -354,6 +364,7 @@ if (isset($_GET['Massage'])) {
                                <thead>
                                   <tr>
                                      <th>#</th>
+                                     <th>Order no</th>
                                      <th>Raw Product</th>
                                      <th>Quantity</th>
                                      <th>Action</th>
@@ -421,9 +432,11 @@ if (isset($_GET['Massage'])) {
 
             const API_BASE_URL = "<?= $BASE_URL ?>";
 
-
+           
             /* ================= ADD  ================= */
             $('#addProductModal').on('submit', function(e) {
+                
+                 alert(API_BASE_URL)
                 e.preventDefault();
 
                 $.ajax({
@@ -433,7 +446,8 @@ if (isset($_GET['Massage'])) {
                         name: $(this).find('input[name="name"]').val(),
                         unit_id: $(this).find('select[name="unit_id"]').val(),
                         sku: $(this).find('input[name="sku"]').val(),
-                        current_stock: $(this).find('input[name="current_stock"]').val()
+                        current_stock: $(this).find('input[name="current_stock"]').val(),
+                        vendor_id: $(this).find('select[name="vendor_id"]').val(),
 
                     },
                     success: function() {
@@ -577,6 +591,7 @@ if (isset($_GET['Massage'])) {
                             html += `
                                 <tr>
                                     <td>${i++}</td>
+                                    <td>${log.order_id ?? '-'}</td>
                                     <td>${log.product ? log.product.name : '-'}</td>
                                     <td>${log.quantity}</td>
                                     <td><span class="badge ${badgeClass}">${displayText}</span></td>

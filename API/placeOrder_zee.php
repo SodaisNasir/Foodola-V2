@@ -5,6 +5,8 @@ require __DIR__ . '/vendor/autoload.php';
 require 'PHPMailer-master/src/PHPMailer.php';
 require 'PHPMailer-master/src/SMTP.php';
 require 'PHPMailer-master/src/Exception.php';
+include('../functions/stock.php');
+include('../functions/email_templates.php');
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -313,6 +315,13 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`, `product_description`,`additional_notes`, `qty` ,`addons`,`types`, `dressing` , `cost` , `price` , `discount_percent`,`additional_discount`,`is_free`)
                                 VALUES ('$last_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$quantity','$add_oon','$tyy_pes','$dress_ing' , '$cost' , '$price' , '$discount', '$additional_discount', '$is_free' )";
                         $exec_sql_deal = mysqli_query($conn, $sql_deal);
+                        
+                        
+                        
+                        
+                                     
+                                  // run deduct stock function
+                            deductStock($conn, $product_id, $quantity, $last_id);
 
 
                         // Fetch departments for this product
@@ -507,84 +516,13 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         $mail->addAddress($ADMIN_EMAIL);
 
                         $mail->isHTML(true);
+                        
+                        
 
-                        $mail->Subject = "Neue Bestellung #{$last_id} – " . htmlspecialchars($APP_NAME);
-
-                        $mail->Body = '
-                                        <html>
-                                        <head>
-                                            <title>Neue Bestellung erhalten</title>
-                                            <style>
-                                                body {
-                                                    font-family: Arial, sans-serif;
-                                                    background-color: #f4f4f4;
-                                                    padding: 20px;
-                                                }
-                                                .email-container {
-                                                    background-color: #ffffff;
-                                                    padding: 20px;
-                                                    border-radius: 8px;
-                                                    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-                                                }
-                                                .header {
-                                                    text-align: center;
-                                                    margin-bottom: 20px;
-                                                }
-                                                .order-details {
-                                                    font-size: 16px;
-                                                    line-height: 1.5;
-                                                }
-                                                .order-details strong {
-                                                    color: #333;
-                                                }
-                                                .view-button {
-                                                    display: inline-block;
-                                                    margin-top: 20px;
-                                                    background-color: #F2AF34;
-                                                    color: #fff;
-                                                    padding: 12px 20px;
-                                                    text-decoration: none;
-                                                    border-radius: 6px;
-                                                    font-weight: bold;
-                                                }
-                                                .footer {
-                                                    margin-top: 30px;
-                                                    font-size: 14px;
-                                                    color: #777;
-                                                    text-align: center;
-                                                }
-                                            </style>
-                                        </head>
-                                        <body>
-                                            <div class="email-container">
-                                             <div class="header">
-                                                <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="' . htmlspecialchars($APP_NAME) . '" style="width: 100px;">
-                                                <h2>Neue Bestellung erhalten</h2>
-                                            </div>
-                                                <div class="order-details">
-                                                    <p><strong>Bestellnummer:</strong> ' . $last_id . '</p>
-                                                    <p><strong>Kunde:</strong> ' . htmlspecialchars($user_name) . '</p>
-                                                    <p><strong>Adresse:</strong> ' . htmlspecialchars($address) . '</p>
-                                                    <p><strong>Gesamtpreis:</strong> €' . number_format(($order_total_price), 2) . '</p>
-                                                    <p><strong>Versandkosten:</strong> €' . number_format($Shipping_cost, 2) . '</p>
-                                                    <p><strong>Zahlungsart:</strong> ' . htmlspecialchars($payment_type) . '</p>
-                                                    <p><strong>Zusätzliche Hinweise:</strong> ' . htmlspecialchars($additionalNotes) . '</p>
-                                                    <p><strong>Bestelldatum:</strong> ' . htmlspecialchars($datetime) . '</p>
-                                        
-                                                <a class="view-button" href="' . $BASE_URL . 'admin_panel/order_details.php?order_id=' . $last_id
-                            . '" target="_blank">
-                                                    Bestellung anzeigen
-                                                </a>
-                                                
-                                                </div>
-                                                <div class="footer">
-                                             <p>Diese E-Mail wurde automatisch von ' . htmlspecialchars($APP_NAME) . ' generiert.</p>
-                                                </div>
-                                            </div>
-                                        </body>
-                                        </html>';
-
-
+                        $mail->Subject = "New Order Received #{$last_id} – " . htmlspecialchars($APP_NAME);
+                        
+                    $total_amount= $order_total_price - $Shipping_cost;
+                    $mail->Body = newOrderEmailTemplate($APP_NAME,$BASE_URL,$last_id,$user_name,$address,$total_amount,$Shipping_cost,$payment_type,$additionalNotes,$datetime,$LANG);
 
                         $mail->send();
                     } catch (Exception $e) {
@@ -914,6 +852,11 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`, `product_description`,`additional_notes`, `qty` ,`addons`,`types`, `dressing` , `cost` , `price` , `discount_percent`, `additional_discount`, `is_free`)
                                 VALUES ('$last_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$quantity','$add_oon','$tyy_pes','$dress_ing' , '$cost' , '$price' , '$discount', '$additional_discount','$is_free' )";
                     $exec_sql_deal = mysqli_query($conn, $sql_deal);
+                    
+                
+                    
+                                // run deduct stock function
+                            deductStock($conn, $product_id, $quantity,$last_id);
 
 
                     $sql_department = "SELECT id, department_name FROM departments WHERE JSON_CONTAINS(sub_category_ids, $pro_subcategory_id )";
@@ -1108,85 +1051,9 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     $mail->addAddress($ADMIN_EMAIL);
 
                     $mail->isHTML(true);
-
-                    $mail->Subject = "Neue Bestellung #{$last_id} – " . htmlspecialchars($APP_NAME);
-
-                    $mail->Body = '
-                                        <html>
-                                        <head>
-                                            <title>Neue Bestellung erhalten</title>
-                                            <style>
-                                                body {
-                                                    font-family: Arial, sans-serif;
-                                                    background-color: #f4f4f4;
-                                                    padding: 20px;
-                                                }
-                                                .email-container {
-                                                    background-color: #ffffff;
-                                                    padding: 20px;
-                                                    border-radius: 8px;
-                                                    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-                                                }
-                                                .header {
-                                                    text-align: center;
-                                                    margin-bottom: 20px;
-                                                }
-                                                .order-details {
-                                                    font-size: 16px;
-                                                    line-height: 1.5;
-                                                }
-                                                .order-details strong {
-                                                    color: #333;
-                                                }
-                                                .view-button {
-                                                    display: inline-block;
-                                                    margin-top: 20px;
-                                                    background-color: #F2AF34;
-                                                    color: #fff;
-                                                    padding: 12px 20px;
-                                                    text-decoration: none;
-                                                    border-radius: 6px;
-                                                    font-weight: bold;
-                                                }
-                                                .footer {
-                                                    margin-top: 30px;
-                                                    font-size: 14px;
-                                                    color: #777;
-                                                    text-align: center;
-                                                }
-                                            </style>
-                                        </head>
-                                        <body>
-                                            <div class="email-container">
-                                            
-                                                <div class="header">
-                                                    <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="' . htmlspecialchars($APP_NAME) . '" style="width: 100px;">
-                                                    <h2>Neue Bestellung erhalten</h2>
-                                                </div>
-                                                
-                                                <div class="order-details">
-                                                    <p><strong>Bestellnummer:</strong> ' . $last_id . '</p>
-                                                    <p><strong>Kunde:</strong> ' . htmlspecialchars($user_name) . '</p>
-                                                    <p><strong>Adresse:</strong> ' . htmlspecialchars($address) . '</p>
-                                                    <p><strong>Gesamtpreis:</strong> €' . number_format(($order_total_price + $Shipping_cost), 2) . '</p>
-                                                    <p><strong>Versandkosten:</strong> €' . number_format($Shipping_cost, 2) . '</p>
-                                                    <p><strong>Zahlungsart:</strong> ' . htmlspecialchars($payment_type) . '</p>
-                                                    <p><strong>Zusätzliche Hinweise:</strong> ' . htmlspecialchars($additionalNotes) . '</p>
-                                                    <p><strong>Bestelldatum:</strong> ' . htmlspecialchars($datetime) . '</p>
-                                        
-                                                    <a class="view-button" href="' . $BASE_URL . 'admin_panel/order_details.php?order_id=' . $last_id . '" target="_blank">
-                                                        Bestellung anzeigen
-                                                    </a>
-                                                </div>
-                                                <div class="footer">
-                                                     <p>Diese E-Mail wurde automatisch von ' . htmlspecialchars($APP_NAME) . ' generiert.</p>
-                                                </div>
-                                            </div>
-                                        </body>
-                                        </html>';
-
-
-
+                    $mail->Subject = "New Order Received #{$last_id} – " . htmlspecialchars($APP_NAME);
+                    $total_amount= $order_total_price - $Shipping_cost;
+                    $mail->Body = newOrderEmailTemplate($APP_NAME,$BASE_URL,$last_id,$user_name,$address,$total_amount,$Shipping_cost,$payment_type,$additionalNotes,$datetime,$LANG);
                     $mail->send();
                 } catch (Exception $e) {
                     $data = [

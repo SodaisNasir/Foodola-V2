@@ -17,6 +17,8 @@ header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Access-Control-Allow-Credentials: true");
 include('../connection.php');
+include('../../functions/stock.php');
+include('../../functions/email_templates.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
   http_response_code(200);
@@ -54,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $order_type = $_POST['order_type'];
   $total_discount = $_POST['total_discount'];
   $wallet_balance = $_POST['wallet_balance'];
+  $additional_pos_discount = $_POST['additional_pos_discount'];
   $payment_method = $_POST['payment_method'];
   $transaction_id = $_POST['transaction_id'];
   $platform = $_POST['platform'];
@@ -67,8 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $datetime = date('Y-m-d H:i:s', time());
 
   if ($tbl_id) {
-    $sql_order = "INSERT INTO `orders_zee`(`table_id`,`reservation_id`, `status`, `payment_type`, `order_total_price`, `payment_status`, `branch_id`, `total_netto_tax`,`total_metto_tax`, `order_type`, `platform` ) 
-                  VALUES ('$tbl_id', '$reservation_id', '$order_status', '$payment_type', '$total_amount', '$paymentstatus', '$branch_id', '$total_netto_tax', '$total_metto_tax', '$order_type', '$platform')";
+    $sql_order = "INSERT INTO `orders_zee`(`table_id`,`reservation_id`, `status`, `payment_type`, `order_total_price`, `payment_status`, `branch_id`, `total_netto_tax`,`total_metto_tax`, `order_type`, `platform` , `total_discount`) 
+                  VALUES ('$tbl_id', '$reservation_id', '$order_status', '$payment_type', '$total_amount', '$paymentstatus', '$branch_id', '$total_netto_tax', '$total_metto_tax', '$order_type', '$platform', '$total_discount')";
     $result_order = mysqli_query($conn, $sql_order);
 
     if ($result_order) {
@@ -81,10 +84,36 @@ $department_list = [];
         if ($details['is_deal'] == "yes") {
           $deal_id = $details['deal_id'];
           $deal_qty = $details['deal_qty'];
+           $deal_cost = $details['deal_price'];
           $notes = mysqli_real_escape_string($conn, $details['additionalNotes']);
           $no_of_deal++;
-
-          foreach ($details['deal_items'] as $deal_item) {
+          
+          
+          $dealArray = $details['deal_items'];
+          $additional_discount = 0;
+          
+          
+          if (!empty($additional_pos_discount) && $total_amount > 0) {
+                
+                $product_total_price = $deal_cost * $deal_qty;
+                foreach ($dealArray as $deal_item) {
+                    foreach ($deal_item['items_products'] as $product) {
+                        foreach ($product['addons'] as $addon) {
+                            $addon_price = isset($addon['as_price']) ? (float)$addon['as_price'] : 0;
+                            $addon_qty   = isset($addon['quantity']) ? (int)$addon['quantity'] : 1;
+                            $product_total_price += ($addon_price* $addon_qty);
+                        }
+                    }
+                }
+               
+                $totalinitial = ($total_amount + $additional_pos_discount) - $shipping_cost;
+                $ratio = $product_total_price / $totalinitial;
+                $additional_discount = round(($additional_pos_discount * $ratio), 2);
+            }  
+          
+          
+          $additional_discount_inserted = 0;
+          foreach ($dealArray as $deal_item) {
             $item_id = $deal_item['item_id'];
 
             foreach ($deal_item['items_products'] as $product) {
@@ -107,10 +136,17 @@ $department_list = [];
                 $product = mysqli_fetch_array($ex_get_pro);
                 $pro_name = $product['name'];
                 $pro_decs = $product['description'];
-
-                $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`, `product_name`,`product_description`,  `qty`, `cost`, `price`, `addons`, `types`, `dressing`, `no_of_deal`, `additional_notes`)VALUES ('$last_order_id', '$deal_id', '$item_id', '$product_id', '$pro_name','$pro_decs', '$deal_qty', '$cost', '$price', '$addons', '$types', '$dressing', '$no_of_deal', '$notes')";
-                $execute_details_insert = mysqli_query($conn, $order_details_insert);
+                $pro_discount = $product['discount'];
                 
+                 if($additional_discount_inserted === 1){
+                  $additional_discount = 0;
+                  $price = 0;
+                  $cost = 0;
+                }
+
+                $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`, `product_name`,`product_description`,  `qty`, `cost`, `price`, `addons`, `types`, `dressing`, `no_of_deal`, `additional_notes`, `discount_percent` , `additional_discount`)VALUES ('$last_order_id', '$deal_id', '$item_id', '$product_id', '$pro_name','$pro_decs', '$deal_qty', '$cost', '$price', '$addons', '$types', '$dressing', '$no_of_deal', '$notes', '$pro_discount' , '$additional_discount')";
+                $execute_details_insert = mysqli_query($conn, $order_details_insert);
+                $additional_discount_inserted = 1;
                 
                    // Fetch departments for this product
                     $sub_category_id = intval($product['sub_category_id']);
@@ -170,9 +206,32 @@ $department_list = [];
             $product = mysqli_fetch_array($ex_get_pro);
             $pro_name = $product['name'];
             $pro_decs = $product['description'];
+            $pro_discount = $product['discount'];
+            
+            
+            $additional_discount = 0;
+            if (!empty($additional_pos_discount) && $total_amount > 0) {
+            
+                $product_total_price = $price * $details['qty']  - ($pro_discount/100 * ($price * $details['qty']));
+                
+              
+                foreach ($details['addons'] as $addon) {
+                    $addon_price = isset($addon['as_price']) ? (float)$addon['as_price'] : 0;
+                    $addon_qty   = isset($addon['quantity']) ? (int)$addon['quantity'] : 1;
+                    $product_total_price += ($addon_price* $addon_qty);
+                }
 
-            $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`, `product_description` ,`qty`, `cost`, `price`, `addons`, `types`, `dressing`, `additional_notes`) 
-                                             VALUES ('$last_order_id', '$product_id', '$pro_name','$pro_decs','$product_qty', '$cost', '$price', '$product_addons', '$product_types', '$product_dressing', '$notes')";
+                $totalinitial = ($total_amount + $additional_pos_discount) - $shipping_cost;
+                $ratio = $product_total_price / $totalinitial;
+            
+                $additional_discount = round(($additional_pos_discount * $ratio), 2);
+            }
+            
+            
+            
+
+            $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`, `product_description` ,`qty`, `cost`, `price`, `addons`, `types`, `dressing`, `additional_notes`, `discount_percent` ,  `additional_discount`) 
+                                             VALUES ('$last_order_id', '$product_id', '$pro_name','$pro_decs','$product_qty', '$cost', '$price', '$product_addons', '$product_types', '$product_dressing', '$notes', '$pro_discount' , '$additional_discount')";
             $execute_details_insert = mysqli_query($conn, $order_details_insert);
             
             
@@ -322,7 +381,7 @@ $department_list = [];
       echo json_encode(array("statusCode" => 201, "message" => "User already exists"));
     } else {
       // Insert new user
-      $sql_insert_user = "INSERT INTO `users`(`role_id`, `name`, `phone`, `email`, `password`, `street`, `postal_code`, `city`, `house_no`) 
+      echo $sql_insert_user = "INSERT INTO `users`(`role_id`, `name`, `phone`, `email`, `password`, `street`, `postal_code`, `city`, `house_no`) 
                             VALUES (3, '$name', '$phone', null, '$password', '$street', '$Shipping_postal_code', '$Shipping_city', '$House_number')";
       $result_user = mysqli_query($conn, $sql_insert_user);
 
@@ -400,15 +459,41 @@ $department_list = [];
           $no_of_deal = 1;
           $department_list = [];
           $addedDepartments = []; // track added department IDs
-
+            $total_products_price = 0;
+          
+            foreach ($order_details as $details){
+               $total_products_price += ($details['price'] * $details['qty']);
+               
+                    foreach ($details['deal_items'] as $item) {
+                        
+                        foreach ($item['items_products'] as $i){
+                            
+                            if (!empty($i['addons'])) {
+    
+                                foreach ($i['addons'] as $addon) {
+    
+                                    $addon_price = isset($addon['as_price']) ? (float)$addon['as_price'] : 0;
+                                    $addon_qty   = isset($addon['quantity']) ? (int)$addon['quantity'] : 1;
+    
+                                     $total_products_price += ($addon_price* $addon_qty* $details['qty']);
+                                }
+                            }
+                        }
+                        
+                    }
+            } 
+              
           foreach ($order_details as $details) {
             if ($details['is_deal'] == "yes") {
               $deal_id = $details['deal_id'];
               $deal_qty = $details['deal_qty'];
               $notes = mysqli_real_escape_string($conn, $details['additionalNotes']);
               $no_of_deal++;
+              
+              $dealArray = $details['deal_items'];
+              $lengthOfDeal = count($dealArray);
 
-              foreach ($details['deal_items'] as $deal_item) {
+              foreach ($dealArray as $deal_item) {
                 $item_id = $deal_item['item_id'];
 
                 foreach ($deal_item['items_products'] as $product) {
@@ -416,6 +501,8 @@ $department_list = [];
                   $addons = mysqli_real_escape_string($conn, json_encode($product['addons'], JSON_UNESCAPED_UNICODE));
                   $types = mysqli_real_escape_string($conn, json_encode($product['types'], JSON_UNESCAPED_UNICODE));
                   $dressing = mysqli_real_escape_string($conn, json_encode($product['dressing'], JSON_UNESCAPED_UNICODE));
+                   $is_free = $product['is_free'];
+                  
 
                   $sql_getitems = "SELECT `deal_cost`, `deal_price` FROM `deals` WHERE `deal_id` = $deal_id";
                   $execute_get_products = mysqli_query($conn, $sql_getitems);
@@ -430,10 +517,30 @@ $department_list = [];
                     $product = mysqli_fetch_array($ex_get_pro);
                     $pro_name = $product['name'];
                     $pro_decs = $product['description'];
+                    $pro_discount = $product['discount'];
+                    
+                    
+                    
+                    $additional_discount = 0;
 
-                    $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`, `product_description`, `qty`, `cost`, `price`, `addons`, `types`, `dressing`, `no_of_deal`, `additional_notes`) 
-                                                             VALUES ('$last_order_id', '$deal_id', '$item_id', '$product_id', '$pro_name', '$pro_decs', '$deal_qty', '$cost', '$price', '$addons', '$types', '$dressing', '$no_of_deal', '$notes')";
+                    if ($wallet_balance > 0 && $total_products_price > 0) {
+                        
+                        $product_total_price = $price * $details['qty'];
+                        $ratio = $product_total_price / $total_products_price;
+                        $additional_discount = round(($wallet_balance * $ratio)/$lengthOfDeal, 2);
+                        
+                    }else if($additional_pos_discount > 0 && $total_products_price > 0){
+                        $product_total_price = $price * $details['qty'];
+                        $ratio = $product_total_price / $total_products_price;
+                        $additional_discount = round(($additional_pos_discount * $ratio)/$lengthOfDeal, 2);
+                    }
+                      
+
+                    $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`, `product_description`, `qty`, `cost`, `price`, `addons`, `types`, `dressing`, `no_of_deal`, `additional_notes`, `discount_percent`, `additional_discount`,`is_free`) 
+                                                             VALUES ('$last_order_id', '$deal_id', '$item_id', '$product_id', '$pro_name', '$pro_decs', '$deal_qty', '$cost', '$price', '$addons', '$types', '$dressing', '$no_of_deal', '$notes', '$pro_discount', '$additional_discount', '$is_free')";
                     $execute_details_insert = mysqli_query($conn, $order_details_insert);
+                    
+                   
                     
                     
                        // Fetch departments for this product
@@ -473,11 +580,14 @@ $department_list = [];
             } else {
               $product_id = $details['id'];
               $product_qty = $details['qty'];
+              
+               
 
               $product_addons = mysqli_real_escape_string($conn, json_encode($details['addons'], JSON_UNESCAPED_UNICODE));
               $product_types = mysqli_real_escape_string($conn, json_encode($details['types'], JSON_UNESCAPED_UNICODE));
               $product_dressing = mysqli_real_escape_string($conn, json_encode($details['dressing'], JSON_UNESCAPED_UNICODE));
               $notes = mysqli_real_escape_string($conn, $details['additionalNotes']);
+               $is_free = $details['is_free'];
 
               $get_product_details = "SELECT `id`, `cost`, `price` FROM `products` WHERE `id`= $product_id";
               $execute_get_products = mysqli_query($conn, $get_product_details);
@@ -492,12 +602,29 @@ $department_list = [];
                 $product = mysqli_fetch_array($ex_get_pro);
                 $pro_name = $product['name'];
                 $pro_decs = $product['description'];
+                $pro_discount = $product['discount'];
+                
+                
+                $additional_discount = 0;
 
-                $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`,`product_description`, `qty`, `cost`, `price`, `addons`, `types`, `dressing`, `additional_notes`) 
-                                                     VALUES ('$last_order_id', '$product_id', '$pro_name','$pro_decs', '$product_qty', '$cost', '$price', '$product_addons', '$product_types', '$product_dressing', '$notes')";
+                    if ($wallet_balance > 0 && $total_products_price > 0) {
+                        
+                        $product_total_price = $price * $details['qty'];
+                        $ratio = $product_total_price / $total_products_price;
+                        $additional_discount = round($wallet_balance * $ratio, 2);
+                    }else if($additional_pos_discount > 0 && $total_products_price > 0){
+                        $product_total_price = $price * $details['qty'];
+                        $ratio = $product_total_price / $total_products_price;
+                        $additional_discount = round(($additional_pos_discount * $ratio)/$lengthOfDeal, 2);
+                    }
+                      
+
+                $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`,`product_description`, `qty`, `cost`, `price`, `addons`, `types`, `dressing`, `additional_notes`, `discount_percent`,`additional_discount`,`is_free`) 
+                                                     VALUES ('$last_order_id', '$product_id', '$pro_name','$pro_decs', '$product_qty', '$cost', '$price', '$product_addons', '$product_types', '$product_dressing', '$notes', '$pro_discount', '$additional_discount', '$is_free')";
                 $execute_details_insert = mysqli_query($conn, $order_details_insert);
                 
-                
+                     // run deduct stock function
+                         deductStock($conn, $product_id, $product_qty, $last_order_id);
      
                     // Fetch departments for this product
                     $sub_category_id = intval($product['sub_category_id']);
@@ -703,84 +830,10 @@ $department_list = [];
 
             $mail->setFrom($FROM_EMAIL, $APP_NAME);
             $mail->addAddress($ADMIN_EMAIL);
-
             $mail->isHTML(true);
-
-            $mail->Subject = "Neue Bestellung #{$last_order_id} – " . htmlspecialchars($APP_NAME);
-
-            $mail->Body = '
-                                <html>
-                                <head>
-                                    <title>Neue Bestellung erhalten</title>
-                                    <style>
-                                        body {
-                                            font-family: Arial, sans-serif;
-                                            background-color: #f4f4f4;
-                                            padding: 20px;
-                                        }
-                                        .email-container {
-                                            background-color: #ffffff;
-                                            padding: 20px;
-                                            border-radius: 8px;
-                                            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-                                        }
-                                        .header {
-                                            text-align: center;
-                                            margin-bottom: 20px;
-                                        }
-                                        .order-details {
-                                            font-size: 16px;
-                                            line-height: 1.5;
-                                        }
-                                        .order-details strong {
-                                            color: #333;
-                                        }
-                                        .view-button {
-                                            display: inline-block;
-                                            margin-top: 20px;
-                                            background-color: #F2AF34;
-                                            color: #fff;
-                                            padding: 12px 20px;
-                                            text-decoration: none;
-                                            border-radius: 6px;
-                                            font-weight: bold;
-                                        }
-                                        .footer {
-                                            margin-top: 30px;
-                                            font-size: 14px;
-                                            color: #777;
-                                            text-align: center;
-                                        }
-                                    </style>
-                                </head>
-                                <body>
-                                    <div class="email-container">
-                                        <div class="header">
-                                           <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="' . htmlspecialchars($APP_NAME) . '" style="width: 100px;">
-                                            <h2>Neue Bestellung erhalten</h2>
-                                        </div>
-                                        <div class="order-details">
-                                            <p><strong>Bestellnummer:</strong> ' . $last_order_id . '</p>
-                                            <p><strong>Kunde:</strong> ' . htmlspecialchars($user['name']) . '</p>
-                                            <p><strong>Adresse:</strong> ' . htmlspecialchars($address) . '</p>
-                                            <p><strong>Gesamtpreis:</strong> €' . number_format(($total_amount + $shipping_cost), 2) . '</p>
-                                            <p><strong>Versandkosten:</strong> €' . number_format($shipping_cost, 2) . '</p>
-                                            <p><strong>Zahlungsart:</strong> ' . htmlspecialchars($payment_type) . '</p>
-                                            <p><strong>Zusätzliche Hinweise:</strong> ' . htmlspecialchars($additionalNotes) . '</p>
-                                            <p><strong>Bestelldatum:</strong> ' . htmlspecialchars($datetime) . '</p>
-                                
-                                            <a class="view-button" href="' . $BASE_URL . 'admin_panel/order_details.php?order_id=' . $last_order_id . '" target="_blank">
-                                                    Bestellung anzeigen
-                                            </a>
-                                        </div>
-                                        <div class="footer">
-                                            <p>Diese E-Mail wurde automatisch ' . htmlspecialchars($APP_NAME) . ' generiert.</p>
-                                        </div>
-                                    </div>
-                                </body>
-                                </html>';
-
-
+            $mail->Subject = "New Order #{$last_order_id} – " . htmlspecialchars($APP_NAME);
+            $user_name = $user['name'];
+            $mail->Body = newOrderEmailTemplate($APP_NAME,$BASE_URL,$last_order_id,$user_name,$address,$total_amount,$shipping_cost,$payment_type,$additionalNotes,$datetime,$LANG);
             $mail->send();
           } catch (Exception $e) {
             // $data = [
@@ -885,7 +938,7 @@ $department_list = [];
     }
 
 
-    $sql = "INSERT INTO `orders_zee`(`user_id`, `status`, `payment_type`, `order_total_price`, 
+     $sql = "INSERT INTO `orders_zee`(`user_id`, `status`, `payment_type`, `order_total_price`, 
                     `payment_status`, `Shipping_address`, `Shipping_address_2`, 
                     `Shipping_city`, `Shipping_postal_code`, `Shipping_Cost`,`branch_id`, `addtional_notes`, `total_netto_tax`, `total_metto_tax`, `order_type`, `total_discount`, `payment_method`, `transaction_id`, `platform`, `ordersheduletype`, `sheduletime`, `created_at`) 
             VALUES ($user_id, '$order_status', '$payment_type', '$total_amount', 
@@ -900,20 +953,77 @@ $department_list = [];
       $no_of_deal = 1;
       $department_list = [];
       $addedDepartments = []; // track added department IDs
+      
+      
+      
+     
+      
+      
       foreach ($order_details as $details) {
         if ($details['is_deal'] == "yes") {
           $deal_id = $details['deal_id'];
           $deal_qty = $details['deal_qty'];
+          $deal_cost = $details['deal_cost'];
           $notes = mysqli_real_escape_string($conn, $details['additionalNotes']);
           $no_of_deal++;
-          foreach ($details['deal_items'] as $deal_item) {
+          
+         $dealArray = $details['deal_items'];
+         $lengthOfDeal = count($dealArray);
+         
+         
+           $additional_discount = 0;
+                
+       
+          if (!empty($wallet_balance) && $total_amount > 0) {
+                
+                $product_total_price = $deal_cost * $deal_qty;
+                foreach ($dealArray as $deal_item) {
+                    foreach ($deal_item['items_products'] as $product) {
+                        foreach ($product['addons'] as $addon) {
+                            $addon_price = isset($addon['as_price']) ? (float)$addon['as_price'] : 0;
+                            $addon_qty   = isset($addon['quantity']) ? (int)$addon['quantity'] : 1;
+                            $product_total_price += ($addon_price* $addon_qty);
+                        }
+                    }
+                }
+               
+                $totalinitial = ($total_amount + $wallet_balance) - $shipping_cost;
+                $ratio = $product_total_price / $totalinitial;
+                $additional_discount = round(($wallet_balance * $ratio), 2);
+                
+            }  else if (!empty($additional_pos_discount) && $total_amount > 0) {
+                
+                $product_total_price = $deal_cost * $deal_qty;
+                foreach ($dealArray as $deal_item) {
+                    foreach ($deal_item['items_products'] as $product) {
+                        foreach ($product['addons'] as $addon) {
+                            $addon_price = isset($addon['as_price']) ? (float)$addon['as_price'] : 0;
+                            $addon_qty   = isset($addon['quantity']) ? (int)$addon['quantity'] : 1;
+                            $product_total_price += ($addon_price* $addon_qty);
+                        }
+                    }
+                }
+               
+                $totalinitial = ($total_amount + $additional_pos_discount) - $shipping_cost;
+                $ratio = $product_total_price / $totalinitial;
+                $additional_discount = round(($additional_pos_discount * $ratio), 2);;
+            }  
+
+        
+          $additional_discount_inserted = 0;
+          foreach ($dealArray as $deal_item) {
             $item_id = $deal_item['item_id'];
             foreach ($deal_item['items_products'] as $product) {
               $product_id = $product['prod_id'];
               $addons = mysqli_real_escape_string($conn, json_encode($product['addons'], JSON_UNESCAPED_UNICODE));
               $types = mysqli_real_escape_string($conn, json_encode($product['types'], JSON_UNESCAPED_UNICODE));
               $dressing = mysqli_real_escape_string($conn, json_encode($product['dressing'], JSON_UNESCAPED_UNICODE));
-
+              $is_free = $product['is_free'];
+              
+             
+                
+                
+             
 
               $sql_getitems = "SELECT `deal_cost`, `deal_price` FROM `deals` WHERE `deal_id` = $deal_id";
               $execute_get_products = mysqli_query($conn, $sql_getitems);
@@ -923,16 +1033,32 @@ $department_list = [];
                 $product_details = mysqli_fetch_array($execute_get_products);
                 $cost = $product_details['deal_cost'];
                 $price = $product_details['deal_price'];
+                
+                //adding this to not add value in DB multiple times to make the calcuation easy for reporting.
+                if($additional_discount_inserted === 1){
+                  $additional_discount = 0;
+                  $price = 0;
+                  $cost = 0;
+                }
+              
 
 
                 $sql_getpro = "SELECT * FROM `products` WHERE `id` = '$product_id'";
                 $ex_get_pro = mysqli_query($conn, $sql_getpro);
-                $product = mysqli_fetch_array($ex_get_pro);
-                $pro_name = $product['name'];
-                $pro_decs = $product['description'];
+                $products = mysqli_fetch_array($ex_get_pro);
+                $pro_name = $products['name'];
+                $pro_decs = $products['description'];
+                $pro_discount = 0; //  there is no discount in the deal for any item
+                $additional_discount_inserted = 1;
+                
+                 
+                
+                
+                
+                      
 
-                $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`, `product_name`,`product_description`, `qty`, `cost`, `price`, `addons`, `types`, `dressing`, `no_of_deal`, `additional_notes`) 
-                                                             VALUES ('$last_order_id', '$deal_id', '$item_id', '$product_id','$pro_name','$pro_decs', '$deal_qty', '$cost', '$price', '$addons', '$types', '$dressing', '$no_of_deal', '$notes')";
+             $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`, `product_name`,`product_description`, `qty`, `cost`, `price`, `addons`, `types`, `dressing`, `no_of_deal`, `additional_notes`, `discount_percent`, `additional_discount`,`is_free`) 
+                                                             VALUES ('$last_order_id', '$deal_id', '$item_id', '$product_id','$pro_name','$pro_decs', '$deal_qty', '$cost', '$price', '$addons', '$types', '$dressing', '$no_of_deal', '$notes', '$pro_discount', '$additional_discount', '$is_free')";
                 $execute_details_insert = mysqli_query($conn, $order_details_insert);
                 
                 
@@ -971,6 +1097,9 @@ $department_list = [];
             }
           }
         } else {
+          
+          
+            
           $product_id = $details['id'];
           $product_qty = $details['qty'];
 
@@ -979,7 +1108,8 @@ $department_list = [];
           $product_types = mysqli_real_escape_string($conn, json_encode($details['types'], JSON_UNESCAPED_UNICODE));
           $product_dressing = mysqli_real_escape_string($conn, json_encode($details['dressing'], JSON_UNESCAPED_UNICODE));
           $notes = mysqli_real_escape_string($conn, $details['additionalNotes']);
-
+           $is_free = $details['is_free'];
+            
           $get_product_details = "SELECT `id`, `cost`, `price` FROM `products` WHERE `id` = '$product_id'";
           $execute_get_products = mysqli_query($conn, $get_product_details);
 
@@ -993,13 +1123,51 @@ $department_list = [];
             $product = mysqli_fetch_array($ex_get_pro);
             $pro_name = $product['name'];
             $pro_decs = $product['description'];
+            $pro_discount = $product['discount'];
+            
+            
+            
+            $additional_discount = 0;
+            
+            if (!empty($wallet_balance) && $total_amount > 0) {
+            
+                $product_total_price = $price * $details['qty']  - ($pro_discount/100 * ($price * $details['qty']));
+                
+              
+                foreach ($details['addons'] as $addon) {
+                    $addon_price = isset($addon['as_price']) ? (float)$addon['as_price'] : 0;
+                    $addon_qty   = isset($addon['quantity']) ? (int)$addon['quantity'] : 1;
+                    $product_total_price += ($addon_price* $addon_qty);
+                }
 
+                $totalinitial = ($total_amount + $wallet_balance) - $shipping_cost;
+                $ratio = $product_total_price / $totalinitial;
+            
+                $additional_discount = round(($wallet_balance * $ratio), 2);
+            }else if (!empty($additional_pos_discount) && $total_amount > 0) {
+            
+                $product_total_price = $price * $details['qty']  - ($pro_discount/100 * ($price * $details['qty']));
+                
+              
+                foreach ($details['addons'] as $addon) {
+                    $addon_price = isset($addon['as_price']) ? (float)$addon['as_price'] : 0;
+                    $addon_qty   = isset($addon['quantity']) ? (int)$addon['quantity'] : 1;
+                    $product_total_price += ($addon_price* $addon_qty);
+                }
 
-            $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`,`product_description`, `qty`, `cost`, `price`, `addons`, `types`, `dressing`, `additional_notes`) 
-                                                     VALUES ('$last_order_id', '$product_id', '$pro_name','$pro_decs', '$product_qty', '$cost', '$price', '$product_addons', '$product_types', '$product_dressing', '$notes')";
+                $totalinitial = ($total_amount + $additional_pos_discount) - $shipping_cost;
+                $ratio = $product_total_price / $totalinitial;
+            
+                $additional_discount = round(($additional_pos_discount * $ratio), 2);
+            }
+           
+            $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`,`product_description`, `qty`, `cost`, `price`, `addons`, `types`, `dressing`, `additional_notes`, `discount_percent`, `additional_discount`,`is_free`) 
+                                                     VALUES ('$last_order_id', '$product_id', '$pro_name','$pro_decs', '$product_qty', '$cost', '$price', '$product_addons', '$product_types', '$product_dressing', '$notes', '$pro_discount', '$additional_discount', '$is_free')";
 
             $execute_details_insert = mysqli_query($conn, $order_details_insert);
             
+            
+                deductStock($conn, $product_id, $product_qty, $last_order_id);
             
                 // Fetch departments for this product
                     $sub_category_id = intval($product['sub_category_id']);
@@ -1197,80 +1365,12 @@ $department_list = [];
         $mail->addAddress($ADMIN_EMAIL);
 
         $mail->isHTML(true);
+        $mail->Subject = "New Order #{$last_order_id} – " . htmlspecialchars($APP_NAME);
+        
+        $user_name = $user['name'];
+        $mail->Body = newOrderEmailTemplate($APP_NAME,$BASE_URL,$last_order_id,$user_name,$address,$total_amount,$shipping_cost,$payment_type,$additionalNotes,$datetime,$LANG);
 
-        $mail->Subject = "Neue Bestellung #{$last_order_id} – " . htmlspecialchars($APP_NAME);
 
-        $mail->Body = '
-                                <html>
-                                <head>
-                                    <title>Neue Bestellung erhalten</title>
-                                    <style>
-                                        body {
-                                            font-family: Arial, sans-serif;
-                                            background-color: #f4f4f4;
-                                            padding: 20px;
-                                        }
-                                        .email-container {
-                                            background-color: #ffffff;
-                                            padding: 20px;
-                                            border-radius: 8px;
-                                            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-                                        }
-                                        .header {
-                                            text-align: center;
-                                            margin-bottom: 20px;
-                                        }
-                                        .order-details {
-                                            font-size: 16px;
-                                            line-height: 1.5;
-                                        }
-                                        .order-details strong {
-                                            color: #333;
-                                        }
-                                        .view-button {
-                                            display: inline-block;
-                                            margin-top: 20px;
-                                            background-color: #F2AF34;
-                                            color: #fff;
-                                            padding: 12px 20px;
-                                            text-decoration: none;
-                                            border-radius: 6px;
-                                            font-weight: bold;
-                                        }
-                                        .footer {
-                                            margin-top: 30px;
-                                            font-size: 14px;
-                                            color: #777;
-                                            text-align: center;
-                                        }
-                                    </style>
-                                </head>
-                                <body>
-                                    <div class="email-container">
-                                        <div class="header">
-                                           <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="' . htmlspecialchars($APP_NAME) . '" style="width: 100px;">
-                                            <h2>Neue Bestellung erhalten</h2>
-                                        </div>
-                                        <div class="order-details">
-                                            <p><strong>Bestellnummer:</strong> ' . $last_order_id . '</p>
-                                            <p><strong>Kunde:</strong> ' . htmlspecialchars($user['name']) . '</p>
-                                            <p><strong>Adresse:</strong> ' . htmlspecialchars($address) . '</p>
-                                            <p><strong>Gesamtpreis:</strong> €' . number_format(($total_amount + $shipping_cost), 2) . '</p>
-                                            <p><strong>Versandkosten:</strong> €' . number_format($shipping_cost, 2) . '</p>
-                                            <p><strong>Zahlungsart:</strong> ' . htmlspecialchars($payment_type) . '</p>
-                                            <p><strong>Zusätzliche Hinweise:</strong> ' . htmlspecialchars($additionalNotes) . '</p>
-                                            <p><strong>Bestelldatum:</strong> ' . htmlspecialchars($datetime) . '</p>
-                                
-                                            <a class="view-button" href="' . $BASE_URL . 'admin_panel/order_details.php?order_id=' . $last_order_id . '" target="_blank">
-                                                Bestellung anzeigen
-                                            </a>
-                                        </div>
-                                        <div class="footer">
-                                            <p>Diese E-Mail wurde automatisch von ' . htmlspecialchars($APP_NAME) . ' generiert.</p>
-                                        </div>
-                                    </div>
-                                </body>
-                                </html>';
 
 
         $mail->send();

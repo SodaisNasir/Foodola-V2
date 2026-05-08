@@ -1,6 +1,7 @@
 <?php
 
 // APP CONFIGRUATION
+$LANG = 'en';
 $APP_NAME = "Foodola";
 $BASE_URL = "https://foodola.foodola.shop/";
 $FACEBOOK_URL = "https://facebook.com/foodola";
@@ -22,7 +23,8 @@ $CHANNEL_2 = "reservations";
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "elliakydnklqykpv";
-$FROM_EMAIL = "support@pizzasofort.de";
+// $MAIL_PASSWORD = "crzeqyvqnffeuhzw";
+$FROM_EMAIL = "support@foodola.de";
 $ADMIN_EMAIL = "boundedsocial@gmail.com";
 
 

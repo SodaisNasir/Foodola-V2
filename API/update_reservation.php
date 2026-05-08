@@ -10,6 +10,7 @@ header("Content-Type: application/json");
 require 'PHPMailer-master/src/PHPMailer.php';
 require 'PHPMailer-master/src/SMTP.php';
 require 'PHPMailer-master/src/Exception.php';
+include('../functions/email_templates.php');
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -80,109 +81,22 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                     // ================= PENDING TEMPLATE =================
                     if ($status === "pending") {
                         $mail->Subject = "Ihre Reservierungsanfrage bei " . $APP_NAME;
-                        $mail->Body = '
-                        <html>
-                        <body style="font-family: Poppins, Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px; background-color: #f7f7f7;">
-                        <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'' . $BASE_URL . 'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
-                            <tr><td align="center">
-                                <table width="100%" class="content" style="max-width: 600px; background-color: rgba(255,255,255,0.95); padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                                    <tr><td align="center">
-                                        <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="' . htmlspecialchars($APP_NAME) . '" style="width: 100px; margin-bottom: 20px;">
-                                    </td></tr>
-                                    <tr><td>
-                                        <p>Sehr geehrte Frau ' . htmlspecialchars($name) . ',</p>
-                                        <p>Vielen Dank für Ihre Reservierung bei <strong>' . $APP_NAME . '</strong>.<br>
-                                        Wir werden Ihnen so schnell wie möglich eine Bestätigungs-E-Mail für Ihre Reservierung zusenden.</p>
-                                        <p>
-                                        <strong>Datum:</strong> ' . $reservation_date . '<br>
-                                        <strong>Uhrzeit:</strong> ' . $reservation_time . ' Uhr<br>
-                                        <strong>Personenanzahl:</strong> ' . $persons . ' Personen
-                                        </p>
-                                        <p>Bei Fragen oder Änderungswünschen stehen wir Ihnen jederzeit gerne zur Verfügung.</p>
-                                        <p>Mit freundlichen Grüßen,<br>Ihr ' . $APP_NAME . ' Team</p>
-                                    </td></tr>
-                                </table>
-                            </td></tr>
-                        </table>
-                        </body>
-                        </html>';
+                        $mail->Body = reservationPendingEmailTemplate($APP_NAME,$name,$reservation_date,$reservation_time,$persons,$BASE_URL,$LANG);
                         $mail->send();
                     }
 
                     // ================= CONFIRMED TEMPLATE =================
                     if ($status === "confirmed") {
-                        $mail->Subject = "Ihre Reservierung wurde bestätigt " . $APP_NAME;
-                        $mail->Body = '
-                        <html>
-                        <body style="font-family: Poppins, Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px; background-color: #f7f7f7;">
-                        <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'' . $BASE_URL . 'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
-                            <tr><td align="center">
-                                <table width="100%" class="content" style="max-width: 600px; background-color: rgba(255,255,255,0.95); padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                                    <tr><td align="center">
-                                        <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="' . htmlspecialchars($APP_NAME) . '" style="width: 100px; margin-bottom: 20px;">
-                                    </td></tr>
-                                    <tr><td>
-                                        <p>Sehr geehrte Frau ' . htmlspecialchars($name) . ',</p>
-                                        <p>Vielen Dank für Ihre Reservierung bei <strong>' . $APP_NAME . '</strong>.<br>
-                                        Gerne bestätigen wir Ihnen Ihre Reservierung wie folgt:</p>
-                                        <p>
-                                        <strong>Datum:</strong> ' . $reservation_date . '<br>
-                                        <strong>Uhrzeit:</strong> ' . $reservation_time . ' Uhr<br>
-                                        <strong>Personenanzahl:</strong> ' . $persons . ' Personen
-                                        </p>
-                                        <p>Wir freuen uns, Sie bei uns im Restaurant begrüßen zu dürfen.<br>
-                                        Bei Fragen oder Änderungswünschen stehen wir Ihnen jederzeit gerne zur Verfügung.</p>
-                                        <p>Mit freundlichen Grüßen,<br>Ihr ' . $APP_NAME . ' Team</p>
-                                    </td></tr>
-                                </table>
-                            </td></tr>
-                        </table>
-                        </body>
-                        </html>';
+                        $mail->Subject = "Your Reservation Has Been Confirmed – " . $APP_NAME;
+                        $mail->Body = reservationConfirmedEmailTemplate($APP_NAME,$name,$reservation_date,$reservation_time,$persons,$BASE_URL,$LANG);
                         $mail->send();
                     }
 
                     // ================= Cancelled TEMPLATE =================
                     if ($status === 'cancelled') {
 
-                        $mail->Subject = 'Stornierung Ihrer Reservierung';
-
-                        $mail->Body = '
-                                <html>
-                                <body style="font-family: Poppins, Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px; background-color: #f7f7f7;">
-                                <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'' . $BASE_URL . 'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
-                                    <tr><td align="center">
-                                        <table width="100%" class="content" style="max-width: 600px; background-color: rgba(255,255,255,0.95); padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                                            <tr><td align="center">
-                                                <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="' . htmlspecialchars($APP_NAME) . '" style="width: 100px; margin-bottom: 20px;">
-                                            </td></tr>
-                            
-                                        <tr>
-                                            <td>
-                                                <p>Sehr geehrte ' . htmlspecialchars($name) . ' ,</p>
-                
-                                                <p>
-                                                    leider müssen wir Ihre Reservierung am 
-                                                    <strong>' . $reservation_date . '</strong> um 
-                                                    <strong>' . $reservation_time . ' Uhr</strong> stornieren.
-                                                    Wir bitten die Unannehmlichkeiten zu entschuldigen.
-                                                </p>
-                
-                                                <p>
-                                                    Gerne nehmen wir jederzeit eine neue Reservierung für Sie entgegen
-                                                    oder helfen Ihnen, einen alternativen Termin zu finden.
-                                                    Sie können uns telefonisch kontaktieren.
-                                                </p>
-                
-                                                <p>
-                                                    Mit freundlichen Grüßen<br>
-                                                    Ihr ' . $APP_NAME . ' Team
-                                                </p>
-                                            </td>
-                                        </tr>
-                                </table>
-                                </body>
-                                </html>';
+                        $mail->Subject = 'Your Reservation Has Been Cancelled';
+                        $mail->Body = reservationCancelledTemplate($APP_NAME,$name,$BASE_URL,$reservation_date,$reservation_time,$LANG);
                         $mail->send();
                     }
                 } catch (Exception $e) {

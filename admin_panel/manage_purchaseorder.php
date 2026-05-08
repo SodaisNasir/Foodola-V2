@@ -334,35 +334,39 @@ if (isset($_GET['Massage'])) {
       });
 
       /* ================= ADD PURCHASE ORDER ================= */
-      $('#addPurchaseOrderForm').on('submit', function(e) {
-         e.preventDefault();
+$('#addPurchaseOrderForm').on('submit', function(e) {
+   e.preventDefault();
 
-         let raw_products = [];
+   let raw_products = [];
 
-         $('#add-products-wrapper .product-row').each(function() {
-            raw_products.push({
-               id: $(this).find('.product-id').val(),
-               quantity: $(this).find('.quantity').val(),
-               cost: $(this).find('.cost').val()
-            });
-         });
+   $('#add-products-wrapper .product-row').each(function() {
 
-         $.ajax({
-            url: API_BASE_URL + 'Laravel/api/inventory/store-purchase-order',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-               purchase_order_number: $('input[name="purchase_order_number"]').val(),
-               vendor_id: $('select[name="vendor_id"]').val(),
-               purchase_date: $('input[name="purchase_date"]').val(),
-               raw_products: JSON.stringify(raw_products)
-            }),
-            success: function() {
-               alert('Purchase Order Added');
-               location.reload();
-            }
-         });
+      let costType = $(this).find('.cost_type:checked').val() || 'average';
+
+      raw_products.push({
+         id: $(this).find('.product-id').val(),
+         quantity: $(this).find('.quantity').val(),
+         cost: $(this).find('.cost').val(),
+         cost_type: costType
       });
+   });
+
+   $.ajax({
+      url: API_BASE_URL + 'Laravel/api/inventory/store-purchase-order',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({
+         purchase_order_number: $('input[name="purchase_order_number"]').val(),
+         vendor_id: $('select[name="vendor_id"]').val(),
+         purchase_date: $('input[name="purchase_date"]').val(),
+         raw_products: JSON.stringify(raw_products)
+      }),
+      success: function() {
+         alert('Purchase Order Added');
+         location.reload();
+      }
+   });
+});
 
       /* ================= OPEN UPDATE MODAL ================= */
       $(document).on('click', '.btn-edit', function() {
@@ -504,8 +508,9 @@ if (isset($_GET['Massage'])) {
    <!-- END: Page JS-->
 
    <script>
-      const productRowHtml = `
+const productRowHtml = `
 <div class="product-row row mb-2">
+
     <div class="col-md-4">
         <select class="form-control product-id" required>
             <option value="">Select Product</option>
@@ -518,17 +523,38 @@ if (isset($_GET['Massage'])) {
         </select>
     </div>
 
-    <div class="col-md-3">
+    <div class="col-md-2">
         <input type="number" class="form-control quantity" placeholder="Qty" min="1" required>
     </div>
 
     <div class="col-md-3">
-        <input type="number" class="form-control cost" placeholder="Cost" min="0" required>
+        <input type="number" class="form-control cost mb-1" placeholder="Cost" min="0" required>
+
+        <!-- Cost Type Options -->
+        <div class="d-flex flex-column">
+
+            <label>
+                <input type="radio" class="cost_type" name="cost_type[]" value="latest">
+                Latest Cost
+            </label>
+
+            <label>
+                <input type="radio" class="cost_type" name="cost_type[]" value="average" checked>
+                Average Cost
+            </label>
+
+            <label>
+                <input type="radio" class="cost_type" name="cost_type[]" value="old">
+                Old Cost
+            </label>
+
+        </div>
     </div>
 
-    <div class="col-md-2">
+    <div class="col-md-1">
         <button type="button" class="btn btn-danger remove-row">&times;</button>
     </div>
+
 </div>`;
    </script>
 

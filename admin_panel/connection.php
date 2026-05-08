@@ -2,6 +2,7 @@
 
 
 // APP CONFIGRUATION
+$LANG = 'en';
 $APP_NAME = "Foodola";
 $BASE_URL = "https://foodola.foodola.shop/";
 $company_address = "Kuhngasse 1, 76684 Östringen";

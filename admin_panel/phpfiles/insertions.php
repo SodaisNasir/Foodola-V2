@@ -1,5 +1,6 @@
 <?php
 define('BASE_DIRECTORY', __DIR__ . '/../../API/');
+require_once __DIR__ . '/../../functions/email_templates.php';
 
 require BASE_DIRECTORY . 'PHPMailer-master/src/PHPMailer.php';
 require BASE_DIRECTORY . 'PHPMailer-master/src/SMTP.php';
@@ -10,6 +11,85 @@ use PHPMailer\PHPMailer\Exception;
 
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
+
+
+
+if (isset($_POST['btn_update_recipe'])) {
+  include('../connection.php');
+    $recipe_id = $_POST['recipe_id'];
+    $product_id = $_POST['product_id'];
+
+    $ingredients = $_POST['ingredients'] ?? [];
+
+    $finalIngredients = [];
+
+    foreach ($ingredients as $raw_id => $data) {
+
+        $qty = $data['qty'] ?? 0;
+        $unit = $data['unit'] ?? '';
+
+        if ($qty > 0 && $raw_id > 0) {
+            $finalIngredients[] = [
+                "raw_product_id" => $raw_id,
+                "qty" => $qty,
+                "unit" => $unit
+            ];
+        }
+    }
+
+    $jsonIngredients = mysqli_real_escape_string(
+        $conn,
+        json_encode($finalIngredients, JSON_UNESCAPED_UNICODE)
+    );
+
+    $sql = "UPDATE recipes 
+            SET product_id = '$product_id',
+                ingredients = '$jsonIngredients'
+            WHERE id = '$recipe_id'";
+
+    $run = mysqli_query($conn, $sql);
+
+    if ($run) {
+        header("Location: ../manage_recipe.php?Massage=Recipe Updated Successfully");
+        exit;
+    } else {
+        header("Location: ../manage_recipe.php?Massage=Update Failed");
+        exit;
+    }
+}
+
+if(isset($_POST['btn_delete_recipe'])){
+    include('../connection.php');
+    $id = $_POST['recipe_id'];
+    $sql = "DELETE FROM `recipes` WHERE `id` = '$id'";
+    $result = mysqli_query($conn, $sql);
+    
+    if($result){
+        header("Location:../manage_recipe.php?Massage=Sucessfully Deleted");
+    }else{
+        echo "<script>alert('Sorry, there was an error uploading your file.');window.location.href='../manage_recipe.php'</script>";
+    }
+
+}
+
+
+if(isset($_POST['btn_insert_recipe'])){
+  include('../connection.php');
+    $product_id = $_POST['product_id'];
+    $ingredients = array_values($_POST['ingredients']);
+
+    $json = json_encode($ingredients, JSON_UNESCAPED_UNICODE);
+
+    $sql = "INSERT INTO recipes (product_id, ingredients) VALUES ('$product_id', '$json')";
+    $result = mysqli_query($conn,$sql );
+
+    if ($result) {
+        header("Location:../manage_recipe.php?Massage=Sucessfully Inserted");
+      }else {
+        echo "<script>alert('Sorry, there was an error uploading your file.');window.location.href='../manage_recipe.php'</script>";
+      }
+}
+
 
 if (isset($_POST['btn_insert_pro_timing'])) {
 
@@ -1125,149 +1205,7 @@ if(isset($_GET['SendEmailButton']))
                         $mail->isHTML(true);
 
                         $mail->Subject = "You have a news from " . htmlspecialchars($APP_NAME);
-                        
-                         $template = '
-                            <html>
-                            <head>
-                                <title>News from ' . htmlspecialchars($APP_NAME) . ' !</title>
-
-                                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-                                <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-                                <style>
-                                    body {
-                                        font-family: "Poppins", Arial, sans-serif;
-                                        line-height: 1.6;
-                                        color: #333;
-                                        padding: 20px;
-                                        background-color: #f7f7f7;
-                                    }
-                                    .content {
-                                        background-color: rgba(255, 255, 255, 0.95);
-                                        padding: 20px;
-                                        border-radius: 8px;
-                                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                                    }
-                                    h1 {
-                                        color: #2B2B29;
-                                        font-size: 28px;
-                                        margin-bottom: 10px;
-                                    }
-                                    h3 {
-                                        color: #2B2B29;
-                                        font-size: 20px;
-                                        margin-top: 20px;
-                                    }
-                                    p, li {
-                                        color: #555;
-                                        font-size: 16px;
-                                        margin: 8px 0;
-                                    }
-                                    a {
-                                        color: #F2AF34;
-                                        text-decoration: none;
-                                    }
-                                    .social-icons img {
-                                        margin: 0 5px;
-                                        width: 35px;
-                                        height: 35px;
-                                        transition: all 0.3s;
-                                    }
-                                    .social-icons img:hover {
-                                        opacity: 0.7;
-                                    }
-                                    /* Mobile adjustments */
-                                    @media (max-width: 768px) {
-                                        h1 {
-                                            font-size: 24px;
-                                        }
-                                        h3, p {
-                                            font-size: 14px;
-                                        }
-                                        .content {
-                                            padding: 15px;
-                                        }
-                                        .social-icons {
-                                            text-align: center;
-                                            margin-top: 10px;
-                                        }
-                                        .social-icons img {
-                                            width: 30px;
-                                            height: 30px;
-                                        }
-                                        table {
-                                            background-image: none;
-                                            background-color: #f7f7f7;
-                                        }
-                                    }
-                                </style>
-                            </head>
-                            <body>
-                                <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'' . $BASE_URL . 'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
-                                    <tr>
-                                        <td align="center">
-                                            <table width="100%" class="content" style="max-width: 600px;">
-                                                <tr>
-                                                    <td align="center">
-                                                        <!-- Logo Section -->
-                                                        <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="'. htmlspecialchars($APP_NAME) .'" style="width: 100px; margin-bottom: 20px;">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                   <td>
-                                                       <h1>Lieber '. htmlspecialchars($APP_NAME) . ' Nutzer – Du hast ein Geschenk erhalten 🍕🎉</h1>
-                                                        <p>Hallo ' . htmlspecialchars($name) . ',</p>
-                                                        <p>wir haben heute eine kleine Überraschung für dich! 🎉<br>
-                                                        Als Dankeschön für deine Treue haben wir dir ['.htmlspecialchars($points).' '.htmlspecialchars($APP_NAME).' Coins] geschenkt – ganz ohne Bedingungen. 💛<br>
-                                                        👉 Dein Vorteil: Nutze deine Coins bei deiner nächsten Bestellung und spare direkt beim Bezahlen.
-                                                        </p>
-                                                
-                                                        
-                                                
-                                                        <h3>Aber aufgepasst ⏳</h3>
-                                                        <ul>
-                                                            <li>Diese Aktion ist nur für kurze Zeit gültig. Verpasse also nicht die Chance, dir dein Lieblingsessen günstiger zu sichern!</li>
-                                                        </ul>
-                                                        
-                                                        
-                                                        <h3>Warum warten/h3>
-                                                        <ul>
-                                                            <li>Bestelle jetzt und löse dein Geschenk direkt ein 🍕🍔</li>
-                                                        </ul>
-                                                        
-                                                 
-                                                        <li>👀 <a href="' .$BASE_URL. '">Jetzt bestellen</a> und finde deine Favoriten</li>
-                                                
-                                                        <p>Wir freuen uns darauf, dich wieder zu beliefern!</p>
-                                                
-                                                        <h4>Bleib mit uns in Kontakt:</h4>
-                                                        <p>Verpasse keine Aktion und keine Neuigkeit – folge uns auf Social Media!</p>
-                                                        <div class="social-icons">
-                                                            <a href="' . htmlspecialchars($FACEBOOK_URL) . '" target="_blank">
-                                                                <img src="https://foodola.foodola.shop/API/uploads/facebook_logo.png" alt="Facebook">
-                                                            </a>
-                                                            <a href="' . htmlspecialchars($INSTAGRAM_URL) . '" target="_blank">
-                                                                <img src="https://foodola.foodola.shop/API/uploads/instagram_logo.png" alt="Instagram">
-                                                            </a>
-                                                            <a href="' . htmlspecialchars($TWITTER_URL) . '" target="_blank">
-                                                                <img src="https://foodola.foodola.shop/API/uploads/twitter_logo.png" alt="Twitter">
-                                                            </a>
-                                                        </div>
-                                                
-                                                        <p>Guten Appetit & viel Spaß beim Genießen!<br><strong>Dein ' . htmlspecialchars($APP_NAME) . ' Team 🍕</strong></p>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </body>
-                            </html>
-                            ';
-                        
-                        
-                        
-
-                        $mail->Body = $template;
+                          $mail->Body = newsGiftTemplate($APP_NAME,$name,$BASE_URL,$FACEBOOK_URL,$INSTAGRAM_URL,$TWITTER_URL,$points, $LANG);
                         $mail->send();
                         $emails_sent = (int)$emails_sent + 1;
                         $updateSQL = "UPDATE `tbl_campaigns_details` SET `status` = 1 , `emails_sent` = $emails_sent WHERE `id` = $id";
@@ -2409,14 +2347,6 @@ if(isset($_POST['updatePoints'])){
 }
 
 
-
-
-
-
-
-
-
-
 if(isset($_POST['btnSubmit_insertFeaturedProduct'])){
 include('../connection.php');
   session_start();
@@ -2521,80 +2451,8 @@ if (isset($_POST['btnSubmit_Action'])) {
                         $mail->isHTML(true);
                         
                         
-                       $mail->Subject = "Ihre Bestellung wurde angenommen";
-
-                        $mail->Body = '
-                        <html>
-                        <head>
-                            <title>Ihre Bestellung wurde angenommen –' . htmlspecialchars($APP_NAME) . '</title>
-                            <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-                            <style>
-                                body {
-                                    font-family: "Poppins", Arial, sans-serif;
-                                    line-height: 1.6;
-                                    color: #333;
-                                    padding: 20px;
-                                    background-color: #f7f7f7;
-                                }
-                                .content {
-                                    background-color: rgba(255, 255, 255, 0.95);
-                                    padding: 20px;
-                                    border-radius: 8px;
-                                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                                }
-                                h1 {
-                                    color: #2B2B29;
-                                    font-size: 28px;
-                                    margin-bottom: 10px;
-                                }
-                                h3 {
-                                    color: #2B2B29;
-                                    font-size: 20px;
-                                    margin-top: 20px;
-                                }
-                                p, li {
-                                    color: #555;
-                                    font-size: 16px;
-                                    margin: 8px 0;
-                                }
-                                a {
-                                    color: #F2AF34;
-                                    text-decoration: none;
-                                }
-                            </style>
-                        </head>
-                        <body>
-                            <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'' . $BASE_URL . 'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
-                                <tr>
-                                    <td align="center">
-                                        <table width="100%" class="content" style="max-width: 600px;">
-                                            <tr>
-                                                <td align="center">
-                                                    <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="'. htmlspecialchars($APP_NAME) .'" style="width: 100px; margin-bottom: 20px;">
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <h1>Ihre Bestellung wurde angenommen!</h1>
-                                                    <p>Hallo <strong>' . htmlspecialchars($name) . '</strong>,</p>
-                                                    <p>Vielen Dank für Ihre Bestellung bei <strong>' . htmlspecialchars($APP_NAME) . '</strong>.</p>
-                                                    <p><strong>Bestellnummer:</strong> ' . htmlspecialchars($order_id) . '</p>
-                                                    <p>Ihre Bestellung wurde erfolgreich angenommen und wird in Kürze bearbeitet.</p>
-                                                    <h3>Was kommt als Nächstes?</h3>
-                                                    <ul>
-                                                        <li>Unser Team bereitet Ihre Bestellung mit größter Sorgfalt zu.</li>
-                                                        <li>Sie erhalten eine Benachrichtigung, sobald Ihre Bestellung unterwegs ist.</li>
-                                                    </ul>
-                                                    <p>Bei Fragen stehen wir Ihnen jederzeit zur Verfügung.</p>
-                                                     <p>Mit freundlichen Grüßen,<br>Ihr ' . htmlspecialchars($APP_NAME) . ' Team</p>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
-                        </body>
-                        </html>';
+                        $mail->Subject = "Your Order Has Been Accepted";
+                        $mail->Body = orderAcceptedEmailTemplate($APP_NAME,$name,$order_id,$BASE_URL,$LANG);
                     
                         $mail->send();
                 
@@ -2745,76 +2603,9 @@ if (isset($_POST['btnSubmit_Action'])) {
                             $mail->addAddress($email); 
                         
                             $mail->isHTML(true);
-                           $mail->Subject = "Ihre Bestellung wurde geliefert";
+                            $mail->Subject = "Your Order Has Been Delivered";
+                            $mail->Body = orderDeliveredEmailTemplate($APP_NAME,$name,$order_id,$BASE_URL,$LANG);
 
-                        $mail->Body = '
-                        <html>
-                        <head>
-                            <title>Ihre Bestellung wurde geliefert –' . htmlspecialchars($APP_NAME) . '</title>
-                            <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-                            <style>
-                                body {
-                                    font-family: "Poppins", Arial, sans-serif;
-                                    line-height: 1.6;
-                                    color: #333;
-                                    padding: 20px;
-                                    background-color: #f7f7f7;
-                                }
-                                .content {
-                                    background-color: rgba(255, 255, 255, 0.95);
-                                    padding: 20px;
-                                    border-radius: 8px;
-                                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                                }
-                                h1 {
-                                    color: #2B2B29;
-                                    font-size: 28px;
-                                    margin-bottom: 10px;
-                                }
-                                h3 {
-                                    color: #2B2B29;
-                                    font-size: 20px;
-                                    margin-top: 20px;
-                                }
-                                p, li {
-                                    color: #555;
-                                    font-size: 16px;
-                                    margin: 8px 0;
-                                }
-                                a {
-                                    color: #F2AF34;
-                                    text-decoration: none;
-                                }
-                            </style>
-                        </head>
-                        <body>
-                            <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'' . $BASE_URL . 'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
-                                <tr>
-                                    <td align="center">
-                                        <table width="100%" class="content" style="max-width: 600px;">
-                                            <tr>
-                                                <td align="center">
-                                                    <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="'. htmlspecialchars($APP_NAME) .'" style="width: 100px; margin-bottom: 20px;">
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <h1>Ihre Bestellung wurde geliefert!</h1>
-                                                    <p>Hallo <strong>' . htmlspecialchars($user_name) . '</strong>,</p>
-                                                    <p>Wir freuen uns, Ihnen mitteilen zu können, dass Ihre Bestellung erfolgreich geliefert wurde.</p>
-                                                    <p><strong>Bestellnummer:</strong> #' . htmlspecialchars($order_id) . '</p>
-                                                    <h3>Guten Appetit!</h3>
-                                                    <p>Wir hoffen, dass Sie Ihr Essen genießen. Vielen Dank, dass Sie bei <strong>' . htmlspecialchars($APP_NAME) . '</strong> bestellt haben.</p>
-                                                    <p>Wenn Sie Fragen haben oder Feedback geben möchten, stehen wir Ihnen jederzeit zur Verfügung.</p>
-                                                    <p>Mit freundlichen Grüßen,<br>Ihr ' . htmlspecialchars($APP_NAME) . ' Team</p>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
-                        </body>
-                        </html>';
 
                     $mail->send();
     
@@ -2894,27 +2685,6 @@ if (isset($_POST['btnSubmit_Action'])) {
         
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 if(isset($_POST['updateCategory'])){

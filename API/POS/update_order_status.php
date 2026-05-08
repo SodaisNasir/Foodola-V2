@@ -4,7 +4,7 @@
 require '../PHPMailer-master/src/PHPMailer.php';
 require '../PHPMailer-master/src/SMTP.php';
 require '../PHPMailer-master/src/Exception.php';
-
+include('../../functions/email_templates.php');
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -85,78 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $mail->isHTML(true);
                     $mail->Subject = "Ihre Bestellung wurde angenommen";
 
-                    $mail->Body = '
-                    <html>
-                    <head>
-                        <title>Ihre Bestellung wurde angenommen – ' . htmlspecialchars($APP_NAME) . '</title>
-                        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-                        <style>
-                            body {
-                                font-family: "Poppins", Arial, sans-serif;
-                                line-height: 1.6;
-                                color: #333;
-                                padding: 20px;
-                                background-color: #f7f7f7;
-                            }
-                            .content {
-                                background-color: rgba(255, 255, 255, 0.95);
-                                padding: 20px;
-                                border-radius: 8px;
-                                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                            }
-                            h1 {
-                                color: #2B2B29;
-                                font-size: 28px;
-                                margin-bottom: 10px;
-                            }
-                            h3 {
-                                color: #2B2B29;
-                                font-size: 20px;
-                                margin-top: 20px;
-                            }
-                            p, li {
-                                color: #555;
-                                font-size: 16px;
-                                margin: 8px 0;
-                            }
-                            a {
-                                color: #F2AF34;
-                                text-decoration: none;
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <table width="100%" cellpadding="0" cellspacing="0" style="background-image:  url(\'' . $BASE_URL . 'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
-                            <tr>
-                                <td align="center">
-                                    <table width="100%" class="content" style="max-width: 600px;">
-                                        <tr>
-                                            <td align="center">
-                                                <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="'. htmlspecialchars($APP_NAME) .'" style="width: 100px; margin-bottom: 20px;">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <h1>Ihre Bestellung wurde angenommen!</h1>
-                                                <p>Hallo <strong>' . htmlspecialchars($name) . '</strong>,</p>
-                                                <p>Vielen Dank für Ihre Bestellung bei <strong>' . htmlspecialchars($APP_NAME) . '</strong>.</p>
-                                                <p><strong>Bestellnummer:</strong> ' . htmlspecialchars($order_id) . '</p>
-                                                <p>Ihre Bestellung wurde erfolgreich angenommen und wird in Kürze bearbeitet.</p>
-                                                <h3>Was kommt als Nächstes?</h3>
-                                                <ul>
-                                                    <li>Unser Team bereitet Ihre Bestellung mit größter Sorgfalt zu.</li>
-                                                    <li>Sie erhalten eine Benachrichtigung, sobald Ihre Bestellung unterwegs ist.</li>
-                                                </ul>
-                                                <p>Bei Fragen stehen wir Ihnen jederzeit zur Verfügung.</p>
-                                                <p>Mit freundlichen Grüßen,<br>Ihr ' . htmlspecialchars($APP_NAME) . ' Team</p>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
-                    </body>
-                    </html>';
+                    $mail->Body = orderAcceptedEmailTemplate($APP_NAME,$name,$order_id,$BASE_URL,$LANG);
 
                     $mail->send();
                 } catch (Exception $e) {
@@ -296,61 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                             $mail->isHTML(true);
                             $mail->Subject = "Ihre Bestellung wurde geliefert";
-
-                            // NOTE: replaced $user_name with $name (fixed undefined variable)
-                            $mail->Body = '
-                            <html>
-                            <head>
-                                <title>Ihre Bestellung wurde geliefert – ' . htmlspecialchars($APP_NAME) . '</title>
-                                <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-                                <style>
-                                    body {
-                                        font-family: "Poppins", Arial, sans-serif;
-                                        line-height: 1.6;
-                                        color: #333;
-                                        padding: 20px;
-                                        background-color: #f7f7f7;
-                                    }
-                                    .content {
-                                        background-color: rgba(255, 255, 255, 0.95);
-                                        padding: 20px;
-                                        border-radius: 8px;
-                                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                                    }
-                                    h1 { color: #2B2B29; font-size: 28px; margin-bottom: 10px; }
-                                    h3 { color: #2B2B29; font-size: 20px; margin-top: 20px; }
-                                    p, li { color: #555; font-size: 16px; margin: 8px 0; }
-                                    a { color: #F2AF34; text-decoration: none; }
-                                </style>
-                            </head>
-                            <body>
-                                <table width="100%" cellpadding="0" cellspacing="0" style="background-image:  url(\'' . $BASE_URL . 'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
-                                    <tr>
-                                        <td align="center">
-                                            <table width="100%" class="content" style="max-width: 600px;">
-                                                <tr>
-                                                    <td align="center">
-                                                        <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="'. htmlspecialchars($APP_NAME) .'" style="width: 100px; margin-bottom: 20px;">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h1>Ihre Bestellung wurde geliefert!</h1>
-                                                        <p>Hallo <strong>' . htmlspecialchars($name) . '</strong>,</p>
-                                                        <p>Wir freuen uns, Ihnen mitteilen zu können, dass Ihre Bestellung erfolgreich geliefert wurde.</p>
-                                                        <p><strong>Bestellnummer:</strong> #' . htmlspecialchars($order_id) . '</p>
-                                                        <h3>Guten Appetit!</h3>
-                                                        <p>Wir hoffen, dass Sie Ihr Essen genießen. Vielen Dank, dass Sie bei <strong>' . htmlspecialchars($APP_NAME) . '</strong> bestellt haben.</p>
-                                                        <p>Wenn Sie Fragen haben oder Feedback geben möchten, stehen wir Ihnen jederzeit zur Verfügung.</p>
-                                                        <p>Mit freundlichen Grüßen,<br>Ihr ' . htmlspecialchars($APP_NAME) . ' Team</p>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </body>
-                            </html>';
+                            $mail->Body = orderDeliveredEmailTemplate($APP_NAME,$name,$order_id,$BASE_URL,$LANG);
 
                             $mail->send();
 
@@ -391,61 +266,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                             $mail->isHTML(true);
                             $mail->Subject = "Ihre Bestellung wurde geliefert";
+                            $mail->Body = orderDeliveredEmailTemplate($APP_NAME,$name,$order_id,$BASE_URL,$LANG);
 
-                            // NOTE: replaced $user_name with $name (fixed undefined variable)
-                            $mail->Body = '
-                            <html>
-                            <head>
-                                <title>Ihre Bestellung wurde geliefert – ' . htmlspecialchars($APP_NAME) . '</title>
-                                <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-                                <style>
-                                    body {
-                                        font-family: "Poppins", Arial, sans-serif;
-                                        line-height: 1.6;
-                                        color: #333;
-                                        padding: 20px;
-                                        background-color: #f7f7f7;
-                                    }
-                                    .content {
-                                        background-color: rgba(255, 255, 255, 0.95);
-                                        padding: 20px;
-                                        border-radius: 8px;
-                                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                                    }
-                                    h1 { color: #2B2B29; font-size: 28px; margin-bottom: 10px; }
-                                    h3 { color: #2B2B29; font-size: 20px; margin-top: 20px; }
-                                    p, li { color: #555; font-size: 16px; margin: 8px 0; }
-                                    a { color: #F2AF34; text-decoration: none; }
-                                </style>
-                            </head>
-                            <body>
-                                <table width="100%" cellpadding="0" cellspacing="0" style="background-image:  url(\'' . $BASE_URL . 'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
-                                    <tr>
-                                        <td align="center">
-                                            <table width="100%" class="content" style="max-width: 600px;">
-                                                <tr>
-                                                    <td align="center">
-                                                        <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="'. htmlspecialchars($APP_NAME) .'" style="width: 100px; margin-bottom: 20px;">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <h1>Ihre Bestellung wurde geliefert!</h1>
-                                                        <p>Hallo <strong>' . htmlspecialchars($name) . '</strong>,</p>
-                                                        <p>Wir freuen uns, Ihnen mitteilen zu können, dass Ihre Bestellung erfolgreich geliefert wurde.</p>
-                                                        <p><strong>Bestellnummer:</strong> #' . htmlspecialchars($order_id) . '</p>
-                                                        <h3>Guten Appetit!</h3>
-                                                        <p>Wir hoffen, dass Sie Ihr Essen genießen. Vielen Dank, dass Sie bei <strong>' . htmlspecialchars($APP_NAME) . '</strong> bestellt haben.</p>
-                                                        <p>Wenn Sie Fragen haben oder Feedback geben möchten, stehen wir Ihnen jederzeit zur Verfügung.</p>
-                                                        <p>Mit freundlichen Grüßen,<br>Ihr ' . htmlspecialchars($APP_NAME) . ' Team</p>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </body>
-                            </html>';
 
                             $mail->send();
 

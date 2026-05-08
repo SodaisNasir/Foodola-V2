@@ -14,5 +14,6 @@ class QrScanLog extends Model
     protected $fillable = [
         'raw_product_id',
         'quantity',
+        'action'
     ];
 }

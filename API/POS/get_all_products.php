@@ -1,11 +1,43 @@
 <?php
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
 header("Access-Control-Allow-Origin: *");  // Allow the specific origin
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS"); // Allow specific HTTP methods
 header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Allow specific headers
 header("Content-Type: application/json"); 
 include('../connection.php'); 
 
-$product_query = "SELECT * FROM products WHERE `status` = 'Active' AND `for_deal_only` = '0'";
+// karachi time_zone
+date_default_timezone_set('Europe/Berlin'); // Germany timezone
+
+$currentTime = date("H:i:s"); // Current time in Germany timezone
+
+// detect source (web or pos)
+$source = isset($_GET['source']) ? $_GET['source'] : 'pos';
+
+// filtering logic
+if ($source == 'pos') {
+    $deal_condition = "AND p.for_deal_only IN (0,2)";
+} else {
+    $deal_condition = "AND p.for_deal_only IN (0)";
+}
+
+$product_query = "
+SELECT p.*, pt.start_time, pt.end_time 
+FROM products p 
+LEFT JOIN product_timings pt 
+ON p.time_id = pt.id AND pt.status = 'active'
+WHERE p.status = 'Active'
+$deal_condition
+AND (
+    p.time_id IS NULL
+    OR pt.id IS NULL
+    OR '$currentTime' BETWEEN pt.start_time AND pt.end_time
+)
+ORDER BY p.sort_order ASC
+";
+
+
 $product_result = mysqli_query($conn, $product_query);
 
 if (mysqli_num_rows($product_result) > 0) {

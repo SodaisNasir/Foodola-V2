@@ -1,7 +1,8 @@
 <?php
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
-
+global $LANG;
+include('connection.php');
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Content-Type: application/json");
@@ -10,9 +11,8 @@ require 'PHPMailer-master/src/PHPMailer.php';
 require 'PHPMailer-master/src/SMTP.php';
 require 'PHPMailer-master/src/Exception.php';
 
-include('connection.php');
 require __DIR__ . '/vendor/autoload.php';
-
+include('../functions/email_templates.php');
 use Pusher\Pusher;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -73,16 +73,16 @@ if ($people < $table['min'] || $people > $table['maximum']) {
 }
 
 /* ===================== INSERT ===================== */
-echo $insert_sql = "
+$insert_sql = "
 INSERT INTO reservations
 (user_id, table_id, reservation_date, start_time, end_time, duration_minutes, people, status, created_at)
 VALUES
 ('$user_id','$table_id','$reservation_date','$start_time','$end_time','$duration_minutes','$people','$status',NOW())
 ";
 
-// if (!mysqli_query($conn, $insert_sql)) {
-//     exit(json_encode(['status' => false, 'message' => 'Failed to create reservation']));
-// }
+if (!mysqli_query($conn, $insert_sql)) {
+    exit(json_encode(['status' => false, 'message' => 'Failed to create reservation']));
+}
 
 $inserted_id = mysqli_insert_id($conn);
 
@@ -91,6 +91,11 @@ $res = mysqli_query($conn, "SELECT * FROM reservations WHERE id='$inserted_id'")
 $reservation = mysqli_fetch_assoc($res);
 
 $user_res = mysqli_query($conn, "SELECT name,email,phone FROM users WHERE id='$user_id'");
+
+if (!$user_res) {
+    die(mysqli_error($conn));
+}
+
 $user = mysqli_fetch_assoc($user_res);
 
 $reservation['table_name'] = $table['table_name'];
@@ -128,51 +133,12 @@ $reservation_time = date("H:i", strtotime($start_time));
 $email = $user['email'];
 $name  = $user['name'];
 $persons = $people;
-
+$LANG = $GLOBALS['LANG'];
 /* ===================== ADMIN EMAIL ===================== */
 try {
     $mail->addAddress($ADMIN_EMAIL);
-    $mail->Subject = "Neue Reservierung erhalten - $APP_NAME";
-                            // Updated Email Body
-                            $mail->Body = '
-                            <html>
-                            <body style="font-family: Poppins, Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px; background-color: #f7f7f7;">
-                            <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\''.$BASE_URL.'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
-                                <tr><td align="center">
-                                    <table width="100%" class="content" style="max-width: 600px; background-color: rgba(255,255,255,0.95); padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                                        <tr><td align="center">
-                                            <img src="'.$BASE_URL.'admin_panel/images/logo.png" alt="'.htmlspecialchars($APP_NAME).'" style="width: 100px; margin-bottom: 20px;">
-                                        </td></tr>
-                        
-                                                    <tr>
-                                                        <td>
-                                                            <p><strong>Neue Reservierung eingegangen</strong></p>
-                            
-                                                            <p>Eine neue Reservierung wurde soeben erstellt. Details siehe unten:</p>
-                            
-                                                            <p>
-                                                                <strong>Name:</strong> '.htmlspecialchars($name).'<br>
-                                                                <strong>E-Mail:</strong> '.htmlspecialchars($email).'<br>
-                                                                <strong>Datum:</strong> '.$reservation_date.'<br>
-                                                                <strong>Uhrzeit:</strong> '.$reservation_time.' Uhr<br>
-                                                                <strong>Personenanzahl:</strong> '.$people.' Personen
-                                                            </p>
-                            
-                                                            <p>Bitte prüfen Sie die Reservierung im Admin-Panel.</p>
-                            
-                                                            <p>
-                                                                Mit freundlichen Grüßen,<br>
-                                                                '.$APP_NAME.' System
-                                                            </p>
-                                                        </td>
-                                                    </tr>
-                                    </table>
-                                </td></tr>
-                            </table>
-                            </body>
-                            </html>';
-                            
-                            
+    $mail->Subject = "New Reservation Received - $APP_NAME";
+    $mail->Body = newReservationAdminTemplate($APP_NAME,$name,$email,$BASE_URL, $reservation_date,$reservation_time,$people,$LANG);
     $mail->send();
 } catch (Exception $e) {}
 
@@ -181,33 +147,12 @@ $mail->clearAddresses();
 /* ===================== CUSTOMER EMAIL ===================== */
 try {
   $mail->addAddress($user['email']);
-    $mail->Subject = "Ihre Reservierung bei $APP_NAME";
-     $mail->Body = '
-                                <html>
-                                <body style="font-family: Poppins, Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px; background-color: #f7f7f7;">
-                                <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\''.$BASE_URL.'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
-                                    <tr><td align="center">
-                                        <table width="100%" class="content" style="max-width: 600px; background-color: rgba(255,255,255,0.95); padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                                            <tr><td align="center">
-                                                <img src="'.$BASE_URL.'admin_panel/images/logo.png" alt="'.htmlspecialchars($APP_NAME).'" style="width: 100px; margin-bottom: 20px;">
-                                            </td></tr>
-                            
-                                    <tr><td>
-                                            <p>Sehr geehrte Frau '.htmlspecialchars($name).',</p>
-                                            <p>Vielen Dank für Ihre Reservierung bei <strong>'.$APP_NAME.'</strong>.<br>
-                                            Gerne bestätigen wir Ihnen Ihre Reservierung wie folgt:</p>
-                                            <p>
-                                            <strong>Datum:</strong> '.$reservation_date.'<br>
-                                            <strong>Uhrzeit:</strong> '.$reservation_time.' Uhr<br>
-                                            <strong>Personenanzahl:</strong> '.$persons.' Personen
-                                            </p>
-                                            <p>Mit freundlichen Grüßen,<br>Ihr '.$APP_NAME.' Team</p>
-                                        </td></tr>
-                                </table>
-                                </body>
-                                </html>';
+   $mail->Subject = "Your Reservation at $APP_NAME";
+ $mail->Body = reservationConfirmationTemplate($APP_NAME,$name,$BASE_URL,$reservation_date,$reservation_time,$persons,$LANG);
         $mail->send();
-} catch (Exception $e) {}
+} catch (Exception $e) {
+    
+}
 
 /* ===================== RESPONSE ===================== */
 echo json_encode([
@@ -215,3 +160,5 @@ echo json_encode([
     'message' => 'Reservation booked successfully',
     'data'    => $reservation
 ]);
+    
+

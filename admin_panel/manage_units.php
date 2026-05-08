@@ -101,39 +101,64 @@ if (isset($_GET['Massage'])) {
                                                     <tr>
                                                         <th>#</th>
                                                         <th>Name</th>
+                                                        <th>Sub Unit</th>
+                                                        
                                                         <th>Created At</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
-                                                    <?php
-                                                    $sql = "SELECT * FROM units ORDER BY id DESC";
-                                                    $result = mysqli_query($conn, $sql);
-                                                    $i = 1;
+                                          <?php
+$sql = "
+SELECT 
+    u1.id,
+    u1.name,
+    u1.created_at,
+    u2.name AS subunit_name
+FROM units u1
+LEFT JOIN units u2 ON u1.unit_id = u2.id
+ORDER BY u1.id DESC
+";
 
-                                                    while ($row = mysqli_fetch_assoc($result)) {
-                                                    ?>
-                                                        <tr>
-                                                            <td><?= $i++ ?></td>
-                                                            <td><?= $row['name'] ?></td>
-                                                            <td><?= $row['created_at'] ?></td>
-                                                            <td>
-                                                                <button
-                                                                    class="btn btn-primary btn-edit"
-                                                                    data-id="<?= $row['id'] ?>"
-                                                                    data-name="<?= $row['name'] ?>">
-                                                                    Update
-                                                                </button>
+$result = mysqli_query($conn, $sql);
+$i = 1;
+?>
 
-                                                                <button
-                                                                    class="btn btn-danger btn-delete"
-                                                                    data-id="<?= $row['id'] ?>">
-                                                                    Delete
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    <?php } ?>
-                                                </tbody>
+<tbody>
+<?php while ($row = mysqli_fetch_assoc($result)) { ?>
+    <tr>
+
+
+        <td><?= $i++ ?></td>
+        <td>
+            <strong><?= $row['name'] ?></strong>
+        </td>
+
+        <td>
+            <?= $row['subunit_name'] ? $row['subunit_name'] : 'N/A' ?>
+        </td>
+        <td>
+            <?= $row['created_at'] ?>
+        </td>
+
+        <!-- ACTION -->
+        <td>
+            <button
+                class="btn btn-primary btn-sm btn-edit"
+                data-id="<?= $row['id'] ?>"
+                data-name="<?= $row['name'] ?>">
+                Update
+            </button>
+
+            <button
+                class="btn btn-danger btn-sm btn-delete"
+                data-id="<?= $row['id'] ?>">
+                Delete
+            </button>
+        </td>
+
+    </tr>
+<?php } ?>
+</tbody>
                                             </table>
                                         </div>
                                     </div>
@@ -153,9 +178,29 @@ if (isset($_GET['Massage'])) {
                                     </button>
                                 </div>
 
+                                
+                             
+                
+                           
                                 <div class="modal-body">
-                                    <label>Unit Name</label>
+                                    
+                                        <select name="unit_id" class="form-control mb-3">
+                                            <option value="">Select Unit</option>
+                                            <?php
+                                            $q = "SELECT id, name FROM units";
+                                            $res = mysqli_query($conn, $q);
+                                            while($unit = mysqli_fetch_assoc($res)){
+                                                echo "<option value='{$unit['id']}'>{$unit['name']}</option>";
+                                            }
+                                            ?>
+                                        </select>
+                                        
+                                        
+                                        
+                                        <label>Unit Name</label>
                                     <input type="text" name="name" class="form-control" required>
+                                    
+                                 
                                 </div>
 
                                 <div class="modal-footer">
@@ -247,7 +292,8 @@ if (isset($_GET['Massage'])) {
                     url: API_BASE_URL + 'Laravel/api/inventory/store-unit',
                     type: 'POST',
                     data: {
-                        name: $(this).find('input[name="name"]').val()
+                        name: $(this).find('input[name="name"]').val(),
+                         unit_id: $('select[name="unit_id"]').val()
                     },
                     success: function() {
                         alert('Unit added successfully');

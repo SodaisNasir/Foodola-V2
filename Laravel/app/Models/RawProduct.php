@@ -17,6 +17,7 @@ class RawProduct extends Model
         'sku',
         'qr_code',
         'current_stock',
+        'vendor_id'
     ];
 
 

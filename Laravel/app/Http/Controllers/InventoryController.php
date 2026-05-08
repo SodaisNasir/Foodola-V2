@@ -102,7 +102,8 @@ class InventoryController extends Controller
             'name' => 'required|string|max:255',
             'unit_id' => 'required|exists:units,id',
             'sku' => 'required|string|unique:raw_products,sku',
-            'current_stock' => 'required|numeric|min:0',
+            'current_stock' => 'nullable|numeric|min:0',
+            'vendor_id' => 'nullable'
         ]);
 
         $input = $request->all();
@@ -111,11 +112,12 @@ class InventoryController extends Controller
         $qrCodeData = $request->sku;
         $qrcode = QrCode::size(300)->generate($qrCodeData);
         $fileName = $request->sku . '.svg';
+        // store in storage/app/public
         Storage::disk('public')->put($fileName, $qrcode);
-        $qrCodeUrl = Storage::url($fileName);
 
+        // ✅ Get APP_URL from env dynamically
+        $input['qr_code'] = url('storage/app/public/' . $fileName);
 
-        $input['qr_code'] = 'http://127.0.0.1:8000/storage/' . $fileName;
         $product = RawProduct::create($input);
 
         return response()->json([
@@ -301,43 +303,147 @@ class InventoryController extends Controller
 
 
     // Purchase Orders
+    // public function store_purchase_order(Request $request)
+    // {
+
+    //     $request->validate([
+    //         'purchase_order_number' => 'required|unique:purchase_orders,purchase_order_number',
+    //         'vendor_id' => 'required|exists:vendors,id',
+    //         'purchase_date' => 'required|date',
+    //         'raw_products' => 'required',
+    //     ]);
+
+
+    //     $input = $request->all();
+    //     $purchase_order = PurchaseOrder::create($input);
+
+    //     $purchase_order_items = [];
+
+
+    //     foreach (json_decode($request->raw_products) as $raw_product) {
+    //         $purchase_order_items[] = [
+    //             'purchase_order_id' => $purchase_order->id,
+    //             'raw_product_id' => $raw_product->id,
+    //             'quantity' => $raw_product->quantity,
+    //             'cost' => $raw_product->cost,
+    //             'total' => $raw_product->quantity * $raw_product->cost,
+    //             'created_at' => now(),
+    //             'updated_at' => now(),
+    //         ];
+    //     }
+
+    //     PurchaseOrderItem::insert($purchase_order_items);
+
+    //     $success['status'] = 200;
+    //     $success['message'] = "Purchase order created successfully";
+    //     $success['data'] = $purchase_order;
+
+    //     return response()->json(['success' => $success]);
+    // }
+    
     public function store_purchase_order(Request $request)
-    {
+{
+    $request->validate([
+        'purchase_order_number' => 'required|unique:purchase_orders,purchase_order_number',
+        'vendor_id' => 'required|exists:vendors,id',
+        'purchase_date' => 'required|date',
+        'raw_products' => 'required',
+    ]);
 
-        $request->validate([
-            'purchase_order_number' => 'required|unique:purchase_orders,purchase_order_number',
-            'vendor_id' => 'required|exists:vendors,id',
-            'purchase_date' => 'required|date',
-            'raw_products' => 'required',
-        ]);
+    $input = $request->all();
+    $purchase_order = PurchaseOrder::create($input);
 
+    $purchase_order_items = [];
 
-        $input = $request->all();
-        $purchase_order = PurchaseOrder::create($input);
+    foreach (json_decode($request->raw_products) as $raw_product) {
 
-        $purchase_order_items = [];
+        // Get product
+        $product = RawProduct::find($raw_product->id);
+        if (!$product) continue;
 
+        // Safe values
+        $newQty  = (float) $raw_product->quantity;
+        $newCost = (float) $raw_product->cost;
 
-        foreach (json_decode($request->raw_products) as $raw_product) {
-            $purchase_order_items[] = [
-                'purchase_order_id' => $purchase_order->id,
-                'raw_product_id' => $raw_product->id,
-                'quantity' => $raw_product->quantity,
-                'cost' => $raw_product->cost,
-                'total' => $raw_product->quantity * $raw_product->cost,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
+        $oldQty  = (float) ($product->current_stock ?? 0);
+        $oldCost = (float) ($product->cost ?? 0);
+
+        // Clean cost_type
+        $costType = strtolower(trim($raw_product->cost_type ?? 'average'));
+
+        /* =============================
+           COST LOGIC START
+        ============================= */
+
+        if ($costType === 'average') {
+
+            // OLD VALUE
+            $oldTotal = $oldQty * $oldCost;
+
+            // NEW VALUE
+            $newTotal = $newQty * $newCost;
+
+            // TOTAL
+            $totalQty = $oldQty + $newQty;
+
+            // AVERAGE CALCULATION
+            if ($totalQty > 0) {
+                $avgCost = ($oldTotal + $newTotal) / $totalQty;
+            } else {
+                $avgCost = $newCost;
+            }
+
+            // SAVE
+            // $product->current_stock = $totalQty;
+            $product->cost = round($avgCost, 2);
+
+        } elseif ($costType === 'latest') {
+
+            // Latest purchase cost override
+            // $product->current_stock = $oldQty + $newQty;
+            $product->cost = $newCost;
+
+        } elseif ($costType === 'old') {
+
+            // Keep old cost, only update stock
+            $product->current_stock = $oldQty + $newQty;
+            // cost remains unchanged
+
+        } else {
+
+            // fallback (safe)
+            // $product->current_stock = $oldQty + $newQty;
+            $product->cost = $newCost;
         }
 
-        PurchaseOrderItem::insert($purchase_order_items);
+        $product->save();
 
-        $success['status'] = 200;
-        $success['message'] = "Purchase order created successfully";
-        $success['data'] = $purchase_order;
+        /* =============================
+           INSERT PURCHASE ITEM
+        ============================= */
 
-        return response()->json(['success' => $success]);
+        $purchase_order_items[] = [
+            'purchase_order_id' => $purchase_order->id,
+            'raw_product_id'    => $raw_product->id,
+            'quantity'          => $newQty,
+            'cost'              => $newCost,
+            'total'             => $newQty * $newCost,
+            'created_at'        => now(),
+            'updated_at'        => now(),
+        ];
     }
+
+    PurchaseOrderItem::insert($purchase_order_items);
+
+    return response()->json([
+        'success' => [
+            'status' => 200,
+            'message' => "Purchase order created successfully",
+            'data' => $purchase_order
+        ]
+    ]);
+}
+    
     public function purchase_orders()
     {
 
@@ -385,6 +491,13 @@ class InventoryController extends Controller
                         $raw_product = RawProduct::find($item->raw_product_id);
                         $raw_product->current_stock += $item->quantity;
                         $raw_product->save();
+                        
+                        QrScanLog::create([
+                            'raw_product_id' => $raw_product->id,
+                            'quantity'       => $item->quantity,
+                            'action'         => 'add',
+                        ]);
+    
                     }
                 }
             }
@@ -426,6 +539,33 @@ class InventoryController extends Controller
             return response()->json(['error' => $error]);
         }
     }
+    
+    
+    public function raw_product(Request $request){
+        
+        $request->validate([
+            'sku' => 'required'
+            ]);
+        
+        $raw_pro = RawProduct::where('sku', $request->sku)->with('unit')->first();
+        if($raw_pro){
+            
+            $success['status'] = 200;
+            $success['message'] = "Raw products found successfully";
+            $success['data'] = $raw_pro;
+            
+            return response()->json(['success' => $success]);
+        }else{
+            
+            $error['status'] = 400;
+            $error['message'] = "No product found";
+            
+            return response()->json(['error' => $error]);
+            
+        }
+    }
+    
+    
     public function delete_purchase_order($id)
     {
 
@@ -460,28 +600,195 @@ class InventoryController extends Controller
         }
     }
 
+
+    public function get_purchase_order_items($id)
+{
+    // Validate that the purchase order exists
+    $purchaseOrder = PurchaseOrder::find($id);
+    if (!$purchaseOrder) {
+
+        $error['status'] = 400;
+        $error['message'] = "Purchase order not found";
+
+        return response()->json(['error' => $error]);
+    }
+
+    // Join raw_products table to get product name
+    $items = PurchaseOrderItem::where('purchase_order_items.purchase_order_id', $id)
+        ->leftJoin('raw_products', 'purchase_order_items.raw_product_id', '=', 'raw_products.id')
+        ->select(
+            'purchase_order_items.id',
+            'purchase_order_items.raw_product_id',
+            'raw_products.name as raw_product_name',
+            'purchase_order_items.quantity',
+            'purchase_order_items.cost',
+            'purchase_order_items.total',
+            'purchase_order_items.created_at'
+        )
+        ->get();
+
+    $success['status'] = 200;
+    $success['message'] = "Items found successfully";
+    $success['data'] = $items;
+
+    return response()->json(['success' => $success]);
+}
     // QR Code Scanning
+    // public function scan_qr_code(Request $request)
+    // {
+
+    //     $request->validate([
+    //         'raw_product_id' => 'required|exists:raw_products,id',
+    //         'quantity' => 'required|numeric|min:1',
+    //     ]);
+
+    //     $qrScanLog = QrScanLog::create([
+    //         'raw_product_id' => $request->raw_product_id,
+    //         'quantity' => $request->quantity,
+    //     ]);
+    //     $rawProduct = RawProduct::find($request->raw_product_id);
+
+    //     $rawProduct->current_stock -= $request->quantity;
+    //     $rawProduct->save();
+
+    //     $success['status'] = 200;
+    //     $success['message'] = "QR code scanned and stock updated successfully";
+    //     $success['data'] = $qrScanLog;
+
+    //     return response()->json(['success' => $success]);
+    // }
+
+
+
     public function scan_qr_code(Request $request)
     {
-
         $request->validate([
-            'raw_product_id' => 'required|exists:raw_products,id',
-            'quantity' => 'required|numeric|min:1',
+            'sku_id' => 'required',
+            'quantity'       => 'required|numeric|min:1',
+            'action'         => 'required|in:add,minus',
         ]);
 
-        $qrScanLog = QrScanLog::create([
-            'raw_product_id' => $request->raw_product_id,
-            'quantity' => $request->quantity,
-        ]);
-        $rawProduct = RawProduct::find($request->raw_product_id);
+        $rawProduct = RawProduct::where('sku', $request->sku_id)->first();
 
-        $rawProduct->current_stock -= $request->quantity;
+        // Update stock based on action
+        if ($request->action === 'add') {
+
+            $rawProduct->current_stock += $request->quantity;
+        } else {
+
+            // Prevent negative stock
+            if ($rawProduct->current_stock < $request->quantity) {
+
+                $error['status'] = 400;
+                $error['message'] = "Insufficient stock";
+
+                return response()->json(['error' => $error]);
+            }
+
+            $rawProduct->current_stock -= $request->quantity;
+        }
+
         $rawProduct->save();
 
+        // Log scan
+        $qrScanLog = QrScanLog::create([
+            'raw_product_id' => $rawProduct->id,
+            'quantity'       => $request->quantity,
+            'action'         => $request->action,
+        ]);
+
         $success['status'] = 200;
-        $success['message'] = "QR code scanned and stock updated successfully";
-        $success['data'] = $qrScanLog;
+        $success['message'] = "Stock updated successfully";
+        $success['data'] = $rawProduct;
 
         return response()->json(['success' => $success]);
     }
+    
+    
+
+    public function scan_products(Request $request)
+    {
+            $request->validate([
+                'products' => 'required',
+                'products.*.product_id' => 'required|exists:raw_products,id',
+                'products.*.quantity' => 'required|numeric|min:1',
+            ]);
+    
+            $updatedProducts = [];
+    
+            foreach (json_decode($request->products) as $item) {
+                
+    
+                $rawProduct = RawProduct::find($item->product_id);
+                $quantity   = $item->quantity;
+    
+                if ($rawProduct->current_stock < $quantity) {
+    
+                    return response()->json([
+                        'status' => 400,
+                        'message' => "Insufficient stock for product ID: " . $rawProduct->id
+                    ]);
+                }
+    
+                $rawProduct->current_stock -= $quantity;
+                $rawProduct->save();
+    
+                QrScanLog::create([
+                    'raw_product_id' => $rawProduct->id,
+                    'quantity'       => $quantity,
+                    'action'         => 'minus',
+                ]);
+    
+                $updatedProducts[] = $rawProduct;
+            }
+         
+            $success['status'] = 200;
+            $success['message'] = "Bulk stock deducted successfully";
+            $success['data'] = $updatedProducts;
+            
+            return response()->json(['success' => $success]);
+    
+    
+    }
+    
+    
+    
+    
+    
+public function get_products_logs(Request $request, $id)
+{
+    $query = QrScanLog::where('raw_product_id', $id)
+        ->orderBy('id', 'desc');
+
+    // Date filter
+    if ($request->from_date) {
+        $query->whereDate('created_at', '>=', $request->from_date);
+    }
+
+    if ($request->to_date) {
+        $query->whereDate('created_at', '<=', $request->to_date);
+    }
+
+    // ✅ Pagination (10 per page)
+    $logs = $query->paginate(5);
+
+    // Attach product manually
+    foreach ($logs as $log) {
+        $product = RawProduct::find($log->raw_product_id);
+        $log->product = $product;
+    }
+
+    return response()->json([
+        'success' => [
+            'status' => 200,
+            'message' => $logs->count() > 0 
+                ? "Logs found successfully"
+                : "No logs found",
+            'data' => $logs->items(),          // only records
+            'current_page' => $logs->currentPage(),
+            'last_page' => $logs->lastPage(),
+            'total' => $logs->total()
+        ]
+    ]);
+}
 }

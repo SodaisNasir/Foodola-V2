@@ -93,19 +93,23 @@ Route::prefix('inventory')->group(function () {
     Route::get('/raw-products', [InventoryController::class, 'raw_products']);
     Route::post('/update-raw-product/{id}', [InventoryController::class, 'update_raw_product']);
     Route::post('/delete-raw-product/{id}', [InventoryController::class, 'delete_raw_product']);
+    Route::post('/raw_product', [InventoryController::class, 'raw_product']);
 
     Route::post('/store-vendor', [InventoryController::class, 'store_vendor']);
     Route::get('/vendors', [InventoryController::class, 'vendors']);
     Route::post('/update-vendor/{id}', [InventoryController::class, 'update_vendor']);
-    Route::get('/delete-vendor/{id}', [InventoryController::class, 'delete-vendor']);
+    Route::post('/delete-vendor/{id}', [InventoryController::class, 'delete_vendor']);
 
     Route::post('/store-purchase-order', [InventoryController::class, 'store_purchase_order']);
     Route::get('/purchase-orders', [InventoryController::class, 'purchase_orders']);
     Route::post('/update-purchase-order/{id}', [InventoryController::class, 'update_purchase_order']);
     Route::post('/delete-purchase-order/{id}', [InventoryController::class, 'delete_purchase_order']);
     Route::get('/purchase-order/{id}', [InventoryController::class, 'purchase_order']);
+    Route::get('/get-purchase-order-items/{id}', [InventoryController::class, 'get_purchase_order_items']);
 
     Route::post('/scan-qr-code', [InventoryController::class, 'scan_qr_code']);
+    Route::post('/scan-products', [InventoryController::class, 'scan_products']);
+    Route::post('/get-products-logs/{id}', [InventoryController::class, 'get_products_logs']);
 
 
 });
