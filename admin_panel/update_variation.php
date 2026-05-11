@@ -183,6 +183,7 @@
                                         <th>Variation ID</th>
                                         <th>Product Name</th>
                                         <th>Sub Title</th>
+                                           <th>Primary</th>
                                         <th>Action</th>
                                          <th>Action</th>
                                     </tr>
@@ -191,7 +192,7 @@
                                       <?php
                                       include_once('connection.php');
                                       $id = $_GET['id'];
-                                      $sql="SELECT vp.id,vp.sub_title,p.name FROM variation_with_product vp INNER JOIN products p on p.id = vp.product_id WHERE vp.var_id = $id";
+                                      $sql="SELECT vp.id,vp.sub_title,vp.is_primary,p.name FROM variation_with_product vp INNER JOIN products p on p.id = vp.product_id WHERE vp.var_id = $id";
                                       $result = mysqli_query($conn,$sql);
                                       $index = 0;
                                       while($row = mysqli_fetch_array($result)){
@@ -201,6 +202,16 @@
                                             echo "<td>{$row['id']}</td>";
                                             echo "<td name='cost'>{$row['name']}</td>";
                                             echo "<td name='price'>{$row['sub_title']}</td>";
+                                            echo "<td>";
+
+                                            if($row['is_primary'] == 1)
+                                            {
+                                                echo '<span class="badge bg-primary">Primary</span>';
+                                            }else{
+                                                echo '<span class="badge bg-secondary">No</span>';
+                                            }
+                                    
+                                            echo "</td>";
                                           
                                             echo '<td><button class="btn btn-primary"  onclick="openAddMore(\''. $row['id'] .'\' ,\''.$row['name'].'\' ,\''.$row['sub_title'].'\')">Update</button>';"
                                              </td>";

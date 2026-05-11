@@ -281,20 +281,67 @@ if (isset($_GET['Massage'])) {
 
         
         
-        $(document).ready(function() {
-            var i = 1;
-            $('#add').click(function() {
+  $(document).ready(function () {
 
-                $('#dynamic_fields').append('<div class="row"><div class="col-sm-6" ><div class="form-group"><input type="text" name="addon_name[]" class="form-control" placeholder="Add On" required ></div></div><div class="col-sm-6" ><div class="form-group"><input type="number" step="0.01" name="addon_price[]" class="form-control" placeholder="Add On Price" required ></div></div></div>')
-                i++;
+    var i = 1;
 
-            });
-            $(document).on('click', '.btn_remove', function() {
-                var button_id = $(this).attr("id");
-                i--;
-                $('#row' + button_id + '').remove();
-            });
-        });
+    $('#add').click(function () {
+
+        $('#dynamic_fields').append(`
+
+            <div class="row mb-2 align-items-center" id="row-${i}">
+
+                <div class="col-sm-5">
+                    <div class="form-group mb-0">
+                        <input 
+                            type="text" 
+                            name="addon_name[]" 
+                            class="form-control" 
+                            placeholder="Add On" 
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="col-sm-5">
+                    <div class="form-group mb-0">
+                        <input 
+                            type="number" 
+                            step="0.01" 
+                            name="addon_price[]" 
+                            class="form-control" 
+                            placeholder="Add On Price" 
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="col-sm-2 text-center">
+                    <button type="button" class="btn btn-danger btn-sm btn_remove" data-id="${i}">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </div>
+
+            </div>
+
+        `);
+
+        i++;
+
+    });
+
+    // REMOVE ROW
+    $(document).on('click', '.btn_remove', function () {
+
+        var id = $(this).data("id");
+
+        $('#row-' + id).remove();
+
+        i--;
+
+    });
+
+});
     </script>
     <!-- BEGIN: Page Vendor JS-->
     <script src="app-assets/vendors/js/forms/validation/jqBootstrapValidation.js"></script>

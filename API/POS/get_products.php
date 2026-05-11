@@ -21,7 +21,21 @@ if (isset($category_id) && !empty($category_id)) {
 
         $sub_category_ids_string = implode(',', $sub_category_ids);
 
-        $product_query = "SELECT * FROM products WHERE sub_category_id IN ($sub_category_ids_string)";
+$product_query = "
+SELECT DISTINCT
+    p.*
+FROM products p
+
+LEFT JOIN variation_with_product vp 
+    ON vp.product_id = p.id
+
+WHERE p.sub_category_id IN ($sub_category_ids_string)
+
+AND (
+    vp.product_id IS NULL
+    OR vp.is_primary = 1
+)
+";
         $product_result = mysqli_query($conn, $product_query);
 
         if (mysqli_num_rows($product_result) > 0) {

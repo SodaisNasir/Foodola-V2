@@ -233,32 +233,56 @@ if(isset($_GET['Massage'])){
     <script src="app-assets/vendors/js/vendors.min.js"></script>
     <!-- BEGIN Vendor JS-->
 <script>
-$(document).ready(function() {
+$(document).ready(function () {
+
   var i = 1;
-  $('#add').click(function() {
+
+  $('#add').click(function () {
+
     if (i <= 20) {
-$('#dynamic_fields').append(`
-  <div class="row mb-2" id="row-${i}">
-    <div class="col-sm-6">
-      <div class="form-group">
-        <input type="text" name="add_type[]" class="form-control" placeholder="Add Type" required>
-      </div>
-    </div>
-    <div class="col-sm-6">
-      <div class="form-group">
-        <input type="number" name="add_price[]" step='0.01' class="form-control" placeholder="Add Type Price" required>
-      </div>
-    </div>
-  </div>
-`);
+
+      $('#dynamic_fields').append(`
+
+        <div class="row mb-2 align-items-center" id="row-${i}">
+
+          <div class="col-sm-5">
+            <div class="form-group mb-0">
+              <input type="text" name="add_type[]" class="form-control" placeholder="Add Type" required>
+            </div>
+          </div>
+
+          <div class="col-sm-5">
+            <div class="form-group mb-0">
+              <input type="number" name="add_price[]" step="0.01" class="form-control" placeholder="Add Type Price" required>
+            </div>
+          </div>
+
+          <div class="col-sm-2 text-center">
+            <button type="button" class="btn btn-danger btn-sm btn_remove" data-id="${i}">
+              <i class="fa fa-trash"></i>
+            </button>
+          </div>
+
+        </div>
+
+      `);
+
       i++;
     }
+
   });
-  $(document).on('click', '.btn_remove', function() {
-    var button_id = $(this).attr("id");
+
+  // REMOVE ROW
+  $(document).on('click', '.btn_remove', function () {
+
+    var id = $(this).data("id");
+
+    $('#row-' + id).remove();
+
     i--;
-    $('#row' + button_id + '').remove();
+
   });
+
 });
 
 

@@ -219,7 +219,42 @@ $(document).ready(function() {
    xmlhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
          var data = this.responseText;
-          $('#dynamic_fields').append('<div id="poks'+i+'"  class="row"><div class="col-sm-6" ><div class="form-group"><select name="pro_id[]" id="drop1" onchange="checkingforitemsSelected('+i+',this.value)" class="form-control"><option>Select</option>'+data+'</select></div></div><div class="col-sm-6" ><div class="form-group"><input type="text" step="0.01" name="var_sub_title[]" class="form-control" placeholder="Variation Sub Title" required ></div></div></div>')
+$('#dynamic_fields').append(
+    '<div id="poks'+i+'" class="row mb-2">'+
+
+        '<div class="col-sm-5">'+
+            '<div class="form-group">'+
+                '<select name="pro_id[]" onchange="checkingforitemsSelected('+i+',this.value)" class="form-control" required>'+
+                    '<option value="">Select Product</option>'+data+
+                '</select>'+
+            '</div>'+
+        '</div>'+
+
+        '<div class="col-sm-4">'+
+            '<div class="form-group">'+
+                '<input type="text" name="var_sub_title[]" class="form-control" placeholder="Variation Sub Title" required>'+
+            '</div>'+
+        '</div>'+
+
+        '<div class="col-sm-2 d-flex align-items-center">'+
+            '<div class="form-check">'+
+
+                // hidden field
+                '<input type="hidden" name="is_primary[]" id="hidden_primary_'+i+'" value="0">'+
+
+                // radio button
+                '<input class="form-check-input primary_radio" type="radio" name="primary_select" data-id="'+i+'">'+
+
+                '<label class="form-check-label ms-1">Primary</label>'+
+            '</div>'+
+        '</div>'+
+
+        '<div class="col-sm-1 d-flex align-items-center">'+
+            '<button type="button" class="btn btn-danger btn-sm btn_remove" id="'+i+'">X</button>'+
+        '</div>'+
+
+    '</div>'
+);
       }
     }
     xmlhttp.open("GET", "phpfiles/getVariationOptions.php", true);
@@ -229,6 +264,18 @@ $(document).ready(function() {
       i++;
 
   });
+  
+  $(document).on('change', '.primary_radio', function () {
+
+    // sab hidden fields 0
+    $("input[name='is_primary[]']").val(0);
+
+    // selected wala 1
+    let id = $(this).data('id');
+
+    $('#hidden_primary_' + id).val(1);
+
+});
   
   
   $(document).on('click', '.btn_remove', function() {
@@ -344,6 +391,11 @@ function submitOperation(){
         alert("You can not submit unless all selected items are unique!")
     }
 }
+
+$(document).on('click', '.btn_remove', function() {
+    var button_id = $(this).attr("id");
+    $('#poks' + button_id).remove();
+});
 </script>
 
 

@@ -11,7 +11,58 @@ use PHPMailer\PHPMailer\Exception;
 
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
+function convertToWebp($sourceFile, $destinationPath, $quality = 80)
+{
+    if (!file_exists($sourceFile)) {
+        return false;
+    }
 
+    $imageInfo = getimagesize($sourceFile);
+
+    if (!$imageInfo) {
+        return false;
+    }
+
+    $mime = $imageInfo['mime'];
+
+    switch ($mime) {
+
+        case 'image/jpeg':
+            $image = imagecreatefromjpeg($sourceFile);
+            break;
+
+        case 'image/png':
+            $image = imagecreatefrompng($sourceFile);
+
+            // Preserve transparency
+            imagepalettetotruecolor($image);
+            imagealphablending($image, true);
+            imagesavealpha($image, true);
+
+            break;
+
+        case 'image/gif':
+            $image = imagecreatefromgif($sourceFile);
+            break;
+
+        case 'image/webp':
+            $image = imagecreatefromwebp($sourceFile);
+            break;
+
+        default:
+            return false;
+    }
+
+    if (!$image) {
+        return false;
+    }
+
+    $result = imagewebp($image, $destinationPath, $quality);
+
+    imagedestroy($image);
+
+    return $result;
+}
 
 
 if (isset($_POST['btn_update_recipe'])) {
@@ -533,70 +584,187 @@ if (isset($_POST['btn_setcashback'])) {
 
 
 
+// if (isset($_POST['ProID'])) {
+//     include('../connection.php');
+
+//     $ProdID = intval($_POST['ProID']); // Use intval for better security
+//     $target_dir = "../Uploads/";
+//     $originalFileName = basename($_FILES["updatedImage"]["name"]);
+//     $imageFileType = strtolower(pathinfo($originalFileName, PATHINFO_EXTENSION));
+
+//     // Validate file size
+//     if ($_FILES["updatedImage"]["size"] > 500000000) {
+//         echo json_encode(['success' => false, 'message' => 'Sorry, your file is too large.']);
+//         exit;
+//     }
+
+//     // Allowed file types
+//     if (!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
+//         echo json_encode(['success' => false, 'message' => 'Only JPG, JPEG, PNG & GIF files are allowed.']);
+//         exit;
+//     }
+
+//     // Escape $ProdID for use in the SQL query
+//     $ProdID = mysqli_real_escape_string($conn, $ProdID);
+
+//     // Get product name and current image
+//     $get_file_name = "SELECT name, img FROM products WHERE id = '$ProdID'";
+//     $result = mysqli_query($conn, $get_file_name);
+
+//     if (mysqli_num_rows($result) > 0) {
+//         $Data = mysqli_fetch_assoc($result);
+//         $productName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $Data['name']); // Sanitize product name
+//         $uniqueID = uniqid(); // Generate a unique ID
+//         $image_name = $productName . "_" . $ProdID . "_" . $uniqueID . "." . $imageFileType;
+
+//         // If a previous image exists, remove it
+//         if (!empty($Data['img'])) {
+//             $existingImagePath = $target_dir . $Data['img'];
+//             if (file_exists($existingImagePath)) {
+//                 if (!unlink($existingImagePath)) {
+//                     echo json_encode(['success' => false, 'message' => 'Failed to delete old image.']);
+//                     exit;
+//                 }
+//             }
+//         }
+
+//         // Attempt to move uploaded file
+//         if (move_uploaded_file($_FILES["updatedImage"]["tmp_name"], $target_dir . $image_name)) {
+//             // Update the database with the new image name
+//             $update = "UPDATE products SET img = '$image_name' WHERE id = '$ProdID'";
+//             if (mysqli_query($conn, $update)) {
+//                 echo json_encode(['success' => true, 'productId' => $ProdID, 'newImageName' => $image_name]);
+//             } else {
+//                 echo json_encode(['success' => false, 'message' => 'Database update failed.']);
+//             }
+//         } else {
+//             echo json_encode(['success' => false, 'message' => 'Error uploading the file.']);
+//         }
+
+//     } else {
+//         echo json_encode(['success' => false, 'message' => 'Product not found.']);
+//     }
+// }
+
+
+
+
+
 if (isset($_POST['ProID'])) {
+
     include('../connection.php');
 
-    $ProdID = intval($_POST['ProID']); // Use intval for better security
+    $ProdID = intval($_POST['ProID']);
     $target_dir = "../Uploads/";
+
+    // Check file exists
+    if (!isset($_FILES["updatedImage"]) || $_FILES["updatedImage"]["error"] != 0) {
+
+        echo json_encode([
+            'success' => false,
+            'message' => 'No image uploaded.'
+        ]);
+
+        exit;
+    }
+
+    // Allowed extensions
+    $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
     $originalFileName = basename($_FILES["updatedImage"]["name"]);
+
     $imageFileType = strtolower(pathinfo($originalFileName, PATHINFO_EXTENSION));
 
-    // Validate file size
+    // Validate extension
+    if (!in_array($imageFileType, $allowedTypes)) {
+
+        echo json_encode([
+            'success' => false,
+            'message' => 'Only JPG, JPEG, PNG, GIF & WEBP files are allowed.'
+        ]);
+
+        exit;
+    }
+
+    // Validate size
     if ($_FILES["updatedImage"]["size"] > 500000000) {
-        echo json_encode(['success' => false, 'message' => 'Sorry, your file is too large.']);
+
+        echo json_encode([
+            'success' => false,
+            'message' => 'File is too large.'
+        ]);
+
         exit;
     }
 
-    // Allowed file types
-    if (!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
-        echo json_encode(['success' => false, 'message' => 'Only JPG, JPEG, PNG & GIF files are allowed.']);
-        exit;
-    }
-
-    // Escape $ProdID for use in the SQL query
-    $ProdID = mysqli_real_escape_string($conn, $ProdID);
-
-    // Get product name and current image
+    // Get product
     $get_file_name = "SELECT name, img FROM products WHERE id = '$ProdID'";
+
     $result = mysqli_query($conn, $get_file_name);
 
     if (mysqli_num_rows($result) > 0) {
-        $Data = mysqli_fetch_assoc($result);
-        $productName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $Data['name']); // Sanitize product name
-        $uniqueID = uniqid(); // Generate a unique ID
-        $image_name = $productName . "_" . $ProdID . "_" . $uniqueID . "." . $imageFileType;
 
-        // If a previous image exists, remove it
+        $Data = mysqli_fetch_assoc($result);
+
+        $productName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $Data['name']);
+
+        $uniqueID = uniqid();
+
+        // Save as webp
+        $image_name = $productName . "_" . $ProdID . "_" . $uniqueID . ".webp";
+
+        $destination = $target_dir . $image_name;
+
+        // Delete old image
         if (!empty($Data['img'])) {
+
             $existingImagePath = $target_dir . $Data['img'];
+
             if (file_exists($existingImagePath)) {
-                if (!unlink($existingImagePath)) {
-                    echo json_encode(['success' => false, 'message' => 'Failed to delete old image.']);
-                    exit;
-                }
+                unlink($existingImagePath);
             }
         }
 
-        // Attempt to move uploaded file
-        if (move_uploaded_file($_FILES["updatedImage"]["tmp_name"], $target_dir . $image_name)) {
-            // Update the database with the new image name
+        $tmpFile = $_FILES["updatedImage"]["tmp_name"];
+
+        // Convert image
+        if (convertToWebp($tmpFile, $destination, 80)) {
+
+            // Update DB
             $update = "UPDATE products SET img = '$image_name' WHERE id = '$ProdID'";
+
             if (mysqli_query($conn, $update)) {
-                echo json_encode(['success' => true, 'productId' => $ProdID, 'newImageName' => $image_name]);
+
+                echo json_encode([
+                    'success' => true,
+                    'productId' => $ProdID,
+                    'newImageName' => $image_name
+                ]);
+
             } else {
-                echo json_encode(['success' => false, 'message' => 'Database update failed.']);
+
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Database update failed.'
+                ]);
             }
+
         } else {
-            echo json_encode(['success' => false, 'message' => 'Error uploading the file.']);
+
+            echo json_encode([
+                'success' => false,
+                'message' => 'Failed to convert image to WEBP.'
+            ]);
         }
 
     } else {
-        echo json_encode(['success' => false, 'message' => 'Product not found.']);
+
+        echo json_encode([
+            'success' => false,
+            'message' => 'Product not found.'
+        ]);
     }
 }
-
-
-
 
 
 if (isset($_POST['btn_update_table'])) {
@@ -763,65 +931,192 @@ $sql = "INSERT INTO `tables`(`table_name`, `seats`, `table_image`, `branch_id`,`
 
 
 // for the insertion of Sub Categories
-if (isset($_POST['btnSubmit_insertCategories'])) {
-  include('../connection.php');
-//   include('../assets/config.php');
-        error_reporting(E_ALL);
-ini_set('display_errors', 1);
-  $cat_name = $_POST['CatName'];
-  $target_dir = "../Uploads/";
-  $target_file = $target_dir . basename($_FILES["CatImage"]["name"]);
-  $uploadOk = 1;
-  $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-  if ($_FILES["CatImage"]["size"] > 8000000) {
-    echo "<script>alert('Sorry, your file is too large.');window.location.href='../addmaincat.php'</script>";
-    $uploadOk = 0;
-  }
+// if (isset($_POST['btnSubmit_insertCategories'])) {
+//   include('../connection.php');
+// //   include('../assets/config.php');
+//         error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+//   $cat_name = $_POST['CatName'];
+//   $target_dir = "../Uploads/";
+//   $target_file = $target_dir . basename($_FILES["CatImage"]["name"]);
+//   $uploadOk = 1;
+//   $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+//   if ($_FILES["CatImage"]["size"] > 8000000) {
+//     echo "<script>alert('Sorry, your file is too large.');window.location.href='../addmaincat.php'</script>";
+//     $uploadOk = 0;
+//   }
 
-  if (
-    $imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
-    && $imageFileType != "gif"
-  ) {
+//   if (
+//     $imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+//     && $imageFileType != "gif"
+//   ) {
 
-    echo "<script>alert('Sorry, only JPG, JPEG, PNG & GIF files are allowed.');window.location.href='../addmaincat.php'</script>";
-    $uploadOk = 0;
-  }
+//     echo "<script>alert('Sorry, only JPG, JPEG, PNG & GIF files are allowed.');window.location.href='../addmaincat.php'</script>";
+//     $uploadOk = 0;
+//   }
 
-  if ($uploadOk == 0) {
-    echo "<script>alert('Sorry, your file was not uploaded.');window.location.href='../addmaincat.php'</script>";
-  } else {
-    $filewithnewname =  date("Ymdis") . "_Main_Cat." . $imageFileType;
-    if (move_uploaded_file($_FILES["CatImage"]["tmp_name"], $target_dir . $filewithnewname)) {
-      // echo "The file ". htmlspecialchars( basename( $_FILES["CatImage"]["name"])). " has been uploaded.";
+//   if ($uploadOk == 0) {
+//     echo "<script>alert('Sorry, your file was not uploaded.');window.location.href='../addmaincat.php'</script>";
+//   } else {
+//     $filewithnewname =  date("Ymdis") . "_Main_Cat." . $imageFileType;
+//     if (move_uploaded_file($_FILES["CatImage"]["tmp_name"], $target_dir . $filewithnewname)) {
+//       // echo "The file ". htmlspecialchars( basename( $_FILES["CatImage"]["name"])). " has been uploaded.";
       
-      $cat_name = mysqli_real_escape_string($conn, $cat_name);
-$filewithnewname = mysqli_real_escape_string($conn, $filewithnewname);
+//       $cat_name = mysqli_real_escape_string($conn, $cat_name);
+// $filewithnewname = mysqli_real_escape_string($conn, $filewithnewname);
 
-      $sql = "INSERT INTO `categories`(`name`, `img`) VALUES ('$cat_name','$filewithnewname')";
-      $result = mysqli_query($conn, $sql);
+//       $sql = "INSERT INTO `categories`(`name`, `img`) VALUES ('$cat_name','$filewithnewname')";
+//       $result = mysqli_query($conn, $sql);
 
 
-      if ($result) {
-        $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                            VALUES ('pizzablitz', '1' ,NOW(),NOW())";
-        $monitor_update = mysqli_query($conn, $monitor_sql);
+//       if ($result) {
+//         $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
+//                             VALUES ('pizzablitz', '1' ,NOW(),NOW())";
+//         $monitor_update = mysqli_query($conn, $monitor_sql);
 
-        if ($monitor_update) {
-          header("Location:../viewcategories.php?Massage=Sucessfully added new category.");
+//         if ($monitor_update) {
+//           header("Location:../viewcategories.php?Massage=Sucessfully added new category.");
+//         } else {
+//           die("Error updating monitoring database: " . mysqli_error($monitor_con));
+//         }
+//       }else{
+//         echo "<script>alert('Sorry, there was an error uploading your file.')</script>";
+//       }
+//     } else {
+
+//       echo "<script>alert('Sorry, there was an error uploading your file.')</script>";
+//     }
+//   }
+ 
+// }
+  
+  
+  if (isset($_POST['btnSubmit_insertCategories'])) {
+
+    include('../connection.php');
+
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+
+    $cat_name = mysqli_real_escape_string($conn, $_POST['CatName']);
+
+    $target_dir = "../Uploads/";
+
+    // Check image exists
+    if (!isset($_FILES["CatImage"]) || $_FILES["CatImage"]["error"] != 0) {
+
+        echo "<script>
+                alert('Please select an image.');
+                window.location.href='../addmaincat.php';
+              </script>";
+        exit;
+    }
+
+    $originalFileName = basename($_FILES["CatImage"]["name"]);
+
+    $imageFileType = strtolower(pathinfo($originalFileName, PATHINFO_EXTENSION));
+
+    $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+    // Validate size
+    if ($_FILES["CatImage"]["size"] > 8000000) {
+
+        echo "<script>
+                alert('Sorry, your file is too large.');
+                window.location.href='../addmaincat.php';
+              </script>";
+        exit;
+    }
+
+    // Validate extension
+    if (!in_array($imageFileType, $allowedTypes)) {
+
+        echo "<script>
+                alert('Only JPG, JPEG, PNG, GIF & WEBP files are allowed.');
+                window.location.href='../addmaincat.php';
+              </script>";
+        exit;
+    }
+
+    // Generate WEBP file name
+    $cleanCategoryName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $cat_name);
+
+    $filewithnewname = date("YmdHis") . "_" . $cleanCategoryName . ".webp";
+
+    $destination = $target_dir . $filewithnewname;
+
+    $tmpFile = $_FILES["CatImage"]["tmp_name"];
+
+    // Convert image to WEBP
+    if (convertToWebp($tmpFile, $destination, 80)) {
+
+        $filewithnewname = mysqli_real_escape_string($conn, $filewithnewname);
+
+        $sql = "INSERT INTO `categories`
+        (
+            `name`,
+            `img`
+        )
+        VALUES
+        (
+            '$cat_name',
+            '$filewithnewname'
+        )";
+
+        $result = mysqli_query($conn, $sql);
+
+        if ($result) {
+
+            $monitor_sql = "INSERT INTO `website_requests`
+            (
+                `website_name`,
+                `status`,
+                `created_at`,
+                `updated_at`
+            )
+            VALUES
+            (
+                'pizzablitz',
+                '1',
+                NOW(),
+                NOW()
+            )";
+
+            $monitor_update = mysqli_query($conn, $monitor_sql);
+
+            if ($monitor_update) {
+
+                header("Location:../viewcategories.php?Massage=Successfully added new category.");
+
+            } else {
+
+                echo "<script>
+                        alert('Monitoring database update failed.');
+                        window.location.href='../addmaincat.php';
+                      </script>";
+            }
+
         } else {
-          die("Error updating monitoring database: " . mysqli_error($monitor_con));
+
+            // Delete image if DB insert fails
+            if (file_exists($destination)) {
+                unlink($destination);
+            }
+
+            echo "<script>
+                    alert('Database insert failed.');
+                    window.location.href='../addmaincat.php';
+                  </script>";
         }
-      }else{
-        echo "<script>alert('Sorry, there was an error uploading your file.')</script>";
-      }
+
     } else {
 
-      echo "<script>alert('Sorry, there was an error uploading your file.')</script>";
+        echo "<script>
+                alert('Failed to convert image to WEBP.');
+                window.location.href='../addmaincat.php';
+              </script>";
     }
-  }
- 
 }
-  
 if(isset($_POST['updateAddonTitle'])){
       include('../connection.php');
 
@@ -1333,67 +1628,157 @@ if(isset($_POST['btnSubmit_placeorder'])){
 
 // }
 
-if (isset($_POST['btnSubmit_insertSubCategories'])) {
-    include('../connection.php');
-    session_start();
+// if (isset($_POST['btnSubmit_insertSubCategories'])) {
+//     include('../connection.php');
+//     session_start();
     
-  $cat_name = mysqli_real_escape_string($conn, $_POST['CatName']);
-$main_cat = mysqli_real_escape_string($conn, $_POST['MainCat']);
-    $target_dir = "../Uploads/";
+//   $cat_name = mysqli_real_escape_string($conn, $_POST['CatName']);
+// $main_cat = mysqli_real_escape_string($conn, $_POST['MainCat']);
+//     $target_dir = "../Uploads/";
 
-    // Upload category image
-    $catImageName = handleImageUpload($_FILES["CatImage"], $target_dir, "Sub_Cat");
+//     // Upload category image
+//     $catImageName = handleImageUpload($_FILES["CatImage"], $target_dir, "Sub_Cat");
 
-    // Upload banner image
-    $bannerImageName = handleImageUpload($_FILES["banner_image"], $target_dir, "Banner");
+//     // Upload banner image
+//     $bannerImageName = handleImageUpload($_FILES["banner_image"], $target_dir, "Banner");
 
-    if ($catImageName && $bannerImageName) {
-        $sql = "INSERT INTO `sub_categories`(`category_id`, `name`, `img`, `banner_image`) VALUES ($main_cat, '$cat_name', '$catImageName', '$bannerImageName')";
-        $result = mysqli_query($conn, $sql);
+//     if ($catImageName && $bannerImageName) {
+//         $sql = "INSERT INTO `sub_categories`(`category_id`, `name`, `img`, `banner_image`) VALUES ($main_cat, '$cat_name', '$catImageName', '$bannerImageName')";
+//         $result = mysqli_query($conn, $sql);
 
-        if ($result) {
-            header("Location: ../addSubCat.php?Massage=Sucessfully Added New Sub Category.");
-        } else {
-            echo "<script>alert('Database error: Unable to insert record.')</script>";
-        }
-    }
-}
+//         if ($result) {
+//             header("Location: ../addSubCat.php?Massage=Sucessfully Added New Sub Category.");
+//         } else {
+//             echo "<script>alert('Database error: Unable to insert record.')</script>";
+//         }
+//     }
+// }
 
 // Function to handle image uploads
-function handleImageUpload($file, $target_dir, $prefix) {
+// Function to handle image uploads
+function handleImageUpload($file, $target_dir, $prefix)
+{
     if ($file['error'] !== UPLOAD_ERR_OK) {
-        echo "<script>alert('Error uploading file: " . $file['name'] . "')</script>";
+
+        echo "<script>
+                alert('Error uploading file: {$file['name']}');
+              </script>";
+
         return false;
     }
 
     $imageFileType = strtolower(pathinfo($file["name"], PATHINFO_EXTENSION));
 
-    // Validate file size
-    if ($file["size"] > 500000) {
-        echo "<script>alert('File too large: " . $file['name'] . "')</script>";
+    // Allowed formats
+    $allowedTypes = ["jpg", "jpeg", "png", "gif", "webp"];
+
+    // Validate size
+    if ($file["size"] > 5000000) {
+
+        echo "<script>
+                alert('File too large: {$file['name']}');
+              </script>";
+
         return false;
     }
 
-    // Validate allowed formats
-    $allowedTypes = ["jpg", "jpeg", "png", "gif"];
+    // Validate extension
     if (!in_array($imageFileType, $allowedTypes)) {
-        echo "<script>alert('Invalid file type for " . $file['name'] . "')</script>";
+
+        echo "<script>
+                alert('Invalid file type for {$file['name']}');
+              </script>";
+
         return false;
     }
 
-    // Generate unique filename
-    $newFileName = date("Ymdis") . "_$prefix." . $imageFileType;
+    // Generate WEBP file name
+    $newFileName = date("YmdHis") . "_{$prefix}.webp";
 
-    // Move uploaded file
-    if (move_uploaded_file($file["tmp_name"], $target_dir . $newFileName)) {
+    $destination = $target_dir . $newFileName;
+
+    // Convert image
+    if (convertToWebp($file["tmp_name"], $destination, 80)) {
+
         return $newFileName;
+
     } else {
-        echo "<script>alert('Failed to upload: " . $file['name'] . "')</script>";
+
+        echo "<script>
+                alert('Failed to convert image: {$file['name']}');
+              </script>";
+
         return false;
     }
 }
 
 
+
+if (isset($_POST['btnSubmit_insertSubCategories'])) {
+
+    include('../connection.php');
+
+    session_start();
+
+    $cat_name = mysqli_real_escape_string($conn, $_POST['CatName']);
+
+    $main_cat = mysqli_real_escape_string($conn, $_POST['MainCat']);
+
+    $target_dir = "../Uploads/";
+
+    // Upload category image
+    $catImageName = handleImageUpload(
+        $_FILES["CatImage"],
+        $target_dir,
+        "Sub_Cat"
+    );
+
+    // Upload banner image
+    $bannerImageName = handleImageUpload(
+        $_FILES["banner_image"],
+        $target_dir,
+        "Banner"
+    );
+
+    if ($catImageName && $bannerImageName) {
+
+        $sql = "INSERT INTO `sub_categories`
+        (
+            `category_id`,
+            `name`,
+            `img`,
+            `banner_image`
+        )
+        VALUES
+        (
+            '$main_cat',
+            '$cat_name',
+            '$catImageName',
+            '$bannerImageName'
+        )";
+
+        $result = mysqli_query($conn, $sql);
+
+        if ($result) {
+header("Location: ../addSubCat.php?Massage=Sucessfully Added New Sub Category.");
+
+        } else {
+
+            // Delete uploaded images if DB insert fails
+            if (file_exists($target_dir . $catImageName)) {
+                unlink($target_dir . $catImageName);
+            }
+
+            if (file_exists($target_dir . $bannerImageName)) {
+                unlink($target_dir . $bannerImageName);
+            }
+
+            echo "<script>
+                    alert('Database error: Unable to insert record.');
+                  </script>";
+        }
+    }
+}
 
 
 if (isset($_POST['btnSubmit_insertSliders'])) {
@@ -1746,83 +2131,248 @@ if(isset($_POST['btnSubmit_insertDeal'])){
 }
 
 
-if(isset($_POST['btnSubmit_insertNewProductZ'])){
+// if(isset($_POST['btnSubmit_insertNewProductZ'])){
     
-            error_reporting(E_ALL);
-ini_set('display_errors', 1);
+//             error_reporting(E_ALL);
+// ini_set('display_errors', 1);
     
-include('../connection.php');
-include('../assets/config.php'); 
+// include('../connection.php');
+// include('../assets/config.php'); 
 
-  session_start();
-//   $addon_name = $_POST['addon_name'];
-//   $addon_price = $_POST['addon_price'];
+//   session_start();
+// //   $addon_name = $_POST['addon_name'];
+// //   $addon_price = $_POST['addon_price'];
 
-  $ProName = mysqli_real_escape_string($conn, $_POST['ProName']);
-  $ProDes = mysqli_real_escape_string($conn, $_POST['ProDes']);
-  $ProCost = $_POST['ProCost'];
-  $ProPrice = $_POST['ProPrice'];
-  $ProQty = $_POST['ProQty']?? 1000;
-  $ProDiscount = $_POST['ProDiscount'];
-  $MainCat = $_POST['MainCat'];
-  $addonCat = $_POST['addonCat'];
-  $typeCat = $_POST['typeCat'];
-  $dressingCat = $_POST['dressingCat'];
-  $sku_id = $_POST['sku_id'];
-  $tax = $_POST['tax'];
-  $for_deal_only = $_POST['for_deal_only'];
-  $time_id = $_POST['time_id'];
+//   $ProName = mysqli_real_escape_string($conn, $_POST['ProName']);
+//   $ProDes = mysqli_real_escape_string($conn, $_POST['ProDes']);
+//   $ProCost = $_POST['ProCost'];
+//   $ProPrice = $_POST['ProPrice'];
+//   $ProQty = $_POST['ProQty']?? 1000;
+//   $ProDiscount = $_POST['ProDiscount'];
+//   $MainCat = $_POST['MainCat'];
+//   $addonCat = $_POST['addonCat'];
+//   $typeCat = $_POST['typeCat'];
+//   $dressingCat = $_POST['dressingCat'];
+//   $sku_id = $_POST['sku_id'];
+//   $tax = $_POST['tax'];
+//   $for_deal_only = $_POST['for_deal_only'];
+//   $time_id = $_POST['time_id'];
   
   
   
-  $target_dir = "../Uploads/";
-  $target_file = $target_dir . basename($_FILES["ProImage"]["name"]);
-  $uploadOk = 1;
-  $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
+//   $target_dir = "../Uploads/";
+//   $target_file = $target_dir . basename($_FILES["ProImage"]["name"]);
+//   $uploadOk = 1;
+//   $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
   
-  if ($_FILES["CatImage"]["size"] > 500000) {
-  echo "<script>alert('Sorry, your file is too large.');window.location.href='../insertNewProduct.php'</script>";
-    $uploadOk = 0;
-  }
+//   if ($_FILES["CatImage"]["size"] > 500000) {
+//   echo "<script>alert('Sorry, your file is too large.');window.location.href='../insertNewProduct.php'</script>";
+//     $uploadOk = 0;
+//   }
   
-  if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
-    && $imageFileType != "gif" ) {
+//   if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+//     && $imageFileType != "gif" ) {
       
-      echo "<script>alert('Sorry, only JPG, JPEG, PNG & GIF files are allowed.');window.location.href='../insertNewProduct.php'</script>";
-      $uploadOk = 0;
-    }
+//       echo "<script>alert('Sorry, only JPG, JPEG, PNG & GIF files are allowed.');window.location.href='../insertNewProduct.php'</script>";
+//       $uploadOk = 0;
+//     }
     
-  if ($uploadOk == 0) {
-      echo "<script>alert('Sorry, your file was not uploaded.');window.location.href='../insertNewProduct.php'</script>";
-    } else {
-      $filewithnewname =  date("Ymdis")."_Product.".$imageFileType;    
-      if (move_uploaded_file($_FILES["ProImage"]["tmp_name"], $target_dir.$filewithnewname)) {
-         "The file ". htmlspecialchars( basename( $_FILES["ProImage"]["name"])). " has been uploaded.";
+//   if ($uploadOk == 0) {
+//       echo "<script>alert('Sorry, your file was not uploaded.');window.location.href='../insertNewProduct.php'</script>";
+//     } else {
+//       $filewithnewname =  date("Ymdis")."_Product.".$imageFileType;    
+//       if (move_uploaded_file($_FILES["ProImage"]["tmp_name"], $target_dir.$filewithnewname)) {
+//          "The file ". htmlspecialchars( basename( $_FILES["ProImage"]["name"])). " has been uploaded.";
          
          
-        $sql = "INSERT INTO `products`(`addon_id`,`type_id`,`dressing_id`, `sub_category_id`,`name`, `sku_id`, `description`, `cost`, `price`, `discount`, `qty`,`img`, `tax`, `for_deal_only`,`time_id`) VALUES ('$addonCat','$typeCat','$dressingCat','$MainCat','$ProName','$sku_id','$ProDes','$ProCost','$ProPrice','$ProDiscount','$ProQty','$filewithnewname', '$tax', '$for_deal_only', '$time_id')";
+//         $sql = "INSERT INTO `products`(`addon_id`,`type_id`,`dressing_id`, `sub_category_id`,`name`, `sku_id`, `description`, `cost`, `price`, `discount`, `qty`,`img`, `tax`, `for_deal_only`,`time_id`) VALUES ('$addonCat','$typeCat','$dressingCat','$MainCat','$ProName','$sku_id','$ProDes','$ProCost','$ProPrice','$ProDiscount','$ProQty','$filewithnewname', '$tax', '$for_deal_only', '$time_id')";
                                         
-        $result = mysqli_query($conn,$sql);
-            if($result){
-                 $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                                VALUES ('pizzablitz', '1' ,NOW(),NOW())";
-                $monitor_update = mysqli_query($conn, $monitor_sql);
+//         $result = mysqli_query($conn,$sql);
+//             if($result){
+//                  $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
+//                                 VALUES ('pizzablitz', '1' ,NOW(),NOW())";
+//                 $monitor_update = mysqli_query($conn, $monitor_sql);
         
-                if ($monitor_update) {
-                        header("Location:../insertNewProduct.php?Massage=Sucessfully added new product.");
-                } else {
-                     header("Location:../insertNewProduct.php?Massage=Sorry, there was an error while adding product.");
-                }
+//                 if ($monitor_update) {
+//                         header("Location:../insertNewProduct.php?Massage=Sucessfully added new product.");
+//                 } else {
+//                      header("Location:../insertNewProduct.php?Massage=Sorry, there was an error while adding product.");
+//                 }
                 
+//             }
+       
+//       } else {
+       
+//         echo "<script>alert('Sorry, there was an error uploading your file.')</script>";
+//       }
+//   }
+
+
+// }
+
+
+if(isset($_POST['btnSubmit_insertNewProductZ'])){
+
+    // error_reporting(E_ALL);
+    // ini_set('display_errors', 1);
+
+    include('../connection.php');
+    include('../assets/config.php');
+
+    session_start();
+
+    $ProName = mysqli_real_escape_string($conn, $_POST['ProName']);
+    $ProDes = mysqli_real_escape_string($conn, $_POST['ProDes']);
+    $ProCost = $_POST['ProCost'];
+    $ProPrice = $_POST['ProPrice'];
+    $ProQty = $_POST['ProQty'] ?? 1000;
+    $ProDiscount = $_POST['ProDiscount'];
+    $MainCat = $_POST['MainCat'];
+    $addonCat = $_POST['addonCat'];
+    $typeCat = $_POST['typeCat'];
+    $dressingCat = $_POST['dressingCat'];
+    $sku_id = $_POST['sku_id'];
+    $tax = $_POST['tax'];
+    $for_deal_only = $_POST['for_deal_only'];
+    $time_id = $_POST['time_id'];
+
+    $target_dir = "../Uploads/";
+
+    // Check image exists
+    if (!isset($_FILES["ProImage"]) || $_FILES["ProImage"]["error"] != 0) {
+
+        echo "<script>
+                alert('Please select an image.');
+                window.location.href='../insertNewProduct.php';
+              </script>";
+        exit;
+    }
+
+    $originalFileName = basename($_FILES["ProImage"]["name"]);
+
+    $imageFileType = strtolower(pathinfo($originalFileName, PATHINFO_EXTENSION));
+
+    $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+    // Validate size
+    if ($_FILES["ProImage"]["size"] > 5000000) {
+
+        echo "<script>
+                alert('Sorry, your file is too large.');
+                window.location.href='../insertNewProduct.php';
+              </script>";
+        exit;
+    }
+
+    // Validate extension
+    if (!in_array($imageFileType, $allowedTypes)) {
+
+        echo "<script>
+                alert('Only JPG, JPEG, PNG, GIF & WEBP files are allowed.');
+                window.location.href='../insertNewProduct.php';
+              </script>";
+        exit;
+    }
+
+    // Generate WEBP file name
+    $cleanProductName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $ProName);
+
+    $filewithnewname = date("YmdHis") . "_" . $cleanProductName . ".webp";
+
+    $destination = $target_dir . $filewithnewname;
+
+    $tmpFile = $_FILES["ProImage"]["tmp_name"];
+
+    // Convert image to WEBP
+    if (convertToWebp($tmpFile, $destination, 80)) {
+
+        $sql = "INSERT INTO `products`
+        (
+            `addon_id`,
+            `type_id`,
+            `dressing_id`,
+            `sub_category_id`,
+            `name`,
+            `sku_id`,
+            `description`,
+            `cost`,
+            `price`,
+            `discount`,
+            `qty`,
+            `img`,
+            `tax`,
+            `for_deal_only`,
+            `time_id`
+        )
+        VALUES
+        (
+            '$addonCat',
+            '$typeCat',
+            '$dressingCat',
+            '$MainCat',
+            '$ProName',
+            '$sku_id',
+            '$ProDes',
+            '$ProCost',
+            '$ProPrice',
+            '$ProDiscount',
+            '$ProQty',
+            '$filewithnewname',
+            '$tax',
+            '$for_deal_only',
+            '$time_id'
+        )";
+
+        $result = mysqli_query($conn, $sql);
+
+        if ($result) {
+
+            $monitor_sql = "INSERT INTO `website_requests`
+            (
+                `website_name`,
+                `status`,
+                `created_at`,
+                `updated_at`
+            )
+            VALUES
+            (
+                'pizzablitz',
+                '1',
+                NOW(),
+                NOW()
+            )";
+
+            $monitor_update = mysqli_query($conn, $monitor_sql);
+
+            if ($monitor_update) {
+
+header("Location:../insertNewProduct.php?Massage=Sucessfully added new product.");
+
+            } else {
+
+                header("Location:../insertNewProduct.php?Massage=Product added but monitor update failed.");
             }
-       
-      } else {
-       
-        echo "<script>alert('Sorry, there was an error uploading your file.')</script>";
-      }
-  }
 
+        } else {
 
+            // Delete uploaded image if DB insert fails
+            if (file_exists($destination)) {
+                unlink($destination);
+            }
+
+            echo "<script>
+                    alert('Database insert failed.');
+                    window.location.href='../insertNewProduct.php';
+                  </script>";
+        }
+
+    } else {
+
+        echo "<script>
+                alert('Failed to convert image to WEBP.');
+                window.location.href='../insertNewProduct.php';
+              </script>";
+    }
 }
 
 
@@ -2000,58 +2550,136 @@ include('../connection.php');
 
 // add variations
 
-if(isset($_POST['btnSubmit_Variation']))
-{
-      include('../connection.php');
+// if(isset($_POST['btnSubmit_Variation']))
+// {
+//       include('../connection.php');
       
-    //   $myarray = array();
+//     //   $myarray = array();
       
-      session_start();
-      $pro_id = $_POST['pro_id'];
-      $var_sub_title = $_POST['var_sub_title'];
-      $var_title =  mysqli_real_escape_string($conn,$_POST['var_title']);
+//       session_start();
+//       $pro_id = $_POST['pro_id'];
+//       $var_sub_title = $_POST['var_sub_title'];
+//       $var_title =  mysqli_real_escape_string($conn,$_POST['var_title']);
       
-    //   print_r($pro_id);
-    //   die();
-    //   array_push($myarray,$pro_id);
-      if(in_array(0 ,$pro_id ))
-      {
-          ?>
-          <script>alert("Please Change Your Product");
-          window.location.href="../addVariation.php";
-          </script>
-          <?php
-      }
-      else
-      {
+//     //   print_r($pro_id);
+//     //   die();
+//     //   array_push($myarray,$pro_id);
+//       if(in_array(0 ,$pro_id ))
+//       {
+//           ?>
+//           <script>alert("Please Change Your Product");
+//           window.location.href="../addVariation.php";
+//           </script>
+//           <?php
+//       }
+//       else
+//       {
   
-            $sql = "INSERT INTO `variation`(`title`) VALUES ('$var_title')";
-            $result = mysqli_query($conn,$sql);
+//             $sql = "INSERT INTO `variation`(`title`) VALUES ('$var_title')";
+//             $result = mysqli_query($conn,$sql);
             
-            $last_inserted_id = $conn->insert_id;
-            if($result)
-            {
-               $combined = array_combine($pro_id, $var_sub_title);
+//             $last_inserted_id = $conn->insert_id;
+//             if($result)
+//             {
+//               $combined = array_combine($pro_id, $var_sub_title);
                
-               foreach($combined as $pro_id => $var_sub_title) {
-                   $var_sub_TILTLE =  mysqli_real_escape_string($conn,$var_sub_title);
-                    $insert_var = "INSERT INTO `variation_with_product`(`product_id`, `sub_title`, `var_id`) VALUES ('$pro_id','$var_sub_TILTLE','$last_inserted_id')";
-                    $result_var = mysqli_query($conn,$insert_var);
-                } 
+//               foreach($combined as $pro_id => $var_sub_title) {
+//                   $var_sub_TILTLE =  mysqli_real_escape_string($conn,$var_sub_title);
+//                     $insert_var = "INSERT INTO `variation_with_product`(`product_id`, `sub_title`, `var_id`) VALUES ('$pro_id','$var_sub_TILTLE','$last_inserted_id')";
+//                     $result_var = mysqli_query($conn,$insert_var);
+//                 } 
                 
-                header("Location:../addVariation.php?Massage=Sucessfully added new Variation.");
+//                 header("Location:../addVariation.php?Massage=Sucessfully added new Variation.");
                 
                 
                 
-            }
-            else
-            {
-                echo "<script>alert('Sorry, there was an error while adding addon.')</script>";
-            }
+//             }
+//             else
+//             {
+//                 echo "<script>alert('Sorry, there was an error while adding addon.')</script>";
+//             }
             
       
         
-      }
+//       }
+
+// }
+
+
+
+
+if(isset($_POST['btnSubmit_Variation']))
+{
+    include('../connection.php');
+
+    session_start();
+
+    $pro_id         = $_POST['pro_id'];
+    $var_sub_title  = $_POST['var_sub_title'];
+    $is_primary     = $_POST['is_primary'];
+
+    $var_title = mysqli_real_escape_string($conn, $_POST['var_title']);
+
+    if(in_array(0, $pro_id))
+    {
+        ?>
+        <script>
+            alert("Please Change Your Product");
+            window.location.href="../addVariation.php";
+        </script>
+        <?php
+    }
+    else
+    {
+
+        $sql = "INSERT INTO `variation`(`title`) 
+                VALUES ('$var_title')";
+
+        $result = mysqli_query($conn, $sql);
+
+        $last_inserted_id = $conn->insert_id;
+
+        if($result)
+        {
+
+            for($i = 0; $i < count($pro_id); $i++)
+            {
+
+                $product_id = mysqli_real_escape_string($conn, $pro_id[$i]);
+
+                $sub_title = mysqli_real_escape_string($conn, $var_sub_title[$i]);
+
+                $primary = mysqli_real_escape_string($conn, $is_primary[$i]);
+
+                $insert_var = "
+                    INSERT INTO `variation_with_product`
+                    (
+                        `product_id`,
+                        `sub_title`,
+                        `var_id`,
+                        `is_primary`
+                    )
+                    VALUES
+                    (
+                        '$product_id',
+                        '$sub_title',
+                        '$last_inserted_id',
+                        '$primary'
+                    )
+                ";
+
+                $result_var = mysqli_query($conn, $insert_var);
+            }
+
+            header("Location:../addVariation.php?Massage=Sucessfully added new Variation.");
+
+        }
+        else
+        {
+            echo "<script>alert('Sorry, there was an error while adding variation.')</script>";
+        }
+
+    }
 
 }
 

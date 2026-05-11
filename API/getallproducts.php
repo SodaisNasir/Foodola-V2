@@ -8,8 +8,21 @@ include('connection.php');
 if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC'){
 
 
-    
-    $select_product = 'SELECT * FROM `products` WHERE `qty` > 0';
+$select_product = "
+SELECT DISTINCT
+    p.*
+FROM products p
+
+LEFT JOIN variation_with_product vp 
+    ON vp.product_id = p.id
+
+WHERE p.qty > 0
+
+AND (
+    vp.product_id IS NULL
+    OR vp.is_primary = 1
+)
+";
     $execute_products = mysqli_query($conn,$select_product);
     
 

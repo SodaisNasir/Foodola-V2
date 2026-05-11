@@ -68,6 +68,8 @@ if(isset($_GET['Massage'])){
     <!-- BEGIN: Custom CSS-->
     <link rel="stylesheet" type="text/css" href="assets/css/style.css">
     <!-- END: Custom CSS-->
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   </head>
   <!-- END: Head-->
@@ -227,34 +229,74 @@ if(isset($_GET['Massage'])){
     <script src="app-assets/vendors/js/vendors.min.js"></script>
     <!-- BEGIN Vendor JS-->
 <script>
-$(document).ready(function() {
-  var i = 1;
-  $('#add').click(function() {
-    if (i <= 20) {
-$('#dynamic_fields').append(`
-  <div class="row mb-2" id="row-${i}">
-    <div class="col-sm-6">
-      <div class="form-group">
-        <input type="text" name="add_dressing[]" class="form-control" placeholder="Add Dressing" required>
-      </div>
-    </div>
-    <div class="col-sm-6">
-      <div class="form-group">
-        <input type="text" name="add_price[]" class="form-control" placeholder="Add Dressing Price" required>
-      </div>
-    </div>
-  </div>
-`);
-      i++;
-    }
-  });
-  $(document).on('click', '.btn_remove', function() {
-    var button_id = $(this).attr("id");
-    i--;
-    $('#row' + button_id + '').remove();
-  });
-});
+$(document).ready(function () {
 
+    var i = 1;
+
+    $('#add').click(function () {
+
+        if (i <= 20) {
+
+            $('#dynamic_fields').append(`
+
+                <div class="row mb-2 align-items-center flex-nowrap" id="row-${i}">
+
+                    <div class="col-sm-5">
+                        <div class="form-group mb-0">
+                            <input 
+                                type="text" 
+                                name="add_dressing[]" 
+                                class="form-control" 
+                                placeholder="Add Dressing" 
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="col-sm-5">
+                        <div class="form-group mb-0">
+                            <input 
+                                type="text" 
+                                name="add_price[]" 
+                                class="form-control" 
+                               step="0.01"
+                                placeholder="Add Dressing Price" 
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="col-sm-2 d-flex align-items-center justify-content-center">
+                        <button 
+                            type="button" 
+                            class="btn btn-danger btn-sm btn_remove"
+                            data-id="${i}"
+                        >
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+
+                </div>
+
+            `);
+
+            i++;
+        }
+
+    });
+
+    // REMOVE ROW
+    $(document).on('click', '.btn_remove', function () {
+
+        var button_id = $(this).data("id");
+
+        $('#row-' + button_id).remove();
+
+        i--;
+
+    });
+
+});
 
  function downloadSampleCSV() {
     const headers = ["dressing_title", "dressing_title_user", "dressing_name", "price"];
