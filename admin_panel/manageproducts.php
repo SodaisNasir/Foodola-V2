@@ -282,6 +282,7 @@ if (isset($_GET['Massage'])) {
                                                         <th>Image</th>
                                                         <th>Allergy Description</th>
                                                         <th>Time</th>
+                                                        <th>Free Addons</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
@@ -331,6 +332,7 @@ $sql = "
         p.description, p.cost, p.img, p.price,
         p.status, p.discount, p.qty, p.tax,p.for_deal_only,
         p.addon_id, p.type_id, p.dressing_id, p.allergy_description, p.time_id,
+        p.free_addon_limit,
         al.ao_title, tl.type_title, dl.dressing_title
     FROM products p
     INNER JOIN sub_categories sc ON sc.id = p.sub_category_id
@@ -359,8 +361,9 @@ if (isset($conn)) {
             $for_deal_only = htmlspecialchars($row['for_deal_only']);
             $imagePath = "Uploads/" . $imgurl;
             $allergyDescription = htmlspecialchars($row['allergy_description']);
-              $time_id = htmlspecialchars($row['time_id']);
+            $time_id = htmlspecialchars($row['time_id']);
             $disabled = ($for_deal_only == '3') ? 'disabled' : '';
+            $free_addon_limit = htmlspecialchars($row['free_addon_limit']);
 
             echo "<tr id='sortableBody' data-id='{$productId}'> ";
             echo "<td class='drag-handle'>☰</td>";
@@ -458,22 +461,31 @@ if (isset($conn)) {
               
             echo "<td class='editable description-short border border-5' contenteditable='true' data-field='allergy_description'>{$allergyDescription}</td>"; 
             
-                  echo "<td class='border border-5' style='min-width: 300px;' data-field='time_id'>";
-                echo "<select class='form-control status-select' data-id='{$row['id']}' name='pro_time'>";
-                
-                echo "<option value=''>-- Select Timing --</option>";
-                
+            echo "<td class='border border-5' style='min-width: 300px;' data-field='time_id'>";
+            echo "<select class='form-control status-select' data-id='{$row['id']}' name='pro_time'>";
+            echo "<option value=''>-- Select Timing --</option>";
                 foreach ($proTimeOptions as $option) {
-                
                     $selected = ($option['id'] == $time_id) ? 'selected' : '';
-                
                     echo "<option value='{$option['id']}' $selected>
                             {$option['timing_name']} ({$option['start_time']} - {$option['end_time']})
                           </option>";
                 }
-                
-                echo "</select>";
-                echo "</td>";
+            echo "</select>";
+            echo "</td>";
+            
+            
+            echo "<td class='border border-5' style='min-width: 200px;' data-field='free_addon_limit'>";
+            echo "<select class='form-control status-select' $disabled>";
+            echo "<option value=''>Select Free Addons</option>";
+            for ($i = 1; $i <= 10; $i++) {
+                $selected = ($free_addon_limit == $i) ? 'selected' : '';
+                echo "<option value='{$i}' {$selected}>
+                        {$i}
+                      </option>";
+            }
+            
+            echo "</select>";
+            echo "</td>";
 
             // Actions
             echo "<td>
@@ -528,6 +540,7 @@ if (isset($conn)) {
                                                         <th>Image</th>
                                                         <th>Allergy Description</th>
                                                         <th>Time</th>
+                                                        <th>Free Addons</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </tfoot>
@@ -712,6 +725,7 @@ $(document).ready(function () {
         const for_deal_only = row.find('[data-field="for_deal_only"] select').val();
         const allergy_description = row.find('[data-field="allergy_description"]').text().trim();
         const time_id = row.find('[data-field="time_id"] select').val();
+        const free_addon_limit = row.find('[data-field="free_addon_limit"] select').val();
 
         if (!id || pro_name === '') {
             alert('Product ID or Name is missing.');
@@ -741,6 +755,7 @@ $(document).ready(function () {
         formData.append('for_deal_only', for_deal_only);
         formData.append('allergy_description', allergy_description);
         formData.append('time_id', time_id);
+        formData.append('free_addon_limit', free_addon_limit);
         
 
         if (selectedFiles[id]) {
@@ -918,10 +933,10 @@ $('#subCategorySelect').on('change', function () {
                                 </td>
                                 <td class='border border-5' style='min-width: 200px;' data-field='for_deal_only'>
                                     <select class="form-control status-select">
-                                        <option value="0" ${item.for_deal_only == 0 ? 'selected' : ''}>Regular Product</option>
-<option value="1" ${item.for_deal_only == 1 ? 'selected' : ''}>Only for Deals</option>
-<option value="2" ${item.for_deal_only == 2 ? 'selected' : ''}>Only for Pos</option>
-<option value="3" ${item.for_deal_only == 3 ? 'selected' : ''}>Only for Free</option>
+                                            <option value="0" ${item.for_deal_only == 0 ? 'selected' : ''}>Regular Product</option>
+                                            <option value="1" ${item.for_deal_only == 1 ? 'selected' : ''}>Only for Deals</option>
+                                            <option value="2" ${item.for_deal_only == 2 ? 'selected' : ''}>Only for Pos</option>
+                                            <option value="3" ${item.for_deal_only == 3 ? 'selected' : ''}>Only for Free</option>
                                         
                                     </select>
                                 </td>
@@ -940,18 +955,38 @@ $('#subCategorySelect').on('change', function () {
                                         ${item.allergy_description ?? ''}
                                     </td>
                                 
-                                    <td class='border border-5' style='min-width: 300px;' data-field='time_id'>
-    <select class="form-control status-select" data-id="${item.id}">
-        <option value="">-- Select Timing --</option>
-
-        ${proTimeOptions.map(opt => `
-            <option value="${opt.id}" 
-                ${opt.id == item.time_id ? 'selected' : ''}>
-                ${opt.timing_name} (${opt.start_time} - ${opt.end_time})
-            </option>
-        `).join('')}
-    </select>
-</td>
+                                <td class='border border-5' style='min-width: 300px;' data-field='time_id'>
+                                        <select class="form-control status-select" data-id="${item.id}">
+                                            <option value="">-- Select Timing --</option>
+                                    
+                                            ${proTimeOptions.map(opt => `
+                                                <option value="${opt.id}" 
+                                                    ${opt.id == item.time_id ? 'selected' : ''}>
+                                                    ${opt.timing_name} (${opt.start_time} - ${opt.end_time})
+                                                </option>
+                                            `).join('')}
+                                        </select>
+                                    </td>
+                                </td>
+                                
+                                
+                                <td class='border border-5' style='min-width: 200px;' data-field='free_addon_limit'>
+                                    <select class="form-control status-select" ${disabled}>
+                                    
+                                        <option value="">Select Free Addons</option>
+                                
+                                        ${Array.from({ length: 10 }, (_, i) => {
+                                            const value = i + 1;
+                                
+                                            return `
+                                                <option value="${value}" 
+                                                    ${item.free_addon_limit == value ? 'selected' : ''}>
+                                                    ${value}
+                                                </option>
+                                            `;
+                                        }).join('')}
+                                
+                                    </select>
                                 </td>
                                     
                                 <td><button class="btn btn-success save-btn" style="display:none;">Save</button></td>

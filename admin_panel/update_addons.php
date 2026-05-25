@@ -242,6 +242,7 @@
                                         <th>Addon ID</th>
                                         <th>Addon Name</th>
                                         <th>Addon Price</th>
+                                        <th>Is Free</th>
                                         <th>Action</th>
               
                                     </tr>
@@ -289,6 +290,13 @@
                                     echo "<td class='editable' contenteditable='true' data-field='as_price' name='price'>"
                                     . formatCurrency($row['as_price'], $currency_sign, $currency_position)
                                     . "</td>";
+                                    
+                                   echo "<td data-field='isFreeInDeal'>
+                                        <select class='form-control status-select'>
+                                            <option value='1' ".($row['isFreeInDeal'] == 1 ? 'selected' : '').">Yes</option>
+                                            <option value='0' ".($row['isFreeInDeal'] == 0 ? 'selected' : '').">No</option>
+                                        </select>
+                                    </td>";
 
                                       
                                     //   echo "<td><button class='btn btn-primary' onclick=\"openAddMore('{$row['as_id']}', '{$row['as_name']}', '{$row['as_price']}')\">Update</button></td>";
@@ -474,18 +482,36 @@
 
 
 $(document).ready(function() {
-  var i = 1;
+
   $('#add').click(function() {
-   
-      $('#dynamic_fields').append('<div class="row"><div class="col-sm-6" ><div class="form-group"><input type="text" name="addon_name[]" class="form-control" placeholder="Add On" required ></div></div><div class="col-sm-6" ><div class="form-group"><input type="number" step="0.01" name="addon_price[]" class="form-control" placeholder="Add On Price" required ></div></div></div>')
-      i++;
+
+    $('#dynamic_fields').append(`
+      <div class="row mb-2">
+        <div class="col-sm-5">
+          <div class="form-group">
+            <input type="text" name="addon_name[]" class="form-control" placeholder="Add On" required>
+          </div>
+        </div>
+
+        <div class="col-sm-5">
+          <div class="form-group">
+            <input type="number" step="0.01" name="addon_price[]" class="form-control" placeholder="Add On Price" required>
+          </div>
+        </div>
+
+        <div class="col-sm-2">
+          <button type="button" class="btn btn-danger btn_remove">Remove</button>
+        </div>
+      </div>
+    `);
 
   });
+
+  // REMOVE ROW
   $(document).on('click', '.btn_remove', function() {
-    var button_id = $(this).attr("id");
-    i--;
-    $('#row' + button_id + '').remove();
+    $(this).closest('.row').remove();
   });
+
 });
 
 var modal = document.getElementById("myModal");
@@ -716,68 +742,125 @@ $('#mergeAddonsForm').on('submit', function(e) {
 
 
 <script>
+
 $(document).ready(function () {
-    // Show save button on edit
+
+    // Editable fields
     $(document).on('input', '.editable', function () {
+
         const field = $(this).data('field');
 
-        // Allow only numbers and one optional dot for 'as_price'
+        // Allow only numbers + single dot for price
         if (field === 'as_price') {
+
             let value = $(this).text();
-            value = value.replace(/[^0-9.]/g, ''); // Remove non-numeric and non-dot
+
+            // Remove currency symbols and invalid chars
+            value = value.replace(/[^0-9.]/g, '');
+
+            // Allow only one decimal point
             const parts = value.split('.');
+
             if (parts.length > 2) {
-                value = parts[0] + '.' + parts[1]; // Keep only first dot
+                value = parts[0] + '.' + parts[1];
             }
+
             $(this).text(value);
-            placeCaretAtEnd(this); // Keep cursor at end
+
+            placeCaretAtEnd(this);
         }
 
+        // Show save button
         $(this).closest('tr').find('.save-btn').show();
     });
 
-    // Save button logic
+
+    // Dropdown change
+    $(document).on('change', '.status-select', function () {
+
+        $(this).closest('tr').find('.save-btn').show();
+
+    });
+
+
+    // Save button click
     $(document).on('click', '.save-btn', function () {
+
         const row = $(this).closest('tr');
+
         const id = row.data('id');
+
         const as_name = row.find('[data-field="as_name"]').text().trim();
-        const as_price = row.find('[data-field="as_price"]').text().trim();
+
+        // Clean price value
+        const as_price = row.find('[data-field="as_price"]')
+            .text()
+            .replace(/[^0-9.]/g, '')
+            .trim();
+
+        // Boolean dropdown value
+        const isFreeInDeal = row.find('[data-field="isFreeInDeal"] select').val();
 
         $.ajax({
             url: '../API/update_inline_addons.php',
             method: 'POST',
             dataType: 'json',
+
             data: {
                 id: id,
                 as_name: as_name,
-                as_price: as_price
+                as_price: as_price,
+                isFreeInDeal: isFreeInDeal
             },
+
             success: function (response) {
+
                 if (response.status) {
+
                     alert(response.message);
+
                     row.find('.save-btn').hide();
+
                 } else {
+
                     alert("Error: " + response.message);
                 }
             },
+
             error: function (xhr) {
-                alert("Request failed: " + xhr.responseText);
+
+                console.log(xhr.responseText);
+
+                alert("Request failed");
             }
         });
     });
 
-    // Keep caret at the end after sanitizing input
+
+    // Keep cursor at end
     function placeCaretAtEnd(el) {
+
         el.focus();
-        if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
+
+        if (
+            typeof window.getSelection != "undefined" &&
+            typeof document.createRange != "undefined"
+        ) {
+
             const range = document.createRange();
+
             range.selectNodeContents(el);
+
             range.collapse(false);
+
             const sel = window.getSelection();
+
             sel.removeAllRanges();
+
             sel.addRange(range);
         }
     }
+
 });
 
 

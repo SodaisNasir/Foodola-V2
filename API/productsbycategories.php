@@ -157,7 +157,9 @@ ORDER BY `sort_order` ASC
                         "types"=>$type != null ? $type : [],
                         "dressing"=>$dressing != null ? $dressing : [],
                         "allergy_description" => $row['allergy_description'],
-                        "time_id" => $row['time_id']
+                        "time_id" => $row['time_id'],
+                        "free_addon_limit" => $row['free_addon_limit']
+                        
                         // "start_time" => $row['start_time'],
                         // "end_time" => $row['end_time']
                      

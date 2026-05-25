@@ -24,6 +24,7 @@ $allergy_desc = mysqli_real_escape_string($conn, $_POST['allergy_description'] ?
 // $start_time = $_POST['start_time'];
 // $end_time = $_POST['end_time'];;
 $time_id = mysqli_real_escape_string($conn, $_POST['time_id'] ?? ''); 
+$free_addon_limit = mysqli_real_escape_string($conn, $_POST['free_addon_limit'] ?? ''); 
 
 
 $image_path = '';
@@ -76,7 +77,8 @@ $sql = "UPDATE `products` SET
     `sub_category_id`='$sub_category_id',
     `for_deal_only`='$for_deal_only',
     `allergy_description` = '$allergy_desc',
-    `time_id` = '$time_id'
+    `time_id` = '$time_id',
+    `free_addon_limit` = '$free_addon_limit'
 
     ";
 

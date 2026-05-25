@@ -239,20 +239,20 @@ while ($row = mysqli_fetch_assoc($res)) {
                                     
                                     
                                  <div class="form-group">
-    <label for="SubCategories">Choose Sub Categories</label>
-    <div class="border p-2 rounded" style="max-height: 250px; overflow-y: auto;">
-        <?php
-        $allSubs = mysqli_query($conn, "SELECT id, name FROM sub_categories");
-        while ($sub = mysqli_fetch_assoc($allSubs)) {
-            echo '
-            <div class="form-check" id="subwrap_'.$sub['id'].'">
-                <input class="form-check-input" type="checkbox" name="sub_category_ids[]" value="'.$sub['id'].'" id="subcat_'.$sub['id'].'">
-                <label class="form-check-label" for="subcat_'.$sub['id'].'">'.htmlspecialchars($sub['name']).'</label>
-            </div>';
-        }
-        ?>
-    </div>
-</div>
+                                    <label for="SubCategories">Choose Sub Categories</label>
+                                    <div class="border p-2 rounded" style="max-height: 250px; overflow-y: auto;">
+                                        <?php
+                                        $allSubs = mysqli_query($conn, "SELECT id, name FROM sub_categories");
+                                        while ($sub = mysqli_fetch_assoc($allSubs)) {
+                                            echo '
+                                            <div class="form-check" id="subwrap_'.$sub['id'].'">
+                                                <input class="form-check-input" type="checkbox" name="sub_category_ids[]" value="'.$sub['id'].'" id="subcat_'.$sub['id'].'">
+                                                <label class="form-check-label" for="subcat_'.$sub['id'].'">'.htmlspecialchars($sub['name']).'</label>
+                                            </div>';
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
 
 
                                     

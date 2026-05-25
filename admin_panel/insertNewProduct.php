@@ -334,6 +334,23 @@ if (isset($_GET['Massage'])) {
                 </select>
             </div>
         </div>
+        
+        <!-- Free Addon Quantity -->
+<div class="col-md-4 col-sm-6" id="freeAddonWrapper" style="display:none;">
+    <h6 class="card-content">Free Addon Items</h6>
+
+    <div class="form-group">
+        <select name="free_addon_limit" id="freeAddonLimit" class="form-control">
+            <option value="">Select Free Addons</option>
+
+            <?php
+            for($i = 1; $i <= 10; $i++){
+                echo "<option value='$i'>$i</option>";
+            }
+            ?>
+        </select>
+    </div>
+</div>
     </div>
 </div>
 
@@ -568,6 +585,28 @@ $(document).ready(function () {
 
     $('#for_deal_only').on('change', function () {
         toggleExtras();
+    });
+
+});
+
+$(document).ready(function () {
+
+    function toggleFreeAddonDropdown() {
+
+        let addonValue = $('#addonSelect').val();
+
+        if (addonValue && addonValue !== '-1') {
+            $('#freeAddonWrapper').show();
+        } else {
+            $('#freeAddonWrapper').hide();
+            $('#freeAddonLimit').val('');
+        }
+    }
+
+    toggleFreeAddonDropdown();
+
+    $('#addonSelect').on('change', function () {
+        toggleFreeAddonDropdown();
     });
 
 });

@@ -292,13 +292,18 @@ $dpt_id = intval($_POST['dpt_id']);
     $status = mysqli_real_escape_string($conn, $_POST['status']);
 
     // --- SAFE SUBCATEGORY HANDLING ---
-    if (isset($_POST['sub_category_ids']) && is_array($_POST['sub_category_ids'])) {
-        $subcategory_ids = array_map('intval', $_POST['sub_category_ids']);
-    } else {
-        $subcategory_ids = []; // <-- IMPORTANT: no error if nothing selected
-    }
+if (isset($_POST['sub_category_ids']) && is_array($_POST['sub_category_ids'])) {
 
-    $encoded_ids = mysqli_real_escape_string($conn, json_encode($subcategory_ids));
+    $subcategory_ids = array_map(function($id) {
+        return (string)$id;
+    }, $_POST['sub_category_ids']);
+
+} else {
+
+    $subcategory_ids = [];
+}
+
+    $encoded_ids =  json_encode($subcategory_ids);
 
     // Update SQL
     $sql = "UPDATE `departments` SET `department_name` = '$department_name',`sub_category_ids` = '$encoded_ids',`status` = '$status'WHERE `id` = $dpt_id
@@ -314,7 +319,11 @@ if (isset($_POST['btn_insert_depart'])) {
 
   include('../connection.php');
   $department_name = $_POST['department_name'];
-  $subcategory_ids = $_POST['sub_category_ids'];
+
+  
+  $subcategory_ids = array_map(function($id) {
+    return (string)$id;
+}, $_POST['sub_category_ids']);
   $decoded_ids =  json_encode($subcategory_ids);
 
     $sql = "INSERT INTO `departments`(`department_name`, `sub_category_ids`,`status`, `created_at`) VALUES ('$department_name', '$decoded_ids', 'active', NOW())";
@@ -2235,6 +2244,7 @@ if(isset($_POST['btnSubmit_insertNewProductZ'])){
     $tax = $_POST['tax'];
     $for_deal_only = $_POST['for_deal_only'];
     $time_id = $_POST['time_id'];
+    $free_addon_limit = $_POST['free_addon_limit'];
 
     $target_dir = "../Uploads/";
 
@@ -2302,7 +2312,8 @@ if(isset($_POST['btnSubmit_insertNewProductZ'])){
             `img`,
             `tax`,
             `for_deal_only`,
-            `time_id`
+            `time_id`,
+            `free_addon_limit`
         )
         VALUES
         (
@@ -2320,7 +2331,8 @@ if(isset($_POST['btnSubmit_insertNewProductZ'])){
             '$filewithnewname',
             '$tax',
             '$for_deal_only',
-            '$time_id'
+            '$time_id',
+            '$free_addon_limit'
         )";
 
         $result = mysqli_query($conn, $sql);
@@ -2617,6 +2629,7 @@ if(isset($_POST['btnSubmit_Variation']))
     $pro_id         = $_POST['pro_id'];
     $var_sub_title  = $_POST['var_sub_title'];
     $is_primary     = $_POST['is_primary'];
+    $parent_title     = $_POST['parent_title'];
 
     $var_title = mysqli_real_escape_string($conn, $_POST['var_title']);
 
@@ -2650,6 +2663,7 @@ if(isset($_POST['btnSubmit_Variation']))
                 $sub_title = mysqli_real_escape_string($conn, $var_sub_title[$i]);
 
                 $primary = mysqli_real_escape_string($conn, $is_primary[$i]);
+                $p_title = mysqli_real_escape_string($conn, $parent_title[$i]);
 
                 $insert_var = "
                     INSERT INTO `variation_with_product`
@@ -2657,14 +2671,16 @@ if(isset($_POST['btnSubmit_Variation']))
                         `product_id`,
                         `sub_title`,
                         `var_id`,
-                        `is_primary`
+                        `is_primary`,
+                        `parent_title`
                     )
                     VALUES
                     (
                         '$product_id',
                         '$sub_title',
                         '$last_inserted_id',
-                        '$primary'
+                        '$primary',
+                        '$p_title'
                     )
                 ";
 

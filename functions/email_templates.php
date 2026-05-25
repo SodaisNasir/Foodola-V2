@@ -1903,5 +1903,221 @@ function otpEmailTemplate($APP_NAME, $BASE_URL, $token,$LANG = 'en'){
     
 }
 
+
+function orderCancelledEmailTemplate($APP_NAME, $name, $order_id, $BASE_URL, $LANG = 'en') {
+
+    if ($LANG == 'de') {
+
+        return '
+
+<html>
+<head>
+    <title>Ihre Bestellung wurde storniert – ' . htmlspecialchars($APP_NAME) . '</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: "Poppins", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            padding: 20px;
+            background-color: #f7f7f7;
+        }
+        .content {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2B2B29;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        h3 {
+            color: #2B2B29;
+            font-size: 20px;
+            margin-top: 20px;
+        }
+        p, li {
+            color: #555;
+            font-size: 16px;
+            margin: 8px 0;
+        }
+        a {
+            color: #F2AF34;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'' . $BASE_URL . 'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+        <tr>
+            <td align="center">
+                <table width="100%" class="content" style="max-width: 600px;">
+
+                    <!-- Logo -->
+                    <tr>
+                        <td align="center">
+                            <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="' . htmlspecialchars($APP_NAME) . '" style="width: 100px; margin-bottom: 20px;">
+                        </td>
+                    </tr>
+
+                    <!-- Content -->
+                    <tr>
+                        <td>
+                            <h1>Ihre Bestellung wurde storniert</h1>
+
+                            <p>Hallo <strong>' . htmlspecialchars($name) . '</strong>,</p>
+
+                            <p>
+                                Ihre Bestellung <strong>#' . htmlspecialchars($order_id) . '</strong>
+                                wurde erfolgreich storniert.
+                            </p>
+
+                            <p>
+                                Falls bereits eine Zahlung erfolgt ist, wird die Rückerstattung
+                                gemäß unseren Richtlinien bearbeitet.
+                            </p>
+
+                            <h3>Haben Sie Fragen?</h3>
+
+                            <p>
+                                Unser Support-Team steht Ihnen jederzeit zur Verfügung,
+                                um Ihre Fragen zu beantworten oder Ihnen bei einer neuen
+                                Bestellung zu helfen.
+                            </p>
+
+                            <p>
+                                Wir hoffen, Sie bald wieder bei
+                                <strong>' . htmlspecialchars($APP_NAME) . '</strong>
+                                begrüßen zu dürfen.
+                            </p>
+
+                            <p>
+                                Mit freundlichen Grüßen,<br>
+                                Ihr ' . htmlspecialchars($APP_NAME) . ' Team
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+
+';
+
+    } else {
+
+        return '
+
+<html>
+<head>
+    <title>Your Order Has Been Cancelled – ' . htmlspecialchars($APP_NAME) . '</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: "Poppins", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            padding: 20px;
+            background-color: #f7f7f7;
+        }
+        .content {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2B2B29;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        h3 {
+            color: #2B2B29;
+            font-size: 20px;
+            margin-top: 20px;
+        }
+        p, li {
+            color: #555;
+            font-size: 16px;
+            margin: 8px 0;
+        }
+        a {
+            color: #F2AF34;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-image: url(\'' . $BASE_URL . 'API/uploads/email_backgroundd.jpg\'); background-size: cover; padding: 20px; background-position: center;">
+        <tr>
+            <td align="center">
+                <table width="100%" class="content" style="max-width: 600px;">
+
+                    <!-- Logo -->
+                    <tr>
+                        <td align="center">
+                            <img src="' . $BASE_URL . 'admin_panel/images/logo.png" alt="' . htmlspecialchars($APP_NAME) . '" style="width: 100px; margin-bottom: 20px;">
+                        </td>
+                    </tr>
+
+                    <!-- Content -->
+                    <tr>
+                        <td>
+                            <h1>Your Order Has Been Cancelled</h1>
+
+                            <p>Hello <strong>' . htmlspecialchars($name) . '</strong>,</p>
+
+                            <p>
+                                Your order <strong>#' . htmlspecialchars($order_id) . '</strong>
+                                has been successfully cancelled.
+                            </p>
+
+                            <p>
+                                If a payment has already been made, the refund will be
+                                processed according to our policy.
+                            </p>
+
+                            <h3>Need Help?</h3>
+
+                            <p>
+                                Our support team is always available to answer your
+                                questions or assist you with a new order.
+                            </p>
+
+                            <p>
+                                We hope to serve you again soon at
+                                <strong>' . htmlspecialchars($APP_NAME) . '</strong>.
+                            </p>
+
+                            <p>
+                                Best regards,<br>
+                                Your ' . htmlspecialchars($APP_NAME) . ' Team
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+
+';
+
+    }
+}
+
 ?>
   

@@ -9,6 +9,7 @@ include('connection.php');
 $id = $_POST['id'] ?? '';
 $as_name = mysqli_real_escape_string($conn, $_POST['as_name'] ?? '');
 $as_price = mysqli_real_escape_string($conn, $_POST['as_price'] ?? '');
+$isFreeInDeal = mysqli_real_escape_string($conn, $_POST['isFreeInDeal'] ?? '');
 
 
 
@@ -19,7 +20,7 @@ if (empty($id) || empty($as_name) || empty($as_price)) {
 }
 
 // Update query
-$sql = "UPDATE `addon_sublist` SET `as_name`='$as_name',`as_price`='$as_price' WHERE `as_id` = '$id'";
+$sql = "UPDATE `addon_sublist` SET `as_name`='$as_name',`as_price`='$as_price', `isFreeInDeal` = '$isFreeInDeal' WHERE `as_id` = '$id'";
 
 if (mysqli_query($conn, $sql)) {
     echo json_encode(['status' => true, 'message' => 'Addons Sublist updated successfully']);
