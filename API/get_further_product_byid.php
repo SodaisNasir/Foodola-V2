@@ -1,4 +1,8 @@
 <?php
+header("Access-Control-Allow-Origin: *"); 
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS"); 
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Content-Type: application/json"); 
 include('connection.php');
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
@@ -8,7 +12,7 @@ if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqa
     $productid = $_POST['product_id'];
     
     $select_product = "SELECT `id`, `addon_id`, `type_id`, `dressing_id`, `sub_category_id`, `name`, `description`, `cost`, 
-    `price`, `discount`, `qty`, `img`, `features`,`tax` , `created_at`, `updated_at`, `allergy_description` FROM 
+    `price`, `discount`, `qty`, `img`, `features`,`tax` , `created_at`, `updated_at`, `allergy_description`, `free_addon_limit` FROM 
     `products` WHERE  `id` = '$productid'";   
      $execute_products = mysqli_query($conn,$select_product);
     
@@ -33,7 +37,7 @@ if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqa
                       $addon = array();
                        while($row1 = mysqli_fetch_array($execute_addon_title)){
                            
-                        $select_addon_sublist = 'SELECT `as_id`, `ao_title`, `as_name`, `as_price` FROM `addon_sublist` WHERE `ao_id` ='.$row1['ao_id'];
+                        $select_addon_sublist = 'SELECT `as_id`, `ao_title`, `as_name`, `as_price`, `isFreeInDeal` FROM `addon_sublist` WHERE `ao_id` ='.$row1['ao_id'];
                         $execute_addon_sublist   = mysqli_query($conn,$select_addon_sublist);   
                            if(mysqli_num_rows($execute_addon_sublist) > 0){
                                 $addon_data = array();
@@ -42,6 +46,7 @@ if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqa
                                                "as_id"=>$row1a['as_id'],
                                                "as_name"=>$row1a['as_name'],
                                                "as_price"=>$row1a['as_price'],
+                                               "isFreeInDeal"=>$row1a['isFreeInDeal'],
                                            ];
                                            array_push($addon_data,$temp1a); 
                                 }
@@ -146,6 +151,7 @@ if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqa
                         "type"=>$type != null ? $type : [],
                         "dressing"=>$dressing != null ? $dressing : [],
                         "tax" => $rows['tax'],
+                        "free_addon_limit" => $rows['free_addon_limit']
                     ];
        
                  $addon = null;

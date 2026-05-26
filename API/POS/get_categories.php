@@ -5,7 +5,9 @@ header("Access-Control-Allow-Headers: Content-Type, Authorization"); // Allow sp
 header("Content-Type: application/json"); 
 include("../connection.php"); 
 
-$query = "SELECT * FROM categories"; 
+$query = "SELECT c.id, c.name,c.img,c.created_at,c.updated_at,COUNT(sc.id) AS subcategory_count,CASE WHEN COUNT(sc.id) = 1 THEN MAX(sc.id)
+        ELSE NULL END AS single_subcategory_id FROM categories c LEFT JOIN sub_categories sc 
+        ON sc.category_id = c.id GROUP BY c.id ORDER BY c.sort_order ASC;"; 
 $execute = mysqli_query($conn, $query);
 
 if(mysqli_num_rows($execute) > 0) { 
