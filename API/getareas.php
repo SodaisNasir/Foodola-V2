@@ -2,7 +2,7 @@
 
 
 if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC'){
-     $sql = "SELECT `id`, `area_name`,`min_order_amount`, `branch_id`, `is_disable` `created_at` FROM `tbl_areas`";
+     $sql = "SELECT `id`, `area_name`,`min_order_amount`, `branch_id`, `is_disable`,`created_at` FROM `tbl_areas` where `is_disable` = 0";
      include('connection.php');
      $execute = mysqli_query($conn,$sql);
      if(mysqli_num_rows($execute) > 0){
