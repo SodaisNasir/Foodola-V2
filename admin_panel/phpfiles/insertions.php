@@ -3354,29 +3354,75 @@ if(isset($_POST['updateCategory'])){
 //     }
 // }
 
-if (isset($_POST['updateSubCategory'])) {
-//         error_reporting(E_ALL);
-// ini_set('display_errors', 1);
-  include('../connection.php');
-  $ProName = mysqli_real_escape_string($conn, $_POST['ProName']);
-  $product_id = $_POST['product_id'];
-  $banner_image = $_POST['banner_image'];
+if(isset($_POST['updateSubCategoryImage'])){
+
+    include('../connection.php');
+
+    $id   = $_POST['id'];
+    $type = $_POST['type'];
+
+    if(!empty($_FILES['image']['name'])){
+
+        $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+
+        $fileName = time() . "_" . rand(1000,9999) . "." . $ext;
+
+        move_uploaded_file(
+            $_FILES['image']['tmp_name'],
+            "../Uploads/".$fileName
+        );
+
+        if($type == "img"){
+            mysqli_query($conn,"
+                UPDATE sub_categories
+                SET img='$fileName'
+                WHERE id='$id'
+            ");
+        }
+
+        if($type == "banner_image"){
+            mysqli_query($conn,"
+                UPDATE sub_categories
+                SET banner_image='$fileName'
+                WHERE id='$id'
+            ");
+        }
+
+        echo json_encode([
+            "status" => true,
+            "message" => "Image Updated"
+        ]);
+        exit;
+    }
+}
 
 
-    $target_dir = "../Uploads/";
-    $target_file = $target_dir . basename($_FILES["banner_image"]["name"]);
-    $uploadOk = 1;
-    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-    $filewithnewname = date("Ymdis") . "_banner." . $imageFileType;
-    move_uploaded_file($_FILES["banner_image"]["tmp_name"], $target_dir . $filewithnewname);
-      "The file " . htmlspecialchars(basename($_FILES["banner_image"]["name"])) . " has been uploaded.";
 
-      $sql = "UPDATE `sub_categories` SET `name` = '$ProName', `banner_image` = '$filewithnewname' WHERE `id` = $product_id";
-      $update = mysqli_query($conn, $sql);
-      if ($update) {
-        header("Location:../SubCat.php?Massage=Sucessfully updated sub category.");
-      }
-  
+
+
+if(isset($_POST['updateSubCategory'])){
+
+    include('../connection.php');
+
+    $id       = $_POST['category_id'];
+    $name     = mysqli_real_escape_string($conn,$_POST['name']);
+    $discount = $_POST['discount'];
+    $main_category_id=  $_POST['main_category_id'];
+
+    mysqli_query($conn,"
+        UPDATE sub_categories SET name='$name', discount='$discount', category_id  = $main_category_id WHERE id='$id'");
+
+    mysqli_query($conn,"
+        UPDATE products
+        SET discount='$discount'
+        WHERE sub_category_id='$id'
+    ");
+
+    echo json_encode([
+        "status" => true,
+        "message" => "Updated"
+    ]);
+    exit;
 }
 
 

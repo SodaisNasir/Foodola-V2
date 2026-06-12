@@ -687,23 +687,53 @@ $(document).ready(function () {
     $(this).closest('tr').find('.save-btn').show();
 });
 
-    $(document).on('change', '.fileInput', function () {
-        const fileInput = this;
-        const productId = $(this).data('id');
-        const file = fileInput.files[0];
+   $(document).on('change', '.fileInput', function () {
+    const fileInput = this;
+    const productId = $(this).data('id');
+    const file = fileInput.files[0];
 
-        if (file) {
-            selectedFiles[productId] = file;
+    if (!file) return;
 
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                $(`#fileUpload${productId}`).siblings('label').find('.image-clickable').attr('src', e.target.result);
-            };
-            reader.readAsDataURL(file);
+    const row = $(fileInput).closest('tr');
 
-            $(fileInput).closest('tr').find('.save-btn').show();
+    // Preview image
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        $(`#fileUpload${productId}`)
+            .siblings('label')
+            .find('.image-clickable')
+            .attr('src', e.target.result);
+    };
+    reader.readAsDataURL(file);
+
+    // Auto upload image
+    const formData = new FormData();
+    formData.append('id', productId);
+    formData.append('product_image', file);
+
+    $.ajax({
+        url: '../API/update_inline_products.php',
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            if (response.status) {
+                row.css('background-color', '#d4edda')
+                   .animate({ backgroundColor: '' }, 1500);
+
+                // Optional success toast
+                alert('Image updated successfully!');
+            } else {
+                alert('Failed to update image: ' + (response.message || 'Unknown error'));
+            }
+        },
+        error: function (xhr, status, error) {
+            alert('Image upload failed: ' + error);
+            console.error(xhr.responseText);
         }
     });
+});
 
     $('#example tbody').on('click', '.save-btn', function () {
         const row = $(this).closest('tr');

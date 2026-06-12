@@ -16,77 +16,6 @@ if (isset($_GET['Massage'])) {
 
 <html class="loading" lang="en" data-textdirection="ltr">
 
-<style>
-    .modal {
-        display: none;
-        /* Hidden by default */
-        position: fixed;
-        /* Stay in place */
-        z-index: 1;
-        /* Sit on top */
-        padding-top: 100px;
-        /* Location of the box */
-        left: 0;
-        top: 0;
-        width: 50%;
-        overflow: auto;
-        /* Enable scroll if needed */
-        background-color: rgb(0, 0, 0);
-        /* Fallback color */
-        background-color: rgba(0, 0, 0, 0.4);
-        /* Black w/ opacity */
-    }
-
-    /* Modal Content */
-
-    .modal-content-Updated {
-        background-color: #fefefe;
-        margin: auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 50%;
-        height: 250px;
-        border-radius: 10px;
-    }
-
-    .modal-content-Updated2 {
-        background-color: #fefefe;
-        margin: auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 50%;
-        height: 250px;
-        border-radius: 10px;
-    }
-
-    /* The Close Button */
-    .close {
-        color: #aaaaaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-    }
-
-    .close:hover,
-    .close:focus {
-        color: #000;
-        text-decoration: none;
-        cursor: pointer;
-
-    }
-    
-      #sortableBody tr {
-    cursor: move;
-  }
-  .drag-handle {
-    cursor: grab;
-    font-size: 18px;
-    user-select: none;
-  }
-  .drag-handle:active {
-    cursor: grabbing;
-  }
-</style>
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -106,7 +35,6 @@ if (isset($_GET['Massage'])) {
 
     <!-- BEGIN: Vendor CSS-->
     <link rel="stylesheet" type="text/css" href="app-assets/vendors/css/vendors.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <!-- END: Vendor CSS-->
 
     <!-- BEGIN: Theme CSS-->
@@ -216,23 +144,23 @@ if (isset($_GET['Massage'])) {
                                     <div class="card-body card-dashboard">
                                         <p class="card-text"></p>
                                         <div class="table-responsive">
-                                            <table id="example" class="table">
+                                                <div class="" id="example_wrapper"></div>
+                                            <table id="example" class="table data-list-view">
                                                 <thead>
                                                     <tr data-id='{$id}'>
                                                         <th>☰</th>
                                                         <th>S no.</th>
-                                                        <!--<th>Cateogry ID</th>-->
                                                         <th>Category Name</th>
-                                                        <th>Category Image</th>
+                                                        <th>Discount</th>
+                                                        <th>Subcategory Image</th>
                                                         <th>Banner Image</th>
-                                                        <!--<th>Create time</th>-->
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="sortableBody">
                                                     <?php
                                                     include_once('connection.php');
-                                                    $sql = "SELECT `id`, `category_id`, `name`, `img`,`banner_image`, `created_at`, `updated_at`, `sort_order` FROM `sub_categories` ORDER BY `sort_order` ASC  ";
+                                                    $sql = "SELECT `id`, `category_id`, `name`, `img`,`banner_image`, `created_at`, `updated_at`, `sort_order`, `discount` FROM `sub_categories` ORDER BY `sort_order` ASC  ";
                                                     $result = mysqli_query($conn, $sql);
                                                     
                                                     $index = 0;
@@ -246,17 +174,34 @@ if (isset($_GET['Massage'])) {
                                                         echo "<tr data-id='{$id}'>";
                                                         echo "<td class='drag-handle'>☰</td>";
                                                         echo "<td>{$sn}</td>";
-                                                        echo "<td name='tittlename'>{$row['name']}</td>";
-                                                        echo "<td><img src='{$imagePath}' alt='Image' width='60' height='60' style='object-fit: cover; border-radius: 5px;'></td>";
-                                                        echo "<td><img src='{$banner_image}' alt='Image' width='60' height='60' style='object-fit: cover; border-radius: 5px;'></td>";
-                                                        // echo "<td>{$row['id']}</td>";
-                                                        // echo "<td name='subname'>{$row['created_at']}</td>";
+                                                        echo "<td name='name'>{$row['name']}</td>";
+                                                        echo "<td name='discount'>{$row['discount']}</td>";
+                                                       echo "<td>
+                                                            <img src='{$imagePath}' 
+                                                                 class='clickable-img'
+                                                                 data-id='{$id}'
+                                                                 data-type='img'
+                                                                 style='cursor:pointer; object-fit:cover; border-radius:5px;' 
+                                                                 width='60' height='60'>
+                                                        </td>";
                                                         
+                                                        echo "<td>
+                                                            <img src='{$banner_image}' 
+                                                                 class='clickable-img'
+                                                                 data-id='{$id}'
+                                                                 data-type='banner_image'
+                                                                 style='cursor:pointer; object-fit:cover; border-radius:5px;' 
+                                                                 width='60' height='60'>
+                                                        </td>";
 
-                                                        echo '<td><button class="btn btn-primary m-1" onclick="openAddMore(\'' . $row['id'] . '\' ,\'' . $row['name'] . '\' ,\'' . $row['created_at'] . '\')">Update</button>';
+                                                      echo "<td>";
 
-                                                        echo "<button class='btn btn-light' onclick='openimagemodel({$row['id']},{$index})' >Update Image</button>
-                                             </td>";
+                                                                    echo "<button class='btn btn-primary m-1'
+                                                                        onclick=\"openAddMore('{$id}', '{$row['name']}', '{$row['discount']}','{$row['category_id']}','{$row['created_at']}')\">
+                                                                        Update
+                                                                    </button>";
+                                                                
+                                                                    echo "</td>";
                                                         echo "</tr>";
                                                         $index++;
                                                     }
@@ -264,17 +209,9 @@ if (isset($_GET['Massage'])) {
                                                     ?>
 
                                                 </tbody>
-                                                <tfoot>
-                                                    <tr>
-                                                        <th>S no.</th>
-                                                        <!--<th>Cateogry ID</th>-->
-                                                        <th>Category Name</th>
-                                                        <th>Category Image</th>
-                                                        <th>Banner Image</th>
-                                                        <!--<th>Create time</th>-->
-                                                        <th>Action</th>
-                                                    </tr>
-                                                </tfoot>
+                                                
+                                                <input type="file" id="bannerImageInput" style="display:none;" />
+                                          
                                             </table>
                                         </div>
                                     </div>
@@ -283,80 +220,77 @@ if (isset($_GET['Massage'])) {
                         </div>
                     </div>
                 </section>
-                <!--/ Zero configuration table -->
-                <div id="myModal" class="modal ">
 
-                    <!-- Modal content -->
-                    <div class="modal-content-Updated2 w-50" style="height:250px; ">
-
-                        <span onclick="closeModel(1)" class="close">&times;</span>
-                        <h2 class="">Update Sub Category Image</h2>
-                        <br>
-
-                        <form method="POST" id="updateImageForm" enctype="multipart/form-data">
-                            <input hidden type="text" id="CatID" name="CatID">
-                            <div class="col-sm-12">
-
-                                <div class="form-group">
-                                    <div class="controls">
-                                         <label for="updateSubCategoryImage" class="form-label">Sub Category Image</label>
-                                     
-                                        <input type="file" name="updatedImage" class="form-control" />
-                                    </div>
-                                </div>
-                            <button type="submit" class="btn btn-primary w-100">Submit</button>
-                            </div>
-
-                        </form>
-                    </div>
-
-                </div>
-
-
-                <div id="myModal_Add" class="modal">
-
-                    <!-- Modal content -->
-                    <div class="modal-content-Updated h-50">
-
-                        <span onclick="closeModel(2)" class="close">&times;</span>
-                        <h2>Update Category</h2>
-                        <br>
-                        <form method="POST" id="updateSubCategoryForm" enctype="multipart/form-data">
-
-                            <div class="col-sm-12">
-                                <input class="form-control" value="" type="text" name="product_id" id="product_id" placeholder="Enter user name" hidden>
-
-                                <div class="form-group">
-                                       <label for="ProName" class="form-label">Subcategory Name</label>
-                                    <div class="controls">
-                                        <input class="form-control" value="" type="text" name="ProName" id="ProName" placeholder="Enter product name">
-                                    </div>
-                                </div>
-
-
-                                <div class="form-group">
-                                    <div class="controls">
-                                    <label for="banner_image" class="form-label">Website Banner Image</label>
-                                        <input type="file" name="banner_image" class="form-control" />
-                                    </div>
-                                </div>
-
-
-                            <button type="submit" class="btn btn-primary w-100">Save</button>
-
-                            </div>
-
-                        </form>
-                    </div>
-
-                </div>
-
-
-
-                <!--/ Scroll - horizontal and vertical table -->
 
             </div>
         </div>
+        
+        <!-- Modal -->
+<div  id="myModal_Add" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg h-50" role="document">
+
+        <div class="modal-content modal-content-Updated">
+
+            <!-- Header -->
+            <div class="modal-header">
+                <h5 class="modal-title">Update Category</h5>
+
+                <!-- FIXED CLOSE BUTTON -->
+               <button type="button" class="close" onclick="closeModel()">
+    <span>&times;</span>
+</button>
+
+            </div>
+
+            <!-- BODY -->
+            <div class="modal-body modal-body-scroll">
+
+                <form method="POST" id="updateSubCategoryForm" enctype="multipart/form-data">
+
+                    <input type="hidden" name="category_id" id="category_id">
+
+                    <!-- Main Category -->
+                    <div class="form-group">
+                        <label>Main Category</label>
+                        <select class="form-control" name="main_category_id" id="main_category_id">
+                            <option value="">Select Main Category</option>
+
+                            <?php
+                            include('connection.php');
+                            $sql = "SELECT id, name FROM categories ORDER BY name ASC";
+                            $result = mysqli_query($conn, $sql);
+
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
+                            }
+                            ?>
+                        </select>
+                    </div>
+
+                    <!-- Subcategory -->
+                    <div class="form-group">
+                        <label>Subcategory Name</label>
+                        <input class="form-control" type="text" name="name" id="name" placeholder="Enter name">
+                    </div>
+
+                    <!-- Discount -->
+                    <div class="form-group">
+                        <label>Discount</label>
+                        <input class="form-control" type="number" name="discount" id="dis" placeholder="Enter discount">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">
+                        Save
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
     </div>
     <!-- END: Content-->
 
@@ -394,132 +328,135 @@ if (isset($_GET['Massage'])) {
     <script src="app-assets/js/scripts/components.min.js"></script>
     <script src="app-assets/js/scripts/customizer.min.js"></script>
     <script src="app-assets/js/scripts/footer.min.js"></script>
-    <!-- END: Theme JS-->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <!-- BEGIN: Page JS-->
+
     <script src="app-assets/js/scripts/datatables/datatable.min.js"></script>
     <!-- END: Page JS-->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
-    <script>
-        $(document).ready(function() {
-            // Update subcategory image
-            $("#updateImageForm").submit(function(e) {
-                e.preventDefault();
-                let formData = new FormData(this);
-                formData.append("btnUpdateSubCatImage", "1"); // Assigning a value
+<script>
+$(document).ready(function () {
 
-                $.ajax({
-                    type: "POST",
-                    url: "phpfiles/insertions.php",
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    success: function(response) {
-                        alert("Image Update Successfully");
-                        location.reload();
-                    }
-                });
-            });
+    // =========================
+    // IMAGE UPDATE STATE
+    // =========================
+    let selectedImageId = null;
+    let selectedImageType = null;
 
-            // Update subcategory name and banner image
-            $("#updateSubCategoryForm").submit(function(e) {
-                e.preventDefault();
-                let formData = new FormData(this);
-                formData.append("updateSubCategory", "1"); // Assigning a value
+    // =========================
+    // CLICK IMAGE → ONLY FOR IMAGE UPDATE
+    // =========================
+    $(document).on('click', '.clickable-img', function () {
 
-                $.ajax({
-                    type: "POST",
-                    url: "phpfiles/insertions.php",
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    success: function(response) {
-                        alert("Category Updated Successfully");
-                        location.reload();
-                    }
-                });
-            });
+        selectedImageId = $(this).data('id');
+        selectedImageType = $(this).data('type'); // img OR banner_image
+
+        $('#bannerImageInput').click();
+    });
+
+    // =========================
+    // FILE SELECT → AUTO UPDATE ONLY IMAGE
+    // =========================
+    $('#bannerImageInput').on('change', function () {
+
+        let file = this.files[0];
+
+        if (!file || !selectedImageId || !selectedImageType) return;
+
+        let formData = new FormData();
+
+        formData.append("updateSubCategoryImage", "1");
+        formData.append("id", selectedImageId);
+        formData.append("type", selectedImageType);
+        formData.append("image", file);
+
+        $.ajax({
+            type: "POST",
+            url: "phpfiles/insertions.php",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function () {
+
+                alert("Image updated successfully!");
+
+                // reset only image state
+                selectedImageId = null;
+                selectedImageType = null;
+                $('#bannerImageInput').val("");
+
+                location.reload();
+            },
+            error: function () {
+                alert("Image upload failed!");
+            }
         });
-    </script>
+    });
 
+    // =========================
+    // NORMAL SUBCATEGORY UPDATE (TEXT ONLY)
+    // =========================
+    $("#updateSubCategoryForm").submit(function (e) {
+
+        e.preventDefault();
+
+        let formData = new FormData(this);
+
+        let discount = formData.get("discount");
+
+        let message = "Are you sure you want to update this sub category";
+
+        if (discount && discount > 0) {
+            message += " and apply " + discount + "% discount?";
+        } else {
+            message += "?";
+        }
+
+        if (!confirm(message)) return;
+
+        formData.append("updateSubCategory", "1");
+
+        $.ajax({
+            type: "POST",
+            url: "phpfiles/insertions.php",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function () {
+                alert("Sub Category Updated Successfully");
+                location.reload();
+            },
+            error: function () {
+                alert("Update failed!");
+            }
+        });
+    });
+
+});
+</script>
     <script>
         var modal = document.getElementById("myModal");
-        var modal_Add = document.getElementById("myModal_Add");
 
         function openModal(id) {
             document.getElementsByName('userID')[0].value = id;
             modal.style.display = "block";
         }
+function openAddMore(id, name, discount, category_id, time) {
 
-        function openAddMore(id, name, time) {
+    $('#name').val(name);
+    $('#category_id').val(id);
+    $('#dis').val(discount);
+    $('#main_category_id').val(category_id);
 
-            document.getElementById('ProName').value = name;
-            document.getElementById('product_id').value = id;
+    $('#myModal_Add').modal('show'); // ✅ THIS IS THE FIX
+}
 
-            modal_Add.style.display = "block";
-
-
-        }
-
-        function openimagemodel(id, index) {
-
-
-            modal.style.display = "block";
-            document.getElementById('CatID').value = id;
+function closeModel() {
+    $('#myModal_Add').modal('hide');
+}
 
 
-        }
-        var span = document.getElementsByClassName("close")[0];
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
 
-            } else if (event.target == modal_Add) {
-                modal_Add.style.display = "none";
-            }
-        }
-
-        function closeModel(id) {
-            if (id == 1) {
-                modal.style.display = "none";
-            } else {
-                modal_Add.style.display = "none";
-            }
-
-        }
-
-        function deleteRow(id) {
-            var req = new XMLHttpRequest();
-            req.open("get", "assets/Actions.php?FunctionName=DeleteCampaignPro&id=" + id, true);
-            req.send();
-            req.onreadystatechange = function() {
-                if (req.readyState == 4 && req.status == 200) {
-                    alert('Row has been deleted!');
-                    location.reload();
-
-                }
-            };
-        }
-
-        function toggle(status, id) {
-            var req = new XMLHttpRequest();
-            req.open("get", "assets/Actions.php?FunctionName=ToggleCampaignPro&id=" + id + "&status=" + status, true);
-            req.send();
-            req.onreadystatechange = function() {
-                if (req.readyState == 4 && req.status == 200) {
-                    alert('Status has been updated!');
-                    location.reload();
-
-                }
-            };
-        }
-        
-        
-        
-        
-        
         
 document.addEventListener('DOMContentLoaded', () => {
   const tbody = document.getElementById('sortableBody');
