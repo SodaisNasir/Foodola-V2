@@ -3579,14 +3579,27 @@ if(isset($_POST['updateSubVariation']))
     $id = $_POST['id'];
     $pro_id = $_POST['name'];
     $sub_title = mysqli_real_escape_string($conn, $_POST['sub_title']);
-    
-    // echo $pro_id;
-    // die();
-    
-    $sql = "UPDATE `variation_with_product` SET `product_id`= $pro_id,`sub_title`= '$sub_title' WHERE `id`= $id";
-    $update = mysqli_query($conn,$sql);
+    $is_primary = $_POST['is_primary'];
+
+    // STEP 1: If this is set as primary, reset old primary first
+    if($is_primary == 1){
+        $reset = "UPDATE variation_with_product 
+                  SET is_primary = 0 
+                  WHERE var_id = (SELECT var_id FROM variation_with_product WHERE id = $id)";
+        mysqli_query($conn, $reset);
+    }
+
+    // STEP 2: Update current record
+    $sql = "UPDATE variation_with_product 
+            SET product_id = $pro_id,
+                sub_title = '$sub_title',
+                is_primary = $is_primary 
+            WHERE id = $id";
+
+    $update = mysqli_query($conn, $sql);
+
     if($update){
-         header("Location:../managevariations.php?&Massage=Sucessfully updated Types.");
+        header("Location:../managevariations.php?Massage=Successfully updated Types.");
     }
 }
 //end

@@ -192,7 +192,10 @@
                                       <?php
                                       include_once('connection.php');
                                       $id = $_GET['id'];
-                                      $sql="SELECT vp.id,vp.sub_title,vp.is_primary,p.name FROM variation_with_product vp INNER JOIN products p on p.id = vp.product_id WHERE vp.var_id = $id";
+                                      $sql="SELECT vp.id,vp.product_id,vp.sub_title,vp.is_primary,p.name 
+FROM variation_with_product vp 
+INNER JOIN products p on p.id = vp.product_id 
+WHERE vp.var_id = $id";
                                       $result = mysqli_query($conn,$sql);
                                       $index = 0;
                                       while($row = mysqli_fetch_array($result)){
@@ -212,9 +215,12 @@
                                             }
                                     
                                             echo "</td>";
-                                          
-                                            echo '<td><button class="btn btn-primary"  onclick="openAddMore(\''. $row['id'] .'\' ,\''.$row['name'].'\' ,\''.$row['sub_title'].'\')">Update</button>';"
-                                             </td>";
+echo '<td>
+<button class="btn btn-primary"
+onclick="openAddMore(\''.$row['id'].'\',\''.$row['product_id'].'\',\''.$row['sub_title'].'\',\''.$row['is_primary'].'\')">
+Update
+</button>
+</td>';
                                             echo '<td><button class="btn btn-danger" onclick="deleteRow(\''. $row['id'] .'\')">Delete</button></td>';     
                                           echo "</tr>";
                                           $index++;
@@ -259,6 +265,8 @@
                     </div>
                   </div>
                 </div>
+                
+                
         
        <button type="submit" name="btnUpdateProdImage" class="btn btn-primary">Submit</button>
        </form>
@@ -322,6 +330,15 @@
                         <input class="form-control"  value="" type="text" name="sub_title" id="sub_title" placeholder="Enter Sub Title" > 
                     </div>
                   </div>
+                  
+                  
+                  <div class="form-group">
+    <label>Primary Product</label>
+    <select class="form-control" name="is_primary" id="is_primary">
+        <option value="0">No</option>
+        <option value="1">Yes (Primary)</option>
+    </select>
+</div>
                   
                 <!--updatefeaturedProduct-->
             
@@ -406,16 +423,18 @@ var modal_Add = document.getElementById("myModal_Add");
         document.getElementsByName('userID')[0].value = id;
         modal.style.display = "block";
  }
-function openAddMore(id,name,sub_title){
+function openAddMore(id, product_id, sub_title,is_primary){
 
-      document.getElementById('id').value = id;
-      document.getElementById('name').value = name;
-       document.getElementById('sub_title').value = sub_title;
-    
-      modal_Add.style.display = "block";
-     
+    document.getElementById('id').value = id;
+    document.getElementById('sub_title').value = sub_title;
 
- }
+    modal_Add.style.display = "block";
+
+    setTimeout(() => {
+        document.getElementById('name').value = product_id;
+         document.getElementById('is_primary').value = is_primary;
+    }, 100);
+}
   function openimagemodel(id,index){
      
 
