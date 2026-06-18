@@ -93,6 +93,7 @@ function active($file, $currentFile) {
       <li class="nav-item has-sub">
         <a href="#"><i class="feather icon-box"></i><span>Product</span></a>
         <ul class="menu-content">
+          <li class="<?php echo active('upload_menu.php',$currentFile); ?>"><a href="upload_menu.php"><i class="feather icon-food"></i> Upload Menu</a></li>
           <li class="<?php echo active('insertNewProduct.php',$currentFile); ?>"><a href="insertNewProduct.php"><i class="feather icon-plus-square"></i> Add Product</a></li>
           <li class="<?php echo active('addmaincat.php',$currentFile); ?>"><a href="addmaincat.php"><i class="feather icon-list"></i> Add Categories</a></li>
           <li class="<?php echo active('addSubCat.php',$currentFile); ?>"><a href="addSubCat.php"><i class="feather icon-list"></i> Add Sub Categories</a></li>
@@ -117,7 +118,7 @@ function active($file, $currentFile) {
       <li class="nav-item has-sub">
         <a href="#"><i class="feather icon-image"></i><span>Content</span></a>
         <ul class="menu-content">
-          <li class="<?php echo active('addslider.php',$currentFile); ?>"><a href="addslider.php"><i class="feather icon-sliders"></i> Slider</a></li>
+          <!--<li class="<?php echo active('addslider.php',$currentFile); ?>"><a href="addslider.php"><i class="feather icon-sliders"></i> Slider</a></li>-->
           <li class="<?php echo active('addprivacypolicy.php',$currentFile); ?>"><a href="addprivacypolicy.php"><i class="feather icon-lock"></i> Privacy Policy</a></li>
           <li class="<?php echo active('addterms_condition.php',$currentFile); ?>"><a href="addterms_condition.php"><i class="feather icon-file-text"></i> Terms</a></li>
           <li class="<?php echo active('imprint.php',$currentFile); ?>"><a href="imprint.php"><i class="feather icon-info"></i> Imprint</a></li>
@@ -176,6 +177,7 @@ function active($file, $currentFile) {
         <li class="<?php echo active('manage_promocode.php',$currentFile); ?>"><a href="manage_promocode.php"><i class="feather icon-tag"></i> Promo Codes</a></li>
         <li class="<?php echo active('enviroment.php',$currentFile); ?>"><a href="enviroment.php"><i class="feather icon-cloud"></i> Environment</a></li>
         <li class="<?php echo active('managetimings.php',$currentFile); ?>"><a href="managetimings.php"><i class="feather icon-clock"></i>Schedule </a></li>
+        <li class="<?php echo active('user_visits.php',$currentFile); ?>"><a href="user_visits.php"><i class="feather icon-user"></i>User Visits </a></li>
         </ul>
       </li>
 

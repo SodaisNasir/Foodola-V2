@@ -11,6 +11,21 @@ use PHPMailer\PHPMailer\Exception;
 
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
+
+
+if(isset($_POST['btn_delete_slider'])){
+    include('../connection.php');
+    $id = $_POST['slider_id'];
+    $sql = "DELETE FROM `sliders` WHERE `id` = '$id'";
+    $result = mysqli_query($conn, $sql);
+    
+    if($result){
+        header("Location:../manageSliders.php");
+    }else{
+        echo "<script>alert('Sorry, there was an error uploading your file.');window.location.href='../manageSliders.php'</script>";
+    }
+
+}
 function convertToWebp($sourceFile, $destinationPath, $quality = 80)
 {
     if (!file_exists($sourceFile)) {
@@ -482,22 +497,45 @@ if (isset($_POST['btn_insert_user'])) {
 
 if (isset($_POST['btn_Update_slider'])) {
     include('../connection.php');
+
     $id = mysqli_real_escape_string($conn, $_POST['id']);
     $alt_name = mysqli_real_escape_string($conn, $_POST['alt_name']);
     $MainCat = mysqli_real_escape_string($conn, $_POST['MainCat']);
     $product_id = mysqli_real_escape_string($conn, $_POST['product_id']);
+    $image_update_sql = "";
 
- 
-    $sql = "UPDATE `sliders` SET `alt_name`='$alt_name',`type`='$MainCat',`product_id`='$product_id' WHERE  `id` = '$id'";
+    if (!empty($_FILES["slider_image"]["name"])) {
+
+        $target_dir = "../Uploads/";
+        $imageFileType = strtolower(pathinfo($_FILES["slider_image"]["name"], PATHINFO_EXTENSION));
+
+        // validate extension
+        $allowed = ["jpg", "jpeg", "png", "gif"];
+
+        if (!in_array($imageFileType, $allowed)) {
+            echo "<script>alert('Invalid image format');window.location.href='../manageSliders.php'</script>";
+        }
+
+        if ($_FILES["slider_image"]["size"] > 500000000) {
+            echo "<script>alert('File too large');window.location.href='../manageSliders.php'</script>";
+        }
+        $filewithnewname = date("Ymdis") . "_Slider." . $imageFileType;
+        if (move_uploaded_file($_FILES["slider_image"]["tmp_name"], $target_dir . $filewithnewname)) {
+            $image_update_sql = ", `img`='$filewithnewname'";
+        } else {
+            echo "<script>alert('Image upload failed');window.location.href='../manageSliders.php'</script>";
+        }
+    }
+
+
+    $sql = "UPDATE `sliders` SET `alt_name`='$alt_name',`type`='$MainCat',`product_id`='$product_id', $image_update_sql WHERE `id`='$id'";
     $result = mysqli_query($conn, $sql);
-
     if ($result) {
-     echo "<script>alert('Updated successfully');window.location.href='../manageSliders.php'</script>";
+        echo "<script>alert('Updated successfully');window.location.href='../manageSliders.php'</script>";
     } else {
         echo "<script>alert('Error updating slider: " . mysqli_error($conn) . "');window.location.href='../manageSliders.php'</script>";
     }
 }
-
 
 if(isset($_POST['btn_insert_code'])){
 
@@ -1837,7 +1875,7 @@ $product_id = mysqli_real_escape_string($conn, $product_id);
         $monitor_update = mysqli_query($conn, $monitor_sql);
 
         if ($monitor_update) {
-          header("Location:../addslider.php?Massage=Sucessfully added new slider.");
+          header("Location:../manageSliders.php?Massage=Sucessfully added new slider.");
         } else {
           die("Error updating monitoring database: " . mysqli_error($monitor_con));
         }

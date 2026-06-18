@@ -69,7 +69,7 @@ if(isset($_GET['Massage'])){
     <!-- BEGIN: Custom CSS-->
     <link rel="stylesheet" type="text/css" href="assets/css/style.css">
     <!-- END: Custom CSS-->
-
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   </head>
   <!-- END: Head-->
 
@@ -188,7 +188,7 @@ if(isset($_GET['Massage'])){
                  
                     <div class="form-group">
                             <label for="product_id">Select Product</label>
-                            <select name="product_id" id="product_id" class="form-control">
+                            <select name="product_id" id="product_id" class="form-control select2">
                                 <option value="">-- Select a Product --</option>
                                 <?php
                                     include("connection.php");
@@ -296,9 +296,14 @@ if(isset($_GET['Massage'])){
     <script src="app-assets/js/scripts/forms/validation/form-validation.js"></script>
     <!-- END: Page JS-->
  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   </body>
   <!-- END: Body-->
-
+<script>
+    $('#product_id').select2({
+    width: '100%'
+});
+</script>
 <!-- Mirrored from pixinvent.com/demo/vuexy-html-bootstrap-admin-template/html/ltr/vertical-menu-template-semi-dark/form-validation.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 16 Apr 2020 21:22:57 GMT -->
 </html>
 <script src="jsfiles/functions.js"></script>

@@ -54,6 +54,7 @@ if (isset($_GET['Massage'])) {
 
     <!-- BEGIN: Custom CSS-->
     <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
 
         .modal {
@@ -241,7 +242,7 @@ if (isset($_GET['Massage'])) {
                                     
                                     echo "<div class='mb-2'>";
                                     echo "<label><strong>Select Sub Category</strong></label>"; 
-                                    echo "<select id='subCategorySelect' class='form-control status-select' style='width: 200px; display: inline-block; margin-left: 10px;'>";
+                                    echo "<select id='subCategorySelect' class='form-control status-select searchable-select' style='width: 200px; display: inline-block; margin-left: 10px;'>";
                                     echo "<option value=''>-- Select Sub Category --</option>";
                                     
                                     while ($row = mysqli_fetch_array($exec_sql)) {
@@ -374,7 +375,7 @@ if (isset($conn)) {
             echo "<td class='editable border border-5' contenteditable='true' data-field='sku_id'>{$skuId}</td>";
 
             // Subcategory Dropdown
-            echo "<td class='border border-5' style='min-width: 220px;' data-field='sub_category_id'><select class='form-control status-select' >";
+            echo "<td class='border border-5' style='min-width: 220px;' data-field='sub_category_id'><select class='form-control status-select searchable-select' >";
             foreach ($subCategoryOptions as $option) {
                 $selected = ($option['id'] == $subCategoryId) ? 'selected' : '';
                 echo "<option value='{$option['id']}' $selected>{$option['name']}</option>";
@@ -412,7 +413,7 @@ if (isset($conn)) {
             echo "</select></td>";
 
             // Addon Dropdown
-            echo "<td  class='border border-5' style='min-width: 200px;'  data-field='addon_id'><select class='form-control status-select' $disabled>";
+            echo "<td  class='border border-5' style='min-width: 200px;'  data-field='addon_id'><select class='form-control status-select searchable-select' $disabled>";
             echo "<option value='-1'>None</option>";
             foreach ($addonOptions as $option) {
                 $selected = ($option['ao_id'] == $row['addon_id']) ? 'selected' : '';
@@ -421,7 +422,7 @@ if (isset($conn)) {
             echo "</select></td>";
 
             // Type Dropdown
-            echo "<td class='border border-5' style='min-width: 200px;'   data-field='type_id' ><select class='form-control status-select' $disabled>";
+            echo "<td class='border border-5' style='min-width: 200px;'   data-field='type_id' ><select class='form-control status-select searchable-select' $disabled>";
             echo "<option value='-1'>None</option>";
             foreach ($typeOptions as $option) {
                 $selected = ($option['type_id'] == $row['type_id']) ? 'selected' : '';
@@ -430,7 +431,7 @@ if (isset($conn)) {
             echo "</select></td>";
 
             // Dressing Dropdown
-            echo "<td class='border border-5' style='min-width: 200px;' data-field='dressing_id' ><select class='form-control status-select' $disabled>";
+            echo "<td class='border border-5' style='min-width: 200px;' data-field='dressing_id' ><select class='form-control status-select searchable-select' $disabled>";
             echo "<option value='-1'>None</option>";
             foreach ($dressingOptions as $option) {
                 $selected = ($option['dressing_id'] == $row['dressing_id']) ? 'selected' : '';
@@ -596,8 +597,20 @@ if (isset($conn)) {
     <!-- BEGIN: Page JS-->
     <script src="app-assets/js/scripts/datatables/datatable.min.js"></script>
     <!-- END: Page JS-->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
       <script>
+          
+          function initSelect2() {
+    $('.searchable-select').select2({
+        width: '100%'
+    });
+}
+
+$(document).ready(function () {
+    initSelect2();
+});
+          
         function toggle(status, id) {
                     const action = status === 'Active' ? 'Deactivate' : 'Activate';
                      if (!confirm(`Are you sure you want to ${action} this product?`)) {
@@ -909,7 +922,7 @@ $('#subCategorySelect').on('change', function () {
                                 <td class="editable border-5" contenteditable="true" data-field="proname">${item.name}</td>
                                 <td class="editable border-5" contenteditable="true" data-field="sku_id">${item.sku_id ?? '-'}</td>
                                 <td class='border border-5' style='min-width: 220px;' data-field='sub_category_id'>
-                                    <select class="form-control status-select">
+                                    <select class="form-control status-select searchable-select">
                                         ${subCategoryOptions.map(opt => `
                                             <option value="${opt.id}" ${opt.id == item.sub_category_id ? 'selected' : ''}>${opt.name}</option>
                                         `).join('')}
@@ -938,7 +951,7 @@ $('#subCategorySelect').on('change', function () {
                                     </select>
                                 </td>
                                 <td class='border border-5' style='min-width: 200px;'  data-field='addon_id'>
-                                    <select class="form-control status-select" ${disabled}>
+                                    <select class="form-control status-select searchable-select" ${disabled}>
                                         <option value="-1">None</option>
                                         ${addonOptions.map(opt => `
                                             <option value="${opt.ao_id}" ${opt.ao_id == item.addons[0]?.ao_id ? 'selected' : ''}>${opt.ao_title}</option>
@@ -946,7 +959,7 @@ $('#subCategorySelect').on('change', function () {
                                     </select>
                                 </td>
                                 <td class='border border-5' style='min-width: 200px;'   data-field='type_id'>
-                                    <select class="form-control status-select" ${disabled}>
+                                    <select class="form-control status-select searchable-select" ${disabled}>
                                         <option value="-1">None</option>
                                         ${typeOptions.map(opt => `
                                             <option value="${opt.type_id}" ${opt.type_id == item.types[0]?.type_id ? 'selected' : ''}>${opt.type_title}</option>
@@ -954,7 +967,7 @@ $('#subCategorySelect').on('change', function () {
                                     </select>
                                 </td>
                                 <td class='border border-5' style='min-width: 200px;' data-field='dressing_id'>
-                                    <select class="form-control status-select" ${disabled}>
+                                    <select class="form-control status-select searchable-select" ${disabled}>
                                         <option value="-1">None</option>
                                         ${dressingOptions.map(opt => `
                                             <option value="${opt.dressing_id}" ${opt.dressing_id == item.dressing[0]?.dressing_id ? 'selected' : ''}>${opt.dressing_title}</option>
@@ -1026,6 +1039,7 @@ $('#subCategorySelect').on('change', function () {
                         });
 
                     $('#sortableBody').html(html);
+                    initSelect2();
                 } else {
                     $('#sortableBody').html('<tr><td colspan="17">No Product found.</td></tr>');
                 }

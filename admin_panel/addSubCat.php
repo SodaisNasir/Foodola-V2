@@ -62,7 +62,7 @@ if (isset($_GET['Massage'])) {
   <link rel="stylesheet" type="text/css" href="app-assets/css/core/colors/palette-gradient.min.css">
   <link rel="stylesheet" type="text/css" href="app-assets/css/plugins/forms/validation/form-validation.css">
   <!-- END: Page CSS-->
-
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   <!-- BEGIN: Custom CSS-->
   <link rel="stylesheet" type="text/css" href="assets/css/style.css">
   <!-- END: Custom CSS-->
@@ -125,94 +125,60 @@ if (isset($_GET['Massage'])) {
                 <div class="card-content">
                   <div class="card-body">
 
-                    <form class="form-horizontal" action="phpfiles/insertions.php" method="POST" enctype="multipart/form-data">
-                      <div class="row">
-                        <!-- 	<div class="col-sm-6">
-									<div class="form-group">
-										<div class="controls">
-											<input type="Number" name="" class="form-control" placeholder="Quiz title" >
+                   <form class="form-horizontal" action="phpfiles/insertions.php" method="POST" enctype="multipart/form-data">
 
-										</div>
-									</div>
-								</div> -->
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <div class="controls">
-                              <label for="subcategory name">Category Name</label>
+  <div class="row">
 
-                              <div class="controls">
-                                <input type="text" name="CatName" class="form-control" placeholder="Category name" required="">
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+    <!-- Category Name -->
+    <div class="col-sm-6">
+      <div class="form-group">
+        <label>Category Name</label>
+        <input type="text" name="CatName" class="form-control" placeholder="Category name" required>
+      </div>
+    </div>
 
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <div class="controls">
-                              <div class="controls">
-                                <label for="subcategory name">Sub Category Image</label>
-                                <input type="file" name="CatImage" class="form-control" placeholder="Category Image" required="">
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <div class="controls">
-                              <label for="subcategory name">Main Category</label>
-                              <select name="MainCat" class="form-control">
-                                <?php
-                                include('/assets/connection.php');
-                                $sql = "SELECT `id`, `name` FROM `categories`";
-                                $execute = mysqli_query($conn, $sql);
-                                while ($row = mysqli_fetch_array($execute)) {
-                                  echo "<option value={$row['id']}>{$row['name']}</option>";
-                                }
-                                ?>
-                              </select>
-                            </div>
-                          </div>
+    <!-- Main Category (Searchable) -->
+    <div class="col-sm-6">
+      <div class="form-group">
+        <label>Main Category</label>
+        <select name="MainCat" class="form-control select2" required>
+          <?php
+          include('/assets/connection.php');
+          $sql = "SELECT `id`, `name` FROM `categories`";
+          $execute = mysqli_query($conn, $sql);
+          while ($row = mysqli_fetch_array($execute)) {
+            echo "<option value='{$row['id']}'>{$row['name']}</option>";
+          }
+          ?>
+        </select>
+      </div>
+    </div>
 
-                        </div>
+    <!-- Sub Category Image -->
+    <div class="col-sm-6">
+      <div class="form-group">
+        <label>Sub Category Image</label>
+        <input type="file" name="CatImage" class="form-control" required>
+      </div>
+    </div>
 
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <div class="controls">
-                              <div class="controls">
-                                <label for="subcategory name">Banner Image</label>
-                                <input type="file" name="banner_image" class="form-control" placeholder="Banner Image" required="">
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+    <!-- Banner Image -->
+    <div class="col-sm-6">
+      <div class="form-group">
+        <label>Banner Image</label>
+        <input type="file" name="banner_image" class="form-control" required>
+      </div>
+    </div>
 
-                        <div class="col-sm-12">
+    <!-- Submit -->
+    <div class="col-sm-12 mt-3">
+      <button type="submit" name="btnSubmit_insertSubCategories" class="btn btn-primary">
+        Submit
+      </button>
+    </div>
 
-                          <button type="Submit" name="btnSubmit_insertSubCategories" class="btn btn-primary">Submit</button>
-
-                        </div>
-
-                    </form>
-
-                    <form class="form-horizontal mt-2">
-                      <div class="row">
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <div class="controls">
-                            <button type="button" class="btn btn-primary my-3" onclick="downloadSampleCSV()">Download Sample CSV</button>
-                            <br>
-                              <label for="csv-file" class="form-label mb-1">Choose a CSV file:</label>
-                              <input type="file" name="csv_file" class="form-control" placeholder="Csv file" id="csv-file">
-
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-
-                      <button type="button" onclick="uploadCsv()" class="btn btn-primary">Submit</button>
-                    </form>
+  </div>
+</form>
                   </div>
                 </div>
               </div>
@@ -261,6 +227,7 @@ if (isset($_GET['Massage'])) {
   <!-- BEGIN: Page JS-->
   <script src="app-assets/js/scripts/forms/validation/form-validation.js"></script>
   <!-- END: Page JS-->
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   <!--<script src="laravel/actions.js"></script>-->
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
 <script src="jsfiles/functions.js"></script>
@@ -341,6 +308,16 @@ if (isset($_GET['Massage'])) {
     });
 }
     
+    
+</script>
+
+<script>
+  $(document).ready(function() {
+    $('.select2').select2({
+      placeholder: "Search category...",
+      allowClear: true
+    });
+  });
 </script>
 </body>
 <!-- END: Body-->

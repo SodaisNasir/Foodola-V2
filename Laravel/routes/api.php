@@ -79,8 +79,7 @@ Route::post('/store-types', [OrderController::class, 'store_types']);
 
 Route::post('accounts', [AdminController::class, 'accounts']);
 Route::get('/departments', [OrderController::class, 'departments']);
-
-
+Route::post('/import-excel', [AdminController::class, 'import_excel']);
 
 // Inventry System Routes
 Route::prefix('inventory')->group(function () {

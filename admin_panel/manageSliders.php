@@ -7,20 +7,20 @@
 // ini_set('display_errors', 1);
 // ini_set('display_startup_errors', 1);
 // error_reporting(E_ALL);
-    // Include your connection file
-    include('connection.php');
+// Include your connection file
+include('connection.php');
 
-    // Fetch all products
-    $sql_products = "SELECT id, name FROM products";
-    $execute_products = mysqli_query($conn, $sql_products);
+// Fetch all products
+$sql_products = "SELECT id, name FROM products";
+$execute_products = mysqli_query($conn, $sql_products);
 
-    // Store product options in an array
-    $product_options = [];
-    if (mysqli_num_rows($execute_products) > 0) {
-        while ($row = mysqli_fetch_assoc($execute_products)) {
-            $product_options[] = $row; // Store each product row
-        }
+// Store product options in an array
+$product_options = [];
+if (mysqli_num_rows($execute_products) > 0) {
+    while ($row = mysqli_fetch_assoc($execute_products)) {
+        $product_options[] = $row; // Store each product row
     }
+}
 ?>
 
 <!DOCTYPE html>
@@ -34,14 +34,14 @@
     <meta name="keywords" content="admin template, Vuexy admin template, dashboard template, flat admin template, responsive admin template, web app">
     <meta name="author" content="PIXINVENT">
     <title><?php
-       include('title.php');
-       echo $pageTitle
-    
-    ?></title>
+            include('title.php');
+            echo $pageTitle
+
+            ?></title>
     <link rel="apple-touch-icon" href="app-assets/images/ico/apple-icon-120.html">
     <link rel="shortcut icon" type="image/x-icon" href="app-assets/images/ico/favicon.ico">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600" rel="stylesheet">
-      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
     <!-- BEGIN: Vendor CSS-->
     <link rel="stylesheet" type="text/css" href="app-assets/vendors/css/vendors.min.css">
@@ -65,9 +65,11 @@
     <link rel="stylesheet" type="text/css" href="assets/css/style.css">
     <!-- END: Custom CSS-->
 
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
-  
+
 <!-- BEGIN: Body-->
+
 <body class="vertical-layout vertical-menu-modern semi-dark-layout 2-columns navbar-floating footer-static" data-open="click" data-menu="vertical-menu-modern" data-col="2-columns" data-layout="semi-dark-layout">
 
     <!-- BEGIN: Header-->
@@ -102,7 +104,7 @@
                             <div class="card-header">
                                 <h4 class="card-title">Manage Sub Category</h4>
                             </div>
-        
+
                             <div class="card-content">
                                 <div class="card-body card-dashboard">
                                     <button class="btn btn-primary float-right mb-1" data-toggle="modal" data-target="#myModal_Add">Add New sliders</button>
@@ -132,20 +134,31 @@
                                                     echo "<td>{$row['type']}</td>";
                                                     echo "<td name='tittlename'><img height='100px' width='100px' src='{$url}'></td>";
                                                     echo "<td name='subname'>{$row['alt_name']}</td>";
-                                              
-                                                    
-                                                        echo "<td class=''>
-                                                            <button onclick='deleteRow({$row['id']})' class='btn btn-danger me-1'>Delete</button>
-                                                            <button 
-                                                                onclick='openUpdateModal(\"{$row['id']}\", \"".addslashes($row['alt_name'])."\", \"{$row['type']}\", \"{$row['product_id']}\")' 
-                                                                class='btn btn-secondary ' 
-                                                                data-toggle='modal' 
-                                                                data-target='#update_modal'>
-                                                                Update
-                                                            </button>
-                                                        </td>";
 
-                                                    
+
+                                                    echo "<td>
+    <div style='display:flex; gap:8px; align-items:center; justify-content:center;'>
+
+        <form action='phpfiles/insertions.php' method='POST' class='m-0 p-0'>
+            <input type='hidden' name='slider_id' value='{$row['id']}'>
+            <button type='submit' name='btn_delete_slider' class='btn btn-danger'
+                onclick='return confirm(\"Are you sure you want to delete this Slider?\")'>
+                Delete
+            </button>
+        </form>
+
+        <button 
+            onclick='openUpdateModal(\"{$row['id']}\", \"" . addslashes($row['alt_name']) . "\", \"{$row['type']}\", \"{$row['product_id']}\")' 
+            class='btn btn-secondary ' 
+            data-toggle='modal' 
+            data-target='#update_modal'>
+            Update
+        </button>
+
+    </div>
+</td>";
+
+
                                                     echo "</tr>";
                                                     $index++;
                                                 }
@@ -182,115 +195,118 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    
-                    <form method="POST" action="phpfiles/insertions.php" enctype="multipart/form-data">
-                        
-                                   <div class="form-group">
-                        
-                             <input type="hidden" class="form-control" name="id" id="id">
-                        <!-- Alt Name Input -->
-                        <label for="alt_name">Alternative Name</label>
-                        <input class="form-control mb-2" type="text" name="alt_name" id="alt_name" placeholder="Enter Alternative Name">
-                        
-                        <!-- Slider Type Dropdown -->
-                        <div class="form-group">
-                            <label for="slider_type">Slider Type</label>
-                            <select name="MainCat" id ="type" class="form-control">
-                                <option value='slider'>Main Slider</option>
-                                <option value='discount'>Discount Slider</option>
-                            </select>
-                        </div>
 
-                        <!-- Product Dropdown (Dynamically filled) -->
+                    <form method="POST" action="phpfiles/insertions.php" enctype="multipart/form-data">
+
                         <div class="form-group">
-                            <label for="product_id">Select Product</label>
-                            <select name="product_id" id="product_id" class="form-control">
-                                <option value="">-- Select a Product --</option>
-                                <?php
+
+                            <input type="hidden" class="form-control" name="id" id="id">
+                            <!-- Alt Name Input -->
+                            <label for="alt_name">Alternative Name</label>
+                            <input class="form-control mb-2" type="text" name="alt_name" id="alt_name" placeholder="Enter Alternative Name">
+
+                            <!-- Slider Type Dropdown -->
+                            <div class="form-group">
+                                <label for="slider_type">Slider Type</label>
+                                <select name="MainCat" id="type" class="form-control">
+                                    <option value='slider'>Main Slider</option>
+                                    <option value='discount'>Discount Slider</option>
+                                </select>
+                            </div>
+
+                            <!-- Product Dropdown (Dynamically filled) -->
+                            <div class="form-group">
+                                <label for="product_id">Select Product</label>
+                                <select name="product_id" id="update_product_id" class="form-control select2">
+                                    <option value="">-- Select a Product --</option>
+                                    <?php
                                     // Populate product options from the database
                                     foreach ($product_options as $product) {
                                         echo "<option value='{$product['id']}'>{$product['name']}</option>";
                                     }
-                                ?>
-                            </select>
-                        </div>
+                                    ?>
+                                </select>
+                            </div>
 
-                        <!-- Image Upload -->
-                        <!--<label for="CatImage">Upload Image</label>-->
-                        <!--<input class="form-control mb-2" type="file" name="CatImage" id="CatImage">-->
-                        
-                        
-                         <button type="submit" name="btn_Update_slider" class="btn btn-primary w-100">Update</button>
-                    </div>
-                    </form>    
-         
+                            <div class="form-group">
+                                <label for="sliderImg">Update Image</label>
+                                <input class="form-control" type="file" name="slider_image" id="sliderImg">
+                            </div>
+
+
+                            <button type="submit" name="btn_Update_slider" class="btn btn-primary w-100">Update</button>
+                        </div>
+                    </form>
+
                 </div>
             </div>
         </div>
     </div>
-    
-    
-    
-    
-    
-    <div class="modal fade" id="myModal_Add" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Add New Slider</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form method="POST" action="phpfiles/insertions.php" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <!-- Alt Name Input -->
-                        <label for="alt_name">Alternative Name</label>
-                        <input class="form-control mb-2" type="text" name="alt_name" id="alt_name" placeholder="Enter Alternative Name">
-                        
-                        <!-- Slider Type Dropdown -->
-                        <div class="form-group">
-                            <label for="slider_type">Slider Type</label>
-                            <select name="MainCat" class="form-control">
-                                <option value='slider'>Main Slider</option>
-                                <option value='discount'>Discount Slider</option>
-                            </select>
-                        </div>
 
-                        <!-- Product Dropdown (Dynamically filled) -->
+
+
+
+
+    <div class="modal fade" id="myModal_Add" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add New Slider</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="phpfiles/insertions.php" enctype="multipart/form-data">
                         <div class="form-group">
-                            <label for="product_id">Select Product</label>
-                            <select name="product_id" id="product_id" class="form-control">
-                                <option value="">-- Select a Product --</option>
-                                <?php
+                            <!-- Alt Name Input -->
+                            <label for="alt_name">Alternative Name</label>
+                            <input class="form-control mb-2" type="text" name="alt_name" id="alt_name" placeholder="Enter Alternative Name">
+
+                            <!-- Slider Type Dropdown -->
+                            <div class="form-group">
+                                <label for="slider_type">Slider Type</label>
+                                <select name="MainCat" class="form-control">
+                                    <option value='slider'>Main Slider</option>
+                                    <option value='discount'>Discount Slider</option>
+                                </select>
+                            </div>
+
+                            <!-- Product Dropdown (Dynamically filled) -->
+                            <div class="form-group">
+                                <label for="product_id">Select Product</label>
+                                <select name="product_id" id="add_product_id" class="form-control select2">
+                                    <option value="">-- Select a Product --</option>
+                                    <?php
                                     // Populate product options from the database
                                     foreach ($product_options as $product) {
                                         echo "<option value='{$product['id']}'>{$product['name']}</option>";
                                     }
-                                ?>
-                            </select>
+                                    ?>
+                                </select>
+                            </div>
+
+
+
+                            <!-- Image Upload -->
+                            <label for="CatImage">Upload Image</label>
+                            <input class="form-control" type="file" name="CatImage" id="CatImage">
                         </div>
 
-                        <!-- Image Upload -->
-                        <label for="CatImage">Upload Image</label>
-                        <input class="form-control" type="file" name="CatImage" id="CatImage">
-                    </div>
-                    
-                    <!-- Submit Button -->
-                    <button type="submit" name="btnSubmit_insertSliders" class="btn btn-primary">Submit</button>
-                </form>
+                        <!-- Submit Button -->
+                        <button type="submit" name="btnSubmit_insertSliders" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <!-- END: Modals -->
 
     <!-- BEGIN: Vendor JS-->
     <script src="app-assets/vendors/js/vendors.min.js"></script>
     <!-- END: Vendor JS-->
- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <!-- BEGIN: Page Vendor JS-->
     <script src="app-assets/vendors/js/forms/validation/jquery.validate.min.js"></script>
     <!-- END: Page Vendor JS-->
@@ -304,25 +320,23 @@
     <!-- BEGIN: Page JS-->
     <script src="app-assets/js/scripts/forms/validation/form-validation.js"></script>
     <!-- END: Page JS-->
-
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <!-- Your Custom Scripts -->
     <script>
-    
-    
-      function deleteRow(id) {
+        function deleteRow(id) {
             var req = new XMLHttpRequest();
             req.open("get", "assets/Actions.php?FunctionName=DeleteSlider&id=" + id, true);
             req.send();
-            req.onreadystatechange = function () {
+            req.onreadystatechange = function() {
                 if (req.readyState == 4 && req.status == 200) {
                     alert('Row has been deleted!');
                     location.reload();
                 }
             };
         }
-    
-    
-        $(document).ready(function () {
+
+
+        $(document).ready(function() {
             $('#example').DataTable({
                 dom: 'Bfrtip',
                 buttons: [
@@ -334,35 +348,43 @@
             });
         });
 
-            // JavaScript functions for modals
-            $('#myModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget); // Button that triggered the modal
-                var userId = button.data('userid'); // Extract info from data-* attributes
-                var modal = $(this);
-                modal.find('input[name="userID"]').val(userId);
-            });
-    
-            $('#myModal_Add').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget); // Button that triggered the modal
-                var productId = button.data('productid'); // Extract info from data-* attributes
-                var modal = $(this);
-                modal.find('input[name="product_id"]').val(productId);
-            });
-            
-            
-            function openUpdateModal(id, alt_name, type, product_id){
-    
-                $('#id').val(id);
-                $('#alt_name').val(alt_name);
-                $('#type').val(type);
-                $('#product_id').val(product_id);
-                
-            }
-            
-            
-        
-        
-        
+        // JavaScript functions for modals
+        $('#myModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var userId = button.data('userid'); // Extract info from data-* attributes
+            var modal = $(this);
+            modal.find('input[name="userID"]').val(userId);
+        });
+
+        $('#myModal_Add').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var productId = button.data('productid'); // Extract info from data-* attributes
+            var modal = $(this);
+            modal.find('input[name="product_id"]').val(productId);
+        });
+
+
+        function openUpdateModal(id, alt_name, type, product_id) {
+
+            $('#id').val(id);
+            $('#alt_name').val(alt_name);
+            $('#type').val(type);
+            $('#update_product_id').val(product_id).trigger('change');
+
+        }
+
+
+
+
+        $('#add_product_id').select2({
+            dropdownParent: $('#myModal_Add'),
+            width: '100%'
+        });
+
+        $('#update_product_id').select2({
+            dropdownParent: $('#update_modal'),
+            width: '100%'
+        });
     </script>
     <!-- END: Custom Scripts -->
 

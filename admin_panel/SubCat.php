@@ -54,6 +54,8 @@ if (isset($_GET['Massage'])) {
     <!-- BEGIN: Custom CSS-->
     <link rel="stylesheet" type="text/css" href="assets/css/style.css">
     <!-- END: Custom CSS-->
+    
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 </head>
 
@@ -249,23 +251,28 @@ if (isset($_GET['Massage'])) {
 
                     <input type="hidden" name="category_id" id="category_id">
 
-                    <!-- Main Category -->
                     <div class="form-group">
-                        <label>Main Category</label>
-                        <select class="form-control" name="main_category_id" id="main_category_id">
-                            <option value="">Select Main Category</option>
+    <label>Main Category</label>
 
-                            <?php
-                            include('connection.php');
-                            $sql = "SELECT id, name FROM categories ORDER BY name ASC";
-                            $result = mysqli_query($conn, $sql);
+    <select class="form-control select2" name="main_category_id" id="main_category_id" style="width:100%;">
+        <option value="">Select Main Category</option>
 
-                            while ($row = mysqli_fetch_assoc($result)) {
-                                echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
-                            }
-                            ?>
-                        </select>
-                    </div>
+        <?php
+        include('connection.php');
+
+        $sql = "SELECT id, name FROM categories ORDER BY name ASC";
+        $result = mysqli_query($conn, $sql);
+
+        while ($row = mysqli_fetch_assoc($result)) {
+        ?>
+            <option value="<?= $row['id']; ?>">
+                <?= htmlspecialchars($row['name']); ?>
+            </option>
+        <?php
+        }
+        ?>
+    </select>
+</div>
 
                     <!-- Subcategory -->
                     <div class="form-group">
@@ -333,6 +340,7 @@ if (isset($_GET['Massage'])) {
     <!-- END: Page JS-->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
 $(document).ready(function () {
@@ -552,6 +560,12 @@ function sendOrderToServer(orderArray) {
     }
 });
 
+
+$(document).ready(function () {
+    $('#main_category_id').select2({
+        dropdownParent: $('#myModal_Add') // modal ka id
+    });
+});
     </script>
 
 

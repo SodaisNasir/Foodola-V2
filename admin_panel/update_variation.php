@@ -41,7 +41,7 @@
   padding: 20px;
   border: 1px solid #888;
   width: 50%;
-  height:300px;
+  height:350px;
   border-radius:10px;
 }
 
@@ -119,7 +119,8 @@
     <!-- BEGIN: Header-->
   
     
-
+    <!-- END: Custom CSS-->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <!-- END: Header-->
 
 
@@ -289,34 +290,39 @@ Update
              <div class="col-sm-12">
                  <input class="form-control" value="" type="text" name="id" id="id" placeholder="Enter user name" hidden> 
                   
-                <div class="form-group">
+              <div class="form-group">
     <div class="controls">
-        <select class="form-control" name="name" id="name">
+        <select class="form-control select2" name="name" id="name" style="width:100%;">
+            <option value="">Select Product</option>
+
             <?php
             include_once('connection.php');
-            
-            // Modified query to include sub_category name
+
             $pro_sql = "
-                SELECT products.id, products.name AS product_name, sub_categories.name AS subcategory_name
+                SELECT products.id,
+                       products.name AS product_name,
+                       sub_categories.name AS subcategory_name
                 FROM products
-                LEFT JOIN sub_categories ON products.sub_category_id = sub_categories.id
+                LEFT JOIN sub_categories
+                    ON products.sub_category_id = sub_categories.id
+                ORDER BY products.name ASC
             ";
+
             $pro_exec = mysqli_query($conn, $pro_sql);
-            $pro_num = mysqli_num_rows($pro_exec);
-            
-            if ($pro_num > 0) {
-                echo "<option disabled>Select</option>";
-                
-                while ($pro_ar = mysqli_fetch_array($pro_exec)) {
+
+            if (mysqli_num_rows($pro_exec) > 0) {
+                while ($pro_ar = mysqli_fetch_assoc($pro_exec)) {
                     ?>
-                    <option value="<?php echo $pro_ar['id'] ?>">
-                        <?php echo $pro_ar['product_name'] . " - " . ($pro_ar['subcategory_name'] ? $pro_ar['subcategory_name'] : "No Subcategory"); ?>
+                    <option value="<?= $pro_ar['id']; ?>">
+                        <?= htmlspecialchars($pro_ar['product_name']); ?>
+                        -
+                        <?= htmlspecialchars($pro_ar['subcategory_name'] ?? 'No Subcategory'); ?>
                     </option>
                     <?php
                 }
             } else {
                 ?>
-                <option>No Product Found</option>
+                <option value="">No Product Found</option>
                 <?php
             }
             ?>
@@ -329,18 +335,17 @@ Update
                     <div class="controls">
                         <input class="form-control"  value="" type="text" name="sub_title" id="sub_title" placeholder="Enter Sub Title" > 
                     </div>
-                  </div>
+                 </div>
                   
-                  
-                  <div class="form-group">
-    <label>Primary Product</label>
-    <select class="form-control" name="is_primary" id="is_primary">
-        <option value="0">No</option>
-        <option value="1">Yes (Primary)</option>
-    </select>
-</div>
-                  
-                <!--updatefeaturedProduct-->
+                                  
+                <div class="form-group">
+                    <label>Primary Product</label>
+                    <select class="form-control" name="is_primary" id="is_primary">
+                        <option value="0">No</option>
+                        <option value="1">Yes (Primary)</option>
+                    </select>
+                </div>
+                 
             
                 
                 </div>
@@ -394,7 +399,7 @@ Update
     <script src="app-assets/js/scripts/customizer.min.js"></script>
     <script src="app-assets/js/scripts/footer.min.js"></script>
     <!-- END: Theme JS-->
-
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <!-- BEGIN: Page JS-->
     <script src="app-assets/js/scripts/datatables/datatable.min.js"></script>
     <!-- END: Page JS-->
@@ -435,7 +440,7 @@ function openAddMore(id, product_id, sub_title,is_primary){
          document.getElementById('is_primary').value = is_primary;
     }, 100);
 }
-  function openimagemodel(id,index){
+function openimagemodel(id,index){
      
 
       modal.style.display = "block";
@@ -486,6 +491,16 @@ function toggle(status,id){
           }
       };
 }
+
+
+    // 🔥 IMPORTANT: activate select2 on new element
+$(document).ready(function () {
+    $('#name').select2({
+        placeholder: 'Search Product',
+        allowClear: true,
+        width: '100%'
+    });
+});
 </script>    
 <script>$(document).ready(function() {
     $('#example').DataTable( {

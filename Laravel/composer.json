@@ -11,6 +11,7 @@
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
         "league/csv": "9.0",
+        "phpoffice/phpspreadsheet": "^5.8",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/browsershot": "3.59",
         "spatie/image": "^2.2"
