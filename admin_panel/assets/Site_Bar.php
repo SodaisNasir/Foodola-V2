@@ -93,7 +93,7 @@ function active($file, $currentFile) {
       <li class="nav-item has-sub">
         <a href="#"><i class="feather icon-box"></i><span>Product</span></a>
         <ul class="menu-content">
-          <li class="<?php echo active('upload_menu.php',$currentFile); ?>"><a href="upload_menu.php"><i class="feather icon-food"></i> Upload Menu</a></li>
+          <li class="<?php echo active('upload_menu.php',$currentFile); ?>"><a href="upload_menu.php"><i class="feather icon-user"></i> Upload Menu</a></li>
           <li class="<?php echo active('insertNewProduct.php',$currentFile); ?>"><a href="insertNewProduct.php"><i class="feather icon-plus-square"></i> Add Product</a></li>
           <li class="<?php echo active('addmaincat.php',$currentFile); ?>"><a href="addmaincat.php"><i class="feather icon-list"></i> Add Categories</a></li>
           <li class="<?php echo active('addSubCat.php',$currentFile); ?>"><a href="addSubCat.php"><i class="feather icon-list"></i> Add Sub Categories</a></li>

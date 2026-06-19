@@ -495,45 +495,103 @@ if (isset($_POST['btn_insert_user'])) {
 }
 
 
+
 if (isset($_POST['btn_Update_slider'])) {
+
     include('../connection.php');
 
-    $id = mysqli_real_escape_string($conn, $_POST['id']);
-    $alt_name = mysqli_real_escape_string($conn, $_POST['alt_name']);
-    $MainCat = mysqli_real_escape_string($conn, $_POST['MainCat']);
+    $id         = mysqli_real_escape_string($conn, $_POST['id']);
+    $alt_name   = mysqli_real_escape_string($conn, $_POST['alt_name']);
+    $MainCat    = mysqli_real_escape_string($conn, $_POST['MainCat']);
     $product_id = mysqli_real_escape_string($conn, $_POST['product_id']);
+
     $image_update_sql = "";
 
+    $target_dir = "../Uploads/";
+
+    // =========================
+    // IF IMAGE IS UPLOADED
+    // =========================
     if (!empty($_FILES["slider_image"]["name"])) {
 
-        $target_dir = "../Uploads/";
+        // Validate image
+        $imageInfo = getimagesize($_FILES["slider_image"]["tmp_name"]);
+
+        if ($imageInfo === false) {
+            header("Location: ../manageSliders.php?Massage=" . urlencode("Invalid image file."));
+            exit;
+        }
+
+        $width  = $imageInfo[0];
+        $height = $imageInfo[1];
+
+        // Dimension check
+        if ($width != 1280 || $height != 528) {
+            header("Location: ../manageSliders.php?Massage=" . urlencode("Image dimension must be exactly 1280 x 528 pixels."));
+            exit;
+        }
+
+        // File size check
+        if ($_FILES["slider_image"]["size"] > 500000000) {
+            header("Location: ../manageSliders.php?Massage=" . urlencode("File too large."));
+            exit;
+        }
+
+        // Extension check
         $imageFileType = strtolower(pathinfo($_FILES["slider_image"]["name"], PATHINFO_EXTENSION));
 
-        // validate extension
-        $allowed = ["jpg", "jpeg", "png", "gif"];
+        $allowed = ["jpg", "jpeg", "png", "gif", "webp"];
 
         if (!in_array($imageFileType, $allowed)) {
-            echo "<script>alert('Invalid image format');window.location.href='../manageSliders.php'</script>";
+            header("Location: ../manageSliders.php?Massage=" . urlencode("Only JPG, JPEG, PNG, GIF & WEBP files are allowed."));
+            exit;
         }
 
-        if ($_FILES["slider_image"]["size"] > 500000000) {
-            echo "<script>alert('File too large');window.location.href='../manageSliders.php'</script>";
-        }
-        $filewithnewname = date("Ymdis") . "_Slider." . $imageFileType;
-        if (move_uploaded_file($_FILES["slider_image"]["tmp_name"], $target_dir . $filewithnewname)) {
+        // Get old image
+        $oldQuery = mysqli_query($conn, "SELECT img FROM sliders WHERE id='$id'");
+        $oldData  = mysqli_fetch_assoc($oldQuery);
+
+        // New WebP file name
+        $filewithnewname = date("YmdHis") . "_Slider.webp";
+        $destinationPath = $target_dir . $filewithnewname;
+
+        // Convert to WebP
+        if (convertToWebp($_FILES["slider_image"]["tmp_name"], $destinationPath, 80)) {
+
+            // Delete old image
+            if (!empty($oldData['img']) && file_exists($target_dir . $oldData['img'])) {
+                unlink($target_dir . $oldData['img']);
+            }
+
             $image_update_sql = ", `img`='$filewithnewname'";
+
         } else {
-            echo "<script>alert('Image upload failed');window.location.href='../manageSliders.php'</script>";
+            header("Location: ../manageSliders.php?Massage=" . urlencode("Failed to convert image to WebP."));
+            exit;
         }
     }
 
+    // =========================
+    // UPDATE QUERY
+    // =========================
+    $sql = "UPDATE sliders SET 
+                alt_name='$alt_name',
+                type='$MainCat',
+                product_id='$product_id'
+                $image_update_sql
+            WHERE id='$id'";
 
-    $sql = "UPDATE `sliders` SET `alt_name`='$alt_name',`type`='$MainCat',`product_id`='$product_id', $image_update_sql WHERE `id`='$id'";
     $result = mysqli_query($conn, $sql);
+
     if ($result) {
-        echo "<script>alert('Updated successfully');window.location.href='../manageSliders.php'</script>";
+
+        header("Location: ../manageSliders.php?Massage=" . urlencode("Updated successfully."));
+        exit;
+
     } else {
-        echo "<script>alert('Error updating slider: " . mysqli_error($conn) . "');window.location.href='../manageSliders.php'</script>";
+
+        header("Location: ../manageSliders.php?Massage=" . urlencode("Error updating slider: " . mysqli_error($conn)));
+        exit;
     }
 }
 
@@ -1829,64 +1887,110 @@ header("Location: ../addSubCat.php?Massage=Sucessfully Added New Sub Category.")
 
 
 if (isset($_POST['btnSubmit_insertSliders'])) {
-//                 error_reporting(E_ALL);
-// ini_set('display_errors', 1);
-  include('../connection.php');
-  session_start();
-  
-  
-  $cat_name = $_POST['CatName'];
-  $main_cat = $_POST['MainCat'];
-  $product_id = $_POST['product_id'];
-  $target_dir = "../Uploads/";
-  $target_file = $target_dir . basename($_FILES["CatImage"]["name"]);
-  $uploadOk = 1;
-  $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-  $cat_name = mysqli_real_escape_string($conn, $cat_name);
-$main_cat = mysqli_real_escape_string($conn, $main_cat);
-$filewithnewname = mysqli_real_escape_string($conn, $filewithnewname);
-$product_id = mysqli_real_escape_string($conn, $product_id);
 
-  if ($_FILES["CatImage"]["size"] > 500000000) {
-    echo "<script>alert('Sorry, your file is too large.')</script>";
-    $uploadOk = 0;
-  }
+    include('../connection.php');
+    session_start();
 
-  if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
+    $cat_name   = mysqli_real_escape_string($conn, $_POST['CatName']);
+    $main_cat   = mysqli_real_escape_string($conn, $_POST['MainCat']);
+    $product_id = mysqli_real_escape_string($conn, $_POST['product_id']);
 
-    echo "<script>alert('Sorry, only JPG, JPEG, PNG & GIF files are allowed.')</script>";
-    $uploadOk = 0;
-  }
+    $target_dir = "../Uploads/";
 
-  if ($uploadOk == 0) {
-    echo "<script>alert('Sorry, your file was not uploaded.')</script>";
-  } else {
-    $filewithnewname =  date("Ymdis") . "_Slider." . $imageFileType;
-    if (move_uploaded_file($_FILES["CatImage"]["tmp_name"], $target_dir . $filewithnewname)) {
-      "The file " . htmlspecialchars(basename($_FILES["CatImage"]["name"])) . " has been uploaded.";
-      
-      
-      $sql = "INSERT INTO `sliders`(`alt_name`, `type`, `img`, `product_id`) VALUES ('$cat_name','$main_cat','$filewithnewname', '$product_id')";
-      $result = mysqli_query($conn, $sql);
+    // Check if image is selected
+    if (!isset($_FILES['CatImage']) || $_FILES['CatImage']['error'] != 0) {
+        header("Location: ../manageSliders.php?Massage=" . urlencode("Please select an image."));
+        exit;
+    }
 
-      if ($result) {
-        $monitor_sql = "INSERT INTO `website_requests` (`website_name`, `status`, `created_at`, `updated_at`) 
-                     VALUES ('pizzablitz', '1' ,NOW(),NOW())";
-        $monitor_update = mysqli_query($conn, $monitor_sql);
+    // Validate image
+    $imageInfo = getimagesize($_FILES["CatImage"]["tmp_name"]);
 
-        if ($monitor_update) {
-          header("Location:../manageSliders.php?Massage=Sucessfully added new slider.");
+    if ($imageInfo === false) {
+        header("Location: ../manageSliders.php?Massage=" . urlencode("Invalid image file."));
+        exit;
+    }
+
+    $width  = $imageInfo[0];
+    $height = $imageInfo[1];
+
+    // Required dimension check
+    if ($width != 1280 || $height != 528) {
+        header("Location: ../manageSliders.php?Massage=" . urlencode("Image dimension must be exactly 1280 x 528 pixels."));
+        exit;
+    }
+
+    // File size check (500MB)
+    if ($_FILES["CatImage"]["size"] > 500000000) {
+        header("Location: ../manageSliders.php?Massage=" . urlencode("Sorry, your file is too large."));
+        exit;
+    }
+
+    // Extension check
+    $imageFileType = strtolower(pathinfo($_FILES["CatImage"]["name"], PATHINFO_EXTENSION));
+
+    $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+    if (!in_array($imageFileType, $allowed)) {
+        header("Location: ../manageSliders.php?Massage=" . urlencode("Sorry, only JPG, JPEG, PNG, GIF & WEBP files are allowed."));
+        exit;
+    }
+
+    // Generate WebP filename
+    $filewithnewname = date("YmdHis") . "_Slider.webp";
+    $destinationPath = $target_dir . $filewithnewname;
+
+    // Convert to WebP
+    if (convertToWebp($_FILES["CatImage"]["tmp_name"], $destinationPath, 80)) {
+
+        $sql = "INSERT INTO sliders
+                (alt_name, type, img, product_id)
+                VALUES
+                ('$cat_name', '$main_cat', '$filewithnewname', '$product_id')";
+
+        $result = mysqli_query($conn, $sql);
+
+        if ($result) {
+
+            $monitor_sql = "INSERT INTO website_requests
+                            (website_name, status, created_at, updated_at)
+                            VALUES
+                            ('pizzablitz', '1', NOW(), NOW())";
+
+            $monitor_update = mysqli_query($conn, $monitor_sql);
+
+            if ($monitor_update) {
+
+                header("Location: ../manageSliders.php?Massage=" . urlencode("Successfully added new slider."));
+                exit;
+
+            } else {
+
+                // Delete uploaded image if monitoring insert fails
+                if (file_exists($destinationPath)) {
+                    unlink($destinationPath);
+                }
+
+                header("Location: ../manageSliders.php?Massage=" . urlencode("Error updating monitoring database."));
+                exit;
+            }
+
         } else {
-          die("Error updating monitoring database: " . mysqli_error($monitor_con));
+
+            // Delete uploaded image if slider insert fails
+            if (file_exists($destinationPath)) {
+                unlink($destinationPath);
+            }
+
+            header("Location: ../manageSliders.php?Massage=" . urlencode("Database error: " . mysqli_error($conn)));
+            exit;
         }
-      } else {
-        echo "<script>alert('Sorry, there was an error uploading your file.')</script>";
-      }
+
     } else {
 
-      echo "<script>alert('Sorry, there was an error uploading your file.')</script>";
+        header("Location: ../manageSliders.php?Massage=" . urlencode("Failed to convert image to WebP."));
+        exit;
     }
-  }
 }
 
 
