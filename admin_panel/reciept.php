@@ -131,7 +131,7 @@ $reservation_fees = isset($order_data_results['reservation_fees']) ? $order_data
 
 
 
-$get_totals_sql = "SELECT `order_total_price`, `total_discount`, `total_netto_tax`, `total_metto_tax`, `Shipping_Cost` , `table_id` FROM `orders_zee` WHERE `id` = " . $order_id;
+$get_totals_sql = "SELECT `order_total_price`, `total_discount`, `total_netto_tax`, `total_metto_tax`, `Shipping_Cost` , `table_id` , `platform` FROM `orders_zee` WHERE `id` = " . $order_id;
 $result_total = mysqli_query($conn, $get_totals_sql);
 $total = mysqli_fetch_assoc($result_total);
 
@@ -304,6 +304,12 @@ body {
             font-weight: bold;
 
     }
+    .order-info{
+         border-bottom: 1px dotted #000;
+    }
+    .company-details {
+    border-bottom: 1px dotted #000;
+    }
 
     .company-details h3,
     .order-details-header h1,
@@ -312,10 +318,14 @@ body {
     .footer-totals ul li,
     .footer-message p,
     .order-info h3 {
-      font-size: 14px;
+      font-size: 13px;
       margin: 3px 0;
       font-weight: bold;
       
+    }
+    
+    .company-details div{
+        font-size: 11px;
     }
 
     /* Lighter company details text */
@@ -440,7 +450,11 @@ body {
         
         
      <div class="header">
-        <img src="images/logo.png" alt="Firmenlogo">
+        <img 
+        src="images/logo.png" 
+        alt="Firmenlogo" 
+        style="width: 200px; height: auto;"
+        >
         <h2><?php echo $APP_NAME?></h2>
         
     </div>    
@@ -448,30 +462,29 @@ body {
  <div class="company-details">
     <div><?php echo $company_address; ?></div>
     <div><?php echo $company_city . ', Tel: ' . $company_phone; ?></div>
-    <div>Bestellnummer: <?php echo $order_id; ?></div>
+    <div>Order#: <?php echo $order_id; ?></div>
 </div>
 
-    <div>--------------------------------------------------</div>
     <div class="order-info">
-    <div><?php echo htmlspecialchars($datetime); ?></div>
+    <h3><?php echo htmlspecialchars($datetime); ?></h3>
 
     <?php if (!empty($data['phone'])) : ?>
-        <div><?php echo htmlspecialchars($data['phone']); ?></div>
+        <h3><?php echo htmlspecialchars($data['phone']); ?></h3>
     <?php endif; ?>
 
     <?php if ($has_table_id): ?>
-        <div>Tabellenname: <?php echo htmlspecialchars($table_name); ?></div>
+        <h3>Tabellenname: <?php echo htmlspecialchars($table_name); ?></h3>
     <?php endif; ?>
 
 
        <?php if (!empty($data['cxname'])): ?>
-        <div><?php echo htmlspecialchars($data['cxname']); ?></div>
+        <h3><?php echo htmlspecialchars($data['cxname']); ?></h3>
     <?php endif; ?>
 
 
     <?php if ($data['order_type'] == 'delivery'): ?>
        
-        <div>Adresse: 
+        <h3>Adresse: 
             <?php echo htmlspecialchars(
               
                
@@ -482,13 +495,13 @@ body {
             
                   //bell name   Shipping_city
             ); ?>
-        </div>
+        </h3>
          
-        <div>
+        <h3>
         Klingeln name: <?= !empty($data['Shipping_area']) ? $data['Shipping_area'] : ($data['Shipping_city'] ?? '') ?>
-        </div>
+        </h3>
     
-        <div><?php echo (($data['Shipping_state']  != ''? "Info: ".$data['Shipping_state']: ''))?></div>  
+        <h3><?php echo (($data['Shipping_state']  != ''? "Info: ".$data['Shipping_state']: ''))?></h3>  
     <?php endif; ?>
    
     <?php if (!empty($data['addtional_notes'])): ?>
@@ -496,20 +509,20 @@ body {
     <?php endif; ?>
 
     <?php if (!empty($data['order_type'])): ?>
-        <div>Auftragsart: 
+        <h3>Auftragsart: 
             <?php echo $data['order_type'] === 'delivery' ? "Lieferung" : "Abholen"; ?>
             <?php if ( $data['ordersheduletype'] == 'orderlater'): ?>
                 @ <?php echo htmlspecialchars($data['sheduletime']); ?>
             <?php endif; ?>
-        </div>
+        </h3>
         
     <?php if($data['payment_type'] != ''){ ?>
-    <div >
+    <h3 >
       Zahlungsmodus: <?php echo $data['payment_type'] === 'cash' ? "Cash" : 'Online' ?> </div>
      <?php } ?>    
     <?php endif; ?>
-</div>
-    <div>--------------------------------------------------</div>
+</h3>
+ 
     <div class="order-details-header">
       <h1>Bestelldetails</h1>
     </div>
@@ -689,7 +702,7 @@ body {
             </td>
             <td class="total-price font-weight-bold">
               <?php
-                       $dealTotal = number_format((($value['price'] + $addonforinner) * $value['qty']), 2, '.', '');
+            $dealTotal = number_format((($value['price'] + $addonforinner) * $value['qty']), 2, '.', '');
             //   echo $dealTotal;
             echo formatCurrency($dealTotal, $currency_sign, $currency_position);
               $finalTotal += $dealTotal;
