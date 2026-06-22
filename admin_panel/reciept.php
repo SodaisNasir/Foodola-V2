@@ -689,7 +689,7 @@ body {
             </td>
             <td class="total-price font-weight-bold">
               <?php
-              $dealTotal = number_format($value['price'] + $addonforinner, 2, '.', '');
+                       $dealTotal = number_format((($value['price'] + $addonforinner) * $value['qty']), 2, '.', '');
             //   echo $dealTotal;
             echo formatCurrency($dealTotal, $currency_sign, $currency_position);
               $finalTotal += $dealTotal;
