@@ -3,11 +3,11 @@
 
 // APP CONFIGRUATION
 $LANG = 'en';
-$APP_NAME = "Foodola";
-$BASE_URL = "https://foodola.foodola.shop/";
-$company_address = "Kuhngasse 1, 76684 Östringen";
-$company_city    = "Östringen";
-$company_phone   = "07253 26560-61";
+$APP_NAME = "Pizza Day Night";
+$BASE_URL = "https://daynightka.de/";
+$company_address = "Pizza Day Night";
+$company_city    = "Karlsruhe";
+$company_phone   = "0721 8601726";
 
 
 // MAIL CONFIGRUATION
@@ -25,9 +25,9 @@ $ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebnchqsvtsgb4evjfpfzagsm
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE='u772850971_foodola';
-$DB_USERNAME='u772850971_foodola';
-$DB_PASSWORD=']f0Hy^78Uf0s';
+$DB_DATABASE='u772850971_daynight';
+$DB_USERNAME='u772850971_daynight';
+$DB_PASSWORD='K*@7g0^g$3x0';
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
 
