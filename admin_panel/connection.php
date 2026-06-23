@@ -3,17 +3,17 @@
 
 // APP CONFIGRUATION
 $LANG = 'de';
-$APP_NAME = "Pizza Late Night";
-$BASE_URL = "https://pizzalatenight-ka.de/";
-$company_address = "Pizza Late Night";
+$APP_NAME = "Foodvibe";
+$BASE_URL = "https://foodvibeka.de/";
+$company_address = "Schilier 35 76135 Karlsruhe";
 $company_city    = "Karlsruhe";
-$company_phone   = "0721 621122";
+$company_phone   = "0721-9851993";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "elliakydnklqykpv";
-$FROM_EMAIL = "support@pizzalatenight.de";
+$FROM_EMAIL = "support@foodvibe.de";
 
 
 
@@ -25,9 +25,9 @@ $ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebnchqsvtsgb4evjfpfzagsm
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE='u772850971_latenight';
-$DB_USERNAME='u772850971_latenight';
-$DB_PASSWORD='s!dJxdhy5A';
+$DB_DATABASE='u772850971_foodvibe';
+$DB_USERNAME='u772850971_foodvibe';
+$DB_PASSWORD='O[1J;o$Nx5';
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
 
