@@ -2,28 +2,27 @@
 
 // APP CONFIGRUATION
 $LANG = 'de';
-$APP_NAME = "Broadway Pizza & Kebab";
-$BASE_URL = "https://broadwaypizza.de/";
-$FACEBOOK_URL = "https://facebook.com/broadwaypizza";
-$INSTAGRAM_URL  = "https://instagram.com/broadwaypizza";
-$TWITTER_URL  = "https://twitter.com/broadwaypizza";
-$company_address = "Industriestraße 24A, 76767 Hagenbach";
-$company_city    = "Hagenbach";
-$company_phone   = "07273 9359582";
-
+$APP_NAME = "Levallauriska";
+$BASE_URL = "https://levallauriska.de/";
+$FACEBOOK_URL = "https://facebook.com/levallauriska";
+$INSTAGRAM_URL  = "https://instagram.com/levallauriska";
+$TWITTER_URL  = "https://twitter.com/levallauriska";
+$company_address = "Neckarstraße 32, Karlsruhe";
+$company_city    = "Karlsruhe";
+$company_phone   = "0721 49088816";
 
 // PUSHER CONFIGRUATION
 $PUSHER_APP_KEY = "a1964c3ac950c1a0cdf5";
 $PUSHER_SECRET_KEY = "a711ec3a4b827eb6bcc5";
 $PUSHER_APP_ID ="1982652";
-$CHANNEL_1 = "broadway_orders";
-$CHANNEL_2 = "broadway_reservations";
+$CHANNEL_1 = "levallauriska_orders";
+$CHANNEL_2 = "levallauriska_reservations";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "elliakydnklqykpv";
-$FROM_EMAIL = "support@broadwaypizza.de";
+$FROM_EMAIL = "support@levallauriska.de";
 $ADMIN_EMAIL = "boundedsocial@gmail.com";
 
 
@@ -40,9 +39,9 @@ $LIEFERSOFT_COMPANY_ID = "228727d6-8910-4b85-8938-4010e7e4d4bd";
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE='u772850971_broadwaypizza';
-$DB_USERNAME='u772850971_broadwaypizza';
-$DB_PASSWORD='B:Ou?Y+0p4q';
+$DB_DATABASE='u772850971_levallauriska';
+$DB_USERNAME='u772850971_levallauriska';
+$DB_PASSWORD='0*LeIZqW';
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
 
