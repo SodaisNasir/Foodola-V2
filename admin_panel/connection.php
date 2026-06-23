@@ -3,17 +3,17 @@
 
 // APP CONFIGRUATION
 $LANG = 'de';
-$APP_NAME = "Foodvibe";
-$BASE_URL = "https://foodvibeka.de/";
-$company_address = "Schilier 35 76135 Karlsruhe";
-$company_city    = "Karlsruhe";
-$company_phone   = "0721-9851993";
+$APP_NAME = "Burger Place";
+$BASE_URL = "https://burgerplace-ger.de/";
+$company_address = "An der Hochschule 13 A76726 Germersheim";
+$company_city    = "Germersheim";
+$company_phone   = "07274 7799540";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "elliakydnklqykpv";
-$FROM_EMAIL = "support@foodvibe.de";
+$FROM_EMAIL = "support@burgerplace-ger.de";
 
 
 
@@ -25,9 +25,9 @@ $ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebnchqsvtsgb4evjfpfzagsm
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE='u772850971_foodvibe';
-$DB_USERNAME='u772850971_foodvibe';
-$DB_PASSWORD='O[1J;o$Nx5';
+$DB_DATABASE='u772850971_burgerplace';
+$DB_USERNAME='u772850971_burgerplace';
+$DB_PASSWORD='qV4+tQf>hf91';
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
 

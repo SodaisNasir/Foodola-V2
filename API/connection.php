@@ -2,27 +2,27 @@
 
 // APP CONFIGRUATION
 $LANG = 'de';
-$APP_NAME = "Foodvibe";
-$BASE_URL = "https://foodvibeka.de/";
-$FACEBOOK_URL = "https://facebook.com/foodvibe";
-$INSTAGRAM_URL  = "https://instagram.com/foodvibe";
-$TWITTER_URL  = "https://twitter.com/foodvibe";
-$company_address = "Schilier 35 76135 Karlsruhe";
-$company_city    = "Karlsruhe";
-$company_phone   = "0721-9851993";
+$APP_NAME = "Burger Place";
+$BASE_URL = "https://burgerplace-ger.de/";
+$FACEBOOK_URL = "https://facebook.com/burgerplaceger";
+$INSTAGRAM_URL  = "https://instagram.com/burgerplaceger";
+$TWITTER_URL  = "https://twitter.com/burgerplaceger";
+$company_address = "An der Hochschule 13 A76726 Germersheim";
+$company_city    = "Germersheim";
+$company_phone   = "07274 7799540";
 
 // PUSHER CONFIGRUATION
 $PUSHER_APP_KEY = "a1964c3ac950c1a0cdf5";
 $PUSHER_SECRET_KEY = "a711ec3a4b827eb6bcc5";
 $PUSHER_APP_ID ="1982652";
-$CHANNEL_1 = "foodvibe_orders";
-$CHANNEL_2 = "foodvibe_reservations";
+$CHANNEL_1 = "burgerplace_orders";
+$CHANNEL_2 = "burgerplace_reservations";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "elliakydnklqykpv";
-$FROM_EMAIL = "support@foodvibe.de";
+$FROM_EMAIL = "support@burgerplace-ger.de";
 $ADMIN_EMAIL = "boundedsocial@gmail.com";
 
 
@@ -39,9 +39,9 @@ $LIEFERSOFT_COMPANY_ID = "228727d6-8910-4b85-8938-4010e7e4d4bd";
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE='u772850971_foodvibe';
-$DB_USERNAME='u772850971_foodvibe';
-$DB_PASSWORD='O[1J;o$Nx5';
+$DB_DATABASE='u772850971_burgerplace';
+$DB_USERNAME='u772850971_burgerplace';
+$DB_PASSWORD='qV4+tQf>hf91';
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
 
