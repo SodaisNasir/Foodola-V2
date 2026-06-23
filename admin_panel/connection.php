@@ -2,18 +2,18 @@
 
 
 // APP CONFIGRUATION
-$LANG = 'en';
-$APP_NAME = "Pizza Day Night";
-$BASE_URL = "https://daynightka.de/";
-$company_address = "Pizza Day Night";
-$company_city    = "Karlsruhe";
-$company_phone   = "0721 8601726";
+$LANG = 'de';
+$APP_NAME = "Red Peppers Pizza";
+$BASE_URL = "https://redpepperspizza.de/";
+$company_address = "Red Peppers Pizza";
+$company_city    = "Neckarsulm";
+$company_phone   = "07132 9999 323";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "elliakydnklqykpv";
-$FROM_EMAIL = "support@foodola.de";
+$FROM_EMAIL = "support@redpepperspizza.de";
 
 
 
@@ -25,9 +25,9 @@ $ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebnchqsvtsgb4evjfpfzagsm
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE='u772850971_daynight';
-$DB_USERNAME='u772850971_daynight';
-$DB_PASSWORD='K*@7g0^g$3x0';
+$DB_DATABASE='u772850971_red_pepper';
+$DB_USERNAME='u772850971_red_pepper';
+$DB_PASSWORD='zQ9~0n~[anJF';
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
 
