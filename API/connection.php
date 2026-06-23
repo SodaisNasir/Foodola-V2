@@ -2,28 +2,28 @@
 
 // APP CONFIGRUATION
 $LANG = 'de';
-$APP_NAME = "Red Peppers Pizza";
-$BASE_URL = "https://pizzaredpeppersneckarsulm.de/";
-$FACEBOOK_URL = "https://facebook.com/redpepperspizza";
-$INSTAGRAM_URL  = "https://instagram.com/redpepperspizza";
-$TWITTER_URL  = "https://twitter.com/redpepperspizza";
-$company_address = "Red Peppers Pizza";
-$company_city    = "Neckarsulm";
-$company_phone   = "07132 9999 323";
+$APP_NAME = "Chick Pom";
+$BASE_URL = "https://chickpom.de/";
+$FACEBOOK_URL = "https://facebook.com/chickpom";
+$INSTAGRAM_URL  = "https://instagram.com/chickpom";
+$TWITTER_URL  = "https://twitter.com/chickpom";
+$company_address = "Hauptstraße 76, 76669 Bad Schönborn";
+$company_city    = "Bad Schönborn";
+$company_phone   = "07253 880905";
 
 
 // PUSHER CONFIGRUATION
 $PUSHER_APP_KEY = "a1964c3ac950c1a0cdf5";
 $PUSHER_SECRET_KEY = "a711ec3a4b827eb6bcc5";
 $PUSHER_APP_ID ="1982652";
-$CHANNEL_1 = "redpeppers_orders";
-$CHANNEL_2 = "redpeppers_reservations";
+$CHANNEL_1 = "chickpom_orders";
+$CHANNEL_2 = "chickpom_reservations";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "elliakydnklqykpv";
-$FROM_EMAIL = "support@redpepperspizza.de";
+$FROM_EMAIL = "support@chickpom.de";
 $ADMIN_EMAIL = "boundedsocial@gmail.com";
 
 
@@ -40,9 +40,9 @@ $LIEFERSOFT_COMPANY_ID = "228727d6-8910-4b85-8938-4010e7e4d4bd";
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE='u772850971_red_pepper';
-$DB_USERNAME='u772850971_red_pepper';
-$DB_PASSWORD='zQ9~0n~[anJF';
+$DB_DATABASE='u772850971_chickpom';
+$DB_USERNAME='u772850971_chickpom';
+$DB_PASSWORD='3cj&#kP^cO6:';
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
 
