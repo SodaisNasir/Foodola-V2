@@ -2,27 +2,27 @@
 
 // APP CONFIGRUATION
 $LANG = 'de';
-$APP_NAME = "Levallauriska";
-$BASE_URL = "https://levallauriska.de/";
-$FACEBOOK_URL = "https://facebook.com/levallauriska";
-$INSTAGRAM_URL  = "https://instagram.com/levallauriska";
-$TWITTER_URL  = "https://twitter.com/levallauriska";
-$company_address = "Neckarstraße 32, Karlsruhe";
+$APP_NAME = "Pizza Late Night";
+$BASE_URL = "https://pizzalatenight-ka.de/";
+$FACEBOOK_URL = "https://facebook.com/latenight";
+$INSTAGRAM_URL  = "https://instagram.com/latenight";
+$TWITTER_URL  = "https://twitter.com/latenight";
+$company_address = "Pizza Late Night";
 $company_city    = "Karlsruhe";
-$company_phone   = "0721 49088816";
+$company_phone   = "0721 621122";
 
 // PUSHER CONFIGRUATION
 $PUSHER_APP_KEY = "a1964c3ac950c1a0cdf5";
 $PUSHER_SECRET_KEY = "a711ec3a4b827eb6bcc5";
 $PUSHER_APP_ID ="1982652";
-$CHANNEL_1 = "levallauriska_orders";
-$CHANNEL_2 = "levallauriska_reservations";
+$CHANNEL_1 = "latenight_orders";
+$CHANNEL_2 = "latenight_reservations";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "elliakydnklqykpv";
-$FROM_EMAIL = "support@levallauriska.de";
+$FROM_EMAIL = "support@pizzalatenight.de";
 $ADMIN_EMAIL = "boundedsocial@gmail.com";
 
 
@@ -39,9 +39,9 @@ $LIEFERSOFT_COMPANY_ID = "228727d6-8910-4b85-8938-4010e7e4d4bd";
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE='u772850971_levallauriska';
-$DB_USERNAME='u772850971_levallauriska';
-$DB_PASSWORD='0*LeIZqW';
+$DB_DATABASE='u772850971_latenight';
+$DB_USERNAME='u772850971_latenight';
+$DB_PASSWORD='s!dJxdhy5A';
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
 
