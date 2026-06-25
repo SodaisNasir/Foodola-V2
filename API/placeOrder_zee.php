@@ -210,8 +210,8 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
 
 
                                 //print_r($tyy_pes); 
-                                $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`,`product_description`,`additional_notes`, `addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`, `additional_discount`,`is_free`)
-                                                  VALUES ('$last_id','$deal_id','$item_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$add_oon','$tyy_pes','$dress_ing' , '$cost' , '$price', '$pro_discount', '$no_of_deal', '$datetime', '$additional_discount', '$is_free' )";
+                                $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`,`product_description`,`additional_notes`, `addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`, `additional_discount`,`is_free`, `qty`)
+                                                  VALUES ('$last_id','$deal_id','$item_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$add_oon','$tyy_pes','$dress_ing' , '$cost' , '$price', '$pro_discount', '$no_of_deal', '$datetime', '$additional_discount', '$is_free', 1 )";
                                 $exec_sql_deal = mysqli_query($conn, $sql_deal);
                                 $additional_discount_inserted = 1;
 
@@ -748,8 +748,8 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         
                      
                             //print_r($tyy_pes); 
-                            $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`,`product_description`,`additional_notes`, `addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`,`additional_discount`,`is_free` )
-                                                  VALUES ('$last_id','$deal_id','$item_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$add_oon','$tyy_pes','$dress_ing' , '$cost', '$price', '$pro_discount','$no_of_deal', '$datetime', '$additional_discount', '$is_free')";
+                            $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`,`product_description`,`additional_notes`, `addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`,`additional_discount`,`is_free`, `qty` )
+                                                  VALUES ('$last_id','$deal_id','$item_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$add_oon','$tyy_pes','$dress_ing' , '$cost', '$price', '$pro_discount','$no_of_deal', '$datetime', '$additional_discount', '$is_free', 1)";
                             $exec_sql_deal = mysqli_query($conn, $sql_deal);
 
 
