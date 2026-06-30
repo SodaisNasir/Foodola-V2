@@ -567,17 +567,27 @@ body {
               <?php endif; ?>
 
               <div class="item-options">
-                <?php if (!empty($addons)) : ?>
-                  <?php foreach ($addons as $addon) : ?>
-                    x<?php echo htmlspecialchars($addon->quantity); ?> <?php echo htmlspecialchars($addon->as_name); ?><br>
+            <?php if (!empty($addons)) : ?>
+                <?php foreach ($addons as $addon) : ?>
+                    x<?php echo htmlspecialchars($addon->quantity); ?>
+                    <?php echo htmlspecialchars($addon->as_name); ?><br>
+            
                     <?php
-                    $addonTotal = $addon->as_price * $addon->quantity;
+            
+                    $paidQty = $addon->quantity - $addon->freeQTY;
+            
+                    if ($paidQty < 0) {
+                        $paidQty = 0;
+                    }
+            
+                    $addonTotal = $addon->as_price * $paidQty;
+            
                     $addonforinner += $addonTotal;
                     $Addons_Price += $addonTotal;
+            
                     ?>
-                  <?php endforeach; ?>
-                <?php endif; ?>
-
+                <?php endforeach; ?>
+            <?php endif; ?>
                 <?php if (!empty($types)) : ?>
                   <?php foreach ($types as $type) : ?>
                     <?php echo htmlspecialchars($type->ts_name); ?><br>
@@ -654,21 +664,26 @@ body {
                         <strong><?php echo htmlspecialchars($row['name']); ?></strong>
 
                         <?php if (!empty($addons)) : ?>
-                          <div>
-                            <?php foreach ($addons as $addon) : ?>
-                              x<?php echo htmlspecialchars($addon->quantity); ?> <?php echo htmlspecialchars($addon->as_name); ?><br>
-                              <?php
-                              if ($di_num_free_items == 0) {
-                                $addonTotal = $addon->as_price * $addon->quantity;
-                                $addonforinner += $addonTotal;
-                                $Addons_Price += $addonTotal;
-                              } else {
-                                $di_num_free_items -= $addon->quantity;
-                              }
-                              ?>
-                            <?php endforeach; ?>
-                          </div>
-                        <?php endif; ?>
+                <?php foreach ($addons as $addon) : ?>
+                    x<?php echo htmlspecialchars($addon->quantity); ?>
+                    <?php echo htmlspecialchars($addon->as_name); ?><br>
+            
+                    <?php
+            
+                    $paidQty = $addon->quantity - $addon->freeQTY;
+            
+                    if ($paidQty < 0) {
+                        $paidQty = 0;
+                    }
+            
+                    $addonTotal = $addon->as_price * $paidQty;
+            
+                    $addonforinner += $addonTotal;
+                    $Addons_Price += $addonTotal;
+            
+                    ?>
+                <?php endforeach; ?>
+            <?php endif; ?>
 
                         <?php if (!empty($types)) : ?>
                           <div>

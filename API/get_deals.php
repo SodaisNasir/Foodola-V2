@@ -50,7 +50,9 @@ if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbq
                                                    while($rowP = mysqli_fetch_array($execute_prod)){
                                                        
                                                               // ADDONS
-                   $select_addon_title = 'SELECT * FROM `addon_list` WHERE `ao_id` ='.$rowP['addon_id'];
+                 $addon_id = isset($rowP['addon_id']) ? (int)$rowP['addon_id'] : 0;
+
+$select_addon_title = "SELECT * FROM `addon_list` WHERE `ao_id` = $addon_id";
                 $execute_addon_title  = mysqli_query($conn,$select_addon_title);   
                   if(mysqli_num_rows($execute_addon_title) > 0){
                       $addon = array();
@@ -87,8 +89,11 @@ if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbq
                     
                     
                                         ////TYPE
-                    
-                                $select_type_title = 'SELECT `type_id`, `type_title`, `type_title_user` FROM `types_list` WHERE `type_id` = '.$rowP['type_id'];
+                  $type_id = isset($rowP['type_id']) ? (int)$rowP['type_id'] : 0;
+
+$select_type_title = "SELECT `type_id`, `type_title`, `type_title_user`
+                      FROM `types_list`
+                      WHERE `type_id` = $type_id";
                                 $execute_type_title  = mysqli_query($conn,$select_type_title);  
                                  if(mysqli_num_rows($execute_type_title) > 0){
                                   $type = array();
