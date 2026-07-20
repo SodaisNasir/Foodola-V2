@@ -11,7 +11,36 @@ if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqa
 
     $array = array($_POST['product_id']);
     
-    $select_product = 'SELECT * FROM `products` WHERE `id` IN (' . implode(",", $array) . ') AND `qty` > 0 AND `status` = "Active"';
+    // $select_product = 'SELECT * FROM `products` WHERE `id` IN (' . implode(",", $array) . ') AND `qty` > 0 AND `status` = "Active"';
+//     $select_product = 'SELECT DISTINCT p.*, vp.parent_title FROM products p
+
+// LEFT JOIN variation_with_product vp
+//       ON vp.product_id = p.id
+
+// WHERE p.id IN (' . implode(",", $array) . ')
+// AND p.qty > 0
+// AND p.status = "Active"
+// AND `for_deal_only` = "0"
+
+// AND (
+//         vp.product_id IS NULL
+//         OR vp.is_primary = 1
+//     )
+// ';
+
+$select_product = "
+SELECT DISTINCT 
+    p.*,
+    vp.parent_title
+FROM products p
+LEFT JOIN variation_with_product vp
+    ON vp.product_id = p.id
+    AND vp.is_primary = 1
+WHERE p.id IN (" . implode(",", $array) . ")
+AND p.qty > 0
+AND p.status = 'Active'
+AND p.for_deal_only = '0'
+";
     $execute_products = mysqli_query($conn,$select_product);
     
 
@@ -127,7 +156,7 @@ $select_dressing_title = "SELECT `dressing_id`, `dressing_title`, `dressing_titl
              $products =[
                         "id"=>$rows['id'],
                         "sub_category_id"=>$rows['sub_category_id'],
-                        "name"=>$rows['name'],
+                      "name" => !empty($rows['parent_title']) ? $rows['parent_title'] : $rows['name'],
                         "description"=>$rows['description'],
                         "cost"=>$rows['cost'],
                         "price"=>$rows['price'],
@@ -138,6 +167,7 @@ $select_dressing_title = "SELECT `dressing_id`, `dressing_title`, `dressing_titl
                         "addons"=>$addon != null ? $addon : [],
                         "types"=>$type != null ? $type : [],
                         "dressing"=>$dressing != null ? $dressing : [],
+                        "free_addon_limit" => $rows['free_addon_limit']
                         
                     ];
        

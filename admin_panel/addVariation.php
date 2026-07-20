@@ -69,7 +69,7 @@ if(isset($_GET['Massage'])){
     <!-- BEGIN: Custom CSS-->
     <link rel="stylesheet" type="text/css" href="assets/css/style.css">
     <!-- END: Custom CSS-->
-
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   </head>
   <!-- END: Head-->
 
@@ -195,94 +195,74 @@ if(isset($_GET['Massage'])){
     <div class="sidenav-overlay"></div>
     <div class="drag-target"></div>
 
-
-
-
-
-
-
-
-
-
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
-
     <!-- BEGIN: Vendor JS-->
     <script src="app-assets/vendors/js/vendors.min.js"></script>
     <!-- BEGIN Vendor JS-->
 <script>
 $(document).ready(function() {
-    
+
   var xmlhttp = new XMLHttpRequest(); 
   var i = 0;
+
   $('#add').click(function() {
-   xmlhttp.onreadystatechange = function() {
+
+    xmlhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
-         var data = this.responseText;
-$('#dynamic_fields').append(
-    '<div id="poks'+i+'" class="row mb-2">'+
 
-        '<div class="col-sm-5">'+
-            '<div class="form-group">'+
-                '<select name="pro_id[]" onchange="checkingforitemsSelected('+i+',this.value)" class="form-control" required>'+
-                    '<option value="">Select Product</option>'+data+
-                '</select>'+
+        var data = this.responseText;
+
+        $('#dynamic_fields').append(
+          '<div id="poks'+i+'" class="row mb-3 align-items-end">'+
+
+            // Product Select (SEARCH ENABLED)
+            '<div class="col-md-3">'+
+              '<select name="pro_id[]" class="form-control select2 dynamic-select" required>'+
+                '<option value="">Select Product</option>'+data+
+              '</select>'+
             '</div>'+
-        '</div>'+
 
-        '<div class="col-sm-4">'+
-            '<div class="form-group">'+
-                '<input type="text" name="var_sub_title[]" class="form-control" placeholder="Variation Sub Title" required>'+
+            // Parent Title
+            // '<div class="col-md-3">'+
+            //   '<input type="text" name="parent_title[]" class="form-control" placeholder="Parent Title" required>'+
+            // '</div>'+
+
+            // Variation Sub Title
+            '<div class="col-md-3">'+
+              '<input type="text" name="var_sub_title[]" class="form-control" placeholder="Variation Sub Title" required>'+
             '</div>'+
-        '</div>'+
 
-        '<div class="col-sm-2 d-flex align-items-center">'+
-            '<div class="form-check">'+
-
-                // hidden field
+            // Primary Radio
+            '<div class="col-md-2 d-flex align-items-center">'+
+              '<div class="form-check">'+
                 '<input type="hidden" name="is_primary[]" id="hidden_primary_'+i+'" value="0">'+
-
-                // radio button
                 '<input class="form-check-input primary_radio" type="radio" name="primary_select" data-id="'+i+'">'+
-
                 '<label class="form-check-label ms-1">Primary</label>'+
+              '</div>'+
             '</div>'+
-        '</div>'+
 
-        '<div class="col-sm-1 d-flex align-items-center">'+
-            '<button type="button" class="btn btn-danger btn-sm btn_remove" id="'+i+'">X</button>'+
-        '</div>'+
+            // Remove Button
+            '<div class="col-md-1">'+
+              '<button type="button" class="btn btn-danger btn-sm btn_remove w-100" id="'+i+'">X</button>'+
+            '</div>'+
 
-    '</div>'
-);
+          '</div>'
+        );
+
+        // 🔥 IMPORTANT: activate select2 on new element
+        $('.select2').select2({
+          placeholder: "Search product...",
+          allowClear: true
+        });
+
       }
-    }
+    };
+
     xmlhttp.open("GET", "phpfiles/getVariationOptions.php", true);
     xmlhttp.send();
-  
 
-      i++;
-
+    i++;
   });
-  
-  $(document).on('change', '.primary_radio', function () {
 
-    // sab hidden fields 0
-    $("input[name='is_primary[]']").val(0);
-
-    // selected wala 1
-    let id = $(this).data('id');
-
-    $('#hidden_primary_' + id).val(1);
-
-});
-  
-  
-  $(document).on('click', '.btn_remove', function() {
-    var button_id = $(this).attr("id");
-    i--;
-    $('#row' + button_id + '').remove();
-  });
 });
 
 var selectedItems = [];
@@ -349,44 +329,6 @@ function submitOperation(){
                  alert(card_value);
                 }
 
-                
-        
-        // $(document).ready(function(){
-
-        //     // inserajax
-        //     $("#save-btn").on("click",function(e){
-        //         e.preventDefault();
-        //         var main_title = $("#main_title").val();
-        //         var selectedItems[];
-        //         var var_sub_title[];
-
-             
-
-        //             $.ajax({
-        //                 url: "phpfiles/variation_submit.php",
-        //                 type: "POST",
-        //                 data: {maintitle:main_title,productId:selectedItems,sub_title:var_sub_title},
-        //                 success: function(data){
-        //                     if(data == 1)
-        //                     {
-        //                         $("#addForm").trigger("reset");
-
-        //                         alert("Data inserted successfull");
-        //                     }
-        //                     else
-        //                     {
-        //                         alert("something went wrong");
-        //                     }
-        //                 }
-        //             });
-
-        //     });
-
-        // });
-        
-        
-        
-        
     }else{
         alert("You can not submit unless all selected items are unique!")
     }
@@ -416,8 +358,8 @@ $(document).on('click', '.btn_remove', function() {
     <!-- END: Page JS-->
     
     <!--for dropdown-->
-    
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     
     <!--end -->

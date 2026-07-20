@@ -16,9 +16,9 @@ License: You must have a valid license purchased only from themeforest(the above
 <?php
 
 if(isset($_GET['Massage'])){
-    if($_GET['Massage'] == 'Sucessfully added new category.'){
-       echo "<script>alert('Sucessfully added new category.')</script>";
-       header("Refresh: 1; url='addmaincat.php'");
+    if($_GET['Massage'] == 'Sucessfully Updated Terms Conditions'){
+       echo "<script>alert('Sucessfully Updated Terms Conditions')</script>";
+       header("Refresh: 1; url='addterms_condition.php'");
 
        
      }else{
@@ -75,8 +75,8 @@ if(isset($_GET['Massage'])){
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 
-    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jodit@4.2.47/es2021/jodit.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jodit@4.2.47/es2021/jodit.min.js"></script>
   </head>
   <!-- END: Head-->
 
@@ -106,14 +106,6 @@ if(isset($_GET['Massage'])){
               </div>
             </div>
           </div>
-          <!--<div class="content-header-right text-md-right col-md-3 col-12 d-md-block d-none">-->
-          <!--  <div class="form-group breadcrum-right">-->
-          <!--    <div class="dropdown">-->
-          <!--      <button class="btn-icon btn btn-primary btn-round btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="feather icon-settings"></i></button>-->
-          <!--      <div class="dropdown-menu dropdown-menu-right"><a class="dropdown-item" href="#">Chat</a><a class="dropdown-item" href="#">Email</a><a class="dropdown-item" href="#">Calendar</a></div>-->
-          <!--    </div>-->
-          <!--  </div>-->
-          <!--</div>-->
         </div>
         <div class="content-body"><!-- Simple Validation start -->
 <section class="simple-validation">
@@ -135,7 +127,7 @@ if(isset($_GET['Massage'])){
                                        
                                        <?php
                                        include_once('connection.php');
-                                       $sql="SELECT  `terms_condition` ,`id` FROM `terms_condition`";
+                                       $sql="SELECT  `terms_condition`,`id` FROM `terms_condition`";
                                        $result = mysqli_query($conn,$sql);
                                        
                                        foreach($result as $row){
@@ -144,30 +136,25 @@ if(isset($_GET['Massage'])){
                                        ?>
                                        
                                         <input type="hidden" name="id" class="form-control" value=<?php echo $row['id'] ?> placeholder="Category Image" required="">
-                                                       <textarea id="summernote" name="terms" value=<?php echo $row['terms_condition'] ?> ></textarea>
-                                                       
+
+                                                        <textarea id="editor" name="terms"><?php echo htmlspecialchars($row['terms_condition']); ?></textarea>
                                                        
                                         <?php } ?>
-                                <script>
-                                  $('#summernote').summernote({
-                                    tabsize: 2,
-                                    height: 100
-                                  });
-                                </script>
+                             <script>
+const editor = Jodit.make('#editor', {
+    height: 700,
+    beautifyHTML: false,
+    askBeforePasteHTML: false,
+    askBeforePasteFromWord: false,
+    defaultMode: Jodit.MODE_WYSIWYG,
+    toolbarAdaptive: false
+});
+</script>
                                     </div>
     							</div>
     						</div>
     			    	</div>
     			    	
-    			<!--        <div class="col-sm-6">-->
-							<!--<div class="form-group">-->
-							<!--	<div class="controls">-->
-       <!--                            <div class="controls">-->
-       <!--                            <input type="file" name="CatImage" class="form-control" placeholder="Category Image" required="">-->
-       <!--                             </div>-->
-    			<!--				</div>-->
-    			<!--			</div>-->
-    			<!--    	</div>-->
                       <div class="col-sm-12">
                           
                           
@@ -183,24 +170,11 @@ if(isset($_GET['Massage'])){
 		</div>
 	</div>
 </section>
-<!-- Input Validation end -->
 
-
-<!-- Input Validation end -->
 
         </div>
       </div>
     </div>
-    <!-- END: Content-->
-
-
-   
-    <!-- End: Customizer-->
-
-    <!-- Buynow Button-->
-    <!--<div class="buy-now"><a href="../../../../../../external.html?link=https://1.envato.market/vuexy_admin" target="_blank" class="btn btn-danger">Buy Now</a>-->
-
-    <!--</div>-->
     <div class="sidenav-overlay"></div>
     <div class="drag-target"></div>
 

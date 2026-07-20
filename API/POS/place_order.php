@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-  $user_id = $_POST['user_id'];
+  $user_id = $_POST['user_id'] ?? NULL;
   $name = $_POST['name'];
   $username = $_POST['user_name'];
   $phone = $_POST['phone'];
@@ -63,6 +63,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $ordersheduletype = $_POST['ordersheduletype'];
   $sheduletime = $_POST['sheduletime'] . ":00";
   $reservation_id = $_POST['reservation_id'];
+  $user_name  = mysqli_real_escape_string($conn, $_POST['user_name'] ?? '');
+  $user_email = mysqli_real_escape_string($conn, $_POST['user_email'] ?? '');
+  $user_phone = mysqli_real_escape_string($conn, $_POST['user_phone'] ?? '');
   
 
 
@@ -381,68 +384,67 @@ $department_list = [];
       echo json_encode(array("statusCode" => 201, "message" => "User already exists"));
     } else {
       // Insert new user
-      echo $sql_insert_user = "INSERT INTO `users`(`role_id`, `name`, `phone`, `email`, `password`, `street`, `postal_code`, `city`, `house_no`) 
-                            VALUES (3, '$name', '$phone', null, '$password', '$street', '$Shipping_postal_code', '$Shipping_city', '$House_number')";
+                $sql_insert_user = "INSERT INTO `users`(`role_id`, `name`, `phone`, `email`, `password`, `street`, `postal_code`, `city`, `house_no`) 
+                                    VALUES (3, '$name', '$phone', null, '$password', '$street', '$Shipping_postal_code', '$Shipping_city', '$House_number')";
       $result_user = mysqli_query($conn, $sql_insert_user);
 
       if ($result_user) {
         $last_user_id = $conn->insert_id;
 
-        if ($wallet_balance) {
-          $sql_check_wallet = "SELECT `amount` FROM `users` WHERE `id` = '$user_id'";
-          $result_check_wallet = mysqli_query($conn, $sql_check_wallet);
-          $row_wallet = mysqli_fetch_assoc($result_check_wallet);
-
-          if ($row_wallet && isset($row_wallet['amount'])) {
-            $current_balance = $row_wallet['amount'];
-
-            if ($wallet_balance > $current_balance) {
-              //   If wallet balance is greater than available amount, show error
-              $response = [
-                "status" => false,
-                "Response_code" => 400,
-                "Message" => "Insufficient wallet balance"
-              ];
-              echo json_encode($response);
-              exit;
+         if ($wallet_balance) {
+              $sql_check_wallet = "SELECT `amount` FROM `users` WHERE `id` = '$user_id'";
+              $result_check_wallet = mysqli_query($conn, $sql_check_wallet);
+              $row_wallet = mysqli_fetch_assoc($result_check_wallet);
+    
+              if ($row_wallet && isset($row_wallet['amount'])) {
+                $current_balance = $row_wallet['amount'];
+    
+                if ($wallet_balance > $current_balance) {
+                  //   If wallet balance is greater than available amount, show error
+                  $response = [
+                    "status" => false,
+                    "Response_code" => 400,
+                    "Message" => "Insufficient wallet balance"
+                  ];
+                  echo json_encode($response);
+                  exit;
+                }
+    
+                // Deduct the balance
+                $sql_update_wallet = "UPDATE `users` SET `amount` = `amount` - $wallet_balance WHERE `id` = '$user_id'";
+                mysqli_query($conn, $sql_update_wallet);
+    
+                // $transaction_message = "Abzug von €$wallet_balance vom Guthaben";
+    
+                $sql_msg = "SELECT `id`, `message_key`, `message_en`, `message_de` FROM `messages` WHERE `message_key` = 'deduct_wallet_balance'";
+                $exec_sql_msg = mysqli_query($conn, $sql_msg);
+                $data = mysqli_fetch_array($exec_sql_msg);
+    
+                $replacements = [
+                  '{{wallet_balance}}' => $wallet_balance
+                ];
+    
+                $message_en = str_replace(array_keys($replacements), array_values($replacements), $data['message_en']);
+                $message_de = str_replace(array_keys($replacements), array_values($replacements), $data['message_de']);
+    
+    
+                $rand_id  = rand(000000, 10000000);
+    
+                $sql = "INSERT INTO `tbl_transaction` (`user_id`, `transaction_id`, `amount`, `type`, `message`, `english_message`) VALUES ('$user_id', '$rand_id', '$wallet_balance', 'debit', '$message_de', '$message_en')";
+    
+                $ex_sql = mysqli_query($conn, $sql);
+              } else {
+                // If amount column is not found
+                $response = ["status" => false, "Response_code" => 400, "Message" => "Wallet balance not found"];
+                echo json_encode($response);
+                exit;
+              }
             }
-
-            // Deduct the balance
-            $sql_update_wallet = "UPDATE `users` SET `amount` = `amount` - $wallet_balance WHERE `id` = '$user_id'";
-            mysqli_query($conn, $sql_update_wallet);
-
-            // $transaction_message = "Abzug von €$wallet_balance vom Guthaben";
-
-            $sql_msg = "SELECT `id`, `message_key`, `message_en`, `message_de` FROM `messages` WHERE `message_key` = 'deduct_wallet_balance'";
-            $exec_sql_msg = mysqli_query($conn, $sql_msg);
-            $data = mysqli_fetch_array($exec_sql_msg);
-
-            $replacements = [
-              '{{wallet_balance}}' => $wallet_balance
-            ];
-
-            $message_en = str_replace(array_keys($replacements), array_values($replacements), $data['message_en']);
-            $message_de = str_replace(array_keys($replacements), array_values($replacements), $data['message_de']);
-
-
-            $rand_id  = rand(000000, 10000000);
-
-            $sql = "INSERT INTO `tbl_transaction` (`user_id`, `transaction_id`, `amount`, `type`, `message`, `english_message`) VALUES ('$user_id', '$rand_id', '$wallet_balance', 'debit', '$message_de', '$message_en')";
-
-            $ex_sql = mysqli_query($conn, $sql);
-          } else {
-            // If amount column is not found
-            $response = ["status" => false, "Response_code" => 400, "Message" => "Wallet balance not found"];
-            echo json_encode($response);
-            exit;
-          }
-        }
             if($platform==='website'){
-                      $street =  $_POST['Shipping_address_2'];
-                      $House_number = $_POST['city'];
-                      $name =  $_POST['Shipping_area'];
-                      
-                  }
+                          $street =  $_POST['Shipping_address_2'];
+                          $House_number = $_POST['city'];
+                          $name =  $_POST['Shipping_area'];
+                }
         // Insert order details
         $sql_order = "INSERT INTO `orders_zee`(`user_id`, `status`, `payment_type`, `order_total_price`, `payment_status`, `Shipping_address`, `Shipping_address_2`, 
                             `Shipping_city`, `Shipping_postal_code`, `Shipping_Cost`, `branch_id`, `addtional_notes`, `total_netto_tax`, `total_metto_tax`,`order_type`, `total_discount`,`payment_method`, `transaction_id`, `platform`, `ordersheduletype`, `sheduletime`, `created_at`) 
@@ -537,7 +539,7 @@ $department_list = [];
                       
 
                     $order_details_insert = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`, `product_description`, `qty`, `cost`, `price`, `addons`, `types`, `dressing`, `no_of_deal`, `additional_notes`, `discount_percent`, `additional_discount`,`is_free`) 
-                                                             VALUES ('$last_order_id', '$deal_id', '$item_id', '$product_id', '$pro_name', '$pro_decs', '$deal_qty', '$cost', '$price', '$addons', '$types', '$dressing', '$no_of_deal', '$notes', '$pro_discount', '$additional_discount', '$is_free')";
+                                                             VALUES ('$last_order_id', '$deal_id', '$item_id', '$product_id', '$pro_name', '$pro_decs', '$deal_qty', '$cost', '$price', '$addons', '$types', '$dressing', '$no_of_deal', '$notes', '$pro_discount', '$ratio', '$is_free')";
                     $execute_details_insert = mysqli_query($conn, $order_details_insert);
                     
                    
@@ -853,18 +855,29 @@ $department_list = [];
   } else {
       
       
-       $sql_user = "SELECT * FROM `users` WHERE `id` = '$user_id'";
-      $exec_sql_user = mysqli_query($conn, $sql_user);
-
-      if ($exec_sql_user && mysqli_num_rows($exec_sql_user) > 0) {
-        $user = mysqli_fetch_array($exec_sql_user, MYSQLI_ASSOC);
+      if($user_id){
+          
+               $sql_user = "SELECT * FROM `users` WHERE `id` = '$user_id'";
+              $exec_sql_user = mysqli_query($conn, $sql_user);
+        
+              if ($exec_sql_user && mysqli_num_rows($exec_sql_user) > 0) {
+                $user = mysqli_fetch_array($exec_sql_user, MYSQLI_ASSOC);
+              }
       }
       
         if($platform==='website'){
           $street =  $_POST['Shipping_address_2'];
           $House_number = $_POST['city'];
           $name =  $_POST['Shipping_area'];
+          if($user_id){
           
+               $sql_user = "SELECT * FROM `users` WHERE `id` = '$user_id'";
+              $exec_sql_user = mysqli_query($conn, $sql_user);
+        
+              if ($exec_sql_user && mysqli_num_rows($exec_sql_user) > 0) {
+                $user = mysqli_fetch_array($exec_sql_user, MYSQLI_ASSOC);
+              }
+      }
          }else if($platform==='pos'){
              $street =  $_POST['street'];
             $House_number = $_POST['house_no'];
@@ -930,20 +943,24 @@ $department_list = [];
       }
     }
 
-    $sql_update_user = "UPDATE `users` SET `street` = '$street', `postal_code` = '$Shipping_postal_code', `city` = '$Shipping_city', `house_no` = '$House_number'WHERE `id` = $user_id";
-    $result_user = mysqli_query($conn, $sql_update_user);
+    if($user_id){
+        
+        $sql_update_user = "UPDATE `users` SET `street` = '$street', `postal_code` = '$Shipping_postal_code', `city` = '$Shipping_city', `house_no` = '$House_number' WHERE `id` = $user_id";
+        $result_user = mysqli_query($conn, $sql_update_user);
 
-    if (!$result_user) {
-      echo json_encode(array("statusCode" => 201, "message" => "Failed to update user", "error" => mysqli_error($conn)));
+        if (!$result_user) {
+          echo json_encode(array("statusCode" => 201, "message" => "Failed to update user", "error" => mysqli_error($conn)));
+        }
+
     }
 
 
      $sql = "INSERT INTO `orders_zee`(`user_id`, `status`, `payment_type`, `order_total_price`, 
                     `payment_status`, `Shipping_address`, `Shipping_address_2`, 
-                    `Shipping_city`, `Shipping_postal_code`, `Shipping_Cost`,`branch_id`, `addtional_notes`, `total_netto_tax`, `total_metto_tax`, `order_type`, `total_discount`, `payment_method`, `transaction_id`, `platform`, `ordersheduletype`, `sheduletime`, `created_at`) 
+                    `Shipping_city`, `Shipping_postal_code`, `Shipping_Cost`,`branch_id`, `addtional_notes`, `total_netto_tax`, `total_metto_tax`, `order_type`, `total_discount`, `payment_method`, `transaction_id`, `platform`, `ordersheduletype`, `sheduletime`, `created_at`,`user_name`, `user_email`, `user_phone`) 
             VALUES ($user_id, '$order_status', '$payment_type', '$total_amount', 
                     '$paymentstatus', '$street', '$House_number', 
-                    '$name', '$Shipping_postal_code', '$shipping_cost', '$branch_id', '$additional_notes', '$total_netto_tax', '$total_metto_tax', '$order_type', '$total_discount', '$payment_method', '$transaction_id', '$platform','$ordersheduletype', '$sheduletime', '$datetime')";
+                    '$name', '$Shipping_postal_code', '$shipping_cost', '$branch_id', '$additional_notes', '$total_netto_tax', '$total_metto_tax', '$order_type', '$total_discount', '$payment_method', '$transaction_id', '$platform','$ordersheduletype', '$sheduletime', '$datetime', '$user_name', '$user_email', '$user_phone')";
 
     $result = mysqli_query($conn, $sql);
 
@@ -982,7 +999,10 @@ $department_list = [];
                         foreach ($product['addons'] as $addon) {
                             $addon_price = isset($addon['as_price']) ? (float)$addon['as_price'] : 0;
                             $addon_qty   = isset($addon['quantity']) ? (int)$addon['quantity'] : 1;
-                            $product_total_price += ($addon_price* $addon_qty);
+                            $isFreeInDeal = isset($addon['isFreeInDeal']) ? (int)$addon['isFreeInDeal'] : 0;
+                            $freeQTY   = $isFreeInDeal == 1 ? isset($addon['freeQTY']) ? (int)$addon['freeQTY'] : 0 :0;
+                            
+                            $product_total_price += ($addon_price* ($addon_qty-$freeQTY));
                         }
                     }
                 }
@@ -990,6 +1010,10 @@ $department_list = [];
                 $totalinitial = ($total_amount + $wallet_balance) - $shipping_cost;
                 $ratio = $product_total_price / $totalinitial;
                 $additional_discount = round(($wallet_balance * $ratio), 2);
+                
+                
+            echo $totalinitial." ".$ratio." ".$additional_discount." product price ".$product_total_price;
+                
                 
             }  else if (!empty($additional_pos_discount) && $total_amount > 0) {
                 
@@ -999,7 +1023,8 @@ $department_list = [];
                         foreach ($product['addons'] as $addon) {
                             $addon_price = isset($addon['as_price']) ? (float)$addon['as_price'] : 0;
                             $addon_qty   = isset($addon['quantity']) ? (int)$addon['quantity'] : 1;
-                            $product_total_price += ($addon_price* $addon_qty);
+                            $freeQTY   = isset($addon['freeQTY']) ? (int)$addon['freeQTY'] : 0;
+                            $product_total_price += ($addon_price* ($addon_qty-$freeQTY));
                         }
                     }
                 }
@@ -1305,7 +1330,7 @@ $department_list = [];
         'payment_type' => $payment_type,
         'status' => "neworder",
         'created_at' => $datetime,
-        'name' => $user['name'],
+  'name' => $user['name']?? $_POST['user_name'],
         "order_type" => $order_type,
         "departments" => $department_list,
       ];

@@ -501,35 +501,31 @@
 
 
 $(document).ready(function() {
-  var i = 1;
   $('#add').click(function() {
-   
-$('#dynamic_fields').append(`
-  <div class="row mb-2">
-    <div class="col-sm-6">
-      <div class="form-group d-flex gap-5">
-        <input type="text" name="addon_name[]" class="form-control" placeholder="Add On" required>
-      </div>
-    </div>
-        <div class="col-sm-6">
-      <div class="form-group d-flex gap-5">
-        <input type="text" name="addon_price[]" class="form-control" placeholder="Add On Price" required>
-      </div>
-    </div>
-  </div>
-`);
 
-      i++;
+    $('#dynamic_fields').append(`
+      <div class="row mb-2">
+        <div class="col-sm-5">
+          <input type="text" name="addon_name[]" class="form-control" placeholder="Add On" required>
+        </div>
+
+        <div class="col-sm-5">
+          <input type="text" name="addon_price[]" class="form-control" placeholder="Add On Price" required>
+        </div>
+
+        <div class="col-sm-2">
+          <button type="button" class="btn btn-danger btn_remove">Remove</button>
+        </div>
+      </div>
+    `);
 
   });
-  
-  
-  
+
+  // REMOVE ROW
   $(document).on('click', '.btn_remove', function() {
-    var button_id = $(this).attr("id");
-    i--;
-    $('#row' + button_id + '').remove();
+    $(this).closest('.row').remove();
   });
+
 });
 
 

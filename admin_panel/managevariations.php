@@ -1,19 +1,4 @@
-<?php include('assets/header.php') ?>
 <!DOCTYPE html>
-
-<?php
-
-  if(isset($_GET['Massage'])){
-      if($_GET['Massage'] == 'Sucessfully updated Addon.'){
-         echo "<script>alert('Sucessfully updated Addon.')</script>";
-        // header("Refresh: 1; url='update_addons.php'");
-       }else{
-          echo "<script>alert('changes made to data successfully!')</script>";
-       }
-     
-  }   
-?>
-
 
 <html class="loading" lang="en" data-textdirection="ltr">
 
@@ -27,7 +12,6 @@
   left: 0;
   top: 0;
   width:50%;
-  height:'auto';
   overflow: auto; /* Enable scroll if needed */
   background-color: rgb(0,0,0); /* Fallback color */
   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
@@ -41,7 +25,7 @@
   padding: 20px;
   border: 1px solid #888;
   width: 50%;
-  height:350px;
+  height:250px;
   border-radius:10px;
 }
 
@@ -69,6 +53,10 @@
   text-decoration: none;
   cursor: pointer;
 
+}
+
+.breadcrumb{
+    background-color : none !important;
 }
 </style>  
 <head>
@@ -107,17 +95,15 @@
 
     <!-- BEGIN: Custom CSS-->
     <link rel="stylesheet" type="text/css" href="assets/css/style.css">
-    <!-- END: Custom CSS-->
 
   </head>
-  
   <!-- END: Head-->
 
   <!-- BEGIN: Body-->
   <body class="vertical-layout vertical-menu-modern semi-dark-layout 2-columns  navbar-floating footer-static  " data-open="click" data-menu="vertical-menu-modern" data-col="2-columns" data-layout="semi-dark-layout">
 
     <!-- BEGIN: Header-->
-  
+     <?php include('assets/header.php') ?>
     
 
     <!-- END: Header-->
@@ -136,12 +122,12 @@
           <div class="content-header-left col-md-9 col-12 mb-2">
             <div class="row breadcrumbs-top">
               <div class="col-12">
-                <h2 class="content-header-title float-left mb-0">Manage Variation</h2>
+                <h2 class="content-header-title float-left mb-0">Manage Variataion</h2>
                 <div class="breadcrumb-wrapper col-12">
-                  <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Home</a>
+                  <ol class="breadcrumb" style="background: none;">
+                    <li class="breadcrumb-item"><a href="index.php">Home</a>
                     </li>
-                    <li class="breadcrumb-item active">Manage Variation
+                    <li class="breadcrumb-item active">Variataion
                     </li>
                   </ol>
                 </div>
@@ -161,81 +147,81 @@
   <!--<div class="col-12">-->
   <!--    <p>Read full documnetation <a href="../../../../../../external.html?link=https://datatables.net/" target="_blank">here</a></p>-->
   <!--</div>-->
-</div>
-<!-- Zero configuration table -->
+        </div>
+        <section id="basic-datatable">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Variataion</h4>
+                        </div>
+                
+                        <div class="card-content">
+                            <div class="card-body card-dashboard">
+                                <p class="card-text"></p>
+                                <div class="table-responsive">
+                                    <table id="example" class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Sno</th>
+                                                <th>Id</th>
+                                                <th>Title</th>
+                                                <th>created_at</th> 
+                                                <th>Save</th>
+                                                <th>View</th>
+                                                <th>Delete</th>
+                                            </tr>
+                                        </thead>
+                                     <tbody>
+                                       <?php
+                                    include_once('connection.php');
+                                    
+                                    $sql = "SELECT `id`, `title`, `created_at` FROM `variation`";
+                                    $result = mysqli_query($conn, $sql);
+                                    $index = 0;
+                                    
+                                    while ($row = mysqli_fetch_array($result)) {
+                                        $sn = $index + 1;
+                                        echo "<tr data-id='{$row['id']}'>";
+                                        echo "<td>{$sn}</td>";
+                                        echo "<td name='tittlename'>{$row['id']}</td>";
+                                        echo "<td class='editable' contenteditable='true' data-field='title' name='subname'>{$row['title']}</td>";
+                                        echo "<td>{$row['created_at']}</td>";
+                                        
+                                        // echo '<td><button class="btn btn-primary" onclick="openAddMore(\'' . $row['id'] . '\' ,\'' . $row['title'] . '\')">Update</button></td>';
+                                        echo "<td><button class='btn btn-success save-btn' style='display:none;'>Save</button></td>";  
+                                        echo "<td><a href='update_variation.php?id={$row['id']}'><button class='btn btn-primary'>View Products</button></a></td>";
+                                        
+                                        echo '<td>
+                                                <form action="deletevariation.php" method="POST" onsubmit="return confirm(\'Are you sure you want to delete this variation?\');">
+                                                    <input type="hidden" name="id" value="' . $row['id'] . '">
+                                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                                </form>
+                                              </td>';
+                                        
+                                        echo "</tr>";
+                                        $index++;
+                                    }
+                                    ?>
+                                    
+                                    </tbody>
 
-<section id="basic-datatable">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">Manage Variation</h4>
-                </div>
-        
-                <div class="card-content">
-                    <div class="card-body card-dashboard">
-                        <p class="card-text"></p>
-                        <div class="table-responsive">
-                            <table id="example" class="table">
-                                <thead>
-                                    <tr>
-                                        <th>S no.</th>
-                                        <th>Variation ID</th>
-                                        <th>Product Name</th>
-                                        <th>Sub Title</th>
-                                           <th>Primary</th>
-                                        <th>Action</th>
-                                         <th>Action</th>
+                                <tfoot >
+                                     <tr>
+                                        <th>Sno</th>
+                                        <th>Id</th>
+                                        <th>Title</th>
+                                        <th>created_at</th>
+                                        <th>Save</th>
+                                        <th>View</th>
+                                        <th>Delete</th>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                      <?php
-                                      include_once('connection.php');
-                                      $id = $_GET['id'];
-                                      $sql="SELECT vp.id,vp.product_id,vp.sub_title,vp.is_primary,p.name 
-FROM variation_with_product vp 
-INNER JOIN products p on p.id = vp.product_id 
-WHERE vp.var_id = $id";
-                                      $result = mysqli_query($conn,$sql);
-                                      $index = 0;
-                                      while($row = mysqli_fetch_array($result)){
-                                          $sn = $index+1;
-                                          echo "<tr>";
-                                            echo "<td>{$sn}</td>";
-                                            echo "<td>{$row['id']}</td>";
-                                            echo "<td name='cost'>{$row['name']}</td>";
-                                            echo "<td name='price'>{$row['sub_title']}</td>";
-                                            echo "<td>";
-
-                                            if($row['is_primary'] == 1)
-                                            {
-                                                echo '<span class="badge bg-primary">Primary</span>';
-                                            }else{
-                                                echo '<span class="badge bg-secondary">No</span>';
-                                            }
-                                    
-                                            echo "</td>";
-echo '<td>
-<button class="btn btn-primary"
-onclick="openAddMore(\''.$row['id'].'\',\''.$row['product_id'].'\',\''.$row['sub_title'].'\',\''.$row['is_primary'].'\')">
-Update
-</button>
-</td>';
-                                            echo '<td><button class="btn btn-danger" onclick="deleteRow(\''. $row['id'] .'\')">Delete</button></td>';     
-                                          echo "</tr>";
-                                          $index++;
-                                      }
-                                      
-                                      ?>
-                                    
-                                </tbody>
-                                <tfoot>
-                                   
                                 </tfoot>
                             </table>
                         </div>
                     </div>
                 </div>
+                
             </div>
         </div>
     </div>
@@ -247,11 +233,13 @@ Update
       <div class="modal-content-Updated2">
 
         <span  onclick="closeModel(1)" class="close">&times;</span>
-        <h2>Update Image</h2>
+        <h2>Update Status</h2>
+         <br>
+         <br>
          <br>
 
-         <form method="POST" action="phpfiles/insertions.php" enctype="multipart/form-data">
-         <input hidden type="text" id="ProID" name="ProID">  
+         <form method="POST" action="assets/Actions.php" enctype="multipart/form-data">
+         <input hidden type="text" name="userID">  
              <div class="col-sm-12">
                 
                  <!--  <div class="form-group">
@@ -261,20 +249,19 @@ Update
                   </div> -->
                   <div class="form-group">
                     <div class="controls">
-                      <input  type="file" name="updatedImage" class="form-control"/>
+                     <select name="Status" id="Status"  class="form-control">
+                            <option value="0">Mark as banned</option>
+                            <option value="1">Mark as unbanned</option>
+                      </select>
                     </div>
                   </div>
                 </div>
-                
-                
         
-       <button type="submit" name="btnUpdateProdImage" class="btn btn-primary">Submit</button>
+       <button type="submit" name="BtnUopdateOrderStatus" class="btn btn-primary">Submit</button>
        </form>
       </div>
     
     </div>
-
-
 
     <div id="myModal_Add" class="modal">
 
@@ -284,67 +271,18 @@ Update
         <span onclick="closeModel(2)" class="close">&times;</span>
         <h2>Update Variation</h2>
          <br>
-         <form method="POST" action="phpfiles/insertions.php" enctype="multipart/form-data">
-        
-             <div class="col-sm-12">
-                 <input class="form-control" value="" type="text" name="id" id="id" placeholder="Enter user name" hidden> 
-                  
-                <div class="form-group">
-                <div class="controls">
-                    <select class="form-control" name="name" id="name">
-                        <?php
-                        include_once('connection.php');
-                        
-                        // Modified query to include sub_category name
-                        $pro_sql = "
-                            SELECT products.id, products.name AS product_name, sub_categories.name AS subcategory_name
-                            FROM products
-                            LEFT JOIN sub_categories ON products.sub_category_id = sub_categories.id
-                        ";
-                        $pro_exec = mysqli_query($conn, $pro_sql);
-                        $pro_num = mysqli_num_rows($pro_exec);
-                        
-                        if ($pro_num > 0) {
-                            echo "<option disabled>Select</option>";
-                            
-                            while ($pro_ar = mysqli_fetch_array($pro_exec)) {
-                                ?>
-                                <option value="<?php echo $pro_ar['id'] ?>">
-                                    <?php echo $pro_ar['product_name'] . " - " . ($pro_ar['subcategory_name'] ? $pro_ar['subcategory_name'] : "No Subcategory"); ?>
-                                </option>
-                                <?php
-                            }
-                        } else {
-                            ?>
-                            <option>No Product Found</option>
-                            <?php
-                        }
-                        ?>
-                    </select>
-                </div>
-                </div>
 
+         <form method="POST" action="phpfiles/insertions.php" enctype="multipart/form-data">
+             <div class="col-sm-12">
+                 <input class="form-control"  value="" type="text" name="id" id="id" placeholder="Enter user name" hidden> 
                   
                 <div class="form-group">
                     <div class="controls">
-                        <input class="form-control"  value="" type="text" name="sub_title" id="sub_title" placeholder="Enter Sub Title" > 
+                        <input class="form-control"  value="" type="text" name="title" id="title" placeholder="Enter Variation Title" > 
                     </div>
                  </div>
-                  
-                                  
-                <div class="form-group">
-                    <label>Primary Product</label>
-                    <select class="form-control" name="is_primary" id="is_primary">
-                        <option value="0">No</option>
-                        <option value="1">Yes (Primary)</option>
-                    </select>
-                </div>
-                 
-            
-                
-                </div>
-        
-       <button type="submit" name="updateSubVariation" class="btn btn-primary">Save</button>
+                <button type="submit" name="updateVariationTitle" class="btn btn-primary">Save</button>
+            </div>
        </form>
       </div>
     
@@ -360,13 +298,13 @@ Update
     <!-- END: Content-->
 
 
+   
     <!-- End: Customizer-->
   
     <!-- Buynow Button-->
     <!--<div class="buy-now"><a href="../../../../../../external.html?link=https://1.envato.market/vuexy_admin" target="_blank" class="btn btn-danger">Buy Now</a>-->
 
-    <!--</div>-->
-    <div class="sidenav-overlay"></div>
+ <div class="sidenav-overlay"></div>
     <div class="drag-target"></div>
 
 
@@ -400,45 +338,17 @@ Update
     
 <script>
 
-
-$(document).ready(function() {
-  var i = 1;
-  $('#add').click(function() {
-   
-      $('#dynamic_fields').append('<div class="row"><div class="col-sm-6" ><div class="form-group"><input type="text" name="addon_name[]" class="form-control" placeholder="Add On" required ></div></div><div class="col-sm-6" ><div class="form-group"><input type="number" step="0.01" name="addon_price[]" class="form-control" placeholder="Add On Price" required ></div></div></div>')
-      i++;
-
-  });
-  $(document).on('click', '.btn_remove', function() {
-    var button_id = $(this).attr("id");
-    i--;
-    $('#row' + button_id + '').remove();
-  });
-});
-
 var modal = document.getElementById("myModal");
 var modal_Add = document.getElementById("myModal_Add");
  function openModal(id){
         document.getElementsByName('userID')[0].value = id;
         modal.style.display = "block";
  }
-function openAddMore(id, product_id, sub_title,is_primary){
-
-    document.getElementById('id').value = id;
-    document.getElementById('sub_title').value = sub_title;
-
-    modal_Add.style.display = "block";
-
-    setTimeout(() => {
-        document.getElementById('name').value = product_id;
-         document.getElementById('is_primary').value = is_primary;
-    }, 100);
-}
-  function openimagemodel(id,index){
+ function openAddMore(id,title){
      
-
-      modal.style.display = "block";
-      document.getElementById('ProID').value = id;
+     document.getElementById('title').value = title;
+       document.getElementById('id').value = id;
+     modal_Add.style.display = "block";
      
 
  }
@@ -462,7 +372,7 @@ window.onclick = function(event) {
 
 function deleteRow(id){
     var req = new XMLHttpRequest();
-      req.open("get","assets/Actions.php?FunctionName=DeleteSubVariationdelete&id="+id,true);
+      req.open("get","assets/Actions.php?FunctionName=DeleteCampaignPro&id="+id,true);
       req.send();
       req.onreadystatechange = function(){
           if(req.readyState==4 && req.status==200){
@@ -497,6 +407,46 @@ function toggle(status,id){
         ]
     } );
 } );</script>
+
+
+
+<script>
+$(document).ready(function () {
+    // Show Save button when title is edited
+    $('.editable').on('input', function () {
+        $(this).closest('tr').find('.save-btn').show();
+    });
+
+    // Save updated title
+    $('.save-btn').on('click', function () {
+        const row = $(this).closest('tr');
+        const id = row.data('id');
+        const title = row.find('[data-field="title"]').text().trim();
+
+        $.ajax({
+            url: '../API/update_inline_variation.php',
+            method: 'POST',
+            dataType: 'json',
+            data: {
+                id: id,
+                title: title,
+
+            },
+            success: function (response) {
+                if (response.status) {
+                    alert(response.message);
+                    row.find('.save-btn').hide();
+                } else {
+                    alert("Error: " + response.message);
+                }
+            },
+            error: function (xhr) {
+                alert("Request failed: " + xhr.responseText);
+            }
+        });
+    });
+});
+</script>
   </body>
   <!-- END: Body-->
 

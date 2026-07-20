@@ -397,15 +397,35 @@ if (isset($_POST['btnSubmitHolidays'])) {
 
 
 if(isset($_POST['btnSubmit_imprint'])){
-    $imprint = $_POST['imprint'];
+       include('../connection.php');
+    $imprint = mysqli_real_escape_string($conn, $_POST['imprint']);
     $id = $_POST['id'];
 
-       include('../connection.php');
 
              $sqladd = "UPDATE `imprint` SET `imprint`='$imprint' WHERE `id` = '$id'";
              $add = mysqli_query($conn,$sqladd);
              if($add){
                  header("Location:../imprint.php?Massage=Sucessfully Updated"); 
+           
+            
+        }
+        
+
+    
+}
+
+
+if(isset($_POST['btnSubmit_aboutUs'])){
+     include('../connection.php');
+    $about = mysqli_real_escape_string($conn, $_POST['about']);
+    $id = $_POST['id'];
+
+       include('../connection.php');
+
+             $sqladd = "UPDATE `about_us` SET `about`='$about' WHERE `id` = '$id'";
+             $add = mysqli_query($conn,$sqladd);
+             if($add){
+                 header("Location:../about_us.php?Massage=Sucessfully Updated"); 
            
             
         }
@@ -2787,8 +2807,7 @@ if(isset($_POST['btnSubmit_Variation']))
     else
     {
 
-        $sql = "INSERT INTO `variation`(`title`) 
-                VALUES ('$var_title')";
+        $sql = "INSERT INTO `variation`(`title`) VALUES ('$var_title')";
 
         $result = mysqli_query($conn, $sql);
 
@@ -2808,21 +2827,8 @@ if(isset($_POST['btnSubmit_Variation']))
                 $p_title = mysqli_real_escape_string($conn, $parent_title[$i]);
 
                 $insert_var = "
-                    INSERT INTO `variation_with_product`
-                    (
-                        `product_id`,
-                        `sub_title`,
-                        `var_id`,
-                        `is_primary`,
-                        `parent_title`
-                    )
-                    VALUES
-                    (
-                        '$product_id',
-                        '$sub_title',
-                        '$last_inserted_id',
-                        '$primary',
-                        '$p_title'
+                    INSERT INTO `variation_with_product`(`product_id`,`sub_title`,`var_id`,`is_primary`,`parent_title`)VALUES('$product_id','$sub_title','$last_inserted_id','$primary',
+                        '$var_title'
                     )
                 ";
 
@@ -3205,7 +3211,7 @@ if (isset($_POST['btnSubmit_Action'])) {
         
         
         
-          $get_user_query = "SELECT user_id FROM orders_zee WHERE id = '$order_id'";
+           $get_user_query = "SELECT user_id, user_name, user_email, user_phone FROM orders_zee WHERE id = '$order_id'";
         $result_user = mysqli_query($conn, $get_user_query);
         $row_user = mysqli_fetch_assoc($result_user);
         
@@ -3216,11 +3222,10 @@ if (isset($_POST['btnSubmit_Action'])) {
             $result_email = mysqli_query($conn, $get_email_query);
             $row_email = mysqli_fetch_assoc($result_email);
         
-            if ($row_email) {
-                $email = $row_email['email'];
-                $name = $row_email['name'];
+            $email = $row_email['email'] ?? $row_user['user_email'];
+            $name = $row_email['name'] ?? $row_user['user_name'];
                 
-                $mail = new PHPMailer(true);
+            $mail = new PHPMailer(true);
         
                    try {
                         $mail->isSMTP();
@@ -3251,7 +3256,7 @@ if (isset($_POST['btnSubmit_Action'])) {
                     echo json_encode($data);
                 }
 
-            }
+            
         }
         
     }elseif($status == 'delivered'){
@@ -3288,7 +3293,7 @@ if (isset($_POST['btnSubmit_Action'])) {
                     $cashback_amount = $total_order_amount * ($cashback_percentage / 100);
             
                     // Fetch user ID
-                    $sql_user = "SELECT `user_id` FROM `orders_zee` WHERE `id` = '$order_id'";
+                     $sql_user = "SELECT `user_id`, `user_name`, `user_email`, `user_phone` FROM `orders_zee` WHERE `id` = '$order_id'";
                     $execute_user = mysqli_query($conn, $sql_user);
                     $row_user = mysqli_fetch_assoc($execute_user);
                     $user_id = $row_user['user_id'];
@@ -3358,25 +3363,25 @@ if (isset($_POST['btnSubmit_Action'])) {
             
             
                             
-            $get_user_query = "SELECT user_id FROM orders_zee WHERE id = '$order_id'";
+            $get_user_query = "SELECT user_id, user_name, user_email, user_phone FROM orders_zee WHERE id = '$order_id'";
             $result_user = mysqli_query($conn, $get_user_query);
             $row_user = mysqli_fetch_assoc($result_user);
             
-            if ($row_user) {
-                $user_id = $row_user['user_id'];
             
-                // Fetch email and name of user from users table
-                $get_email_query = "SELECT email, name FROM users WHERE id = '$user_id'";
-                $result_email = mysqli_query($conn, $get_email_query);
-                $row_email = mysqli_fetch_assoc($result_email);
+            $user_id = $row_user['user_id'];
             
-                if ($row_email) {
-                    $email = $row_email['email'];
-                    $name = $row_email['name'];
+            // Fetch email and name of user from users table
+            $get_email_query = "SELECT email, name FROM users WHERE id = '$user_id'";
+            $result_email = mysqli_query($conn, $get_email_query);
+            $row_email = mysqli_fetch_assoc($result_email);
+            
+                
+            $email = $row_email['email'] ?? $row_user['user_email'];
+            $name = $row_email['name'] ?? $row_user['user_name'];
                     
-                    $mail = new PHPMailer(true);
+            $mail = new PHPMailer(true);
             
-                    try {
+                try {
                             $mail->isSMTP();
                             $mail->Host = 'smtp.gmail.com';
                             $mail->SMTPAuth = true;
@@ -3391,21 +3396,19 @@ if (isset($_POST['btnSubmit_Action'])) {
                             $mail->isHTML(true);
                             $mail->Subject = "Your Order Has Been Delivered";
                             $mail->Body = orderDeliveredEmailTemplate($APP_NAME,$name,$order_id,$BASE_URL,$LANG);
-
-
-                    $mail->send();
+                            $mail->send();
     
-                        } catch (Exception $e) {
+                } catch (Exception $e) {
                             $data = [
                                 "status" => false,
                                 "Response_code" => 500,
                                 "Message" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"
                             ];
                             echo json_encode($data);
-                        }
-
                 }
-            }
+
+                
+            
             
     }
 
@@ -3815,14 +3818,14 @@ if(isset($_POST['updateInventory'])){
 }
   
 if(isset($_POST['btnSubmit_privacypolicy'])){
-    $privacy = $_POST['privacy'];
-
        include('../connection.php');
-
-             $sqladd = "INSERT INTO `privacy_policy`(`privacy`) VALUES ('$privacy')";
-             $add = mysqli_query($conn,$sqladd);
+    $privacy = $_POST['privacy'];
+    $privacy = mysqli_real_escape_string($conn, $_POST['privacy']);
+          $sql = "UPDATE privacy_policy 
+                SET privacy = '$privacy'";
+             $add = mysqli_query($conn,$sql);
              if($add){
-                 header("Location:../managePoints.php?Massage=Sucessfully updated points."); 
+                 header("Location:../addprivacypolicy.php?Massage=Sucessfully Updated Privacy"); 
            
             
         }
@@ -3925,14 +3928,16 @@ if (isset($_POST['btnSubmit_insertTimings'])) {
 
 
 if(isset($_POST['btnSubmit_termscondition'])){
-    $privacy = $_POST['terms'];
-
        include('../connection.php');
+      
+    $privacy = mysqli_real_escape_string($conn, $_POST['terms']);
 
-             $sqladd = "INSERT INTO `terms_condition`(`terms_condition`) VALUES ('$privacy')";
+
+             $sqladd = "UPDATE terms_condition 
+                SET terms_condition = '$privacy'";
              $add = mysqli_query($conn,$sqladd);
              if($add){
-                 header("Location:../managePoints.php?Massage=Sucessfully updated points."); 
+                 header("Location:../addterms_condition.php?Massage=Sucessfully Updated Terms Conditions"); 
            
             
         }

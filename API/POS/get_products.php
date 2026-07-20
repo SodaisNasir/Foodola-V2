@@ -23,7 +23,8 @@ if (isset($category_id) && !empty($category_id)) {
 
 $product_query = "
 SELECT DISTINCT
-    p.*
+    p.*,
+    vp.parent_title
 FROM products p
 
 LEFT JOIN variation_with_product vp 
@@ -43,6 +44,14 @@ AND (
 
             while ($product_row = mysqli_fetch_assoc($product_result)) {
                 $product = $product_row; 
+                                
+                 if (!empty($product_row['parent_title'])) {
+                        $product['name'] = $product_row['parent_title'];
+                } else {
+                        $product['name'] = $product_row['name'];
+                }
+                unset($product['parent_title']);
+
 
                 // Fetch addons if addon_id exists
                 if (!empty($product_row['addon_id'])) {

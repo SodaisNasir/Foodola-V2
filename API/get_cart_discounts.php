@@ -28,10 +28,29 @@ if(isset($_POST['token']) && $_POST['token'] === $expectedToken){
             $ids = implode(',', array_map('intval', $productIds));
 
             // FULL PRODUCT DETAILS
-            $productQuery = "SELECT * FROM products WHERE id IN ($ids)";
+            // $productQuery = "SELECT * FROM products WHERE id IN ($ids)";
+            $productQuery = "
+SELECT DISTINCT
+    p.*,
+    vp.parent_title
+
+FROM products p
+
+LEFT JOIN variation_with_product vp
+       ON vp.product_id = p.id
+
+WHERE p.id IN ($ids)
+
+AND (
+        vp.product_id IS NULL
+        OR vp.is_primary = 1
+    )
+";
             $productResult = mysqli_query($conn, $productQuery);
 
             while ($product = mysqli_fetch_assoc($productResult)) {
+                
+                   $product['name'] = !empty($product['parent_title']) ? $product['parent_title'] : $product['name'];
                 $productsFullData[] = $product; // full row push
             }
         }

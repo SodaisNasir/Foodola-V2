@@ -37,7 +37,9 @@ $sql = "SELECT
     orders.created_at,
     orders.addtional_notes,
     orders.status,
-    orders.order_type
+    orders.order_type,
+    orders.user_name,
+    orders.user_phone
 FROM orders_zee AS orders
 LEFT JOIN users ON users.id = orders.user_id
 LEFT JOIN tables ON tables.id = orders.table_id
@@ -54,8 +56,8 @@ if ($result) {
 
         $order = [
             'id' => $row['id'],
-            'name' => $row['name'],
-            'phone' => $row['phone'],
+            'name' => $row['name'] ?? $row['user_name'],
+            'phone' => $row['phone'] ?? $row['user_phone'],
             'address' => $address,
             'order_total_price' =>  $row['order_total_price'],
             'created_at' => $row['created_at'],

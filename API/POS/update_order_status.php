@@ -41,21 +41,141 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $rider_id_sql = is_numeric($rider_id) ? intval($rider_id) : "NULL";
         $sql = "UPDATE `orders_zee` SET `status` = '" . mysqli_real_escape_string($conn, $status) . "', `rider_id` = $rider_id_sql WHERE `id` = " . intval($order_id);
     } else if ($status === 'pending') {
+        
         // Pending: set expected delivered_at based on minutes passed in delivery_at POST param
         date_default_timezone_set('Europe/Berlin');
+        // notify user by email about pending acceptance
+        $get_user_query = "SELECT `user_id` ,  `user_name`, `user_email`, `user_phone` FROM orders_zee WHERE id = '" . mysqli_real_escape_string($conn, $order_id) . "'";
+        $result_user = mysqli_query($conn, $get_user_query);
+        $row_user = mysqli_fetch_assoc($result_user);
+        
+        $fiskalySQL = "SELECT `key_name`, `key_value` FROM `enviroments`
+        WHERE `key_name` IN (
+            'fiskaly_api_key',
+            'fiskaly_api_secret',
+            'fiskaly_tss_id',
+            'fiskaly_client_id',
+            'fiskaly_admin_pin',
+            'fiskaly_admin_punk',
+            'access_token'
+        );";
+        $result_fiskaly = mysqli_query($conn, $fiskalySQL);
+        $fiskalyData = [];
+        $keysCount = 0;
+        while ($row = mysqli_fetch_assoc($result_fiskaly)) {
+            $fiskalyData[$row['key_name']] = $row['key_value'];
+            
+            if($row['key_value'] != ''){
+                $keysCount++;
+            }
+        }
+        if($keysCount === 7){
+            $getitemdetails = "SELECT `deal_id` , `no_of_deal` , `deal_item_id` , `product_id` , od.cost , od.price ,od.discount_percent , `addons` ,`additional_discount` , products.tax , orders.order_total_price , orders.fiskaly_response FROM `order_details_zee` as od INNER JOIN products ON products.id = od.product_id LEFT JOIN orders_zee as orders ON orders.id = od.order_id WHERE `order_id` =  $order_id; ";
+            $resultdetails = mysqli_query($conn, $getitemdetails);
+            $tax7Amount= 0;
+            $tax19Amount= 0;
+            $orderTotalCharges = 0;
+            $fiskaly_response = false;
+            while ($row = mysqli_fetch_assoc($resultdetails)) {
+               
+               $orderTotalCharges = $row['order_total_price'];
+               $fiskaly_response = $row['fiskaly_response'] == 0 ? false : $row['fiskaly_response'];
+    
+                if ($row['deal_id'] > 0) {
+            
+                    $tax7Amount += $row['cost'] - $row['additional_discount'];
+            
+                    $addons = json_decode($row['addons'], true);
+            
+                    if (is_array($addons)) {
+                        foreach ($addons as $addon) {
+            
+                            $addon_price = isset($addon['as_price']) ? (float)$addon['as_price'] : 0;
+                            $addon_qty = isset($addon['quantity']) ? (int)$addon['quantity'] : 1;
+                            $isFreeInDeal = isset($addon['isFreeInDeal']) ? (int)$addon['isFreeInDeal'] : 0;
+                            $freeQTY = ($isFreeInDeal == 1) ? (isset($addon['freeQTY']) ? (int)$addon['freeQTY'] : 0) : 0;
+            
+                            $tax7Amount += ($addon_price * ($addon_qty - $freeQTY));
+                        }
+                    }
+                }else{
+                    $productPrice = $row['price'] - ($row['price'] * $row['discount_percent']/100) ;
+                    
+                    $addons = json_decode($row['addons'], true);
+            
+                    if (is_array($addons)) {
+                        foreach ($addons as $addon) {
+            
+                            $addon_price = isset($addon['as_price']) ? (float)$addon['as_price'] : 0;
+                            $addon_qty = isset($addon['quantity']) ? (int)$addon['quantity'] : 1;
+                            $isFreeInDeal = isset($addon['isFreeInDeal']) ? (int)$addon['isFreeInDeal'] : 0;
+                            $freeQTY = ($isFreeInDeal == 1) ? (isset($addon['freeQTY']) ? (int)$addon['freeQTY'] : 0) : 0;
+            
+                            $productPrice += ($addon_price * ($addon_qty - $freeQTY));
+                        }
+                    }
+                    
+                    $productPrice = $productPrice - $row['additional_discount'];
+                    if($row['tax'] === '7'){
+                        $tax7Amount +=$productPrice;
+                    }else{
+                        $tax19Amount +=$productPrice; 
+                    }
+                    
+                }
+            }
+            $totalTax = $tax7Amount + $tax19Amount;
+             if($orderTotalCharges == $totalTax && $fiskaly_response == false){
+                
+                $amounts_per_vat_rate = [];
+                if ($tax7Amount > 0) {
+                    $amounts_per_vat_rate[] = [
+                        "vat_rate" => "REDUCED_1",
+                        "amount" => number_format($tax7Amount, 2, '.', '')
+                    ];
+                }
+                
+                if ($tax19Amount > 0) {
+                    $amounts_per_vat_rate[] = [
+                        "vat_rate" => "NORMAL",
+                        "amount" => number_format($tax19Amount, 2, '.', '')
+                    ];
+                }
+                
+    
+                $transactionData = (StartTransaction($fiskalyData, $amounts_per_vat_rate, $orderTotalCharges));
+                
+                $minutesToAdd = isset($_POST['delivery_at']) ? (int)$_POST['delivery_at'] : 0;
 
-        $minutesToAdd = isset($_POST['delivery_at']) ? (int)$_POST['delivery_at'] : 0;
+                $time = new DateTime();
+                $time->add(new DateInterval("PT{$minutesToAdd}M"));
+                $delivered_at = $time->format('Y-m-d g:i A');
+        
+                $sql = "UPDATE `orders_zee` SET `status` = '" . mysqli_real_escape_string($conn, $status) . "', `delivered_at` = '" . mysqli_real_escape_string($conn, $delivered_at) ."', `fiskaly_response` = '" . mysqli_real_escape_string($conn, $transactionData) . "' WHERE `id` = " . intval($order_id);
+            }else{
+                 $minutesToAdd = isset($_POST['delivery_at']) ? (int)$_POST['delivery_at'] : 0;
 
         $time = new DateTime();
         $time->add(new DateInterval("PT{$minutesToAdd}M"));
         $delivered_at = $time->format('Y-m-d g:i A');
 
-        $sql = "UPDATE `orders_zee` SET `status` = '" . mysqli_real_escape_string($conn, $status) . "', `delivered_at` = '" . mysqli_real_escape_string($conn, $delivered_at) . "' WHERE `id` = " . intval($order_id);
+        $sql = "UPDATE orders_zee
+                SET status='pending',
+                    delivered_at='$delivered_at'
+                WHERE id=$order_id";
+            }
+        }else{
+            $minutesToAdd = isset($_POST['delivery_at']) ? (int)$_POST['delivery_at'] : 0;
 
-        // notify user by email about pending acceptance
-        $get_user_query = "SELECT user_id FROM orders_zee WHERE id = '" . mysqli_real_escape_string($conn, $order_id) . "'";
-        $result_user = mysqli_query($conn, $get_user_query);
-        $row_user = mysqli_fetch_assoc($result_user);
+            $time = new DateTime();
+            $time->add(new DateInterval("PT{$minutesToAdd}M"));
+            $delivered_at = $time->format('Y-m-d g:i A');
+    
+            $sql = "UPDATE `orders_zee` SET `status` = '" . mysqli_real_escape_string($conn, $status) . "', `delivered_at` = '" . mysqli_real_escape_string($conn, $delivered_at) . "' WHERE `id` = " . intval($order_id);
+        }    
+                
+        
+        
 
         if ($row_user) {
             $user_id = $row_user['user_id'];
@@ -64,9 +184,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result_email = mysqli_query($conn, $get_email_query);
             $row_email = mysqli_fetch_assoc($result_email);
 
-            if ($row_email) {
-                $email = $row_email['email'];
-                $name = $row_email['name'];
+            
+                $email = $row_email['email'] ??  $row_user['user_email'];;
+                $name = $row_email['name'] ?? $row_user['user_name'];
 
                 $mail = new PHPMailer(true);
 
@@ -89,9 +209,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     $mail->send();
                 } catch (Exception $e) {
-                    // If email fails, do not block the rest of the flow; optionally log $mail->ErrorInfo
+                    // If email fails, do not block the rest of the flow; optionally log $mail->ErrorInfo''
+                    
                 }
-            }
         }
     } else if ($status == 'delivered') {
         // === DELIVERED: prevent duplicate cashback & prevent duplicate updates if already delivered ===
@@ -102,7 +222,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $cashback_row = mysqli_fetch_assoc($execute);
 
         // Check the order's current statuses
-        $check_order_status = "SELECT `cashback_status`, `status`, `user_id`, `order_total_price` FROM `orders_zee` WHERE `id` = '" . mysqli_real_escape_string($conn, $order_id) . "'";
+        $check_order_status = "SELECT cashback_status, status, user_id, order_total_price,user_name, user_email, user_phone FROM orders_zee WHERE id = " . intval($order_id);
+            
+            
         $execute_status = mysqli_query($conn, $check_order_status);
         $order_status_row = mysqli_fetch_assoc($execute_status);
 
@@ -170,10 +292,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $result = mysqli_query($conn, $sql_get_user_token);
                     $user_row = mysqli_fetch_assoc($result);
 
-                    if ($user_row) {
+             
                         $token = $user_row['notification_token'];
-                        $email = $user_row['email'];
-                        $name = $user_row['name'];
+                        $email = $user_row['email'] ?? $order_status_row['user_email'];
+                        $name = $user_row['name'] ?? $order_status_row['user_name'];
 
                         if ($token) {
                             $content = [
@@ -219,9 +341,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $mail->Port = 587;
 
                             $mail->setFrom($FROM_EMAIL, $APP_NAME);
-                            if ($email) {
-                                $mail->addAddress($email);
-                            }
+                            $mail->addAddress($email);
 
                             $mail->isHTML(true);
                             $mail->Subject = "Ihre Bestellung wurde geliefert";
@@ -232,7 +352,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         } catch (Exception $e) {
                             // If email fails, ignore silently or log $mail->ErrorInfo
                         }
-                    } 
                 } 
             } else {
                 // cashback not active: still update order status to delivered (if you want to mark delivered even if cashback disabled)
@@ -244,9 +363,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $result = mysqli_query($conn, $sql_get_user_token);
                     $user_row = mysqli_fetch_assoc($result);
 
-                    if ($user_row) {
-                        $email = $user_row['email'];
-                        $name = $user_row['name'];
+   
+                     $email = $user_row['email'] ?? $order_status_row['user_email'];
+                        $name = $user_row['name'] ?? $order_status_row['user_name'];
                         // send delivered email to user
                         $mail = new PHPMailer(true);
 
@@ -274,7 +393,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         } catch (Exception $e) {
                             // If email fails, ignore silently or log $mail->ErrorInfo
                         }
-                    }
+                    
             }
         } else {
             // order not found
@@ -400,4 +519,98 @@ function getOrderContentMessage($status, $order_id, $delivered_at = null, $ryder
             "de" => "Ihre Bestellung Nr: $order_id hat den Status $status erhalten."
         ];
     }
+}
+
+
+function StartTransaction($fiskalyData, $amounts_per_vat_rate, $orderTotalCharges){
+    
+    $fiskaly_tss_id = $fiskalyData['fiskaly_tss_id'];
+    $fiskaly_client_id = $fiskalyData['fiskaly_client_id'];
+    $access_token = $fiskalyData['access_token'];
+    $curl = curl_init();
+
+    $data = [
+    "state" => "ACTIVE",
+    "client_id" => $fiskaly_client_id
+    ];
+    
+    $uuid = generateUUIDv4();
+    
+    // First Request
+       curl_setopt_array($curl, array(
+        CURLOPT_URL => 'https://kassensichv-middleware.fiskaly.com/api/v2/tss/' . $fiskaly_tss_id . '/tx/'.$uuid.'/?tx_revision=1',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'PUT',
+        CURLOPT_POSTFIELDS => json_encode($data),
+        CURLOPT_HTTPHEADER => array(
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $access_token
+        ),
+    ));
+    
+    $response = curl_exec($curl);
+
+    curl_close($curl);
+    
+    // echo $response;
+    
+    
+    
+    $dataFinish = [
+        "schema" => [
+            "standard_v1" => [
+                "receipt" => [
+                    "receipt_type" => "RECEIPT",
+                    "amounts_per_vat_rate" => $amounts_per_vat_rate,
+                    "amounts_per_payment_type" => [
+                        [
+                            "payment_type" => "NON_CASH",
+                            "amount" => number_format($orderTotalCharges, 2, '.', '')
+                        ]
+                    ]
+                ]
+            ]
+        ],
+        "state" => "FINISHED",
+        "client_id" => $fiskaly_client_id
+    ];
+    
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => 'https://kassensichv-middleware.fiskaly.com/api/v2/tss/' . $fiskaly_tss_id . '/tx/'.$uuid.'/?tx_revision=2',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'PUT',
+        CURLOPT_POSTFIELDS => json_encode($dataFinish),
+        CURLOPT_HTTPHEADER => array(
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $access_token
+        ),
+    ));
+    
+    $response2 = curl_exec($curl);
+
+    curl_close($curl);
+    return $response2;
+
+}
+
+function generateUUIDv4() {
+    $data = random_bytes(16);
+
+    // Set version to 4
+    $data[6] = chr((ord($data[6]) & 0x0f) | 0x40);
+
+    // Set variant to RFC 4122
+    $data[8] = chr((ord($data[8]) & 0x3f) | 0x80);
+
+    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }

@@ -9,7 +9,6 @@
     <title><?php include('title.php'); echo $pageTitle; ?></title>
 
     <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600" rel="stylesheet">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <link rel="stylesheet" href="app-assets/vendors/css/vendors.min.css">
@@ -67,13 +66,15 @@
                     <div class="row">
                         <div class="col-md-12">
 
-                            <div class="card"
-                                style="border:2px dashed #7367f0; background-color:rgba(115,103,240,.03);">
+                            <div class="card" style="border:2px dashed #7367f0; background-color:rgba(115,103,240,.03);">
 
-                                <div class="card-header">
+                                <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
                                     <h4 class="card-title text-primary">
                                         Import Complete Menu via Excel
                                     </h4>
+                                    <a href="/admin_panel/assets/upload_menu.xlsx" class="btn btn-outline-primary btn-sm mt-1 mt-sm-0" download>
+                                        <i class="feather icon-download"></i> Download Excel Template
+                                    </a>
                                 </div>
 
                                 <div class="card-body">
@@ -82,8 +83,7 @@
                                         Upload Excel file (.xlsx or .xls)
                                     </p>
 
-                                    <form id="excelUploadForm"
-                                        enctype="multipart/form-data">
+                                    <form id="excelUploadForm" enctype="multipart/form-data">
 
                                         <div class="row align-items-center">
 
@@ -107,9 +107,7 @@
 
                                     </form>
 
-                                    <div id="uploadStatus"
-                                        class="alert mt-3 d-none">
-                                    </div>
+                                    <div id="uploadStatus" class="alert mt-3 d-none"></div>
 
                                 </div>
 
@@ -128,22 +126,18 @@
     <div class="drag-target"></div>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
     <script src="app-assets/vendors/js/vendors.min.js"></script>
     <script src="app-assets/js/core/app-menu.min.js"></script>
     <script src="app-assets/js/core/app.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         $(document).ready(function () {
 
             $('#excelUploadForm').on('submit', function (e) {
-
                 e.preventDefault();
 
                 var formData = new FormData(this);
-
                 var statusDiv = $('#uploadStatus');
                 var btn = $('#uploadBtn');
 
@@ -155,28 +149,19 @@
                     .html('Uploading file, please wait...');
 
                 $.ajax({
-
                     url: '../Laravel/api/import-excel',
-
                     type: 'POST',
-
                     data: formData,
-
                     processData: false,
                     contentType: false,
-
                     headers: {
                         'Accept': 'application/json'
                     },
-
                     beforeSend: function () {
                         console.log('API Hit Started');
                     },
-
                     success: function (response) {
-
                         console.log(response);
-
                         btn.prop('disabled', false);
 
                         statusDiv
@@ -190,11 +175,8 @@
 
                         $('#excelUploadForm')[0].reset();
                     },
-
                     error: function (xhr, status, error) {
-
                         console.log(xhr.responseText);
-
                         btn.prop('disabled', false);
 
                         statusDiv
@@ -202,27 +184,18 @@
                             .addClass('alert-danger');
 
                         var errorMessage = 'API request failed.';
-
-                        if (xhr.responseJSON &&
-                            xhr.responseJSON.message) {
-
-                            errorMessage =
-                                xhr.responseJSON.message;
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
                         }
 
                         statusDiv.html(
                             '<strong>Error!</strong><br>' +
                             errorMessage +
-                            '<br><small>Status: ' +
-                            xhr.status +
-                            '</small>'
+                            '<br><small>Status: ' + xhr.status + '</small>'
                         );
                     }
-
                 });
-
             });
-
         });
     </script>
 

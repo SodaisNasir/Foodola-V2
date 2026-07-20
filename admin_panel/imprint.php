@@ -74,9 +74,8 @@ if(isset($_GET['Massage'])){
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-
-    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jodit@4.2.47/es2021/jodit.min.css">
+<script src="https://cdn.jsdelivr.net/npm/jodit@4.2.47/es2021/jodit.min.js"></script>
   </head>
   <!-- END: Head-->
 
@@ -144,16 +143,20 @@ if(isset($_GET['Massage'])){
                                        ?>
                                        
                                         <input type="hidden" name="id" class="form-control" value=<?php echo $row['id'] ?> placeholder="Category Image" required="">
-                                        <textarea id="summernote" name="imprint" value=<?php echo $row['imprint'] ?> ></textarea>
+                                                <textarea id="editor" name="imprint"><?php echo htmlspecialchars($row['imprint']); ?></textarea>
                                                        
                                                        
                                         <?php } ?>
-                                <script>
-                                  $('#summernote').summernote({
-                                    tabsize: 2,
-                                    height: 100
-                                  });
-                                </script>
+                    <script>
+const editor = Jodit.make('#editor', {
+    height: 700,
+    beautifyHTML: false,
+    askBeforePasteHTML: false,
+    askBeforePasteFromWord: false,
+    defaultMode: Jodit.MODE_WYSIWYG,
+    toolbarAdaptive: false
+});
+</script>
                                     </div>
     							</div>
     						</div>

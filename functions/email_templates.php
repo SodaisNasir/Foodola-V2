@@ -1,5 +1,8 @@
 <?php
-include("connection.php");
+
+// if (!isset($conn)) {
+//     include_once(__DIR__ . '/../connection.php');
+// }
 function welcomeEmailTemplate($APP_NAME, $name, $BASE_URL, $FACEBOOK_URL, $INSTAGRAM_URL, $TWITTER_URL, $LANG = 'en'){
     if ($LANG == 'de') {
 

@@ -1,441 +1,441 @@
-<?php
-
-// error_reporting(E_ALL);
-// ini_set('display_errors', 1);
+// <?php
+
+// // error_reporting(E_ALL);
+// // ini_set('display_errors', 1);
 
-header('Content-Type: application/json');
-
-require 'connection.php';
+// header('Content-Type: application/json');
+
+// require 'connection.php';
 
-require 'PHPMailer-master/src/PHPMailer.php';
-require 'PHPMailer-master/src/SMTP.php';
-require 'PHPMailer-master/src/Exception.php';
+// require 'PHPMailer-master/src/PHPMailer.php';
+// require 'PHPMailer-master/src/SMTP.php';
+// require 'PHPMailer-master/src/Exception.php';
 
-include('../functions/email_templates.php');
+// include('../functions/email_templates.php');
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
-/*
-|--------------------------------------------------------------------------
-| Get Liefersoft Token
-|--------------------------------------------------------------------------
-*/
-function getLiefersoftToken()
-{
-    include('connection.php');
+// use PHPMailer\PHPMailer\PHPMailer;
+// use PHPMailer\PHPMailer\Exception;
+
+// /*
+// |--------------------------------------------------------------------------
+// | Get Liefersoft Token
+// |--------------------------------------------------------------------------
+// */
+// function getLiefersoftToken()
+// {
+//     include('connection.php');
 
-    $payload = [
-        "login" => $LIEFERSOFT_LOGIN,
-        "password" => $LIEFERSOFT_PASSWORD,
-        "companyId" => $LIEFERSOFT_COMPANY_ID
-    ];
-
-    $ch = curl_init("https://api.liefersoft.de/login");
-
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST => true,
-        CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-        CURLOPT_POSTFIELDS => json_encode($payload)
-    ]);
+//     $payload = [
+//         "login" => $LIEFERSOFT_LOGIN,
+//         "password" => $LIEFERSOFT_PASSWORD,
+//         "companyId" => $LIEFERSOFT_COMPANY_ID
+//     ];
+
+//     $ch = curl_init("https://api.liefersoft.de/login");
+
+//     curl_setopt_array($ch, [
+//         CURLOPT_RETURNTRANSFER => true,
+//         CURLOPT_POST => true,
+//         CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+//         CURLOPT_POSTFIELDS => json_encode($payload)
+//     ]);
 
-    $response = curl_exec($ch);
+//     $response = curl_exec($ch);
 
-    curl_close($ch);
+//     curl_close($ch);
 
-    $data = json_decode($response, true);
+//     $data = json_decode($response, true);
 
-    return $data['accessToken'] ?? null;
-}
+//     return $data['accessToken'] ?? null;
+// }
 
-/*
-|--------------------------------------------------------------------------
-| Fetch Single Order From Liefersoft
-|--------------------------------------------------------------------------
-*/
-function fetchSingleOrder($token, $liefersoft_id)
-{
-    $url = "https://api.liefersoft.de/orders/" . urlencode($liefersoft_id);
+// /*
+// |--------------------------------------------------------------------------
+// | Fetch Single Order From Liefersoft
+// |--------------------------------------------------------------------------
+// */
+// function fetchSingleOrder($token, $liefersoft_id)
+// {
+//     $url = "https://api.liefersoft.de/orders/" . urlencode($liefersoft_id);
 
-    $ch = curl_init($url);
+//     $ch = curl_init($url);
 
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER => [
-            "Authorization: Bearer " . $token
-        ]
-    ]);
+//     curl_setopt_array($ch, [
+//         CURLOPT_RETURNTRANSFER => true,
+//         CURLOPT_HTTPHEADER => [
+//             "Authorization: Bearer " . $token
+//         ]
+//     ]);
 
-    $response = curl_exec($ch);
+//     $response = curl_exec($ch);
 
-    curl_close($ch);
+//     curl_close($ch);
 
-    return json_decode($response, true);
-}
+//     return json_decode($response, true);
+// }
 
-/*
-|--------------------------------------------------------------------------
-| OneSignal Notification
-|--------------------------------------------------------------------------
-*/
-function sendNotification($playerIds, $content)
-{
-    include('connection.php');
+// /*
+// |--------------------------------------------------------------------------
+// | OneSignal Notification
+// |--------------------------------------------------------------------------
+// */
+// function sendNotification($playerIds, $content)
+// {
+//     include('connection.php');
 
-    $fields = [
-        'app_id' => $ONE_SIGNAL_APP_ID,
-        'include_player_ids' => $playerIds,
-        'data' => ["foo" => "NewMessage"],
-        'large_icon' => "ic_launcher_round.png",
-        'contents' => $content
-    ];
+//     $fields = [
+//         'app_id' => $ONE_SIGNAL_APP_ID,
+//         'include_player_ids' => $playerIds,
+//         'data' => ["foo" => "NewMessage"],
+//         'large_icon' => "ic_launcher_round.png",
+//         'contents' => $content
+//     ];
 
-    $ch = curl_init();
+//     $ch = curl_init();
 
-    curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+//     curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
 
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/json; charset=utf-8',
-        "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
-    ]);
+//     curl_setopt($ch, CURLOPT_HTTPHEADER, [
+//         'Content-Type: application/json; charset=utf-8',
+//         "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
+//     ]);
 
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HEADER, false);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+//     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+//     curl_setopt($ch, CURLOPT_HEADER, false);
+//     curl_setopt($ch, CURLOPT_POST, true);
+//     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));
+//     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-    curl_exec($ch);
+//     curl_exec($ch);
 
-    curl_close($ch);
-}
+//     curl_close($ch);
+// }
 
-/*
-|--------------------------------------------------------------------------
-| Send Email
-|--------------------------------------------------------------------------
-*/
-function sendEmail($to, $name, $subject, $body)
-{
-    include('connection.php');
+// /*
+// |--------------------------------------------------------------------------
+// | Send Email
+// |--------------------------------------------------------------------------
+// */
+// function sendEmail($to, $name, $subject, $body)
+// {
+//     include('connection.php');
 
-    $mail = new PHPMailer(true);
+//     $mail = new PHPMailer(true);
 
-    try {
+//     try {
 
-        $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = $MAIL_USERNAME;
-        $mail->Password   = $MAIL_PASSWORD;
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587;
+//         $mail->isSMTP();
+//         $mail->Host       = 'smtp.gmail.com';
+//         $mail->SMTPAuth   = true;
+//         $mail->Username   = $MAIL_USERNAME;
+//         $mail->Password   = $MAIL_PASSWORD;
+//         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+//         $mail->Port       = 587;
 
-        $mail->setFrom($FROM_EMAIL, $APP_NAME);
+//         $mail->setFrom($FROM_EMAIL, $APP_NAME);
 
-        $mail->addAddress($to, $name);
+//         $mail->addAddress($to, $name);
 
-        $mail->isHTML(true);
+//         $mail->isHTML(true);
 
-        $mail->Subject = $subject;
-        $mail->Body    = $body;
-
-        $mail->send();
+//         $mail->Subject = $subject;
+//         $mail->Body    = $body;
+
+//         $mail->send();
 
-        return true;
+//         return true;
 
-    } catch (Exception $e) {
+//     } catch (Exception $e) {
 
-        return false;
-    }
-}
+//         return false;
+//     }
+// }
 
-/*
-|--------------------------------------------------------------------------
-| Start
-|--------------------------------------------------------------------------
-*/
+// /*
+// |--------------------------------------------------------------------------
+// | Start
+// |--------------------------------------------------------------------------
+// */
 
-$token = getLiefersoftToken();
+// $token = getLiefersoftToken();
 
-if (!$token) {
-    http_response_code(500);
-    echo json_encode(["status" => false,"message" => "Failed to login to Liefersoft"]);
-    exit;
-}
+// if (!$token) {
+//     http_response_code(500);
+//     echo json_encode(["status" => false,"message" => "Failed to login to Liefersoft"]);
+//     exit;
+// }
 
-/*
-|--------------------------------------------------------------------------
-| Fetch only relevant orders from your DB
-|--------------------------------------------------------------------------
-*/
+// /*
+// |--------------------------------------------------------------------------
+// | Fetch only relevant orders from your DB
+// |--------------------------------------------------------------------------
+// */
 
-$query = mysqli_query($conn, "SELECT id,liefersoft_id,status,user_id,order_total_price,cashback_status FROM orders_zee WHERE status IN ('neworder','pending','accepted', 'delivered', 'canceled')");
+// $query = mysqli_query($conn, "SELECT id,liefersoft_id,status,user_id,order_total_price,cashback_status FROM orders_zee WHERE status IN ('neworder','pending','accepted', 'delivered', 'canceled')");
 
-$updatedOrders = [];
+// $updatedOrders = [];
 
-while ($dbOrder = mysqli_fetch_assoc($query)) {
+// while ($dbOrder = mysqli_fetch_assoc($query)) {
 
-    $order_id          = (int)$dbOrder['id'];
-    $liefersoft_id     = trim($dbOrder['liefersoft_id']);
-    $currentStatus     = strtolower(trim($dbOrder['status']));
-    $user_id           = (int)$dbOrder['user_id'];
-    $order_total_price = (float)$dbOrder['order_total_price'];
-    $cashback_status   = (int)$dbOrder['cashback_status'];
+//     $order_id          = (int)$dbOrder['id'];
+//     $liefersoft_id     = trim($dbOrder['liefersoft_id']);
+//     $currentStatus     = strtolower(trim($dbOrder['status']));
+//     $user_id           = (int)$dbOrder['user_id'];
+//     $order_total_price = (float)$dbOrder['order_total_price'];
+//     $cashback_status   = (int)$dbOrder['cashback_status'];
 
-    if (empty($liefersoft_id)) {
-        continue;
-    }
+//     if (empty($liefersoft_id)) {
+//         continue;
+//     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Fetch Single Order From Liefersoft
-    |--------------------------------------------------------------------------
-    */
+//     /*
+//     |--------------------------------------------------------------------------
+//     | Fetch Single Order From Liefersoft
+//     |--------------------------------------------------------------------------
+//     */
 
-    $liveOrder = fetchSingleOrder($token, $liefersoft_id);
+//     $liveOrder = fetchSingleOrder($token, $liefersoft_id);
 
-    if (!$liveOrder ||!isset($liveOrder['platformStatus'])) {
-        continue;
-    }
+//     if (!$liveOrder ||!isset($liveOrder['platformStatus'])) {
+//         continue;
+//     }
 
-    $liveStatus = strtolower(trim($liveOrder['platformStatus']));
+//     $liveStatus = strtolower(trim($liveOrder['platformStatus']));
 
-    /*
-    |--------------------------------------------------------------------------
-    | Normalize statuses
-    |--------------------------------------------------------------------------
-    */
+//     /*
+//     |--------------------------------------------------------------------------
+//     | Normalize statuses
+//     |--------------------------------------------------------------------------
+//     */
 
-    if ($liveStatus == 'processing') {
-        $liveStatus = 'pending';
-    }
+//     if ($liveStatus == 'processing') {
+//         $liveStatus = 'pending';
+//     }
 
-    if ($liveStatus == 'processed') {
-        $liveStatus = 'delivered';
-    }
+//     if ($liveStatus == 'processed') {
+//         $liveStatus = 'delivered';
+//     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Allowed statuses only
-    |--------------------------------------------------------------------------
-    */
+//     /*
+//     |--------------------------------------------------------------------------
+//     | Allowed statuses only
+//     |--------------------------------------------------------------------------
+//     */
 
-    if (!in_array($liveStatus, ['accepted','pending','canceled','delivered'])) {
-        continue;
-    }
-    /*
-    |--------------------------------------------------------------------------
-    | Skip if same status
-    |--------------------------------------------------------------------------
-    */
+//     if (!in_array($liveStatus, ['accepted','pending','canceled','delivered'])) {
+//         continue;
+//     }
+//     /*
+//     |--------------------------------------------------------------------------
+//     | Skip if same status
+//     |--------------------------------------------------------------------------
+//     */
 
-    if ($currentStatus == $liveStatus) {
-        continue;
-    }
+//     if ($currentStatus == $liveStatus) {
+//         continue;
+//     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Update order status
-    |--------------------------------------------------------------------------
-    */
+//     /*
+//     |--------------------------------------------------------------------------
+//     | Update order status
+//     |--------------------------------------------------------------------------
+//     */
 
-    mysqli_query($conn, "UPDATE orders_zee SET status='" . mysqli_real_escape_string($conn, $liveStatus) . "'WHERE id='{$order_id}'");
+//     mysqli_query($conn, "UPDATE orders_zee SET status='" . mysqli_real_escape_string($conn, $liveStatus) . "'WHERE id='{$order_id}'");
 
-    $updatedOrders[] = ["order_id"   => $order_id,"old_status" => $currentStatus,"new_status" => $liveStatus];
+//     $updatedOrders[] = ["order_id"   => $order_id,"old_status" => $currentStatus,"new_status" => $liveStatus];
 
-    /*
-    |--------------------------------------------------------------------------
-    | Fetch user
-    |--------------------------------------------------------------------------
-    */
+//     /*
+//     |--------------------------------------------------------------------------
+//     | Fetch user
+//     |--------------------------------------------------------------------------
+//     */
 
-    $userQuery = mysqli_query($conn, "SELECT email,name,notification_token FROM users WHERE id='{$user_id}'LIMIT 1");
+//     $userQuery = mysqli_query($conn, "SELECT email,name,notification_token FROM users WHERE id='{$user_id}'LIMIT 1");
 
-    $user = mysqli_fetch_assoc($userQuery);
+//     $user = mysqli_fetch_assoc($userQuery);
 
-    $email         = $user['email'] ?? '';
-    $name          = $user['name'] ?? 'Customer';
-    $notif_token   = $user['notification_token'] ?? '';
+//     $email         = $user['email'] ?? '';
+//     $name          = $user['name'] ?? 'Customer';
+//     $notif_token   = $user['notification_token'] ?? '';
 
-    /*
-    |--------------------------------------------------------------------------
-    | ACCEPTED
-    |--------------------------------------------------------------------------
-    */
+//     /*
+//     |--------------------------------------------------------------------------
+//     | ACCEPTED
+//     |--------------------------------------------------------------------------
+//     */
 
-    if ($liveStatus == 'pending') {
+//     if ($liveStatus == 'pending') {
 
-        date_default_timezone_set('Europe/Berlin');
+//         date_default_timezone_set('Europe/Berlin');
 
-        $minutesToAdd = 45;
+//         $minutesToAdd = 45;
 
-        $time = new DateTime();
+//         $time = new DateTime();
 
-        $time->add(new DateInterval("PT{$minutesToAdd}M"));
+//         $time->add(new DateInterval("PT{$minutesToAdd}M"));
 
-        $delivered_at = $time->format('Y-m-d h:i A');
+//         $delivered_at = $time->format('Y-m-d h:i A');
 
-        mysqli_query($conn, "UPDATE orders_zee SET delivered_at='" . mysqli_real_escape_string($conn, $delivered_at) . "'WHERE id='{$order_id}'");
+//         mysqli_query($conn, "UPDATE orders_zee SET delivered_at='" . mysqli_real_escape_string($conn, $delivered_at) . "'WHERE id='{$order_id}'");
 
-        /*
-        |--------------------------------------------------------------------------
-        | Push Notification
-        |--------------------------------------------------------------------------
-        */
+//         /*
+//         |--------------------------------------------------------------------------
+//         | Push Notification
+//         |--------------------------------------------------------------------------
+//         */
 
-        if (!empty($notif_token)) {
+//         if (!empty($notif_token)) {
 
-            $content = [
-                "en" => "Your order #{$order_id} has been accepted.",
-                "de" => "Ihre Bestellung #{$order_id} wurde angenommen."
-            ];
+//             $content = [
+//                 "en" => "Your order #{$order_id} has been accepted.",
+//                 "de" => "Ihre Bestellung #{$order_id} wurde angenommen."
+//             ];
 
-            sendNotification([$notif_token], $content);
-        }
+//             sendNotification([$notif_token], $content);
+//         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Email
-        |--------------------------------------------------------------------------
-        */
+//         /*
+//         |--------------------------------------------------------------------------
+//         | Email
+//         |--------------------------------------------------------------------------
+//         */
 
-        if (!empty($email)) {
+//         if (!empty($email)) {
 
-            $body = orderAcceptedEmailTemplate($APP_NAME,$name,$order_id,$BASE_URL,$LANG);
+//             $body = orderAcceptedEmailTemplate($APP_NAME,$name,$order_id,$BASE_URL,$LANG);
 
-            sendEmail($email,$name,"Ihre Bestellung wurde angenommen",$body);
-        }
-    }
+//             sendEmail($email,$name,"Ihre Bestellung wurde angenommen",$body);
+//         }
+//     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | DELIVERED
-    |--------------------------------------------------------------------------
-    */
+//     /*
+//     |--------------------------------------------------------------------------
+//     | DELIVERED
+//     |--------------------------------------------------------------------------
+//     */
 
-    if ($liveStatus == 'delivered') {
-        $cashback_amount = 0;
-        if ($cashback_status != 1) {
+//     if ($liveStatus == 'delivered') {
+//         $cashback_amount = 0;
+//         if ($cashback_status != 1) {
 
-            $cashback_q = mysqli_query($conn, "SELECT *FROM cash_back WHERE status = 1 LIMIT 1");
+//             $cashback_q = mysqli_query($conn, "SELECT *FROM cash_back WHERE status = 1 LIMIT 1");
 
-            if ($cashback_q && mysqli_num_rows($cashback_q) > 0) {
+//             if ($cashback_q && mysqli_num_rows($cashback_q) > 0) {
 
-                $cashback_data = mysqli_fetch_assoc($cashback_q);
+//                 $cashback_data = mysqli_fetch_assoc($cashback_q);
 
-                $cashback_percentage = (float)$cashback_data['cashback_percenatge'];
+//                 $cashback_percentage = (float)$cashback_data['cashback_percenatge'];
 
-                if ($cashback_percentage > 0 && $order_total_price > 0) {
+//                 if ($cashback_percentage > 0 && $order_total_price > 0) {
 
-                    $cashback_amount = round($order_total_price * ($cashback_percentage / 100), 2);
+//                     $cashback_amount = round($order_total_price * ($cashback_percentage / 100), 2);
 
-                    mysqli_query($conn, "UPDATE orders_zee SET cashback_status = 1 WHERE id='{$order_id}'");
+//                     mysqli_query($conn, "UPDATE orders_zee SET cashback_status = 1 WHERE id='{$order_id}'");
 
-                    mysqli_query($conn, "UPDATE users SET amount = amount + {$cashback_amount} WHERE id='{$user_id}'");
+//                     mysqli_query($conn, "UPDATE users SET amount = amount + {$cashback_amount} WHERE id='{$user_id}'");
 
-                    $transaction_id = rand(100000, 999999);
+//                     $transaction_id = rand(100000, 999999);
 
-                    $transaction_message = $cashback_amount . ' Cashback erhalten für (Bestell-ID: ' . $order_id .')';
+//                     $transaction_message = $cashback_amount . ' Cashback erhalten für (Bestell-ID: ' . $order_id .')';
 
-                    $english_message = $cashback_amount . ' Receive cashback for (order ID: ' .$order_id .')';
+//                     $english_message = $cashback_amount . ' Receive cashback for (order ID: ' .$order_id .')';
 
-                    mysqli_query($conn, "INSERT INTO tbl_transaction(user_id,transaction_id,amount,type,message,english_message) VALUES ('{$user_id}','{$transaction_id}','{$cashback_amount}','credit',
-                            '" . mysqli_real_escape_string($conn, $transaction_message) . "',
-                            '" . mysqli_real_escape_string($conn, $english_message) . "')");
-                }
-            }
-        }
+//                     mysqli_query($conn, "INSERT INTO tbl_transaction(user_id,transaction_id,amount,type,message,english_message) VALUES ('{$user_id}','{$transaction_id}','{$cashback_amount}','credit',
+//                             '" . mysqli_real_escape_string($conn, $transaction_message) . "',
+//                             '" . mysqli_real_escape_string($conn, $english_message) . "')");
+//                 }
+//             }
+//         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Push Notification
-        |--------------------------------------------------------------------------
-        */
+//         /*
+//         |--------------------------------------------------------------------------
+//         | Push Notification
+//         |--------------------------------------------------------------------------
+//         */
 
-        if (!empty($notif_token)) {
+//         if (!empty($notif_token)) {
 
-            $content = [
-                "en" => "Your order #{$order_id} has been delivered.",
-                "de" => "Ihre Bestellung #{$order_id} wurde geliefert."
-            ];
+//             $content = [
+//                 "en" => "Your order #{$order_id} has been delivered.",
+//                 "de" => "Ihre Bestellung #{$order_id} wurde geliefert."
+//             ];
 
-            sendNotification([$notif_token], $content);
+//             sendNotification([$notif_token], $content);
 
-            /*
-            |--------------------------------------------------------------------------
-            | Cashback Notification
-            |--------------------------------------------------------------------------
-            */
+//             /*
+//             |--------------------------------------------------------------------------
+//             | Cashback Notification
+//             |--------------------------------------------------------------------------
+//             */
 
-            if ($cashback_amount > 0) {
+//             if ($cashback_amount > 0) {
 
-                $cashbackContent = [
-                    "en" => "You received €{$cashback_amount} cashback.",
-                    "de" => "Sie haben {$cashback_amount}€ Cashback erhalten."
-                ];
+//                 $cashbackContent = [
+//                     "en" => "You received €{$cashback_amount} cashback.",
+//                     "de" => "Sie haben {$cashback_amount}€ Cashback erhalten."
+//                 ];
 
-                sendNotification([$notif_token], $cashbackContent);
-            }
-        }
+//                 sendNotification([$notif_token], $cashbackContent);
+//             }
+//         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Email
-        |--------------------------------------------------------------------------
-        */
+//         /*
+//         |--------------------------------------------------------------------------
+//         | Email
+//         |--------------------------------------------------------------------------
+//         */
 
-        if (!empty($email)) { 
-            $body = orderDeliveredEmailTemplate($APP_NAME,$name,$order_id,$BASE_URL,$LANG);
+//         if (!empty($email)) { 
+//             $body = orderDeliveredEmailTemplate($APP_NAME,$name,$order_id,$BASE_URL,$LANG);
 
-            sendEmail($email,$name,"Ihre Bestellung wurde geliefert",$body);
-        }
-    }
+//             sendEmail($email,$name,"Ihre Bestellung wurde geliefert",$body);
+//         }
+//     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | CANCELED
-    |--------------------------------------------------------------------------
-    */
+//     /*
+//     |--------------------------------------------------------------------------
+//     | CANCELED
+//     |--------------------------------------------------------------------------
+//     */
 
-    if ($liveStatus == 'canceled') {
+//     if ($liveStatus == 'canceled') {
 
-        /*
-        |--------------------------------------------------------------------------
-        | Push Notification
-        |--------------------------------------------------------------------------
-        */
+//         /*
+//         |--------------------------------------------------------------------------
+//         | Push Notification
+//         |--------------------------------------------------------------------------
+//         */
 
-        if (!empty($notif_token)) {
+//         if (!empty($notif_token)) {
 
-            $content = [
-                "en" => "Your order #{$order_id} has been canceled.",
-                "de" => "Ihre Bestellung #{$order_id} wurde storniert."
-            ];
+//             $content = [
+//                 "en" => "Your order #{$order_id} has been canceled.",
+//                 "de" => "Ihre Bestellung #{$order_id} wurde storniert."
+//             ];
 
-            sendNotification([$notif_token], $content);
-        }
+//             sendNotification([$notif_token], $content);
+//         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Email
-        |--------------------------------------------------------------------------
-        */
+//         /*
+//         |--------------------------------------------------------------------------
+//         | Email
+//         |--------------------------------------------------------------------------
+//         */
 
-        if (!empty($email)) {
+//         if (!empty($email)) {
 
-            $body = orderCancelledEmailTemplate($APP_NAME,$name,$order_id,$BASE_URL,$LANG);
+//             $body = orderCancelledEmailTemplate($APP_NAME,$name,$order_id,$BASE_URL,$LANG);
 
-            sendEmail($email,$name,"Ihre Bestellung wurde storniert",$body);
-        }
-    }
-}
+//             sendEmail($email,$name,"Ihre Bestellung wurde storniert",$body);
+//         }
+//     }
+// }
 
-/*
-|--------------------------------------------------------------------------
-| Final Response
-|--------------------------------------------------------------------------
-*/
+// /*
+// |--------------------------------------------------------------------------
+// | Final Response
+// |--------------------------------------------------------------------------
+// */
 
-echo json_encode(["status" => true,"updatedOrders" => $updatedOrders,"message" => !empty($updatedOrders) ? "Orders updated successfully" : "No status changes found"]);
+// echo json_encode(["status" => true,"updatedOrders" => $updatedOrders,"message" => !empty($updatedOrders) ? "Orders updated successfully" : "No status changes found"]);

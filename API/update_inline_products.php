@@ -43,6 +43,7 @@ if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] === UPL
                 'message' => 'Image updated successfully',
                 'image' => $file_name
             ]);
+
         } else {
 
             echo json_encode([
@@ -50,6 +51,7 @@ if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] === UPL
                 'message' => 'Database Error: ' . mysqli_error($conn)
             ]);
         }
+
     } else {
 
         echo json_encode([
@@ -111,6 +113,7 @@ if (mysqli_query($conn, $sql)) {
         'status' => true,
         'message' => 'Product updated successfully'
     ]);
+
 } else {
 
     echo json_encode([
@@ -118,3 +121,4 @@ if (mysqli_query($conn, $sql)) {
         'message' => 'Database Error: ' . mysqli_error($conn)
     ]);
 }
+?>

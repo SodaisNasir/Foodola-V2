@@ -25,7 +25,7 @@ if ($source == 'pos') {
 // $product_query = "SELECT p.*, pt.start_time, pt.end_time FROM products p LEFT JOIN product_timings pt ON p.time_id = pt.id AND pt.status = 'active' WHERE p.status = 'Active'$deal_condition AND (p.time_id IS NULL OR pt.id IS NULL OR '$currentTime' BETWEEN pt.start_time AND pt.end_time) ORDER BY p.sort_order ASC";
 
 
-$product_query = "SELECT DISTINCT p.*, pt.start_time,pt.end_time FROM products p LEFT JOIN variation_with_product vp ON vp.product_id = p.id LEFT JOIN product_timings pt ON p.time_id = pt.id AND pt.status = 'active' WHERE p.status = 'Active'$deal_condition AND ( vp.product_id IS NULL OR vp.is_primary = 1) AND (p.time_id IS NULL OR pt.id IS NULL OR '$currentTime' BETWEEN pt.start_time AND pt.end_time)ORDER BY p.sort_order ASC";
+$product_query = "SELECT DISTINCT p.*,vp.parent_title, pt.start_time,pt.end_time FROM products p LEFT JOIN variation_with_product vp ON vp.product_id = p.id LEFT JOIN product_timings pt ON p.time_id = pt.id AND pt.status = 'active' WHERE p.status = 'Active'$deal_condition AND ( vp.product_id IS NULL OR vp.is_primary = 1) AND (p.time_id IS NULL OR pt.id IS NULL OR '$currentTime' BETWEEN pt.start_time AND pt.end_time)ORDER BY p.sort_order ASC";
 
 
 $product_result = mysqli_query($conn, $product_query);
@@ -35,6 +35,13 @@ if (mysqli_num_rows($product_result) > 0) {
 
     while ($product_row = mysqli_fetch_assoc($product_result)) {
         $product = $product_row; 
+        
+                  if (!empty($product_row['parent_title'])) {
+                        $product['name'] = $product_row['parent_title'];
+                } else {
+                        $product['name'] = $product_row['name'];
+                }
+                unset($product['parent_title']);
 
         // Fetch addons if addon_id exists
         if (!empty($product_row['addon_id'])) {

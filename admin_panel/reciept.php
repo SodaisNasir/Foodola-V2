@@ -38,15 +38,15 @@ function getOrderData($conn, $order_id)
                            o.Shipping_address, o.Shipping_state , o.Shipping_address_2, o.Shipping_city, o.Shipping_area, o.Shipping_postal_code,
                            od.id AS order_detail_id, o.total_discount, o.order_type, o.payment_method, o.ordersheduletype,
                            o.sheduletime, od.order_id, od.deal_id, od.deal_item_id, od.product_id, od.qty, od.addons, od.types,
-                           od.dressing, od.additional_notes,od.is_free, p.name, p.description, p.img, od.price, od.cost, od.discount_percent, o.created_at, o.total_netto_tax, o.total_metto_tax
+                           od.dressing, od.additional_notes,od.is_free, p.name, p.description, p.img,  p.free_addon_limit,  od.price, od.cost, od.discount_percent, o.created_at, o.total_netto_tax, o.total_metto_tax, o.user_name, o.user_email, o.user_phone
                            FROM `orders_zee` o
                            INNER JOIN `order_details_zee` od ON od.order_id = o.id
                            INNER JOIN `products` p ON p.id = od.product_id
                            WHERE o.id = " . $order_id . " AND od.deal_id = 0";
-
+                           
   $base_sql_deals = "SELECT od.no_of_deal, od.qty, od.cost, od.price, od.additional_notes,od.is_free, de.deal_name, o.order_total_price, o.payment_type, o.Shipping_Cost, o.Shipping_address, o.Shipping_address_2,
                           o.Shipping_city, o.Shipping_state , o.Shipping_area, o.Shipping_postal_code, o.total_discount, o.order_type,
-                          o.payment_method, o.ordersheduletype, o.sheduletime, o.total_netto_tax, o.total_metto_tax
+                          o.payment_method, o.ordersheduletype, o.sheduletime, o.total_netto_tax, o.total_metto_tax, o.user_name, o.user_email, o.user_phone
                           FROM `orders_zee` o
                           INNER JOIN `order_details_zee` od ON od.order_id = o.id
                           INNER JOIN `products` p ON p.id = od.product_id
@@ -54,6 +54,7 @@ function getOrderData($conn, $order_id)
                           INNER JOIN deals as de ON od.deal_id = de.deal_id
                           WHERE o.id = " . $order_id . " AND od.deal_id > 0
                           GROUP BY od.no_of_deal";
+
 
   if ($has_table_id) {
     $sql_products = $base_sql_products;
@@ -85,11 +86,66 @@ function getOrderData($conn, $order_id)
     
     
   } else {
-    $sql_products = "SELECT o.id, o.user_id, u.phone, u.email, u.name as cxname, " . substr($base_sql_products, 7); // Prepend user fields
-    $sql_products = str_replace("FROM `orders_zee` o", "FROM `orders_zee` o INNER JOIN users as u ON u.id = o.user_id", $sql_products);
+   $sql_products = "
+        SELECT 
+            o.id,
+            o.user_id,
+            CASE 
+                WHEN o.user_id > 0 THEN u.phone 
+                ELSE o.user_phone 
+            END AS phone,
+            
+            CASE 
+                WHEN o.user_id > 0 THEN u.email 
+                ELSE o.user_email 
+            END AS email,
+            
+            CASE 
+                WHEN o.user_id > 0 THEN u.name 
+                ELSE o.user_name 
+            END AS cxname,
+            
+            " . substr($base_sql_products, 7);
 
-    $sql_deals = "SELECT od.no_of_deal, od.qty, od.cost, od.price, de.deal_name, u.phone, u.email, u.name as cxname, " . substr($base_sql_deals, 7); // Prepend user fields
-    $sql_deals = str_replace("FROM `orders_zee` o", "FROM `orders_zee` o INNER JOIN users as u ON u.id = o.user_id", $sql_deals);
+    $sql_products = str_replace(
+        "FROM `orders_zee` o",
+        "FROM `orders_zee` o 
+         LEFT JOIN users u ON u.id = o.user_id",
+        $sql_products
+    );
+
+
+    $sql_deals = "
+        SELECT 
+            od.no_of_deal,
+            od.qty,
+            od.cost,
+            od.price,
+            de.deal_name,
+            
+            CASE 
+                WHEN o.user_id > 0 THEN u.phone 
+                ELSE o.user_phone 
+            END AS phone,
+            
+            CASE 
+                WHEN o.user_id > 0 THEN u.email 
+                ELSE o.user_email 
+            END AS email,
+            
+            CASE 
+                WHEN o.user_id > 0 THEN u.name 
+                ELSE o.user_name 
+            END AS cxname,
+            
+            " . substr($base_sql_deals, 7);
+
+    $sql_deals = str_replace(
+        "FROM `orders_zee` o",
+        "FROM `orders_zee` o 
+         LEFT JOIN users u ON u.id = o.user_id",
+        $sql_deals
+    );
   }
 
   mysqli_set_charset($conn, "utf8");
@@ -102,8 +158,13 @@ function getOrderData($conn, $order_id)
   if (!$data_products && mysqli_num_rows($result_deals) > 0) {
     $data_products = mysqli_fetch_assoc($result_deals); // Fallback to deal data
   }
+  
+  $sql_check_fiskaly = "SELECT `fiskaly_response`  FROM `orders_zee` WHERE `id` = $order_id";
+  $result_check_fiskaly = mysqli_query($conn, $sql_check_fiskaly);
+  $fiskaly_data = mysqli_fetch_assoc($result_check_fiskaly);
+ 
 
-  return ['products' => $result_products, 'deals' => $result_deals, 'order_data' => $data_products, 'has_table_id' => $has_table_id, 'check_data' => $check_data];
+  return ['products' => $result_products, 'deals' => $result_deals, 'order_data' => $data_products, 'has_table_id' => $has_table_id, 'check_data' => $check_data, 'fiskaly_data'=>$fiskaly_data['fiskaly_response']];
 }
 
 // --- 2. Function to get table name (without bind param) ---
@@ -125,6 +186,8 @@ $result = $order_data_results['products'];
 $result_deal = $order_data_results['deals'];
 $check_data = $order_data_results['check_data'];
 $has_table_id = $order_data_results['has_table_id'];
+$fiskaly_data = json_decode($order_data_results['fiskaly_data'], true);
+
 
 $table_name = getTableName($conn, $check_data['table_id']);
 $reservation_fees = isset($order_data_results['reservation_fees']) ? $order_data_results['reservation_fees'] : 0;
@@ -437,6 +500,12 @@ body {
   
 }
 
+.signature {
+    text-align: left;
+    font-size: 0.7rem;
+    word-break: break-all;
+}
+
  .header { text-align: center; margin-bottom: 10px; }
 .header img { width: 50px; height: auto; }
 .header h2 { margin: 5px 0; font-size: 20px; }
@@ -469,7 +538,7 @@ body {
     <h3><?php echo htmlspecialchars($datetime); ?></h3>
 
     <?php if (!empty($data['phone'])) : ?>
-        <h3><?php echo htmlspecialchars($data['phone']); ?></h3>
+        <h3><?php echo htmlspecialchars($data['user_phone']); ?></h3>
     <?php endif; ?>
 
     <?php if ($has_table_id): ?>
@@ -633,21 +702,29 @@ body {
                 <div class="item-options text-muted small">
                   <?php
                   $no = $value['no_of_deal'];
-                  $sql_sub = $has_table_id ?
-                    "SELECT o.id, od.deal_item_id, od.product_id, od.qty, od.addons, od.types, od.dressing,od.is_free, p.name, od.price, od.additional_notes, dl.di_num_free_items
-                     FROM `orders_zee` o
-                     INNER JOIN `order_details_zee` od ON od.order_id = o.id
-                     INNER JOIN `products` p ON p.id = od.product_id
-                     INNER JOIN deal_items dl ON dl.di_id = od.deal_item_id
-                     WHERE o.id = $order_id AND od.deal_id > 0 AND od.no_of_deal = $no"
-                    :
-                    "SELECT o.id, od.deal_item_id, od.product_id, od.qty, od.addons, od.types, od.dressing, od.additional_notes,od.is_free, p.name, od.price, dl.di_num_free_items
-                     FROM `orders_zee` o
-                     INNER JOIN `order_details_zee` od ON od.order_id = o.id
-                     INNER JOIN `products` p ON p.id = od.product_id
-                     INNER JOIN users u ON u.id = o.user_id
-                     INNER JOIN deal_items dl ON dl.di_id = od.deal_item_id
-                     WHERE o.id = $order_id AND od.deal_id > 0 AND od.no_of_deal = $no";
+                     $sql_sub = $has_table_id ?
+                    "SELECT o.id, od.deal_item_id, od.product_id, od.qty, od.addons, od.types,
+        od.dressing, od.is_free, p.name, od.price,
+        od.additional_notes, dl.di_num_free_items
+ FROM `orders_zee` o
+ INNER JOIN `order_details_zee` od ON od.order_id = o.id
+ INNER JOIN `products` p ON p.id = od.product_id
+ INNER JOIN deal_items dl ON dl.di_id = od.deal_item_id
+ WHERE o.id = $order_id
+   AND od.deal_id > 0
+   AND od.no_of_deal = $no"
+:
+"SELECT o.id, od.deal_item_id, od.product_id, od.qty, od.addons, od.types,
+        od.dressing, od.additional_notes, od.is_free,
+        p.name, od.price, dl.di_num_free_items
+ FROM `orders_zee` o
+ INNER JOIN `order_details_zee` od ON od.order_id = o.id
+ INNER JOIN `products` p ON p.id = od.product_id
+ LEFT JOIN users u ON u.id = o.user_id
+ INNER JOIN deal_items dl ON dl.di_id = od.deal_item_id
+ WHERE o.id = $order_id
+   AND od.deal_id > 0
+   AND od.no_of_deal = $no";
 
                   $result_sub = mysqli_query($conn, $sql_sub);
                   $addonforinner = 0;
@@ -787,13 +864,12 @@ $updated_tax_19 = $shippingTax + $tax_19 ;
     <li><span>MwSt. (7%):</span><span><?php echo formatCurrency($tax_7, $currency_sign, $currency_position); ?></span></li>
     <li><span>MwSt. (19%):</span><span><?php echo formatCurrency($updated_tax_19, $currency_sign, $currency_position); ?></span></li>
     <li><span>Gesamt:</span><span><?php echo formatCurrency($grand_total, $currency_sign, $currency_position); ?></span></li>
-  </ul>
-</div>
-
-
     
-
-    <div class="footer-message">
+  </ul>
+    
+</div>
+   
+     <div class="footer-message">
       <p>Vielen Dank für Ihren Einkauf!</p>
     </div>
     
@@ -801,6 +877,17 @@ $updated_tax_19 = $shippingTax + $tax_19 ;
       <div style="margin:10px 0;">
     <img src="<?php echo $qrFile; ?>" alt="QR Code Order <?php echo $order_id; ?>" />
   </div>
+   
+   <div class="signature">Technische Sicherheitseinrichtung</div>
+   <div class="signature">Start: <?php echo  date('d.m.Y H:i:s',  $fiskaly_data['time_start']); ?></div>
+   <div class="signature">Stop: <?php echo  date('d.m.Y H:i:s',  $fiskaly_data['time_end']); ?></div>
+   <div class="signature">TSE-Seriennummer: <?php echo   $fiskaly_data['client_serial_number']; ?></div>
+   <div class="signature">TSE-Signatur:<br> <?php echo  nl2br(chunk_split($fiskaly_data['signature']['value'], 45));  ?></div>
+   <div class="signature">TSE-Algorithmus: <?php echo  nl2br(chunk_split($fiskaly_data['signature']['algorithm'], 45));  ?></div>
+   <div class="signature">TSE-Public Key: <br> <?php echo  nl2br(chunk_split($fiskaly_data['signature']['public_key'], 45));  ?></div>
+   <div class="signature">Client/Kassen ID: <?php echo  nl2br(chunk_split($fiskaly_data['client_id'], 45));  ?></div>
+   <div class="signature">TSE Zietformat: <?php echo  nl2br(chunk_split($fiskaly_data['log']['timestamp_format'], 45));  ?></div>
+
   </div>
   
   

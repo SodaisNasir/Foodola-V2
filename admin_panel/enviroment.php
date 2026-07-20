@@ -272,6 +272,7 @@ $pixelMode  = isset($pixelMode) ? intval($pixelMode) : 0;
     $pixelKeys  = ['pixel_key','pixel_secret','pixel_mode'];
     $stripeKeys = ['stripe_client_key','stripe_secret_key'];
     $liefersoftKeys = ['liefersoft_company_key', 'liefersoft_login_key', 'liefersoft_password_key'];
+    $fiskalyKeys = ['fiskaly_api_key', 'fiskaly_api_secret', 'fiskaly_tss_id', 'fiskaly_client_id', 'fiskaly_admin_pin' , 'fiskaly_admin_punk'];
 
     // ----------- OTHER KEYS -------------
     foreach ($apiKeys as $apiKey):
@@ -279,6 +280,7 @@ $pixelMode  = isset($pixelMode) ? intval($pixelMode) : 0;
         if (in_array($apiKey['key_name'], $pixelKeys)) continue;
         if (in_array($apiKey['key_name'], $stripeKeys)) continue;
         if (in_array($apiKey['key_name'], $liefersoftKeys)) continue;
+        if (in_array($apiKey['key_name'], $fiskalyKeys)) continue;
 
         $keyName = $apiKey['key_name'];
         $keyValue = $apiKey['key_value'];
@@ -413,6 +415,44 @@ $pixelMode  = isset($pixelMode) ? intval($pixelMode) : 0;
 
 
 
+<!-- ---------------- Fiskaly KEYS ---------------- -->
+<h5 class="mt-2 mb-2">Fiskaly</h5>
+<?php $fiskaly_keys = 0 ?> 
+<div>
+<div class="row mb-2">
+    <div class="col-md-6">
+        <label>API Key</label>
+        <input type="text" class="form-control" name="fiskaly_api_key" 
+               value="<?php
+                   $val = '';
+                   foreach ($apiKeys as $k) { if($k['key_name'] == 'fiskaly_api_key') {$val = $k['key_value']; if($val){$fiskaly_keys++;} break; } }
+                   echo htmlspecialchars($val);
+               ?>" 
+               placeholder="Enter API Key">
+    </div>
+
+    <div class="col-md-6">
+        <label>API Secret</label>
+        <input type="text" class="form-control" name="fiskaly_api_secret" 
+               value="<?php
+                   $val = '';
+                   foreach ($apiKeys as $k) { if($k['key_name'] == 'fiskaly_api_secret') { $val = $k['key_value']; if($val){$fiskaly_keys++;} break; } }
+                   echo htmlspecialchars($val);
+               ?>" 
+               placeholder="Enter Secret Key">
+    </div>
+    
+    
+</div>
+<?php if($fiskaly_keys === 2){ ?>
+<button type="button" id="startFiskaly" class="btn btn-primary">Authenticate Fiskaly</button>
+<?php }?>
+</div>
+<br>
+
+
+
+
   <!-- Update button triggers OTP flow -->
   <button type="button" id="startOtpProcess" class="btn btn-primary">Update</button>
 
@@ -502,6 +542,14 @@ function generatePassword() {
     }
     document.getElementById('auth_token').value = password;
 }
+
+function generateAdminPin() {
+    return Math.floor(10000000 + Math.random() * 90000000).toString();
+}
+function generateSerial() {
+    return crypto.randomUUID().replace(/-/g, '');
+}
+
 </script>
 
 
@@ -514,6 +562,155 @@ function generatePassword() {
 
 
 <script>
+document.getElementById('startFiskaly').addEventListener('click', async function () {
+    try {
+        const apikey = document.getElementsByName('fiskaly_api_key')[0].value;
+        const apisecret = document.getElementsByName('fiskaly_api_secret')[0].value;
+
+        // STEP 1 - Authentication
+        let response = await fetch(
+            "https://kassensichv-middleware.fiskaly.com/api/v2/auth",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    api_key: apikey,
+                    api_secret: apisecret
+                })
+            }
+        );
+
+        const authResult = await response.json();
+        const access_token = authResult.access_token;
+
+        console.log("Authenticated");
+
+        const tssid = crypto.randomUUID();
+
+        // STEP 2 - Create TSS
+        response = await fetch(
+            `https://kassensichv-middleware.fiskaly.com/api/v2/tss/${tssid}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${access_token}`
+                },
+                body: JSON.stringify({})
+            }
+        );
+
+        const tssResult = await response.json();
+        const admin_puk = tssResult.admin_puk;
+
+        console.log("TSS Created");
+        
+        
+        await updateFiskaly("fiskaly_tss_id", tssid);
+        console.log("TSS Updated");
+        
+        await updateFiskaly("fiskaly_admin_punk", admin_puk);
+        console.log("Admin punk Updated");
+
+        // STEP 3 - Set TSS State
+        response = await fetch(
+            `https://kassensichv-middleware.fiskaly.com/api/v2/tss/${tssid}`,
+            {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${access_token}`
+                },
+                body: JSON.stringify({
+                    description: "Taking this permission for our setup",
+                    state: "UNINITIALIZED"
+                })
+            }
+        );
+
+        await response.json();
+
+        console.log("TSS Updated");
+
+        const admin_pin = generateAdminPin();
+
+        // STEP 4 - Set Admin PIN
+        response = await fetch(
+            `https://kassensichv-middleware.fiskaly.com/api/v2/tss/${tssid}/admin`,
+            {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${access_token}`
+                },
+                body: JSON.stringify({
+                    admin_puk,
+                    new_admin_pin: admin_pin
+                })
+            }
+        );
+
+        await response.json();
+
+        console.log("Admin PIN Set");
+        
+        await updateFiskaly("fiskaly_admin_pin", admin_pin);
+        console.log("Admin pin Updated");
+
+        // STEP 5 - Admin Auth
+        response = await fetch(
+            `https://kassensichv-middleware.fiskaly.com/api/v2/tss/${tssid}/admin/auth`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${access_token}`
+                },
+                body: JSON.stringify({
+                    admin_pin
+                })
+            }
+        );
+
+        await response.json();
+
+        console.log("Admin Authenticated");
+
+        const client_id = crypto.randomUUID();
+        const serial_number = generateSerial();
+
+        // STEP 6 - Create Client
+        response = await fetch(
+            `https://kassensichv-middleware.fiskaly.com/api/v2/tss/${tssid}/client/${client_id}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${access_token}`
+                },
+                body: JSON.stringify({
+                    serial_number
+                })
+            }
+        );
+
+        const clientResult = await response.json();
+
+        console.log("Client Created");
+        
+         await updateFiskaly("fiskaly_client_id", client_id);
+        console.log("Client Id Updated");
+        
+        console.log(clientResult);
+
+    } catch (error) {
+        console.error("Error:", error);
+    }
+});
+
+
 document.getElementById('startOtpProcess').addEventListener('click', function () {
    const form = document.getElementById('apiKeyForm'); // ✅ This ensures correct form
     const formData = new FormData(form);
@@ -534,6 +731,10 @@ document.getElementById('startOtpProcess').addEventListener('click', function ()
         }
     });
 });
+
+
+
+
 
 document.getElementById('otpForm').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -561,6 +762,25 @@ document.getElementById('otpForm').addEventListener('submit', function (e) {
         alert('Invalid OTP. Please try again.');
     }
 });
+
+
+async function updateFiskaly(keyName, keyValue) {
+    const formdata = new FormData();
+    formdata.append("token", "as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC");
+    formdata.append("key_name", keyName);
+    formdata.append("key_value", keyValue);
+
+    const response = await fetch("../API/updateFiskaly.php", {
+        method: "POST",
+        body: formdata
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+    }
+
+    return await response.text();
+}
 </script>
 
 

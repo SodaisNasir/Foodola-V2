@@ -8,9 +8,11 @@ include('connection.php');
 if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC'){
 
 
+// QUERY FIX
 $select_product = "
 SELECT DISTINCT
-    p.*
+    p.*,
+    vp.parent_title
 FROM products p
 
 LEFT JOIN variation_with_product vp 
@@ -136,7 +138,7 @@ AND (
              $products =[
                         "id"=>$rows['id'],
                         "sub_category_id"=>$rows['sub_category_id'],
-                        "name"=>$rows['name'],
+                        "name" => !empty($rows['parent_title']) ? $rows['parent_title'] : $rows['name'],
                         "description"=>$rows['description'],
                         "cost"=>$rows['cost'],
                         "price"=>$rows['price'],

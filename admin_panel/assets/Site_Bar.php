@@ -93,7 +93,7 @@ function active($file, $currentFile) {
       <li class="nav-item has-sub">
         <a href="#"><i class="feather icon-box"></i><span>Product</span></a>
         <ul class="menu-content">
-          <li class="<?php echo active('upload_menu.php',$currentFile); ?>"><a href="upload_menu.php"><i class="feather icon-user"></i> Upload Menu</a></li>
+          <li class="<?php echo active('upload_menu.php',$currentFile); ?>"><a href="upload_menu.php"><i class="feather icon-menu"></i> Upload Menu</a></li>
           <li class="<?php echo active('insertNewProduct.php',$currentFile); ?>"><a href="insertNewProduct.php"><i class="feather icon-plus-square"></i> Add Product</a></li>
           <li class="<?php echo active('addmaincat.php',$currentFile); ?>"><a href="addmaincat.php"><i class="feather icon-list"></i> Add Categories</a></li>
           <li class="<?php echo active('addSubCat.php',$currentFile); ?>"><a href="addSubCat.php"><i class="feather icon-list"></i> Add Sub Categories</a></li>
@@ -122,6 +122,7 @@ function active($file, $currentFile) {
           <li class="<?php echo active('addprivacypolicy.php',$currentFile); ?>"><a href="addprivacypolicy.php"><i class="feather icon-lock"></i> Privacy Policy</a></li>
           <li class="<?php echo active('addterms_condition.php',$currentFile); ?>"><a href="addterms_condition.php"><i class="feather icon-file-text"></i> Terms</a></li>
           <li class="<?php echo active('imprint.php',$currentFile); ?>"><a href="imprint.php"><i class="feather icon-info"></i> Imprint</a></li>
+          <li class="<?php echo active('about_us.php',$currentFile); ?>"><a href="about_us.php"><i class="feather icon-users"></i> About Us</a></li>
         </ul>
       </li>
 

@@ -38,6 +38,9 @@ class AdminController extends Controller
         }
     }
     
+    
+    
+    
     public function import_excel(Request $request)
     {
         // 1. Validation
@@ -52,7 +55,7 @@ class AdminController extends Controller
             $spreadsheet = IOFactory::load($file->getRealPath());
             $sheetNames = $spreadsheet->getSheetNames();
 
-        
+            // Transaction start: data safe rakhne ke liye
             DB::beginTransaction();
 
             // -------------------------------------------------------------------------
@@ -60,7 +63,7 @@ class AdminController extends Controller
             // -------------------------------------------------------------------------
             if (isset($sheetNames[0])) {
                 $data = $spreadsheet->getSheet(0)->toArray(null, true, true, true);
-                array_shift($data); 
+                array_shift($data); // Header skip kiya
 
                 foreach ($data as $row) {
                     $cat_name = trim($row['B'] ?? '');
@@ -244,7 +247,7 @@ class AdminController extends Controller
                 }
             }
 
-
+            // Sab theek raha tou commit karein
             DB::commit();
 
             return response()->json([
@@ -254,7 +257,7 @@ class AdminController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-
+            // Error ki soorat me sab rollback hojayega
             DB::rollBack();
             return response()->json([
                 'status' => 'error',

@@ -42,13 +42,15 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
     $sheduletime = $_POST['sheduletime'] . ":00";
     $wallet_balance = $_POST['wallet_balance'];
     $total_discount = $_POST['total_discount'];
-
+    $user_name  = isset($_POST['user_name']) ? mysqli_real_escape_string($conn, $_POST['user_name']) : '';
+    $user_email = isset($_POST['user_email']) ? mysqli_real_escape_string($conn, $_POST['user_email']) : '';
+    $user_phone = isset($_POST['user_phone']) ? mysqli_real_escape_string($conn, $_POST['user_phone']) : '';
     date_default_timezone_set('Europe/Berlin');
 
 
     $datetime = date('Y-m-d H:i:s', time());
     if ($payment_type == 'online') {
-        if ($wallet_balance) {
+        if ($user_id && $wallet_balance) {
             $sql_check_wallet = "SELECT `amount` FROM `users` WHERE `id` = '$user_id'";
             $result_check_wallet = mysqli_query($conn, $sql_check_wallet);
             $row_wallet = mysqli_fetch_assoc($result_check_wallet);
@@ -115,10 +117,10 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
             $sql_ins = "INSERT INTO `orders_zee`(`user_id`, `status`, `payment_type`,
                 `order_total_price`, `payment_status`, `Shipping_address`, `Shipping_address_2`,
                 `Shipping_city`, `Shipping_area`, `Shipping_postal_code`, `Shipping_Cost`,
-                `Shipping_state`, `addtional_notes` , `created_at`  , `payment_method` , `transaction_id` , `order_type`, `total_netto_tax`, `total_metto_tax`, `branch_id`, `platform`, `ordersheduletype`, `sheduletime`, `total_discount`) VALUES 
+                `Shipping_state`, `addtional_notes` , `created_at`  , `payment_method` , `transaction_id` , `order_type`, `total_netto_tax`, `total_metto_tax`, `branch_id`, `platform`, `ordersheduletype`, `sheduletime`, `total_discount`, `user_name`, `user_email`, `user_phone`) VALUES 
                 ('$user_id','neworder','$payment_type','$order_total_price','$payment_status','$Shipping_address',
                   '$Shipping_address_2','$Shipping_city','$Shipping_area','$Shipping_postal_code','$Shipping_cost',
-                  '$Shipping_state','$addtional_notes' , '$datetime' , '$payment_method' , '$transaction_id' , '$order_type', '$total_netto_tax', '$total_metto_tax', '$branch_id', '$platform', '$ordersheduletype', '$sheduletime', '$total_discount')";
+                  '$Shipping_state','$addtional_notes' , '$datetime' , '$payment_method' , '$transaction_id' , '$order_type', '$total_netto_tax', '$total_metto_tax', '$branch_id', '$platform', '$ordersheduletype', '$sheduletime', '$total_discount','$user_name', '$user_email', '$user_phone')";
             $exec_sql_ins = mysqli_query($conn, $sql_ins);
 
             $last_id = $conn->insert_id;
@@ -378,68 +380,73 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     array_push($data_array, $data);
                     echo json_encode($data_array);
 
-                    // Insert into notifications table
-                    $insert_noti_details = "INSERT INTO `notification`( `user_id`, `content`, `purpose`) VALUES ('$user_id','Ihre Bestellung wurde erfolgreich aufgegeben','order')";
-                    mysqli_query($conn, $insert_noti_details);
-
-                    // Fetch user notification token
-                    $sqltaskMembers = "SELECT orders.id , users.name, users.notification_token FROM `orders_zee` AS orders INNER JOIN users AS users On users.id = orders.user_id WHERE orders.id = $last_id";
-                    $taskMembers = mysqli_query($conn, $sqltaskMembers);
-                    $playerId = [];
-                    $user_name = "";
-
-                    while ($row = mysqli_fetch_array($taskMembers)) {
-                        $order_id =  $row['id'];
-                        $user_name = $row['name'];
-                        if (!empty($row['notification_token'])) {
-                            $playerId[] = $row['notification_token'];
+                            if($user_id){
+                        
+                                      // Insert into notifications table
+                                $insert_noti_details = "INSERT INTO `notification`( `user_id`, `content`, `purpose`) VALUES ('$user_id','Ihre Bestellung wurde erfolgreich aufgegeben','order')";
+                                mysqli_query($conn, $insert_noti_details);
+            
+                                // Fetch user notification token
+                                $sqltaskMembers = "SELECT orders.id , users.name, users.notification_token FROM `orders_zee` AS orders INNER JOIN users AS users On users.id = orders.user_id WHERE orders.id = $last_id";
+                                $taskMembers = mysqli_query($conn, $sqltaskMembers);
+                                $playerId = [];
+                                $user_name = "";
+            
+                                while ($row = mysqli_fetch_array($taskMembers)) {
+                                    $order_id =  $row['id'];
+                                    $user_name = $row['name'];
+                                    if (!empty($row['notification_token'])) {
+                                        $playerId[] = $row['notification_token'];
+                                    }
+                                }
+            
+                                // ✅ Fetch admin notification tokens
+                                $adminTokens = [];
+                                $select_admin_sql = "SELECT `notification_token` FROM `users` WHERE `role_id` = '1'";
+                                $admin_result = mysqli_query($conn, $select_admin_sql);
+            
+                                while ($admin_row = mysqli_fetch_assoc($admin_result)) {
+                                    if (!empty($admin_row['notification_token'])) {
+                                        $adminTokens[] = $admin_row['notification_token'];
+                                    }
+                                }
+            
+                                // ✅ Merge user and admin tokens
+                                $allRecipients = array_merge($playerId, $adminTokens);
+            
+                                // ✅ Build OneSignal payload
+                                $content = array(
+                                    "en" => 'Ihre Bestellnummer: ' . $last_id . ' im Wert von ' . ($order_total_price + $Shipping_cost) . '€ wurde erfolgreich aufgegeben und wird in den nächsten 45 bis 60 Minuten geliefert.'
+                                );
+            
+                                $fields = array(
+                                    'app_id' => $ONE_SIGNAL_APP_ID,
+                                    'include_player_ids' => $allRecipients,
+                                    'data' => array("foo" => "NewMassage", "Id" => $taskid),
+                                    'large_icon' => "ic_launcher_round.png",
+                                    'contents' => $content
+                                );
+            
+                                $fields = json_encode($fields);
+            
+                                // Send notification using cURL
+                                $ch = curl_init();
+                                curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+                                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                                    'Content-Type: application/json; charset=utf-8',
+                                    "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
+                                ));
+                                curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+                                curl_setopt($ch, CURLOPT_HEADER, FALSE);
+                                curl_setopt($ch, CURLOPT_POST, TRUE);
+                                curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+                                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            
+                                $response = curl_exec($ch);
+                                curl_close($ch);
+                                    
                         }
-                    }
 
-                    // ✅ Fetch admin notification tokens
-                    $adminTokens = [];
-                    $select_admin_sql = "SELECT `notification_token` FROM `users` WHERE `role_id` = '1'";
-                    $admin_result = mysqli_query($conn, $select_admin_sql);
-
-                    while ($admin_row = mysqli_fetch_assoc($admin_result)) {
-                        if (!empty($admin_row['notification_token'])) {
-                            $adminTokens[] = $admin_row['notification_token'];
-                        }
-                    }
-
-                    // ✅ Merge user and admin tokens
-                    $allRecipients = array_merge($playerId, $adminTokens);
-
-                    // ✅ Build OneSignal payload
-                    $content = array(
-                        "en" => 'Ihre Bestellnummer: ' . $last_id . ' im Wert von ' . ($order_total_price + $Shipping_cost) . '€ wurde erfolgreich aufgegeben und wird in den nächsten 45 bis 60 Minuten geliefert.'
-                    );
-
-                    $fields = array(
-                        'app_id' => $ONE_SIGNAL_APP_ID,
-                        'include_player_ids' => $allRecipients,
-                        'data' => array("foo" => "NewMassage", "Id" => $taskid),
-                        'large_icon' => "ic_launcher_round.png",
-                        'contents' => $content
-                    );
-
-                    $fields = json_encode($fields);
-
-                    // Send notification using cURL
-                    $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                        'Content-Type: application/json; charset=utf-8',
-                        "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
-                    ));
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-                    curl_setopt($ch, CURLOPT_HEADER, FALSE);
-                    curl_setopt($ch, CURLOPT_POST, TRUE);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-
-                    $response = curl_exec($ch);
-                    curl_close($ch);
 
 
 
@@ -454,7 +461,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         'payment_type' => $payment_type,
                         'status' => "neworder",
                         'created_at' => $datetime,
-                        'name' => $user_name,
+                        'name' => $user_name ?? $_POST['user_name'],
                         'order_type' => $order_type,
                         "departments" => $department_list,
                     ];
@@ -522,6 +529,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         $mail->Subject = "New Order Received #{$last_id} – " . htmlspecialchars($APP_NAME);
                         
                     $total_amount= $order_total_price - $Shipping_cost;
+                         $user_name = $user_name ?? $_POST['user_name'];
                     $mail->Body = newOrderEmailTemplate($APP_NAME,$BASE_URL,$last_id,$user_name,$address,$total_amount,$Shipping_cost,$payment_type,$additionalNotes,$datetime,$LANG);
 
                         $mail->send();
@@ -549,7 +557,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
         }
     } else {
 
-        if ($wallet_balance) {
+        if ($user_id && $wallet_balance) {
 
             $sql_check_wallet = "SELECT `amount` FROM `users` WHERE `id` = '$user_id'";
             $result_check_wallet = mysqli_query($conn, $sql_check_wallet);
@@ -608,10 +616,10 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
         $sql_ins = "INSERT INTO `orders_zee`(`user_id`, `status`, `payment_type`,
                 `order_total_price`, `payment_status`, `Shipping_address`, `Shipping_address_2`,
                 `Shipping_city`, `Shipping_area`, `Shipping_postal_code`, `Shipping_Cost`,
-                `Shipping_state`, `addtional_notes` , `created_at`  , `payment_method` , `transaction_id` , `order_type`, `total_netto_tax`, `total_metto_tax`, `branch_id`, `platform`, `ordersheduletype`, `sheduletime`, `total_discount`) VALUES 
+                `Shipping_state`, `addtional_notes` , `created_at`  , `payment_method` , `transaction_id` , `order_type`, `total_netto_tax`, `total_metto_tax`, `branch_id`, `platform`, `ordersheduletype`, `sheduletime`, `total_discount`,`user_name`, `user_email`, `user_phone`) VALUES 
                 ('$user_id','neworder','$payment_type','$order_total_price','$payment_status','$Shipping_address',
                   '$Shipping_address_2','$Shipping_city','$Shipping_area','$Shipping_postal_code','$Shipping_cost',
-                  '$Shipping_state','$addtional_notes' , '$datetime' , '$payment_method' , '$transaction_id' , '$order_type', '$total_netto_tax', '$total_metto_tax', '$branch_id', '$platform', '$ordersheduletype', '$sheduletime', '$total_discount')";
+                  '$Shipping_state','$addtional_notes' , '$datetime' , '$payment_method' , '$transaction_id' , '$order_type', '$total_netto_tax', '$total_metto_tax', '$branch_id', '$platform', '$ordersheduletype', '$sheduletime', '$total_discount', '$user_name', '$user_email', '$user_phone')";
         $exec_sql_ins = mysqli_query($conn, $sql_ins);
 
         $last_id = $conn->insert_id;
@@ -914,68 +922,72 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                 array_push($data_array, $data);
                 echo json_encode($data_array);
 
-                // Insert into notifications table
-                $insert_noti_details = "INSERT INTO `notification`( `user_id`, `content`, `purpose`) VALUES ('$user_id','Ihre Bestellung wurde erfolgreich aufgegeben','order')";
-                mysqli_query($conn, $insert_noti_details);
-
-                // Fetch user notification token
-                $sqltaskMembers = "SELECT orders.id , users.name, users.notification_token FROM `orders_zee` AS orders INNER JOIN users AS users On users.id = orders.user_id WHERE orders.id = $last_id";
-                $taskMembers = mysqli_query($conn, $sqltaskMembers);
-                $playerId = [];
-                $user_name = "";
-
-                while ($row = mysqli_fetch_array($taskMembers)) {
-                    $order_id =  $row['id'];
-                    $user_name = $row['name'];
-                    if (!empty($row['notification_token'])) {
-                        $playerId[] = $row['notification_token'];
-                    }
+                 if($user_id){
+                    
+                            // Insert into notifications table
+                        $insert_noti_details = "INSERT INTO `notification`( `user_id`, `content`, `purpose`) VALUES ('$user_id','Ihre Bestellung wurde erfolgreich aufgegeben','order')";
+                        mysqli_query($conn, $insert_noti_details);
+        
+                        // Fetch user notification token
+                        $sqltaskMembers = "SELECT orders.id , users.name, users.notification_token FROM `orders_zee` AS orders INNER JOIN users AS users On users.id = orders.user_id WHERE orders.id = $last_id";
+                        $taskMembers = mysqli_query($conn, $sqltaskMembers);
+                        $playerId = [];
+                        $user_name = "";
+        
+                        while ($row = mysqli_fetch_array($taskMembers)) {
+                            $order_id =  $row['id'];
+                            $user_name = $row['name'];
+                            if (!empty($row['notification_token'])) {
+                                $playerId[] = $row['notification_token'];
+                            }
+                        }
+        
+                        // ✅ Fetch admin notification tokens
+                        $adminTokens = [];
+                        $select_admin_sql = "SELECT `notification_token` FROM `users` WHERE `role_id` = '1' AND `notification_token` IS NOT NULL";
+                        $admin_result = mysqli_query($conn, $select_admin_sql);
+        
+                        while ($admin_row = mysqli_fetch_assoc($admin_result)) {
+                            if (!empty($admin_row['notification_token'])) {
+                                $adminTokens[] = $admin_row['notification_token'];
+                            }
+                        }
+        
+                        // ✅ Merge user and admin tokens
+                        $allRecipients = array_merge($playerId, $adminTokens);
+        
+                        // ✅ Build OneSignal payload
+                        $content = array(
+                            "en" => 'Ihre Bestellnummer: ' . $last_id . ' im Wert von ' . ($order_total_price + $Shipping_cost) . '€ wurde erfolgreich aufgegeben und wird in den nächsten 45 bis 60 Minuten geliefert.'
+                        );
+        
+                        $fields = array(
+                            'app_id' => $ONE_SIGNAL_APP_ID,
+                            'include_player_ids' => $allRecipients,
+                            'data' => array("foo" => "NewMassage", "Id" => $taskid),
+                            'large_icon' => "ic_launcher_round.png",
+                            'contents' => $content
+                        );
+        
+                        $fields = json_encode($fields);
+        
+                        // Send notification using cURL
+                        $ch = curl_init();
+                        curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                            'Content-Type: application/json; charset=utf-8',
+                            "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
+                        ));
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+                        curl_setopt($ch, CURLOPT_HEADER, FALSE);
+                        curl_setopt($ch, CURLOPT_POST, TRUE);
+                        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+                        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        
+                        $response = curl_exec($ch);
+                        curl_close($ch);
                 }
 
-                // ✅ Fetch admin notification tokens
-                $adminTokens = [];
-                $select_admin_sql = "SELECT `notification_token` FROM `users` WHERE `role_id` = '1' AND `notification_token` IS NOT NULL";
-                $admin_result = mysqli_query($conn, $select_admin_sql);
-
-                while ($admin_row = mysqli_fetch_assoc($admin_result)) {
-                    if (!empty($admin_row['notification_token'])) {
-                        $adminTokens[] = $admin_row['notification_token'];
-                    }
-                }
-
-                // ✅ Merge user and admin tokens
-                $allRecipients = array_merge($playerId, $adminTokens);
-
-                // ✅ Build OneSignal payload
-                $content = array(
-                    "en" => 'Ihre Bestellnummer: ' . $last_id . ' im Wert von ' . ($order_total_price + $Shipping_cost) . '€ wurde erfolgreich aufgegeben und wird in den nächsten 45 bis 60 Minuten geliefert.'
-                );
-
-                $fields = array(
-                    'app_id' => $ONE_SIGNAL_APP_ID,
-                    'include_player_ids' => $allRecipients,
-                    'data' => array("foo" => "NewMassage", "Id" => $taskid),
-                    'large_icon' => "ic_launcher_round.png",
-                    'contents' => $content
-                );
-
-                $fields = json_encode($fields);
-
-                // Send notification using cURL
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                    'Content-Type: application/json; charset=utf-8',
-                    "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
-                ));
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-                curl_setopt($ch, CURLOPT_HEADER, FALSE);
-                curl_setopt($ch, CURLOPT_POST, TRUE);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-
-                $response = curl_exec($ch);
-                curl_close($ch);
 
 
 
@@ -990,7 +1002,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     'payment_type' => $payment_type,
                     'status' => "neworder",
                     'created_at' => $datetime,
-                    'name' => $user_name,
+                   'name' => $user_name ?? $_POST['user_name'],
                     'order_type' => $order_type,
                     'departments' => $department_list
                 ];
@@ -1053,6 +1065,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     $mail->isHTML(true);
                     $mail->Subject = "New Order Received #{$last_id} – " . htmlspecialchars($APP_NAME);
                     $total_amount= $order_total_price - $Shipping_cost;
+                      $user_name = $user_name ?? $_POST['user_name'];
                     $mail->Body = newOrderEmailTemplate($APP_NAME,$BASE_URL,$last_id,$user_name,$address,$total_amount,$Shipping_cost,$payment_type,$additionalNotes,$datetime,$LANG);
                     $mail->send();
                 } catch (Exception $e) {

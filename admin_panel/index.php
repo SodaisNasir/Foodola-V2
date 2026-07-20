@@ -359,6 +359,57 @@ if (isset($_GET['Massage'])) {
             </div>
         </div>
     </div>
+
+
+</div>
+    </div>
+
+
+<div class="row">
+    <div class="col-lg-4 col-md-4 col-12">
+        <div class="card">
+            <div class="card-content">
+                <div class="card-body text-center">
+                    <h6 class="text-bold-600">Active Users (Website)</h6>
+                    <h1 class="text-bold-700 my-1 text-primary" id="activeWebTotal">0</h1>
+                    <div class="d-flex justify-content-around mt-1">
+                        <small class="text-success">Users: <span id="activeWebUsers">0</span></small>
+                        <small class="text-warning">Guests: <span id="activeWebGuests">0</span></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-md-4 col-12">
+        <div class="card">
+            <div class="card-content">
+                <div class="card-body text-center">
+                    <h6 class="text-bold-600">Active Users (Android)</h6>
+                    <h1 class="text-bold-700 my-1 text-success" id="activeAndroidTotal">0</h1>
+                    <div class="d-flex justify-content-around mt-1">
+                        <small class="text-success">Users: <span id="activeAndroidUsers">0</span></small>
+                        <small class="text-warning">Guests: <span id="activeAndroidGuests">0</span></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-md-4 col-12">
+        <div class="card">
+            <div class="card-content">
+                <div class="card-body text-center">
+                    <h6 class="text-bold-600">Active Users (iOS)</h6>
+                    <h1 class="text-bold-700 my-1 text-dark" id="activeIOSTotal">0</h1>
+                    <div class="d-flex justify-content-around mt-1">
+                        <small class="text-success">Users: <span id="activeIOSUsers">0</span></small>
+                        <small class="text-warning">Guests: <span id="activeIOSGuests">0</span></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
     </div>
 
@@ -974,7 +1025,55 @@ var dailyOrdersChart = new Chart(dailyOrdersCtx, {
         event.target.submit();
     }
 });
+
+
+
 </script>
+
+
+
+<script>
+
+function loadActiveUsers() {
+    $.ajax({
+        url: "../API/get_active_users.php",
+        type: "GET",
+        dataType: "json",
+        success: function(res) {
+            if (res.status === 'success') {
+                // Web Stats
+                let webTotal = res.web.users + res.web.guests;
+                $("#activeWebTotal").text(webTotal);
+                $("#activeWebUsers").text(res.web.users);
+                $("#activeWebGuests").text(res.web.guests);
+
+                // Android Stats
+                let androidTotal = res.android.users + res.android.guests;
+                $("#activeAndroidTotal").text(androidTotal);
+                $("#activeAndroidUsers").text(res.android.users);
+                $("#activeAndroidGuests").text(res.android.guests);
+
+                // iOS Stats
+                let iosTotal = res.ios.users + res.ios.guests;
+                $("#activeIOSTotal").text(iosTotal);
+                $("#activeIOSUsers").text(res.ios.users);
+                $("#activeIOSGuests").text(res.ios.guests);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Live user metrics sync error: ", error);
+        }
+    });
+}
+
+// Polling setup
+loadActiveUsers();
+setInterval(loadActiveUsers, 5000);
+
+</script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+
 
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
