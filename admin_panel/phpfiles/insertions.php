@@ -2856,13 +2856,13 @@ if(isset($_POST['btnSubmit_insertType'])){
 include('../connection.php');
   session_start();
   $type_title = mysqli_real_escape_string($conn,$_POST['type_title']);
-    $type_title_user = mysqli_real_escape_string($conn,$_POST['type_title_user']);
+    // $type_title_user = mysqli_real_escape_string($conn,$_POST['type_title_user']);
   $add_type = $_POST['add_type'];
   $add_price = $_POST['add_price'];
 
   
-        if($type_title && $type_title_user){
-        $sql = "INSERT INTO `types_list` (`type_title`, `type_title_user`) VALUES ('$type_title','$type_title_user')";
+        if($type_title ){
+        $sql = "INSERT INTO `types_list` (`type_title`, `type_title_user`) VALUES ('$type_title','$type_title')";
         $result = mysqli_query($conn,$sql);
         
         $last_inserted_id = $conn->insert_id;
@@ -2872,7 +2872,7 @@ include('../connection.php');
            foreach($add_type as $index => $at) {
                    $price = $add_price[$index];
                $add_TYPE_NAME =  mysqli_real_escape_string($conn,$at);
-                $insert_types = "INSERT INTO `types_sublist`(`type_id`, `type_title`, `type_title_user`, `ts_name`,`price`) VALUES ('$last_inserted_id','$type_title','$type_title_user','$add_TYPE_NAME', '$price')";
+                $insert_types = "INSERT INTO `types_sublist`(`type_id`, `type_title`, `type_title_user`, `ts_name`,`price`) VALUES ('$last_inserted_id','$type_title','$type_title','$add_TYPE_NAME', '$price')";
                 $result_types = mysqli_query($conn,$insert_types);
             } 
             
@@ -2896,13 +2896,13 @@ if(isset($_POST['btnSubmit_insertDressing'])){
 include('../connection.php');
   session_start();
   $type_title = mysqli_real_escape_string($conn,$_POST['dressing_title']);
-  $type_title_user = mysqli_real_escape_string($conn,$_POST['dressing_title_user']);
+//   $type_title_user = mysqli_real_escape_string($conn,$_POST['dressing_title_user']);
   $add_type = $_POST['add_dressing'];
   $add_price = $_POST['add_price'];
 
   
-        if($type_title && $type_title_user){
-        $sql = "INSERT INTO `dressing_list`(`dressing_title`, `dressing_title_user`) VALUES ('$type_title','$type_title_user')";
+        if($type_title ){
+        $sql = "INSERT INTO `dressing_list`(`dressing_title`, `dressing_title_user`) VALUES ('$type_title','$type_title')";
         $result = mysqli_query($conn,$sql);
         
         $last_inserted_id = $conn->insert_id;
@@ -2912,7 +2912,7 @@ include('../connection.php');
            foreach($add_type as $index =>  $at) {
                    $price = $add_price[$index];
                $dressing_NAME = mysqli_real_escape_string($conn,$at);
-                $insert_types = "INSERT INTO `dressing_sublist`(`dressing_id`, `dressing_title`, `dressing_title_user`, `dressing_name`, `price`) VALUES ('$last_inserted_id','$type_title','$type_title_user','$dressing_NAME', '$price')";
+                $insert_types = "INSERT INTO `dressing_sublist`(`dressing_id`, `dressing_title`, `dressing_title_user`, `dressing_name`, `price`) VALUES ('$last_inserted_id','$type_title','$type_title','$dressing_NAME', '$price')";
                 $result_types = mysqli_query($conn,$insert_types);
             } 
             

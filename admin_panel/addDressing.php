@@ -154,15 +154,15 @@ if(isset($_GET['Massage'])){
     						</div>
     			    	</div>
     			    	
-    					<div class="col-sm-6">
-							<div class="form-group">
-								<div class="controls">
-                                   <div class="controls">
-                                   <input type="text" name="dressing_title_user" class="form-control" placeholder="Dressing Title for user" required="">
-                                    </div>
-    							</div>
-    						</div>
-    			    	</div>
+    			<!--		<div class="col-sm-6">-->
+							<!--<div class="form-group">-->
+							<!--	<div class="controls">-->
+       <!--                            <div class="controls">-->
+       <!--                            <input type="text" name="dressing_title_user" class="form-control" placeholder="Dressing Title for user" required="">-->
+       <!--                             </div>-->
+    			<!--				</div>-->
+    			<!--			</div>-->
+    			<!--    	</div>-->
     			    
                 
                           
