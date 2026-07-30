@@ -551,7 +551,7 @@ body {
     <?php endif; ?>
 
 
-    <?php if ($data['order_type'] == 'delivery'): ?>
+  <?php if ($data['order_type'] == 'delivery'): ?>
        
         <h3>Adresse: 
             <?php echo htmlspecialchars(
@@ -559,6 +559,7 @@ body {
                
                  ($data['Shipping_address'] ?? '') . ' ' . 
                  ($data['Shipping_address_2'] ?? '') . ' ' . 
+                 ($data['Shipping_address'] === '' ? $data['Shipping_city'] : '') . ' ' . 
                 ($data['Shipping_postal_code'] ?? '') 
             
             
