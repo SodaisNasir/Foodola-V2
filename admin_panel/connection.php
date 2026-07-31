@@ -2,18 +2,18 @@
 
 
 // APP CONFIGRUATION
-$LANG = 'en';
-$APP_NAME = "Foodola";
-$BASE_URL = "https://foodola.foodola.shop/";
-$company_address = "Kuhngasse 1, 76684 Östringen";
-$company_city    = "Östringen";
-$company_phone   = "07253 26560-61";
+$LANG = 'de';
+$APP_NAME = "Oven King";
+$BASE_URL = "https://ovenking.de/";
+$company_address = "LEONBERGER STR 51/171297 MÖNSHEIM";
+$company_city    = "MÖNSHEIM";
+$company_phone   = "070449098020";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "elliakydnklqykpv";
-$FROM_EMAIL = "support@foodola.de";
+$FROM_EMAIL = "support@ovenking.de";
 
 
 
@@ -25,9 +25,9 @@ $ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebnchqsvtsgb4evjfpfzagsm
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE='u772850971_foodola';
-$DB_USERNAME='u772850971_foodola';
-$DB_PASSWORD=']f0Hy^78Uf0s';
+$DB_DATABASE='u772850971_ovenking';
+$DB_USERNAME='u772850971_ovenking';
+$DB_PASSWORD='5~LwGT+b#5Mz';
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
 

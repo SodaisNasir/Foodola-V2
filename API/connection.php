@@ -1,30 +1,30 @@
 <?php
 
 // APP CONFIGRUATION
-$LANG = 'en';
-$APP_NAME = "Foodola";
-$BASE_URL = "https://foodola.foodola.shop/";
-$FACEBOOK_URL = "https://facebook.com/foodola";
-$INSTAGRAM_URL  = "https://instagram.com/foodola";
-$TWITTER_URL  = "https://twitter.com/foodola";
-$company_address = "Kuhngasse 1, 76684 Östringen";
-$company_city    = "Östringen";
-$company_phone   = "07253 26560-61";
+$LANG = 'de';
+$APP_NAME = "Oven King";
+$BASE_URL = "https://ovenking.de/";
+$FACEBOOK_URL = "https://facebook.com/ovenking";
+$INSTAGRAM_URL  = "https://instagram.com/ovenking";
+$TWITTER_URL  = "https://twitter.com/ovenking";
+$company_address = "LEONBERGER STR 51/171297 MÖNSHEIM";
+$company_city    = "MÖNSHEIM";
+$company_phone   = "070449098020";
 
 
 // PUSHER CONFIGRUATION
 $PUSHER_APP_KEY = "a1964c3ac950c1a0cdf5";
 $PUSHER_SECRET_KEY = "a711ec3a4b827eb6bcc5";
 $PUSHER_APP_ID ="1982652";
-$CHANNEL_1 = "orders";
-$CHANNEL_2 = "reservations";
+$CHANNEL_1 = "ovenking_orders";
+$CHANNEL_2 = "ovenking_reservations";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "elliakydnklqykpv";
 // $MAIL_PASSWORD = "crzeqyvqnffeuhzw";
-$FROM_EMAIL = "support@foodola.de";
+$FROM_EMAIL = "support@ovenking.de";
 $ADMIN_EMAIL = "boundedsocial@gmail.com";
 
 
@@ -42,9 +42,9 @@ $LIEFERSOFT_COMPANY_ID = "228727d6-8910-4b85-8938-4010e7e4d4bd";
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE='u772850971_foodola';
-$DB_USERNAME='u772850971_foodola';
-$DB_PASSWORD=']f0Hy^78Uf0s';
+$DB_DATABASE='u772850971_ovenking';
+$DB_USERNAME='u772850971_ovenking';
+$DB_PASSWORD='5~LwGT+b#5Mz';
 
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
