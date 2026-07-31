@@ -3410,6 +3410,9 @@ if (isset($_POST['btnSubmit_Action'])) {
                 
             
             
+    }else{
+        $sql = "UPDATE `orders_zee` SET `status` = '$status' WHERE `id` = $order_id";
+        $update = mysqli_query($conn, $sql);
     }
 
     $sql_get_user_id = "SELECT `user_id` FROM `orders_zee` WHERE `id` = '$order_id'";
