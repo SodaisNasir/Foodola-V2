@@ -538,7 +538,7 @@ body {
     <h3><?php echo htmlspecialchars($datetime); ?></h3>
 
     <?php if (!empty($data['phone'])) : ?>
-        <h3><?php echo htmlspecialchars($data['user_phone']); ?></h3>
+        <h3><?php echo htmlspecialchars($data['phone']); ?></h3>
     <?php endif; ?>
 
     <?php if ($has_table_id): ?>
@@ -551,7 +551,7 @@ body {
     <?php endif; ?>
 
 
-  <?php if ($data['order_type'] == 'delivery'): ?>
+    <?php if ($data['order_type'] == 'delivery'): ?>
        
         <h3>Adresse: 
             <?php echo htmlspecialchars(
@@ -559,7 +559,6 @@ body {
                
                  ($data['Shipping_address'] ?? '') . ' ' . 
                  ($data['Shipping_address_2'] ?? '') . ' ' . 
-                 ($data['Shipping_address'] === '' ? $data['Shipping_city'] : '') . ' ' . 
                 ($data['Shipping_postal_code'] ?? '') 
             
             
@@ -879,6 +878,7 @@ $updated_tax_19 = $shippingTax + $tax_19 ;
     <img src="<?php echo $qrFile; ?>" alt="QR Code Order <?php echo $order_id; ?>" />
   </div>
    
+   <?php if(!empty($fiskaly_data['client_serial_number'])){ ?>
    <div class="signature">Technische Sicherheitseinrichtung</div>
    <div class="signature">Start: <?php echo  date('d.m.Y H:i:s',  $fiskaly_data['time_start']); ?></div>
    <div class="signature">Stop: <?php echo  date('d.m.Y H:i:s',  $fiskaly_data['time_end']); ?></div>
@@ -888,6 +888,7 @@ $updated_tax_19 = $shippingTax + $tax_19 ;
    <div class="signature">TSE-Public Key: <br> <?php echo  nl2br(chunk_split($fiskaly_data['signature']['public_key'], 45));  ?></div>
    <div class="signature">Client/Kassen ID: <?php echo  nl2br(chunk_split($fiskaly_data['client_id'], 45));  ?></div>
    <div class="signature">TSE Zietformat: <?php echo  nl2br(chunk_split($fiskaly_data['log']['timestamp_format'], 45));  ?></div>
+   <?php } ?>
 
   </div>
   
