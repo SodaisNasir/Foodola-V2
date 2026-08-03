@@ -2,35 +2,35 @@
 
 // APP CONFIGRUATION
 $LANG = 'de';
-$APP_NAME = "Chick Pom";
-$BASE_URL = "https://chickpom.de/";
-$FACEBOOK_URL = "https://facebook.com/chickpom";
-$INSTAGRAM_URL  = "https://instagram.com/chickpom";
-$TWITTER_URL  = "https://twitter.com/chickpom";
-$company_address = "Hauptstraße 76, 76669 Bad Schönborn";
-$company_city    = "Bad Schönborn";
-$company_phone   = "07253 880905";
+$APP_NAME = "Burger Point";
+$BASE_URL = "https://burgerpoint.shop/BurgerPoint/";
+$FACEBOOK_URL = "https://facebook.com/burgerpoint";
+$INSTAGRAM_URL  = "https://instagram.com/burgerpoint";
+$TWITTER_URL  = "https://twitter.com/burgerpoint";
+$company_address = "Burger Point Heimservice";
+$company_city    = "Karlsruhe";
+$company_phone   = "0721 95975992";
 
 
 // PUSHER CONFIGRUATION
 $PUSHER_APP_KEY = "a1964c3ac950c1a0cdf5";
 $PUSHER_SECRET_KEY = "a711ec3a4b827eb6bcc5";
 $PUSHER_APP_ID = "1982652";
-$CHANNEL_1 = "chickpom_orders";
-$CHANNEL_2 = "chickpom_reservations";
+$CHANNEL_1 = "burgerpoint_orders";
+$CHANNEL_2 = "burgerpoint_reservations";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "elliakydnklqykpv";
 // $MAIL_PASSWORD = "crzeqyvqnffeuhzw";
-$FROM_EMAIL = "support@chickpom.de";
-$ADMIN_EMAIL = "boundedsocial@gmail.com";
+$FROM_EMAIL = "support@burgerpoint.de";
+$ADMIN_EMAIL = "Ejaz8156@gmail.com";
 
 
 // ONESIGNAL CONFIGRUATION
-$ONE_SIGNAL_APP_ID = "04869310-bf7c-4e9d-9ec9-faf58aac8168";
-$ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebndv4tpuahlbusgva3p6eutn2x652nleaiuwtlm27le3ugia7aaeb3ikpob2alnlj2pqawjlsb7g2x3q";
+$ONE_SIGNAL_APP_ID = "2de883ec-be41-4820-a517-558beee8b0ac";
+$ONE_SIGNAL_AUTH_KEY = "os_v2_app_fxuih3f6ifecbjixkwf652fqvth5cvjs6zyu6x45bxrdyqx6thsko5tkpievvqngjhhkpn6l3n53whqh5xextgwkut3dbjnai26xili";
 
 
 //LIEFERSOFT CONFIGRUATION
@@ -42,9 +42,9 @@ $LIEFERSOFT_COMPANY_ID = "228727d6-8910-4b85-8938-4010e7e4d4bd";
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE = 'u772850971_chickpom';
-$DB_USERNAME = 'u772850971_chickpom';
-$DB_PASSWORD = '3cj&#kP^cO6:';
+$DB_DATABASE='u772850971_burgerpoint';
+$DB_USERNAME='u772850971_burgerpoint';
+$DB_PASSWORD='7Xj[4ABe=';
 
 
 $conn = mysqli_connect($Host, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE);
