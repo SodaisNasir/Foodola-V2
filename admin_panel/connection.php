@@ -3,17 +3,17 @@
 
 // APP CONFIGRUATION
 $LANG = 'de';
-$APP_NAME = "Chick Pom";
-$BASE_URL = "https://chickpom.de/";
-$company_address = "Hauptstraße 76, 76669 Bad Schönborn";
-$company_city    = "Bad Schönborn";
-$company_phone   = "07253 880905";
+$APP_NAME = "Kohinoor Indian";
+$BASE_URL = "https://kohinoorindian-ka.de/";
+$company_address = "Kuhngasse 1, 76684 Östringen";
+$company_city    = "Östringen";
+$company_phone   = "0725326560-61";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "elliakydnklqykpv";
-$FROM_EMAIL = "support@chickpom.de";
+$FROM_EMAIL = "support@kohinoorindian.de";
 
 
 
@@ -25,9 +25,9 @@ $ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebnchqsvtsgb4evjfpfzagsm
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE = 'u772850971_chickpom';
-$DB_USERNAME = 'u772850971_chickpom';
-$DB_PASSWORD = '3cj&#kP^cO6:';
+$DB_DATABASE='u772850971_kohinoorindia';
+$DB_USERNAME='u772850971_kohinoorindia';
+$DB_PASSWORD='K6t=rSTy3u3~';
 
 $conn = mysqli_connect($Host, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE);
 
