@@ -3,17 +3,17 @@
 
 // APP CONFIGRUATION
 $LANG = 'de';
-$APP_NAME = "Chick Pom";
-$BASE_URL = "https://chickpom.de/";
-$company_address = "Hauptstraße 76, 76669 Bad Schönborn";
-$company_city    = "Bad Schönborn";
-$company_phone   = "07253 880905";
+$APP_NAME = "Pizza Leimen";
+$BASE_URL = "https://pizzalimon.foodola.shop/";
+$company_address = "Karlsruher Str. 4, 69181 Leimen";
+$company_city    = "Karlsruher";
+$company_phone   = "06224 9259819";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "elliakydnklqykpv";
-$FROM_EMAIL = "support@chickpom.de";
+$FROM_EMAIL = "support@pizzaleimen.de";
 
 
 
@@ -25,9 +25,9 @@ $ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebnchqsvtsgb4evjfpfzagsm
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE = 'u772850971_chickpom';
-$DB_USERNAME = 'u772850971_chickpom';
-$DB_PASSWORD = '3cj&#kP^cO6:';
+$DB_DATABASE='u772850971_pizzalimon';
+$DB_USERNAME='u772850971_pizzalimon';
+$DB_PASSWORD='0U1DA@Gny:';
 
 $conn = mysqli_connect($Host, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE);
 
