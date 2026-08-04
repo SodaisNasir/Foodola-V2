@@ -2,29 +2,29 @@
 
 // APP CONFIGRUATION
 $LANG = 'de';
-$APP_NAME = "Chick Pom";
-$BASE_URL = "https://chickpom.de/";
-$FACEBOOK_URL = "https://facebook.com/chickpom";
-$INSTAGRAM_URL  = "https://instagram.com/chickpom";
-$TWITTER_URL  = "https://twitter.com/chickpom";
-$company_address = "Hauptstraße 76, 76669 Bad Schönborn";
-$company_city    = "Bad Schönborn";
-$company_phone   = "07253 880905";
+$APP_NAME = "Haveli Restaurant";
+$BASE_URL = "https://havelirestaurant.foodola.shop/";
+$FACEBOOK_URL = "https://facebook.com/havelirestaurant";
+$INSTAGRAM_URL  = "https://instagram.com/havelirestaurant";
+$TWITTER_URL  = "https://twitter.com/havelirestaurant";
+$company_address = "Von-Behring-Strasse 276297 Stutensee";
+$company_city    = "Karlsruhe";
+$company_phone   = "072447424450";
 
 
 // PUSHER CONFIGRUATION
 $PUSHER_APP_KEY = "a1964c3ac950c1a0cdf5";
 $PUSHER_SECRET_KEY = "a711ec3a4b827eb6bcc5";
 $PUSHER_APP_ID = "1982652";
-$CHANNEL_1 = "chickpom_orders";
-$CHANNEL_2 = "chickpom_reservations";
+$CHANNEL_1 = "Haveli_orders";
+$CHANNEL_2 = "Haveli_reservations";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "elliakydnklqykpv";
 // $MAIL_PASSWORD = "crzeqyvqnffeuhzw";
-$FROM_EMAIL = "support@chickpom.de";
+$FROM_EMAIL = "support@havelirestaurant.de";
 $ADMIN_EMAIL = "boundedsocial@gmail.com";
 
 
@@ -42,9 +42,9 @@ $LIEFERSOFT_COMPANY_ID = "228727d6-8910-4b85-8938-4010e7e4d4bd";
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE = 'u772850971_chickpom';
-$DB_USERNAME = 'u772850971_chickpom';
-$DB_PASSWORD = '3cj&#kP^cO6:';
+$DB_DATABASE='u772850971_haveli';
+$DB_USERNAME='u772850971_haveli';
+$DB_PASSWORD='#7!~s>I|nV';
 
 
 $conn = mysqli_connect($Host, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE);
