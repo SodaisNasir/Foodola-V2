@@ -2,29 +2,29 @@
 
 // APP CONFIGRUATION
 $LANG = 'de';
-$APP_NAME = "Chick Pom";
-$BASE_URL = "https://chickpom.de/";
-$FACEBOOK_URL = "https://facebook.com/chickpom";
-$INSTAGRAM_URL  = "https://instagram.com/chickpom";
-$TWITTER_URL  = "https://twitter.com/chickpom";
-$company_address = "Hauptstraße 76, 76669 Bad Schönborn";
-$company_city    = "Bad Schönborn";
-$company_phone   = "07253 880905";
+$APP_NAME = "Tandoori Graben";
+$BASE_URL = "https://tandoori-graben.de/";
+$FACEBOOK_URL = "https://facebook.com/tandoorigraben";
+$INSTAGRAM_URL  = "https://instagram.com/tandoorigraben";
+$TWITTER_URL  = "https://twitter.com/tandoorigraben";
+$company_address = "Münchener Straße 27, 60329 Frankfurt am Main";
+$company_city    = "Frankfurt am Main";
+$company_phone   = " 0692400 35-4546";
 
 
 // PUSHER CONFIGRUATION
 $PUSHER_APP_KEY = "a1964c3ac950c1a0cdf5";
 $PUSHER_SECRET_KEY = "a711ec3a4b827eb6bcc5";
 $PUSHER_APP_ID = "1982652";
-$CHANNEL_1 = "chickpom_orders";
-$CHANNEL_2 = "chickpom_reservations";
+$CHANNEL_1 = "tandoorigraben_orders";
+$CHANNEL_2 = "tandoorigraben_reservations";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "elliakydnklqykpv";
 // $MAIL_PASSWORD = "crzeqyvqnffeuhzw";
-$FROM_EMAIL = "support@chickpom.de";
+$FROM_EMAIL = "support@tandoori-graben.de";
 $ADMIN_EMAIL = "boundedsocial@gmail.com";
 
 
@@ -42,9 +42,9 @@ $LIEFERSOFT_COMPANY_ID = "228727d6-8910-4b85-8938-4010e7e4d4bd";
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE = 'u772850971_chickpom';
-$DB_USERNAME = 'u772850971_chickpom';
-$DB_PASSWORD = '3cj&#kP^cO6:';
+$DB_DATABASE='u772850971_tandoorigraben';
+$DB_USERNAME='u772850971_tandoorigraben';
+$DB_PASSWORD='j1B!e&8i';
 
 
 $conn = mysqli_connect($Host, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE);
