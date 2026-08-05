@@ -3841,6 +3841,7 @@ return array(
     'PhpOffice\\PhpSpreadsheet\\Chart\\ChartColor' => $vendorDir . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet/Chart/ChartColor.php',
     'PhpOffice\\PhpSpreadsheet\\Chart\\DataSeries' => $vendorDir . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet/Chart/DataSeries.php',
     'PhpOffice\\PhpSpreadsheet\\Chart\\DataSeriesValues' => $vendorDir . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet/Chart/DataSeriesValues.php',
+    'PhpOffice\\PhpSpreadsheet\\Chart\\DataTable' => $vendorDir . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet/Chart/DataTable.php',
     'PhpOffice\\PhpSpreadsheet\\Chart\\Exception' => $vendorDir . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet/Chart/Exception.php',
     'PhpOffice\\PhpSpreadsheet\\Chart\\GridLines' => $vendorDir . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet/Chart/GridLines.php',
     'PhpOffice\\PhpSpreadsheet\\Chart\\Layout' => $vendorDir . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet/Chart/Layout.php',
