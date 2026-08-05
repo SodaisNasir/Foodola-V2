@@ -18,14 +18,16 @@ $source = isset($_GET['source']) ? $_GET['source'] : 'pos';
 // filtering logic
 if ($source == 'pos') {
     $deal_condition = "AND p.for_deal_only IN (0,2)";
+    $product_query = "SELECT p.*, pt.start_time, pt.end_time FROM products p LEFT JOIN product_timings pt ON p.time_id = pt.id AND pt.status = 'active' WHERE p.status = 'Active'$deal_condition AND (p.time_id IS NULL OR pt.id IS NULL OR '$currentTime' BETWEEN pt.start_time AND pt.end_time) ORDER BY p.sort_order ASC";
 } else {
     $deal_condition = "AND p.for_deal_only IN (0)";
+    $product_query = "SELECT DISTINCT p.*,vp.parent_title, pt.start_time,pt.end_time FROM products p LEFT JOIN variation_with_product vp ON vp.product_id = p.id LEFT JOIN product_timings pt ON p.time_id = pt.id AND pt.status = 'active' WHERE p.status = 'Active'$deal_condition AND ( vp.product_id IS NULL OR vp.is_primary = 1) AND (p.time_id IS NULL OR pt.id IS NULL OR '$currentTime' BETWEEN pt.start_time AND pt.end_time)ORDER BY p.sort_order ASC";
 }
 
-// $product_query = "SELECT p.*, pt.start_time, pt.end_time FROM products p LEFT JOIN product_timings pt ON p.time_id = pt.id AND pt.status = 'active' WHERE p.status = 'Active'$deal_condition AND (p.time_id IS NULL OR pt.id IS NULL OR '$currentTime' BETWEEN pt.start_time AND pt.end_time) ORDER BY p.sort_order ASC";
 
 
-$product_query = "SELECT DISTINCT p.*,vp.parent_title, pt.start_time,pt.end_time FROM products p LEFT JOIN variation_with_product vp ON vp.product_id = p.id LEFT JOIN product_timings pt ON p.time_id = pt.id AND pt.status = 'active' WHERE p.status = 'Active'$deal_condition AND ( vp.product_id IS NULL OR vp.is_primary = 1) AND (p.time_id IS NULL OR pt.id IS NULL OR '$currentTime' BETWEEN pt.start_time AND pt.end_time)ORDER BY p.sort_order ASC";
+
+
 
 
 $product_result = mysqli_query($conn, $product_query);
