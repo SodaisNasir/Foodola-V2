@@ -7,8 +7,40 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 
 
 if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC'){
+$source = $_GET['source'];
 
+if($source == 'pos'){
+    
+    $sql = "
+SELECT DISTINCT
+    sc.id,
+    sc.category_id,
+    sc.name,
+    sc.img,
+    sc.created_at,
+    sc.updated_at,
+    sc.banner_image
+FROM sub_categories sc
+WHERE EXISTS (
+    SELECT 1
+    FROM products p
+    LEFT JOIN variation_with_product vp
+        ON vp.product_id = p.id
+    WHERE p.sub_category_id = sc.id
+      AND p.status = 'Active'
+      AND (
+            vp.product_id IS NULL
+            OR vp.is_primary = 1
+      )
+)
+ORDER BY sc.sort_order ASC
+";
+    
+}else{
+    
      $sql = "SELECT `id`, `category_id`, `name`, `img`, `created_at`, `updated_at`, `banner_image` FROM `sub_categories` ORDER BY `sort_order` ASC";
+}
+
      include('connection.php');
      $execute = mysqli_query($conn,$sql);
      if(mysqli_num_rows($execute) > 0){
