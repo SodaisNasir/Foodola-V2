@@ -60,7 +60,7 @@ if (!empty($_POST['start_date']) && !empty($_POST['end_date'])) {
 $query_orders = "
     SELECT *
     FROM orders_zee
-    WHERE (status != 'cancelled' OR status IS NULL)
+    WHERE (status != 'canceled' OR status IS NULL)
     $date_filter
 ";
 
