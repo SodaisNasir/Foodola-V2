@@ -5,26 +5,31 @@ $postData = [
     "token" => "as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC"
 ];
 
-/* DATE */
-if (!empty($_GET['date'])) {
-    $postData['date'] = $_GET['date'];
+/* DATE (Daily Report) */
+if (!empty($_REQUEST['date'])) {
+    $postData['date'] = $_REQUEST['date'];
 }
 
-/* MONTH */
-if (!empty($_GET['month'])) {
-    $postData['month'] = $_GET['month'];
+/* MONTH & YEAR (Monthly/Yearly Report) */
+if (!empty($_REQUEST['month'])) {
+    $postData['month'] = $_REQUEST['month'];
+}
+
+if (!empty($_REQUEST['year'])) {
+    $postData['year'] = $_REQUEST['year'];
 }
 
 /* DATE RANGE */
-if (!empty($_GET['start_date']) && !empty($_GET['end_date'])) {
-    $postData['start_date'] = $_GET['start_date'];
-    $postData['end_date']   = $_GET['end_date'];
+if (!empty($_REQUEST['start_date']) && !empty($_REQUEST['end_date'])) {
+    $postData['start_date'] = $_REQUEST['start_date'];
+    $postData['end_date']   = $_REQUEST['end_date'];
 }
 
 $curl = curl_init();
 
 curl_setopt_array($curl, [
-    CURLOPT_URL => "https://test.foodola.shop/API/get_report_data.php",
+     CURLOPT_URL => rtrim($BASE_URL, '/') . "/API/get_report_data.php",
+    CURLOPT_RETURNTRANSFER => true,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_POST => true,
     CURLOPT_POSTFIELDS => $postData
@@ -170,13 +175,16 @@ $txt_pickup_online_delivery_online_2 = "Abholung Online / Lieferung Online";
     $txt_pickup_cash_delivery_cash_2 = "Pickup Cash / Delivery Cash";
     $txt_pickup_online_delivery_online_2 = "Pickup Online / Delivery Online";
 }
-
+$favicon = $BASE_URL . "/logo.png";
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+     <link rel="icon" type="image/png" href="<?php echo htmlspecialchars($favicon); ?>">
+    <link rel="shortcut icon" href="<?php echo htmlspecialchars($favicon); ?>">
+    <link rel="apple-touch-icon" href="<?php echo htmlspecialchars($favicon); ?>">
     <title>Z-Report - <?php echo htmlspecialchars($APP_NAME); ?></title>
     <style>
         @page {
