@@ -2785,66 +2785,61 @@ include('../connection.php');
 if(isset($_POST['btnSubmit_Variation']))
 {
     include('../connection.php');
-
     session_start();
 
-    $pro_id         = $_POST['pro_id'];
-    $var_sub_title  = $_POST['var_sub_title'];
-    $is_primary     = $_POST['is_primary'];
-    $parent_title     = $_POST['parent_title'];
+    $pro_id        = $_POST['pro_id'];
+    $var_sub_title = $_POST['var_sub_title'];
+    $is_primary    = $_POST['is_primary']; // Array mapping index wise values
+    
+    // Parent title check
+    $parent_title  = isset($_POST['parent_title']) ? $_POST['parent_title'] : [];
 
     $var_title = mysqli_real_escape_string($conn, $_POST['var_title']);
 
-    if(in_array(0, $pro_id))
+    if(in_array(0, $pro_id) || empty($pro_id))
     {
         ?>
         <script>
-            alert("Please Change Your Product");
+            alert("Please Select Valid Products");
             window.location.href="../addVariation.php";
         </script>
         <?php
     }
     else
     {
-
         $sql = "INSERT INTO `variation`(`title`) VALUES ('$var_title')";
-
         $result = mysqli_query($conn, $sql);
-
         $last_inserted_id = $conn->insert_id;
 
         if($result)
         {
-
             for($i = 0; $i < count($pro_id); $i++)
             {
-
                 $product_id = mysqli_real_escape_string($conn, $pro_id[$i]);
-
-                $sub_title = mysqli_real_escape_string($conn, $var_sub_title[$i]);
-
-                $primary = mysqli_real_escape_string($conn, $is_primary[$i]);
-                $p_title = mysqli_real_escape_string($conn, $parent_title[$i]);
+                $sub_title  = mysqli_real_escape_string($conn, $var_sub_title[$i]);
+                
+                // Primary radio button check
+                $primary    = isset($is_primary[$i]) ? mysqli_real_escape_string($conn, $is_primary[$i]) : 0;
+                
+                // Parent title check
+                $p_title    = isset($parent_title[$i]) ? mysqli_real_escape_string($conn, $parent_title[$i]) : $var_title;
 
                 $insert_var = "
-                    INSERT INTO `variation_with_product`(`product_id`,`sub_title`,`var_id`,`is_primary`,`parent_title`)VALUES('$product_id','$sub_title','$last_inserted_id','$primary',
-                        '$var_title'
-                    )
+                    INSERT INTO `variation_with_product` (`product_id`, `sub_title`, `var_id`, `is_primary`, `parent_title`) 
+                    VALUES ('$product_id', '$sub_title', '$last_inserted_id', '$primary', '$p_title')
                 ";
 
                 $result_var = mysqli_query($conn, $insert_var);
             }
 
-            header("Location:../addVariation.php?Massage=Sucessfully added new Variation.");
-
+            header("Location:../addVariation.php?Massage=" . urlencode("Sucessfully added new Variation."));
+            exit();
         }
         else
         {
-            echo "<script>alert('Sorry, there was an error while adding variation.')</script>";
+            echo "<script>alert('Sorry, there was an error while adding variation.'); window.location.href='../addVariation.php';</script>";
         }
-
     }
-
 }
 
 // end variation
