@@ -2,18 +2,18 @@
 
 
 // APP CONFIGRUATION
-$LANG = 'de';
-$APP_NAME = "Chick Pom";
-$BASE_URL = "https://chickpom.de/";
-$company_address = "Hauptstraße 76, 76669 Bad Schönborn";
-$company_city    = "Bad Schönborn";
-$company_phone   = "07253 880905";
+$LANG = 'en';
+$APP_NAME = "Margarita Burger Östringen";
+$BASE_URL = "https://margheritaburgerostringen.de/";
+$company_address = "Hauptstraße 4576684 Östringen";
+$company_city    = "Östringen";
+$company_phone   = "07253 26560-61";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "elliakydnklqykpv";
-$FROM_EMAIL = "support@chickpom.de";
+$FROM_EMAIL = "support@margaritaburger.de";
 
 
 
@@ -25,11 +25,11 @@ $ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebnchqsvtsgb4evjfpfzagsm
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE = 'u772850971_chickpom';
-$DB_USERNAME = 'u772850971_chickpom';
-$DB_PASSWORD = '3cj&#kP^cO6:';
+$DB_DATABASE='u772850971_margheritaburg';
+$DB_USERNAME='u772850971_margheritaburg';
+$DB_PASSWORD='>MQ+7Zt4';
 
-$conn = mysqli_connect($Host, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE);
+$conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
 
 
 
@@ -40,3 +40,8 @@ $conn = mysqli_connect($Host, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE);
 if (!$conn) {
   die("Connection failed: " . mysqli_connect_error());
 }
+
+
+
+
+?>
