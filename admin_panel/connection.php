@@ -13,7 +13,7 @@ $company_phone   = "0721 621122";
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "elliakydnklqykpv";
-$FROM_EMAIL = "support@pizzalatenight.de";
+$FROM_EMAIL = "pizzalate8@gmail.com";
 
 
 

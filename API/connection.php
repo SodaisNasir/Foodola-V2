@@ -24,7 +24,7 @@ $CHANNEL_2 = "latenight_reservations";
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "elliakydnklqykpv";
 // $MAIL_PASSWORD = "crzeqyvqnffeuhzw";
-$FROM_EMAIL = "support@pizzalatenight.de";
+$FROM_EMAIL = "pizzalate8@gmail.com";
 $ADMIN_EMAIL = "boundedsocial@gmail.com";
 
 
