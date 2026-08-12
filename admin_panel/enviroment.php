@@ -555,69 +555,76 @@ function generateSerial() {
 
 
 <script>
-    document.getElementById('modeSwitch').addEventListener('change', function () {
-        document.getElementById('modeLabel').textContent = this.checked ? 'Live Mode' : 'Sandbox Mode';
-    });
-</script>
+function generatePassword() {
+    const length = 60;
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+    let password = '';
+    for (let i = 0; i < length; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    document.getElementById('auth_token').value = password;
+}
 
+function generateAdminPin() {
+    return Math.floor(10000000 + Math.random() * 90000000).toString();
+}
 
-<script>
-document.getElementById('startFiskaly').addEventListener('click', async function () {
-    try {
-        const apikey = document.getElementsByName('fiskaly_api_key')[0].value;
-        const apisecret = document.getElementsByName('fiskaly_api_secret')[0].value;
+function generateSerial() {
+    return crypto.randomUUID().replace(/-/g, '');
+}
 
-        // STEP 1 - Authentication
-        let response = await fetch(
-            "https://kassensichv-middleware.fiskaly.com/api/v2/auth",
-            {
+// PayPal & Pixel Toggle Listeners 
+document.addEventListener("DOMContentLoaded", function () {
+    const paypalMode = document.getElementById('paypalMode');
+    if (paypalMode) {
+        paypalMode.addEventListener('change', function () {
+            document.getElementById('paypalLabel').textContent = this.checked ? 'Live Mode' : 'Sandbox Mode';
+        });
+    }
+
+    const pixelMode = document.getElementById('pixelMode');
+    if (pixelMode) {
+        pixelMode.addEventListener('change', function () {
+            document.getElementById('pixelLabel').textContent = this.checked ? 'Live Mode' : 'Test Mode';
+        });
+    }
+});
+
+// Fiskaly Auth
+const startFiskalyBtn = document.getElementById('startFiskaly');
+if (startFiskalyBtn) {
+    startFiskalyBtn.addEventListener('click', async function () {
+        try {
+            const apikey = document.getElementsByName('fiskaly_api_key')[0].value;
+            const apisecret = document.getElementsByName('fiskaly_api_secret')[0].value;
+
+            let response = await fetch("https://kassensichv-middleware.fiskaly.com/api/v2/auth", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    api_key: apikey,
-                    api_secret: apisecret
-                })
-            }
-        );
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ api_key: apikey, api_secret: apisecret })
+            });
 
-        const authResult = await response.json();
-        const access_token = authResult.access_token;
+            const authResult = await response.json();
+            const access_token = authResult.access_token;
 
-        console.log("Authenticated");
+            const tssid = crypto.randomUUID();
 
-        const tssid = crypto.randomUUID();
-
-        // STEP 2 - Create TSS
-        response = await fetch(
-            `https://kassensichv-middleware.fiskaly.com/api/v2/tss/${tssid}`,
-            {
+            response = await fetch(`https://kassensichv-middleware.fiskaly.com/api/v2/tss/${tssid}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${access_token}`
                 },
                 body: JSON.stringify({})
-            }
-        );
+            });
 
-        const tssResult = await response.json();
-        const admin_puk = tssResult.admin_puk;
+            const tssResult = await response.json();
+            const admin_puk = tssResult.admin_puk;
 
-        console.log("TSS Created");
-        
-        
-        await updateFiskaly("fiskaly_tss_id", tssid);
-        console.log("TSS Updated");
-        
-        await updateFiskaly("fiskaly_admin_punk", admin_puk);
-        console.log("Admin punk Updated");
+            await updateFiskaly("fiskaly_tss_id", tssid);
+            await updateFiskaly("fiskaly_admin_punk", admin_puk);
 
-        // STEP 3 - Set TSS State
-        response = await fetch(
-            `https://kassensichv-middleware.fiskaly.com/api/v2/tss/${tssid}`,
-            {
+            response = await fetch(`https://kassensichv-middleware.fiskaly.com/api/v2/tss/${tssid}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -627,115 +634,96 @@ document.getElementById('startFiskaly').addEventListener('click', async function
                     description: "Taking this permission for our setup",
                     state: "UNINITIALIZED"
                 })
-            }
-        );
+            });
 
-        await response.json();
+            await response.json();
+            const admin_pin = generateAdminPin();
 
-        console.log("TSS Updated");
-
-        const admin_pin = generateAdminPin();
-
-        // STEP 4 - Set Admin PIN
-        response = await fetch(
-            `https://kassensichv-middleware.fiskaly.com/api/v2/tss/${tssid}/admin`,
-            {
+            response = await fetch(`https://kassensichv-middleware.fiskaly.com/api/v2/tss/${tssid}/admin`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${access_token}`
                 },
-                body: JSON.stringify({
-                    admin_puk,
-                    new_admin_pin: admin_pin
-                })
-            }
-        );
+                body: JSON.stringify({ admin_puk, new_admin_pin: admin_pin })
+            });
 
-        await response.json();
+            await response.json();
+            await updateFiskaly("fiskaly_admin_pin", admin_pin);
 
-        console.log("Admin PIN Set");
-        
-        await updateFiskaly("fiskaly_admin_pin", admin_pin);
-        console.log("Admin pin Updated");
-
-        // STEP 5 - Admin Auth
-        response = await fetch(
-            `https://kassensichv-middleware.fiskaly.com/api/v2/tss/${tssid}/admin/auth`,
-            {
+            response = await fetch(`https://kassensichv-middleware.fiskaly.com/api/v2/tss/${tssid}/admin/auth`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${access_token}`
                 },
-                body: JSON.stringify({
-                    admin_pin
-                })
-            }
-        );
+                body: JSON.stringify({ admin_pin })
+            });
 
-        await response.json();
+            await response.json();
 
-        console.log("Admin Authenticated");
+            const client_id = crypto.randomUUID();
+            const serial_number = generateSerial();
 
-        const client_id = crypto.randomUUID();
-        const serial_number = generateSerial();
-
-        // STEP 6 - Create Client
-        response = await fetch(
-            `https://kassensichv-middleware.fiskaly.com/api/v2/tss/${tssid}/client/${client_id}`,
-            {
+            response = await fetch(`https://kassensichv-middleware.fiskaly.com/api/v2/tss/${tssid}/client/${client_id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${access_token}`
                 },
-                body: JSON.stringify({
-                    serial_number
-                })
-            }
-        );
+                body: JSON.stringify({ serial_number })
+            });
 
-        const clientResult = await response.json();
+            await response.json();
+            await updateFiskaly("fiskaly_client_id", client_id);
+            alert("Fiskaly Authenticated Successfully!");
 
-        console.log("Client Created");
-        
-         await updateFiskaly("fiskaly_client_id", client_id);
-        console.log("Client Id Updated");
-        
-        console.log(clientResult);
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Fiskaly Error: " + error.message);
+        }
+    });
+}
 
-    } catch (error) {
-        console.error("Error:", error);
-    }
-});
-
-
+// OTP Process Trigger
 document.getElementById('startOtpProcess').addEventListener('click', function () {
-   const form = document.getElementById('apiKeyForm'); // ✅ This ensures correct form
+    const form = document.getElementById('apiKeyForm');
     const formData = new FormData(form);
 
     fetch('../API/send_otp.php', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(async response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
-        if (data.success) {
-            // Show OTP modal
+        console.log("OTP Response:", data);
+        
+        if (data && data.success) {
             document.getElementById('actual_otp').value = data.otp;
             document.getElementById('api_data').value = JSON.stringify(Object.fromEntries(formData));
-            $('#otpModal').modal('show');
+            
+            // Modal Open Call
+            if (typeof $ !== 'undefined' && $.fn.modal) {
+                $('#otpModal').modal('show');
+            } else {
+                alert("Bootstrap/jQuery load nahi hua hai!");
+            }
         } else {
-            alert('Failed to send OTP.');
+            alert(data.message || 'Failed to send OTP.');
         }
+    })
+    .catch(error => {
+        console.error('OTP Error:', error);
+        alert('Error sending OTP request: ' + error.message + '\nBrowser Console (F12) check karein.');
     });
 });
 
-
-
-
-
+// OTP Submit
 document.getElementById('otpForm').addEventListener('submit', function (e) {
     e.preventDefault();
 
@@ -744,7 +732,6 @@ document.getElementById('otpForm').addEventListener('submit', function (e) {
     const formDataJson = JSON.parse(document.getElementById('api_data').value);
 
     if (enteredOtp === actualOtp) {
-        // Create form and submit
         const tempForm = document.createElement('form');
         tempForm.method = 'POST';
 
@@ -762,7 +749,6 @@ document.getElementById('otpForm').addEventListener('submit', function (e) {
         alert('Invalid OTP. Please try again.');
     }
 });
-
 
 async function updateFiskaly(keyName, keyValue) {
     const formdata = new FormData();
