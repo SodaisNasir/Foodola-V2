@@ -157,46 +157,58 @@ if(isset($_POST['btn_insert_recipe'])){
 }
 
 
+// INSERT PROCESS
 if (isset($_POST['btn_insert_pro_timing'])) {
-
-  include('../connection.php');
-  $timing_name = $_POST['timing_name'];
-  $start_time = $_POST['start_time'];
-  $end_time = $_POST['end_time'];
-  $status = $_POST['status'];
-
-
-    $sql = "INSERT INTO `product_timings`(`timing_name`, `start_time`, `end_time`, `status`) VALUES ('$timing_name','$start_time','$end_time','$status')";
+ include('../connection.php');
+    $timing_name = mysqli_real_escape_string($conn, $_POST['timing_name']);
+    $start_time  = mysqli_real_escape_string($conn, $_POST['start_time']);
+    $end_time    = mysqli_real_escape_string($conn, $_POST['end_time']);
+    $status      = mysqli_real_escape_string($conn, $_POST['status']);
     
-      $result = mysqli_query($conn, $sql);
-      if ($result) {
-          
-        header("Location:../manage_product_timmings.php?Massage=Sucessfully Inserted");
-      }else {
-        echo "<script>alert('Sorry, there was an error uploading your file.');window.location.href='../manage_product_timmings.php'</script>";
-      }
-}
-if (isset($_POST['btn_update_pro_timing'])) {
-//     error_reporting(E_ALL);
-// ini_set('display_errors', 1);
-    include('../connection.php');
+    // Checkboxes array ko comma-separated string mein convert karna
+    $days_array  = isset($_POST['days']) ? $_POST['days'] : array();
+    $days        = mysqli_real_escape_string($conn, implode(',', $days_array));
 
-    $id = $_POST['timing_id'];
-    $timing_name = $_POST['timing_name'];
-    $start_time = $_POST['start_time'];
-    $end_time = $_POST['end_time'];
-    $status = $_POST['status'];
+    $sql = "INSERT INTO `product_timings` (`timing_name`, `days`, `start_time`, `end_time`, `status`) 
+            VALUES ('$timing_name', '$days', '$start_time', '$end_time', '$status')";
+    
+    $result = mysqli_query($conn, $sql);
 
-  
-    // Update SQL
-    $sql = "UPDATE `product_timings` SET `timing_name`='$timing_name',`start_time`='$start_time',`end_time`='$end_time',`status`='$status' WHERE `id` = '$id'";
-    
-    
-   $result = mysqli_query($conn, $sql);
     if ($result) {
-     echo "<script>alert('Updated successfully');window.location.href='../manage_product_timmings.php'</script>";
+        header("Location: ../manage_product_timmings.php?Massage=Sucessfully Inserted");
+        exit();
     } else {
-        echo "<script>alert('Error updating table: " . mysqli_error($conn) . "');window.location.href='../manage_product_timmings.php'</script>";
+        echo "<script>alert('Error inserting data: " . mysqli_error($conn) . "');window.location.href='../manage_product_timmings.php';</script>";
+    }
+}
+
+// UPDATE PROCESS
+if (isset($_POST['btn_update_pro_timing'])) {
+ include('../connection.php');
+    $id          = mysqli_real_escape_string($conn, $_POST['timing_id']);
+    $timing_name = mysqli_real_escape_string($conn, $_POST['timing_name']);
+    $start_time  = mysqli_real_escape_string($conn, $_POST['start_time']);
+    $end_time    = mysqli_real_escape_string($conn, $_POST['end_time']);
+    $status      = mysqli_real_escape_string($conn, $_POST['status']);
+
+    // Checkboxes array ko comma-separated string mein convert karna
+    $days_array  = isset($_POST['days']) ? $_POST['days'] : array();
+    $days        = mysqli_real_escape_string($conn, implode(',', $days_array));
+
+    $sql = "UPDATE `product_timings` 
+            SET `timing_name` = '$timing_name',
+                `days`        = '$days',
+                `start_time`  = '$start_time',
+                `end_time`    = '$end_time',
+                `status`      = '$status' 
+            WHERE `id` = '$id'";
+    
+    $result = mysqli_query($conn, $sql);
+
+    if ($result) {
+        echo "<script>alert('Updated successfully');window.location.href='../manage_product_timmings.php';</script>";
+    } else {
+        echo "<script>alert('Error updating table: " . mysqli_error($conn) . "');window.location.href='../manage_product_timmings.php';</script>";
     }
 }
 if(isset($_POST['btn_delete_time'])){
