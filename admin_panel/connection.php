@@ -2,18 +2,18 @@
 
 
 // APP CONFIGRUATION
-$LANG = 'en';
-$APP_NAME = "Foodola";
-$BASE_URL = "https://foodola.foodola.shop/";
-$company_address = "Kuhngasse 1, 76684 Östringen";
-$company_city    = "Östringen";
-$company_phone   = "07253 26560-61";
+$LANG = 'de';
+$APP_NAME = "Pizza & Pasta";
+$BASE_URL = "http://pizzapasta-karlsruhe.de/";
+$company_address = "Industriestraße 1176189 Karlsruhe";
+$company_city    = "Karlsruhe";
+$company_phone   = "0721 95784694";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "elliakydnklqykpv";
-$FROM_EMAIL = "support@foodola.de";
+$FROM_EMAIL = "support@pizzapasta-karlsruhe.de";
 
 
 
@@ -25,9 +25,9 @@ $ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebnchqsvtsgb4evjfpfzagsm
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE='u772850971_foodola';
-$DB_USERNAME='u772850971_foodola';
-$DB_PASSWORD=']f0Hy^78Uf0s';
+$DB_DATABASE='u772850971_pizzapasta';
+$DB_USERNAME='u772850971_pizzapasta';
+$DB_PASSWORD='k0HolIDD3?';
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
 
