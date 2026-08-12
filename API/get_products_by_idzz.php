@@ -8,9 +8,12 @@ include('connection.php');
 // ini_set('display_errors', 1);
 
 if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC'){
-
+    //  date_default_timezone_set('Asia/Karachi');
+    date_default_timezone_set('Europe/Berlin');
+$currentDay  = date('D');     // Output: Mon, Tue, Wed, etc.
+    $currentTime = date('H:i:s'); // Output: 14:30:00
     $array = array($_POST['product_id']);
-    
+    $ids = implode(",", array_map('intval', $array));
     // $select_product = 'SELECT * FROM `products` WHERE `id` IN (' . implode(",", $array) . ') AND `qty` > 0 AND `status` = "Active"';
 //     $select_product = 'SELECT DISTINCT p.*, vp.parent_title FROM products p
 
@@ -29,18 +32,32 @@ if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqa
 // ';
 
 $select_product = "
-SELECT DISTINCT 
-    p.*,
-    vp.parent_title
-FROM products p
-LEFT JOIN variation_with_product vp
-    ON vp.product_id = p.id
-    AND vp.is_primary = 1
-WHERE p.id IN (" . implode(",", $array) . ")
-AND p.qty > 0
-AND p.status = 'Active'
-AND p.for_deal_only = '0'
-";
+    SELECT DISTINCT 
+        p.*,
+        vp.parent_title,
+        pt.start_time,
+        pt.end_time,
+        pt.days
+    FROM products p
+    LEFT JOIN variation_with_product vp
+        ON vp.product_id = p.id
+        AND vp.is_primary = 1
+    LEFT JOIN product_timings pt
+        ON p.time_id = pt.id 
+        AND pt.status = 'active'
+    WHERE p.id IN ($ids)
+    AND p.qty > 0
+    AND p.status = 'Active'
+    AND p.for_deal_only = '0'
+    AND (
+        p.time_id IS NULL 
+        OR pt.id IS NULL 
+        OR (
+            (pt.days IS NULL OR pt.days = '' OR REPLACE(pt.days, ' ', '') LIKE '%$currentDay%')
+            AND ('$currentTime' BETWEEN pt.start_time AND pt.end_time)
+        )
+    )
+    ";
     $execute_products = mysqli_query($conn,$select_product);
     
 
