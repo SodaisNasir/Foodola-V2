@@ -5,63 +5,52 @@
 // ini_set('display_errors', 1);
 
 include('connection.php');
-mysqli_query($conn, "SET time_zone = '+01:00'");
+// mysqli_query($conn, "SET time_zone = '+01:00'");
 if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC'){
- 
-    $category_id = $_POST['category_id'];
+//  date_default_timezone_set('Asia/Karachi');
+date_default_timezone_set('Europe/Berlin');
+   $currentDay  = date('D');       // Output: Mon, Tue, Wed, etc.
+    $currentTime = date('H:i:s');   // Output: 14:30:00
     
-// $select_user_restuarant = "
-// SELECT p.*, pt.start_time, pt.end_time
-// FROM products p
-// LEFT JOIN product_timings pt 
-//       ON p.time_id = pt.id 
-//       AND pt.status = 'active'
+    $category_id = mysqli_real_escape_string($conn, $_POST['category_id']);
 
-// WHERE p.sub_category_id = '$category_id'
-// AND p.status = 'Active'
-// AND p.for_deal_only = '0'
-// AND (
-//         p.time_id IS NULL
-//         OR pt.id IS NULL
-//         OR CURTIME() BETWEEN pt.start_time AND pt.end_time
-//     )
+    $select_user_restuarant = "
+    SELECT DISTINCT
+        p.*,
+        vp.parent_title,
+        pt.start_time,
+        pt.end_time,
+        pt.days
 
-// ORDER BY p.sort_order ASC
-// ";
+    FROM products p
 
-$select_user_restuarant = "
-SELECT DISTINCT
-    p.*,
-    vp.parent_title,
-    pt.start_time,
-    pt.end_time
+    LEFT JOIN variation_with_product vp 
+        ON vp.product_id = p.id
 
-FROM products p
+    LEFT JOIN product_timings pt 
+        ON p.time_id = pt.id 
+        AND pt.status = 'active'
 
-LEFT JOIN variation_with_product vp 
-       ON vp.product_id = p.id
+    WHERE p.sub_category_id = '$category_id'
+    AND p.status = 'Active'
+    AND p.for_deal_only = '0'
 
-LEFT JOIN product_timings pt 
-       ON p.time_id = pt.id 
-       AND pt.status = 'active'
-
-WHERE p.sub_category_id = '$category_id'
-AND p.status = 'Active'
-AND p.for_deal_only = '0'
-
-AND (
+    AND (
         p.time_id IS NULL
         OR pt.id IS NULL
-        OR CURTIME() BETWEEN pt.start_time AND pt.end_time
+        OR (
+            (pt.days IS NULL OR pt.days = '' OR REPLACE(pt.days, ' ', '') LIKE '%$currentDay%')
+            AND ('$currentTime' BETWEEN pt.start_time AND pt.end_time)
+        )
     )
 
-AND (
+    AND (
         vp.product_id IS NULL
         OR vp.is_primary = 1
     )
 
-ORDER BY p.sort_order ASC
-";
+    ORDER BY p.sort_order ASC
+    ";
 
     $execute_restuarant = mysqli_query($conn,$select_user_restuarant);
     
