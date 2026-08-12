@@ -197,6 +197,8 @@ if (isset($_GET['Massage'])) {
             
             
         }
+        
+        
     </style>
 
 </head>
@@ -288,234 +290,234 @@ if (isset($_GET['Massage'])) {
                                                     </tr>
                                                 </thead>
                                                         <tbody id="sortableBody">
-<?php
-include_once('connection.php');
+                                                                    <?php
+                                                                    include_once('connection.php');
+                                                                    
+                                                                    // Fetch dropdown options
+                                                                    $addonOptions = [];
+                                                                    $typeOptions = [];
+                                                                    $dressingOptions = [];
+                                                                    $subCategoryOptions = [];
+                                                                    $proTimeOptions = [];
+                                                                    
+                                                                    $addonRes = mysqli_query($conn, "SELECT ao_id, ao_title FROM addon_list");
+                                                                    while ($row = mysqli_fetch_assoc($addonRes)) {
+                                                                        $addonOptions[] = $row;
+                                                                    }
+                                                                    
+                                                                    $typeRes = mysqli_query($conn, "SELECT type_id, type_title FROM types_list");
+                                                                    while ($row = mysqli_fetch_assoc($typeRes)) {
+                                                                        $typeOptions[] = $row;
+                                                                    }
+                                                                    
+                                                                    $dressingRes = mysqli_query($conn, "SELECT dressing_id, dressing_title FROM dressing_list");
+                                                                    while ($row = mysqli_fetch_assoc($dressingRes)) {
+                                                                        $dressingOptions[] = $row;
+                                                                    }
+                                                                    
+                                                                    $subCatRes = mysqli_query($conn, "SELECT id, name FROM sub_categories");
+                                                                    while ($row = mysqli_fetch_assoc($subCatRes)) {
+                                                                        $subCategoryOptions[] = $row;
+                                                                    }
+                                                                    
+                                                                    
+                                                                    $proTimeRes = mysqli_query($conn, "SELECT `id`, `timing_name`, `start_time`, `end_time`, `status` FROM `product_timings` WHERE `status` = 'active'");
+                                                                    while ($row = mysqli_fetch_assoc($proTimeRes)) {
+                                                                        $proTimeOptions[] = $row;
+                                                                    }
+                                                                    
+                                                                    // Main product query
+                                                                    $sql = "
+                                                                        SELECT
+                                                                            p.id, p.sub_category_id,
+                                                                            sc.name AS subname,
+                                                                            p.features, p.name AS proname, p.sku_id,
+                                                                            p.description, p.cost, p.img, p.price,
+                                                                            p.status, p.discount, p.qty, p.tax,p.for_deal_only,
+                                                                            p.addon_id, p.type_id, p.dressing_id, p.allergy_description, p.time_id,
+                                                                            p.free_addon_limit,
+                                                                            al.ao_title, tl.type_title, dl.dressing_title
+                                                                        FROM products p
+                                                                        INNER JOIN sub_categories sc ON sc.id = p.sub_category_id
+                                                                        LEFT JOIN addon_list al ON al.ao_id = p.addon_id
+                                                                        LEFT JOIN types_list tl ON tl.type_id = p.type_id
+                                                                        LEFT JOIN dressing_list dl ON dl.dressing_id = p.dressing_id
+                                                                        ORDER BY p.id ASC
+                                                                    ";
+                                                                    
+                                                                    if (isset($conn)) {
+                                                                        $result = mysqli_query($conn, $sql);
+                                                                        $index = 0;
+                                                                        if ($result) {
+                                                                            while ($row = mysqli_fetch_array($result)) {
+                                                                                $sn = $index + 1;
+                                                                                $productId = htmlspecialchars($row['id']);
+                                                                                $productName = htmlspecialchars($row['proname']);
+                                                                                $skuId = htmlspecialchars($row['sku_id']);
+                                                                                $subCategoryId = htmlspecialchars($row['sub_category_id']);
+                                                                                $cost = htmlspecialchars($row['cost']);
+                                                                                $price = htmlspecialchars($row['price']);
+                                                                                $discount = htmlspecialchars($row['discount']);
+                                                                                $description = htmlspecialchars($row['description']);
+                                                                                $status = htmlspecialchars($row['status']);
+                                                                                $imgurl = htmlspecialchars($row['img']);
+                                                                                $for_deal_only = htmlspecialchars($row['for_deal_only']);
+                                                                                $imagePath = "Uploads/" . $imgurl;
+                                                                                $allergyDescription = htmlspecialchars($row['allergy_description']);
+                                                                                $time_id = htmlspecialchars($row['time_id']);
+                                                                                $disabled = ($for_deal_only == '3') ? 'disabled' : '';
+                                                                                $free_addon_limit = htmlspecialchars($row['free_addon_limit']);
+                                                                    
+                                                                                echo "<tr id='sortableBody' data-id='{$productId}'> ";
+                                                                                echo "<td class='drag-handle'>☰</td>";
+                                                                                echo "<td>{$sn}</td>";
+                                                                                echo "<td>{$productId}</td>";
+                                                                                
+                                                                                echo "<td class='editable border border-5' contenteditable='true' data-field='proname'>{$productName}</td>";
+                                                                                echo "<td class='editable border border-5' contenteditable='true' data-field='sku_id'>{$skuId}</td>";
+                                                                    
+                                                                                // Subcategory Dropdown
+                                                                                echo "<td class='border border-5' style='min-width: 220px;' data-field='sub_category_id'><select class='form-control status-select searchable-select' >";
+                                                                                foreach ($subCategoryOptions as $option) {
+                                                                                    $selected = ($option['id'] == $subCategoryId) ? 'selected' : '';
+                                                                                    echo "<option value='{$option['id']}' $selected>{$option['name']}</option>";
+                                                                                }
+                                                                                echo "</select></td>";
+                                                                    
+                                                                                echo "<td class='editable border border-5' contenteditable='true' data-field='cost'>{$cost}</td>";
+                                                                                echo "<td class='editable border border-5' contenteditable='true' data-field='price' inputmode='decimal'>{$price}</td>";
+                                                                                echo "<td class='editable border border-5' contenteditable='true' data-field='discount'>{$discount}</td>";
+                                                                                echo "<td class='editable description-short border border-5' contenteditable='true' data-field='description'>{$description}</td>";
+                                                                    
+                                                                                // Feature status (Yes/No)
+                                                                                          echo "<td class='border border-5' style='min-width: 100px;' data-field='features'><select class='form-control status-select'>";
+                                                                                foreach (['Yes', 'No'] as $opt) {
+                                                                                    $selected = ($row['features'] === $opt) ? 'selected' : '';
+                                                                                    echo "<option value='{$opt}' $selected>{$opt}</option>";
+                                                                                }
+                                                                                echo "</select></td>";
+                                                                    
+                                                                    
+                                                                                // Product Status (Active/Inactive)
+                                                                                echo "<td class='border border-5' style='min-width: 100px;' data-field='status'><select class='form-control status-select' >";
+                                                                                foreach (['Active', 'Inactive'] as $opt) {
+                                                                                    $selected = ($row['status'] === $opt) ? 'selected' : '';
+                                                                                    echo "<option value='{$opt}' $selected>{$opt}</option>";
+                                                                                }
+                                                                                echo "</select></td>";
+                                                                    
+                                                                                // Tax options (e.g., 7 or 19)
+                                                                                echo "<td class='border border-5' style='min-width: 100px;'  data-field='tax' ><select class='form-control status-select'>";
+                                                                                foreach ([7, 19] as $opt) {
+                                                                                    $selected = ($row['tax'] == $opt) ? 'selected' : '';
+                                                                                    echo "<option value='{$opt}' $selected>{$opt}</option>";
+                                                                                }
+                                                                                echo "</select></td>";
+                                                                    
+                                                                                // Addon Dropdown
+                                                                                echo "<td  class='border border-5' style='min-width: 200px;'  data-field='addon_id'><select class='form-control status-select searchable-select' $disabled>";
+                                                                                echo "<option value='-1'>None</option>";
+                                                                                foreach ($addonOptions as $option) {
+                                                                                    $selected = ($option['ao_id'] == $row['addon_id']) ? 'selected' : '';
+                                                                                    echo "<option value='{$option['ao_id']}' $selected>{$option['ao_title']}</option>";
+                                                                                }
+                                                                                echo "</select></td>";
+                                                                    
+                                                                                // Type Dropdown
+                                                                                echo "<td class='border border-5' style='min-width: 200px;'   data-field='type_id' ><select class='form-control status-select searchable-select' $disabled>";
+                                                                                echo "<option value='-1'>None</option>";
+                                                                                foreach ($typeOptions as $option) {
+                                                                                    $selected = ($option['type_id'] == $row['type_id']) ? 'selected' : '';
+                                                                                    echo "<option value='{$option['type_id']}' $selected>{$option['type_title']}</option>";
+                                                                                }
+                                                                                echo "</select></td>";
+                                                                    
+                                                                                // Dressing Dropdown
+                                                                                echo "<td class='border border-5' style='min-width: 200px;' data-field='dressing_id' ><select class='form-control status-select searchable-select' $disabled>";
+                                                                                echo "<option value='-1'>None</option>";
+                                                                                foreach ($dressingOptions as $option) {
+                                                                                    $selected = ($option['dressing_id'] == $row['dressing_id']) ? 'selected' : '';
+                                                                                    echo "<option value='{$option['dressing_id']}' $selected>{$option['dressing_title']}</option>";
+                                                                                }
+                                                                                echo "</select></td>";
+                                                                                
+                                                                    
+                                                                                
+                                                                            echo "<td class='border border-5' style='min-width: 200px;' data-field='for_deal_only'>
+                                                                              <select class='form-control status-select'  >
+                                                                                <option value='0'" . ($for_deal_only == '0' ? ' selected' : '') . ">Regular Product</option>
+                                                                                <option value='1'" . ($for_deal_only == '1' ? ' selected' : '') . ">Only for Deals</option>
+                                                                                <option value='2'" . ($for_deal_only == '2' ? ' selected' : '') . ">Only for POS</option>
+                                                                                <option value='3'" . ($for_deal_only == '3' ? ' selected' : '') . ">Only for Free</option>
+                                                                              </select>
+                                                                            </td>";
+                                                                    
+                                                                                // Image
+                                                                                echo "<td class='border border-5'>
+                                                                                    <label for='fileUpload{$productId}' style='cursor: pointer;'>
+                                                                                        <img class='image-clickable' width='80' height='80' src='{$imagePath}' alt='Product Image' 
+                                                                                             style='object-fit: cover; border-radius: 8px;'>
+                                                                                    </label>
+                                                                                    <input type='file' id='fileUpload{$productId}' data-id='{$productId}' class='d-none fileInput'>
+                                                                                  </td>";
+                                                                                  
+                                                                                  
+                                                                                echo "<td class='editable description-short border border-5' contenteditable='true' data-field='allergy_description'>{$allergyDescription}</td>"; 
+                                                                                
+                                                                                echo "<td class='border border-5' style='min-width: 300px;' data-field='time_id'>";
+                                                                                echo "<select class='form-control status-select' data-id='{$row['id']}' name='pro_time'>";
+                                                                                echo "<option value=''>-- Select Timing --</option>";
+                                                                                    foreach ($proTimeOptions as $option) {
+                                                                                        $selected = ($option['id'] == $time_id) ? 'selected' : '';
+                                                                                        echo "<option value='{$option['id']}' $selected>
+                                                                                                {$option['timing_name']} ({$option['start_time']} - {$option['end_time']})
+                                                                                              </option>";
+                                                                                    }
+                                                                                echo "</select>";
+                                                                                echo "</td>";
+                                                                                
+                                                                                
+                                                                                echo "<td class='border border-5' style='min-width: 200px;' data-field='free_addon_limit'>";
+                                                                                echo "<select class='form-control status-select' $disabled>";
+                                                                                echo "<option value=''>Select Free Addons</option>";
+                                                                                for ($i = 1; $i <= 10; $i++) {
+                                                                                    $selected = ($free_addon_limit == $i) ? 'selected' : '';
+                                                                                    echo "<option value='{$i}' {$selected}>
+                                                                                            {$i}
+                                                                                          </option>";
+                                                                                }
+                                                                                
+                                                                                echo "</select>";
+                                                                                echo "</td>";
+                                                                    
+                                                                                // Actions
+                                                                                echo "<td>
+                                                                                        <button class='btn btn-success save-btn' style='display:none; margin-bottom: 5px;'>Save</button>
+                                                                                   
+                                                                                      </td>";
+                                                                    
+                                                                    
+                                                                    
+                                                                    
+                                                                    
+                                                                                echo "</tr>";
+                                                                                $index++;
+                                                                            }
+                                                                    
+                                                                    
+                                                                            
+                                                                        } else {
+                                                                            echo "<tr><td colspan='17'>Error: " . mysqli_error($conn) . "</td></tr>";
+                                                                        }
+                                                                    } else {
+                                                                        echo "<tr><td colspan='17'>Database connection not found.</td></tr>";
+                                                                    }
+                                                                    
+                                                                    
+                                                                    ?>
 
-// Fetch dropdown options
-$addonOptions = [];
-$typeOptions = [];
-$dressingOptions = [];
-$subCategoryOptions = [];
-$proTimeOptions = [];
-
-$addonRes = mysqli_query($conn, "SELECT ao_id, ao_title FROM addon_list");
-while ($row = mysqli_fetch_assoc($addonRes)) {
-    $addonOptions[] = $row;
-}
-
-$typeRes = mysqli_query($conn, "SELECT type_id, type_title FROM types_list");
-while ($row = mysqli_fetch_assoc($typeRes)) {
-    $typeOptions[] = $row;
-}
-
-$dressingRes = mysqli_query($conn, "SELECT dressing_id, dressing_title FROM dressing_list");
-while ($row = mysqli_fetch_assoc($dressingRes)) {
-    $dressingOptions[] = $row;
-}
-
-$subCatRes = mysqli_query($conn, "SELECT id, name FROM sub_categories");
-while ($row = mysqli_fetch_assoc($subCatRes)) {
-    $subCategoryOptions[] = $row;
-}
-
-
-$proTimeRes = mysqli_query($conn, "SELECT `id`, `timing_name`, `start_time`, `end_time`, `status` FROM `product_timings` WHERE `status` = 'active'");
-while ($row = mysqli_fetch_assoc($proTimeRes)) {
-    $proTimeOptions[] = $row;
-}
-
-// Main product query
-$sql = "
-    SELECT
-        p.id, p.sub_category_id,
-        sc.name AS subname,
-        p.features, p.name AS proname, p.sku_id,
-        p.description, p.cost, p.img, p.price,
-        p.status, p.discount, p.qty, p.tax,p.for_deal_only,
-        p.addon_id, p.type_id, p.dressing_id, p.allergy_description, p.time_id,
-        p.free_addon_limit,
-        al.ao_title, tl.type_title, dl.dressing_title
-    FROM products p
-    INNER JOIN sub_categories sc ON sc.id = p.sub_category_id
-    LEFT JOIN addon_list al ON al.ao_id = p.addon_id
-    LEFT JOIN types_list tl ON tl.type_id = p.type_id
-    LEFT JOIN dressing_list dl ON dl.dressing_id = p.dressing_id
-    ORDER BY p.id ASC
-";
-
-if (isset($conn)) {
-    $result = mysqli_query($conn, $sql);
-    $index = 0;
-    if ($result) {
-        while ($row = mysqli_fetch_array($result)) {
-            $sn = $index + 1;
-            $productId = htmlspecialchars($row['id']);
-            $productName = htmlspecialchars($row['proname']);
-            $skuId = htmlspecialchars($row['sku_id']);
-            $subCategoryId = htmlspecialchars($row['sub_category_id']);
-            $cost = htmlspecialchars($row['cost']);
-            $price = htmlspecialchars($row['price']);
-            $discount = htmlspecialchars($row['discount']);
-            $description = htmlspecialchars($row['description']);
-            $status = htmlspecialchars($row['status']);
-            $imgurl = htmlspecialchars($row['img']);
-            $for_deal_only = htmlspecialchars($row['for_deal_only']);
-            $imagePath = "Uploads/" . $imgurl;
-            $allergyDescription = htmlspecialchars($row['allergy_description']);
-            $time_id = htmlspecialchars($row['time_id']);
-            $disabled = ($for_deal_only == '3') ? 'disabled' : '';
-            $free_addon_limit = htmlspecialchars($row['free_addon_limit']);
-
-            echo "<tr id='sortableBody' data-id='{$productId}'> ";
-            echo "<td class='drag-handle'>☰</td>";
-            echo "<td>{$sn}</td>";
-            echo "<td>{$productId}</td>";
-            
-            echo "<td class='editable border border-5' contenteditable='true' data-field='proname'>{$productName}</td>";
-            echo "<td class='editable border border-5' contenteditable='true' data-field='sku_id'>{$skuId}</td>";
-
-            // Subcategory Dropdown
-            echo "<td class='border border-5' style='min-width: 220px;' data-field='sub_category_id'><select class='form-control status-select searchable-select' >";
-            foreach ($subCategoryOptions as $option) {
-                $selected = ($option['id'] == $subCategoryId) ? 'selected' : '';
-                echo "<option value='{$option['id']}' $selected>{$option['name']}</option>";
-            }
-            echo "</select></td>";
-
-            echo "<td class='editable border border-5' contenteditable='true' data-field='cost'>{$cost}</td>";
-            echo "<td class='editable border border-5' contenteditable='true' data-field='price' inputmode='decimal'>{$price}</td>";
-            echo "<td class='editable border border-5' contenteditable='true' data-field='discount'>{$discount}</td>";
-            echo "<td class='editable description-short border border-5' contenteditable='true' data-field='description'>{$description}</td>";
-
-            // Feature status (Yes/No)
-                      echo "<td class='border border-5' style='min-width: 100px;' data-field='features'><select class='form-control status-select'>";
-            foreach (['Yes', 'No'] as $opt) {
-                $selected = ($row['features'] === $opt) ? 'selected' : '';
-                echo "<option value='{$opt}' $selected>{$opt}</option>";
-            }
-            echo "</select></td>";
-
-
-            // Product Status (Active/Inactive)
-            echo "<td class='border border-5' style='min-width: 100px;' data-field='status'><select class='form-control status-select' >";
-            foreach (['Active', 'Inactive'] as $opt) {
-                $selected = ($row['status'] === $opt) ? 'selected' : '';
-                echo "<option value='{$opt}' $selected>{$opt}</option>";
-            }
-            echo "</select></td>";
-
-            // Tax options (e.g., 7 or 19)
-            echo "<td class='border border-5' style='min-width: 100px;'  data-field='tax' ><select class='form-control status-select'>";
-            foreach ([7, 19] as $opt) {
-                $selected = ($row['tax'] == $opt) ? 'selected' : '';
-                echo "<option value='{$opt}' $selected>{$opt}</option>";
-            }
-            echo "</select></td>";
-
-            // Addon Dropdown
-            echo "<td  class='border border-5' style='min-width: 200px;'  data-field='addon_id'><select class='form-control status-select searchable-select' $disabled>";
-            echo "<option value='-1'>None</option>";
-            foreach ($addonOptions as $option) {
-                $selected = ($option['ao_id'] == $row['addon_id']) ? 'selected' : '';
-                echo "<option value='{$option['ao_id']}' $selected>{$option['ao_title']}</option>";
-            }
-            echo "</select></td>";
-
-            // Type Dropdown
-            echo "<td class='border border-5' style='min-width: 200px;'   data-field='type_id' ><select class='form-control status-select searchable-select' $disabled>";
-            echo "<option value='-1'>None</option>";
-            foreach ($typeOptions as $option) {
-                $selected = ($option['type_id'] == $row['type_id']) ? 'selected' : '';
-                echo "<option value='{$option['type_id']}' $selected>{$option['type_title']}</option>";
-            }
-            echo "</select></td>";
-
-            // Dressing Dropdown
-            echo "<td class='border border-5' style='min-width: 200px;' data-field='dressing_id' ><select class='form-control status-select searchable-select' $disabled>";
-            echo "<option value='-1'>None</option>";
-            foreach ($dressingOptions as $option) {
-                $selected = ($option['dressing_id'] == $row['dressing_id']) ? 'selected' : '';
-                echo "<option value='{$option['dressing_id']}' $selected>{$option['dressing_title']}</option>";
-            }
-            echo "</select></td>";
-            
-
-            
-        echo "<td class='border border-5' style='min-width: 200px;' data-field='for_deal_only'>
-          <select class='form-control status-select'  >
-            <option value='0'" . ($for_deal_only == '0' ? ' selected' : '') . ">Regular Product</option>
-            <option value='1'" . ($for_deal_only == '1' ? ' selected' : '') . ">Only for Deals</option>
-            <option value='2'" . ($for_deal_only == '2' ? ' selected' : '') . ">Only for POS</option>
-            <option value='3'" . ($for_deal_only == '3' ? ' selected' : '') . ">Only for Free</option>
-          </select>
-        </td>";
-
-            // Image
-            echo "<td class='border border-5'>
-                <label for='fileUpload{$productId}' style='cursor: pointer;'>
-                    <img class='image-clickable' width='80' height='80' src='{$imagePath}' alt='Product Image' 
-                         style='object-fit: cover; border-radius: 8px;'>
-                </label>
-                <input type='file' id='fileUpload{$productId}' data-id='{$productId}' class='d-none fileInput'>
-              </td>";
-              
-              
-            echo "<td class='editable description-short border border-5' contenteditable='true' data-field='allergy_description'>{$allergyDescription}</td>"; 
-            
-            echo "<td class='border border-5' style='min-width: 300px;' data-field='time_id'>";
-            echo "<select class='form-control status-select' data-id='{$row['id']}' name='pro_time'>";
-            echo "<option value=''>-- Select Timing --</option>";
-                foreach ($proTimeOptions as $option) {
-                    $selected = ($option['id'] == $time_id) ? 'selected' : '';
-                    echo "<option value='{$option['id']}' $selected>
-                            {$option['timing_name']} ({$option['start_time']} - {$option['end_time']})
-                          </option>";
-                }
-            echo "</select>";
-            echo "</td>";
-            
-            
-            echo "<td class='border border-5' style='min-width: 200px;' data-field='free_addon_limit'>";
-            echo "<select class='form-control status-select' $disabled>";
-            echo "<option value=''>Select Free Addons</option>";
-            for ($i = 1; $i <= 10; $i++) {
-                $selected = ($free_addon_limit == $i) ? 'selected' : '';
-                echo "<option value='{$i}' {$selected}>
-                        {$i}
-                      </option>";
-            }
-            
-            echo "</select>";
-            echo "</td>";
-
-            // Actions
-            echo "<td>
-                    <button class='btn btn-success save-btn' style='display:none; margin-bottom: 5px;'>Save</button>
-               
-                  </td>";
-
-
-
-
-
-            echo "</tr>";
-            $index++;
-        }
-
-
-        
-    } else {
-        echo "<tr><td colspan='17'>Error: " . mysqli_error($conn) . "</td></tr>";
-    }
-} else {
-    echo "<tr><td colspan='17'>Database connection not found.</td></tr>";
-}
-
-
-?>
-
-</tbody>
-</div>
+                                                    </tbody>
+                                                    </div>
 
 
 
@@ -552,9 +554,7 @@ if (isset($conn)) {
                             </div>
                         </div>
                     </div>
-                    
-                    
-                    
+                
                     <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
                       <div id="orderToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
                         <div class="d-flex">
@@ -611,7 +611,7 @@ $(document).ready(function () {
     initSelect2();
 });
           
-        function toggle(status, id) {
+function toggle(status, id) {
                     const action = status === 'Active' ? 'Deactivate' : 'Activate';
                      if (!confirm(`Are you sure you want to ${action} this product?`)) {
                          return; // Stop if user cancels
@@ -639,8 +639,7 @@ $(document).ready(function () {
                     };
                 }
 
-
-        $(document).ready(function () {
+$(document).ready(function () {
         var table = $('#example').DataTable(
                 {
                 dom: 'Bfrtip',
@@ -813,7 +812,7 @@ $(document).ready(function () {
             contentType: false,
             success: function (response) {
                 if (response.status) {
-                    alert(response.message || 'Product updated successfully!');
+                    // alert(response.message || 'Product updated successfully!');
                     row.find('.save-btn').hide();
                     row.css('background-color', '#d4edda').animate({ backgroundColor: '' }, 1500);
                 } else {
@@ -840,8 +839,6 @@ $(document).ready(function () {
     }
 });
 
-
-
 document.addEventListener('DOMContentLoaded', () => {
   const tbody = document.getElementById('sortableBody');
 
@@ -860,7 +857,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 });
 
-
 function sendOrderToServer(orderArray) {
   fetch('../API/update_products_order.php', {
     method: 'POST',
@@ -876,21 +872,27 @@ function sendOrderToServer(orderArray) {
     }
   });
 }
-    const addonOptions = <?= json_encode($addonOptions) ?>;
-    const typeOptions = <?= json_encode($typeOptions) ?>;
-    const dressingOptions = <?= json_encode($dressingOptions) ?>;
-    const subCategoryOptions = <?= json_encode($subCategoryOptions) ?>;
-    const proTimeOptions = <?= json_encode($proTimeOptions) ?>;
-    const imgUrl = <?= json_encode($imagePath = "Uploads/" ) ?>;
+
+const addonOptions = <?= json_encode($addonOptions) ?>;
+const typeOptions = <?= json_encode($typeOptions) ?>;
+const dressingOptions = <?= json_encode($dressingOptions) ?>;
+const subCategoryOptions = <?= json_encode($subCategoryOptions) ?>;
+const proTimeOptions = <?= json_encode($proTimeOptions) ?>;
+const imgUrl = <?= json_encode($imagePath = "Uploads/" ) ?>;
     
 
 $('#subCategorySelect').on('change', function () {
     const categoryId = $(this).val();
 
     if (categoryId) {
+        // Step 1: Destroy existing DataTable instance
+        if ($.fn.DataTable.isDataTable('#example')) {
+            $('#example').DataTable().destroy();
+        }
+
         $('#sortableBody').html(`
             <tr>
-                <td colspan="17">
+                <td colspan="22" class="text-center p-4">
                     <div id="loader" class="text-center mb-3">
                         <div class="spinner-border text-primary" role="status">
                             <span class="sr-only">Loading...</span>
@@ -912,147 +914,147 @@ $('#subCategorySelect').on('change', function () {
                 const res = JSON.parse(response);
                 if (res.status && res.data.length > 0) {
                     let html = '';
-                         res.data.forEach((item, index) => {
-                                                 const disabled = item.for_deal_only == 3 ? 'disabled' : '';
-                            html += `
-                            <tr data-id="${item.product_id}">
-                                echo "<td class='drag-handle'>☰</td>";
-                                <td>${index + 1}</td>
-                                <td class="border-5">${item.product_id}</td>
-                                <td class="editable border-5" contenteditable="true" data-field="proname">${item.name}</td>
-                                <td class="editable border-5" contenteditable="true" data-field="sku_id">${item.sku_id ?? '-'}</td>
-                                <td class='border border-5' style='min-width: 220px;' data-field='sub_category_id'>
-                                    <select class="form-control status-select searchable-select">
-                                        ${subCategoryOptions.map(opt => `
-                                            <option value="${opt.id}" ${opt.id == item.sub_category_id ? 'selected' : ''}>${opt.name}</option>
-                                        `).join('')}
-                                    </select>
-                                </td>
-                                <td class="editable border-5" contenteditable="true" data-field="cost">${item.cost}</td>
-                                <td class="editable border-5" contenteditable="true" data-field="price">${item.price}</td>
-                                <td class="editable border-5" contenteditable="true" data-field="discount">${item.discount}</td>
-                                <td class="editable border-5" contenteditable="true" data-field="description">${item.description}</td>
-                                <td class='border border-5' style='min-width: 100px;' data-field='features'>
-                                    <select class="form-control">
-                                        <option value="Yes" ${item.features === 'Yes' ? 'selected' : ''}>Yes</option>
-                                        <option value="No" ${item.features === 'No' ? 'selected' : ''}>No</option>
-                                    </select>
-                                </td>
-                                <td class='border border-5' style='min-width: 100px;' data-field='status'>
-                                    <select class="form-control status-select">
-                                        <option value="Active" ${item.status === 'Active' ? 'selected' : ''}>Active</option>
-                                        <option value="Inactive" ${item.status === 'Inactive' ? 'selected' : ''}>Inactive</option>
-                                    </select>
-                                </td>
-                                <td class='border border-5' style='min-width: 100px;'  data-field='tax'>
-                                    <select class="form-control status-select">
-                                        <option value="7" ${item.tax == 7 ? 'selected' : ''}>7</option>
-                                        <option value="19" ${item.tax == 19 ? 'selected' : ''}>19</option>
-                                    </select>
-                                </td>
-                                <td class='border border-5' style='min-width: 200px;'  data-field='addon_id'>
-                                    <select class="form-control status-select searchable-select" ${disabled}>
-                                        <option value="-1">None</option>
-                                        ${addonOptions.map(opt => `
-                                            <option value="${opt.ao_id}" ${opt.ao_id == item.addons[0]?.ao_id ? 'selected' : ''}>${opt.ao_title}</option>
-                                        `).join('')}
-                                    </select>
-                                </td>
-                                <td class='border border-5' style='min-width: 200px;'   data-field='type_id'>
-                                    <select class="form-control status-select searchable-select" ${disabled}>
-                                        <option value="-1">None</option>
-                                        ${typeOptions.map(opt => `
-                                            <option value="${opt.type_id}" ${opt.type_id == item.types[0]?.type_id ? 'selected' : ''}>${opt.type_title}</option>
-                                        `).join('')}
-                                    </select>
-                                </td>
-                                <td class='border border-5' style='min-width: 200px;' data-field='dressing_id'>
-                                    <select class="form-control status-select searchable-select" ${disabled}>
-                                        <option value="-1">None</option>
-                                        ${dressingOptions.map(opt => `
-                                            <option value="${opt.dressing_id}" ${opt.dressing_id == item.dressing[0]?.dressing_id ? 'selected' : ''}>${opt.dressing_title}</option>
-                                        `).join('')}
-                                    </select>
-                                </td>
-                                <td class='border border-5' style='min-width: 200px;' data-field='for_deal_only'>
-                                    <select class="form-control status-select">
-                                            <option value="0" ${item.for_deal_only == 0 ? 'selected' : ''}>Regular Product</option>
-                                            <option value="1" ${item.for_deal_only == 1 ? 'selected' : ''}>Only for Deals</option>
-                                            <option value="2" ${item.for_deal_only == 2 ? 'selected' : ''}>Only for Pos</option>
-                                            <option value="3" ${item.for_deal_only == 3 ? 'selected' : ''}>Only for Free</option>
-                                        
-                                    </select>
-                                </td>
-                                
-                                
-                                
-                                <td class='border border-5'>
-                                    <label for="fileUpload${item.product_id}" style="cursor: pointer;">
-                                        <img class="image-clickable" src="${'Uploads/'+item.img}" width="80" height="80" style="object-fit: cover; border-radius: 8px;">
-                                    </label>
-                                    <input type="file" id="fileUpload${item.product_id}" data-id="${item.product_id}" class="d-none fileInput">
-                                </td>
-                                
-                                  <!-- Allergy Description -->
-                                    <td class="editable border-5" contenteditable="true" data-field="allergy_description">
-                                        ${item.allergy_description ?? ''}
-                                    </td>
-                                
-                                <td class='border border-5' style='min-width: 300px;' data-field='time_id'>
-                                        <select class="form-control status-select" data-id="${item.id}">
-                                            <option value="">-- Select Timing --</option>
-                                    
-                                            ${proTimeOptions.map(opt => `
-                                                <option value="${opt.id}" 
-                                                    ${opt.id == item.time_id ? 'selected' : ''}>
-                                                    ${opt.timing_name} (${opt.start_time} - ${opt.end_time})
-                                                </option>
-                                            `).join('')}
-                                        </select>
-                                    </td>
-                                </td>
-                                
-                                
-                                <td class='border border-5' style='min-width: 200px;' data-field='free_addon_limit'>
-                                    <select class="form-control status-select" ${disabled}>
-                                    
-                                        <option value="">Select Free Addons</option>
-                                
-                                        ${Array.from({ length: 10 }, (_, i) => {
-                                            const value = i + 1;
-                                
-                                            return `
-                                                <option value="${value}" 
-                                                    ${item.free_addon_limit == value ? 'selected' : ''}>
-                                                    ${value}
-                                                </option>
-                                            `;
-                                        }).join('')}
-                                
-                                    </select>
-                                </td>
-                                    
-                                <td><button class="btn btn-success save-btn" style="display:none;">Save</button></td>
-                            </tr>
-                            
-                            `;
-                        });
+                    res.data.forEach((item, index) => {
+                        const disabled = item.for_deal_only == 3 ? 'disabled' : '';
+                        
+                        html += `
+                        <tr data-id="${item.product_id}">
+                            <td class="drag-handle">☰</td>
+                            <td>${index + 1}</td>
+                            <td class="border-5">${item.product_id}</td>
+                            <td class="editable border-5" contenteditable="true" data-field="proname">${item.name}</td>
+                            <td class="editable border-5" contenteditable="true" data-field="sku_id">${item.sku_id ?? '-'}</td>
+                            <td class="border border-5" style="min-width: 220px;" data-field="sub_category_id">
+                                <select class="form-control status-select searchable-select">
+                                    ${subCategoryOptions.map(opt => `
+                                        <option value="${opt.id}" ${opt.id == item.sub_category_id ? 'selected' : ''}>${opt.name}</option>
+                                    `).join('')}
+                                </select>
+                            </td>
+                            <td class="editable border-5" contenteditable="true" data-field="cost">${item.cost}</td>
+                            <td class="editable border-5" contenteditable="true" data-field="price">${item.price}</td>
+                            <td class="editable border-5" contenteditable="true" data-field="discount">${item.discount}</td>
+                            <td class="editable border-5" contenteditable="true" data-field="description">${item.description}</td>
+                            <td class="border border-5" style="min-width: 100px;" data-field="features">
+                                <select class="form-control">
+                                    <option value="Yes" ${item.features === 'Yes' ? 'selected' : ''}>Yes</option>
+                                    <option value="No" ${item.features === 'No' ? 'selected' : ''}>No</option>
+                                </select>
+                            </td>
+                            <td class="border border-5" style="min-width: 100px;" data-field="status">
+                                <select class="form-control status-select">
+                                    <option value="Active" ${item.status === 'Active' ? 'selected' : ''}>Active</option>
+                                    <option value="Inactive" ${item.status === 'Inactive' ? 'selected' : ''}>Inactive</option>
+                                </select>
+                            </td>
+                            <td class="border border-5" style="min-width: 100px;" data-field="tax">
+                                <select class="form-control status-select">
+                                    <option value="7" ${item.tax == 7 ? 'selected' : ''}>7</option>
+                                    <option value="19" ${item.tax == 19 ? 'selected' : ''}>19</option>
+                                </select>
+                            </td>
+                            <td class="border border-5" style="min-width: 200px;" data-field="addon_id">
+                                <select class="form-control status-select searchable-select" ${disabled}>
+                                    <option value="-1">None</option>
+                                    ${addonOptions.map(opt => `
+                                        <option value="${opt.ao_id}" ${opt.ao_id == item.addons[0]?.ao_id ? 'selected' : ''}>${opt.ao_title}</option>
+                                    `).join('')}
+                                </select>
+                            </td>
+                            <td class="border border-5" style="min-width: 200px;" data-field="type_id">
+                                <select class="form-control status-select searchable-select" ${disabled}>
+                                    <option value="-1">None</option>
+                                    ${typeOptions.map(opt => `
+                                        <option value="${opt.type_id}" ${opt.type_id == item.types[0]?.type_id ? 'selected' : ''}>${opt.type_title}</option>
+                                    `).join('')}
+                                </select>
+                            </td>
+                            <td class="border border-5" style="min-width: 200px;" data-field="dressing_id">
+                                <select class="form-control status-select searchable-select" ${disabled}>
+                                    <option value="-1">None</option>
+                                    ${dressingOptions.map(opt => `
+                                        <option value="${opt.dressing_id}" ${opt.dressing_id == item.dressing[0]?.dressing_id ? 'selected' : ''}>${opt.dressing_title}</option>
+                                    `).join('')}
+                                </select>
+                            </td>
+                            <td class="border border-5" style="min-width: 200px;" data-field="for_deal_only">
+                                <select class="form-control status-select">
+                                    <option value="0" ${item.for_deal_only == 0 ? 'selected' : ''}>Regular Product</option>
+                                    <option value="1" ${item.for_deal_only == 1 ? 'selected' : ''}>Only for Deals</option>
+                                    <option value="2" ${item.for_deal_only == 2 ? 'selected' : ''}>Only for Pos</option>
+                                    <option value="3" ${item.for_deal_only == 3 ? 'selected' : ''}>Only for Free</option>
+                                </select>
+                            </td>
+                            <td class="border border-5">
+                                <label for="fileUpload${item.product_id}" style="cursor: pointer;">
+                                    <img class="image-clickable" src="${'Uploads/'+item.img}" width="80" height="80" style="object-fit: cover; border-radius: 8px;">
+                                </label>
+                                <input type="file" id="fileUpload${item.product_id}" data-id="${item.product_id}" class="d-none fileInput">
+                            </td>
+                            <td class="editable border-5" contenteditable="true" data-field="allergy_description">
+                                ${item.allergy_description ?? ''}
+                            </td>
+                            <td class="border border-5" style="min-width: 300px;" data-field="time_id">
+                                <select class="form-control status-select" data-id="${item.id}">
+                                    <option value="">-- Select Timing --</option>
+                                    ${proTimeOptions.map(opt => `
+                                        <option value="${opt.id}" ${opt.id == item.time_id ? 'selected' : ''}>
+                                            ${opt.timing_name} (${opt.start_time} - ${opt.end_time})
+                                        </option>
+                                    `).join('')}
+                                </select>
+                            </td>
+                            <td class="border border-5" style="min-width: 200px;" data-field="free_addon_limit">
+                                <select class="form-control status-select" ${disabled}>
+                                    <option value="">Select Free Addons</option>
+                                    ${Array.from({ length: 10 }, (_, i) => {
+                                        const value = i + 1;
+                                        return `
+                                            <option value="${value}" ${item.free_addon_limit == value ? 'selected' : ''}>
+                                                ${value}
+                                            </option>
+                                        `;
+                                    }).join('')}
+                                </select>
+                            </td>
+                            <td><button class="btn btn-success save-btn" style="display:none;">Save</button></td>
+                        </tr>`;
+                    });
 
                     $('#sortableBody').html(html);
+
+                    // Step 2: Re-initialize with original layout settings
+                    initMyDataTable();
                     initSelect2();
                 } else {
-                    $('#sortableBody').html('<tr><td colspan="17">No Product found.</td></tr>');
+                    $('#sortableBody').html('<tr><td colspan="22" class="text-center">No Product found.</td></tr>');
+                    initMyDataTable();
                 }
             },
             error: function () {
-                $('#sortableBody').html('<tr><td colspan="17">Failed to fetch products.</td></tr>');
+                $('#sortableBody').html('<tr><td colspan="22" class="text-center">Failed to fetch products.</td></tr>');
+                initMyDataTable();
                 alert("Failed to fetch products.");
             }
         });
     } else {
+        if ($.fn.DataTable.isDataTable('#example')) {
+            $('#example').DataTable().destroy();
+        }
         $('#sortableBody').html('');
+        initMyDataTable();
     }
 });
+
+// Helper function to re-initialize DataTable with proper layout settings
+function initMyDataTable() {
+    $('#example').DataTable({
+        dom: 'Bfrtip',
+        buttons: ['copy', 'csv', 'pdf'],
+        lengthChange: false,
+        pageLength: 10
+    });
+}
 
 // Product visibility change
 $(document).on('change', '[data-field="for_deal_only"] select', function () {
