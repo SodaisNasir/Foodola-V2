@@ -338,6 +338,22 @@ $(document).on('click', '.btn_remove', function() {
     var button_id = $(this).attr("id");
     $('#poks' + button_id).remove();
 });
+
+
+
+// Listen for changes on any dynamically added primary radio button
+$(document).on('change', '.primary_radio', function() {
+    
+    // 1. First, reset ALL hidden primary inputs back to '0'
+    $('input[name="is_primary[]"]').val('0');
+    
+    // 2. Get the unique data-id of the radio button that was just clicked
+    var selectedId = $(this).data('id');
+    
+    // 3. Target the specific hidden input for this row and change its value to '1'
+    $('#hidden_primary_' + selectedId).val('1');
+    
+});
 </script>
 
 
