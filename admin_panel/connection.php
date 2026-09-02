@@ -3,17 +3,17 @@
 
 // APP CONFIGRUATION
 $LANG = 'en';
-$APP_NAME = "Foodola";
-$BASE_URL = "https://foodola.foodola.shop/";
-$company_address = "Kuhngasse 1, 76684 Östringen";
-$company_city    = "Östringen";
-$company_phone   = "07253 26560-61";
+$APP_NAME = "Desi Dawat";
+$BASE_URL = "https://desi.foodola.shop/";
+$company_address = "Plot No #R-1, 11-B opp.PTCL Exchange, North Karachi";
+$company_city    = "Karachi";
+$company_phone   = "0334-5044423";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "elliakydnklqykpv";
-$FROM_EMAIL = "support@foodola.de";
+$FROM_EMAIL = "support@desidawat.com";
 
 
 
@@ -25,9 +25,9 @@ $ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebnchqsvtsgb4evjfpfzagsm
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE='u772850971_foodola';
-$DB_USERNAME='u772850971_foodola';
-$DB_PASSWORD=']f0Hy^78Uf0s';
+$DB_DATABASE='u772850971_desidawat';
+$DB_USERNAME='u772850971_desidawat';
+$DB_PASSWORD='2$^OzBJtR';
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
 
