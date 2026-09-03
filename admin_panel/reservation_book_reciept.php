@@ -7,11 +7,12 @@ if (!$reservation_id) {
     die("Invalid Reservation ID");
 }
 
-// Fetch reservation with table name
+// Fetch reservation with table name, user name & phone
 $sql = "
-    SELECT r.*, t.table_name
+    SELECT r.*, t.table_name, u.name AS user_name, u.phone AS user_phone
     FROM reservations r
     LEFT JOIN tables t ON t.id = r.table_id
+    LEFT JOIN users u ON u.id = r.user_id
     WHERE r.id = $reservation_id
 ";
 $res = mysqli_query($conn, $sql);
@@ -95,9 +96,7 @@ $APP_NAME = $APP_NAME ?? 'Restaurant';
     padding:2px 25px;
     font-size:13px;
     vertical-align:top;
-    
   }
-  
 
   .label {
     font-weight:bold;
@@ -147,8 +146,22 @@ body {
 
   <div class="order-details-header">RESERVIERUNGSDETAILS</div>
 
-  <table >
+  <table>
     <tbody>
+      <?php if (!empty($reservation['user_name'])): ?>
+      <tr>
+        <td class="label">Name</td>
+        <td><strong><?php echo htmlspecialchars($reservation['user_name']); ?></strong></td>
+      </tr>
+      <?php endif; ?>
+
+      <?php if (!empty($reservation['user_phone'])): ?>
+      <tr>
+        <td class="label">Telefon</td>
+        <td><strong><?php echo htmlspecialchars($reservation['user_phone']); ?></strong></td>
+      </tr>
+      <?php endif; ?>
+
       <tr>
         <td class="label">Datum</td>
         <td><?php echo date('d.m.Y', strtotime($reservation['reservation_date'])); ?></td>
@@ -163,7 +176,7 @@ body {
       </tr>
       <tr>
         <td class="label">Dauer</td>
-        <td><?php echo $reservation['duration_minutes']; ?> Minutennn</td>
+        <td><?php echo $reservation['duration_minutes']; ?> Minuten</td>
       </tr>
       <tr>
         <td class="label">Personen</td>
