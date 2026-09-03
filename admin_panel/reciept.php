@@ -5,7 +5,7 @@ include_once('connection.php');
 
 include_once('phpfiles/function.php');
 
-date_default_timezone_set('Asia/Karachi');
+date_default_timezone_set('Europe/Berlin');
 $order_id = intval($_GET['order_id']); // Sanitize input
 $minutes_to_add = 0;
 
@@ -278,7 +278,7 @@ if ($row = mysqli_fetch_assoc($resultSettings)) {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
-  <title>Quittung</title>
+  <title>Receipt</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
 
@@ -542,7 +542,7 @@ body {
     <?php endif; ?>
 
     <?php if ($has_table_id): ?>
-        <h3>Tabellenname: <?php echo htmlspecialchars($table_name); ?></h3>
+        <h3>Table name: <?php echo htmlspecialchars($table_name); ?></h3>
     <?php endif; ?>
 
 
@@ -553,7 +553,7 @@ body {
 
     <?php if ($data['order_type'] == 'delivery'): ?>
        
-         <h3>Adresse: 
+         <h3>Address: 
             <?php echo htmlspecialchars(
               
                
@@ -575,7 +575,7 @@ body {
     <?php endif; ?>
    
     <?php if (!empty($data['addtional_notes'])): ?>
-        <h3>Notizen: <?php echo htmlspecialchars($data['addtional_notes']); ?></h3>
+        <h3>Notes: <?php echo htmlspecialchars($data['addtional_notes']); ?></h3>
     <?php endif; ?>
 
     <?php if (!empty($data['order_type'])): ?>
@@ -594,7 +594,7 @@ body {
 </h3>
  
     <div class="order-details-header">
-      <h1>Bestelldetails</h1>
+      <h1>Order details</h1>
     </div>
 
     <div class="item-details">
@@ -633,7 +633,7 @@ body {
               <div class="item-name"><?php echo htmlspecialchars($value['name']); ?></div>
 
               <?php if (!empty($value['additional_notes'])) : ?>
-                <div class="mt-1 item-notes">Notiz: <?php echo htmlspecialchars($value['additional_notes']); ?></div>
+                <div class="mt-1 item-notes">Note: <?php echo htmlspecialchars($value['additional_notes']); ?></div>
               <?php endif; ?>
 
               <div class="item-options">
