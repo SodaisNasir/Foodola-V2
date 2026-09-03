@@ -4,7 +4,7 @@
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
 include_once('connection.php');
-date_default_timezone_set('Europe/Berlin');
+date_default_timezone_set('Asia/Karachi');
 
 
 
@@ -174,25 +174,25 @@ if ($result_deal && mysqli_num_rows($result_deal) > 0) {
     <div class="header">
       <img src="images/logo.png" alt="Logo">
       <h2><?php echo $APP_NAME?> </h2>
-      <div class="big-order">BESTELL-NR: <?php echo $order_id; ?></div>
+      <div class="big-order">Order-No: <?php echo $order_id; ?></div>
     </div>
 
-    <div class="details">
-      <h5>Auftragsart: <?php echo $order_type; ?></h5>
+     <div class="details">
+      <h5>Type: <?php echo $order_type=="Lieferung" ? "Delivery" : "Pickup"; ?></h5>
       <?php if ($check_data['order_type'] === 'table_order'): ?>
         <p><strong>Tisch:</strong> <?php echo $table_name; ?></p>
       <?php endif; ?>
-      <p><strong>Datum:</strong> <?php echo date('d.m.Y H:i'); ?></p>
+      <p><strong>Date Time:</strong> <?php echo date('d.m.Y H:i'); ?></p>
     </div>
 
-    <div class="order-details-header"><h1>Küchenbestellung</h1></div>
+    <div class="order-details-header"><h1>Order Details</h1></div>
 
     <div class="item-details">
       <table>
         <thead>
           <tr>
-            <th>Artikel</th>
-            <th style="text-align:right;  padding:5px;">Menge</th>
+            <th>Item</th>
+            <th style="text-align:right;  padding:5px;">QTY</th>
           </tr>
         </thead>
         <tbody>
@@ -268,9 +268,9 @@ if ($result_deal && mysqli_num_rows($result_deal) > 0) {
       </table>
     </div>
 
-    <div class="footer">
-      <p>Gesamtanzahl Artikel: <?php echo $total_items; ?></p>
-      <p>*** Vielen Dank! ***</p>
+   <div class="footer">
+      <p>Total Items: <?php echo $total_items; ?></p>
+      <p>*** Thank you! ***</p>
     </div>
     
     

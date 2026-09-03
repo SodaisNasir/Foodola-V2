@@ -5,8 +5,8 @@ function formatCurrency($amount, $options = []) {
         return 'Intl extension not enabled';
     }
 
-    $locale = $options['locale'] ?? 'de_DE';
-    $currency = $options['currency'] ?? 'EUR';
+    $locale = $options['locale'] ?? 'en_PK';
+    $currency = $options['currency'] ?? 'PKR';
 
     $formatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
 

@@ -1,10 +1,10 @@
 <?php
 // Enable full error reporting
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
 
 include_once('connection.php');
-date_default_timezone_set('Europe/Berlin');
+date_default_timezone_set('Asia/Karachi');
 
 // Get Order ID
 $order_id = intval($_GET['order_id'] ?? 0);
@@ -20,11 +20,11 @@ $order_type = $order_data['order_type'] ?? 'unknown';
 
 // Helper to get table name
 function getTableName($conn, $table_id) {
-    if (empty($table_id)) return "Kein Tisch";
+    if (empty($table_id)) return "No Table";
     $query = "SELECT table_name FROM tables WHERE id = $table_id";
     $result = mysqli_query($conn, $query);
     $table = mysqli_fetch_assoc($result);
-    return $table ? $table['table_name'] : "Tisch $table_id";
+    return $table ? $table['table_name'] : "Table $table_id";
 }
 
 $table_name = getTableName($conn, $table_id);
@@ -72,10 +72,10 @@ while ($row = mysqli_fetch_assoc($result)) {
 ?>
 
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Küchenbons — Abteilung</title>
+<title>Kitchen Ticket — Department</title>
 <style>
   body {
     font-family: "Arial", sans-serif;
@@ -189,31 +189,31 @@ while ($row = mysqli_fetch_assoc($result)) {
   <div class="receipt-container">
     <div class="header">
       <img src="images/logo.png" alt="Logo">
-      <h2>Pizzablitzöstringen.de</h2>
-      <div class="big-order">BESTELL-NR: <?php echo $order_id; ?></div>
+      <h2><?php echo htmlspecialchars($APP_NAME); ?></h2>
+      <div class="big-order">ORDER NO: <?php echo $order_id; ?></div>
     </div>
 
     <div class="dept-title"><?php echo strtoupper($dept['name']); ?></div>
 
     <div class="details">
-      <p><strong>Auftragsart:</strong>
+      <p><strong>Order Type:</strong>
         <?php
           if (!empty($table_id)) echo "Dine-In (" . htmlspecialchars($table_name) . ")";
-          elseif ($order_type === 'delivery') echo "Lieferung";
-          elseif ($order_type === 'pickup') echo "Abholung";
-          else echo "Unbekannt";
+          elseif ($order_type === 'delivery') echo "Delivery";
+          elseif ($order_type === 'pickup') echo "Pickup";
+          else echo "Unknown";
         ?>
       </p>
-      <p><strong>Datum:</strong> <?php echo date('d.m.Y H:i'); ?></p>
+      <p><strong>Date:</strong> <?php echo date('d.m.Y H:i'); ?></p>
     </div>
 
-    <div class="section-label">KÜCHENBESTELLUNG</div>
+    <div class="section-label">KITCHEN ORDER</div>
 
     <table>
       <thead>
         <tr>
-          <th>Artikel</th>
-          <th style="text-align:right;">Menge</th>
+          <th>Item</th>
+          <th style="text-align:right;">Qty</th>
         </tr>
       </thead>
       <tbody>
@@ -231,7 +231,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                   if (!empty($addons)) foreach ($addons as $addon) echo "x{$addon->quantity} " . htmlspecialchars($addon->as_name) . "<br>";
                   if (!empty($types)) foreach ($types as $type) echo htmlspecialchars($type->ts_name) . "<br>";
                   if (!empty($dressing)) foreach ($dressing as $dress) echo htmlspecialchars($dress->dressing_name) . "<br>";
-                  if (!empty($item['additional_notes'])) echo "<div class='item-notes'>Notiz: " . htmlspecialchars($item['additional_notes']) . "</div>";
+                  if (!empty($item['additional_notes'])) echo "<div class='item-notes'>Note: " . htmlspecialchars($item['additional_notes']) . "</div>";
                 ?>
               </div>
             </td>
@@ -242,8 +242,8 @@ while ($row = mysqli_fetch_assoc($result)) {
     </table>
 
     <div class="footer">
-      <p>Abteilung: <?php echo htmlspecialchars($dept['name']); ?></p>
-      <p>*** Vielen Dank! ***</p>
+      <p>Department: <?php echo htmlspecialchars($dept['name']); ?></p>
+      <p>*** Thank You! ***</p>
     </div>
   </div>
 <?php endforeach; ?>

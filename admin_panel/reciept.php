@@ -5,7 +5,7 @@ include_once('connection.php');
 
 include_once('phpfiles/function.php');
 
-date_default_timezone_set('Europe/Berlin');
+date_default_timezone_set('Asia/Karachi');
 $order_id = intval($_GET['order_id']); // Sanitize input
 $minutes_to_add = 0;
 
@@ -579,8 +579,8 @@ body {
     <?php endif; ?>
 
     <?php if (!empty($data['order_type'])): ?>
-        <h3>Auftragsart: 
-            <?php echo $data['order_type'] === 'delivery' ? "Lieferung" : "Abholen"; ?>
+        <h3>Order Type: 
+            <?php echo $data['order_type'] === 'delivery' ? "Delivery" : "Pickup"; ?>
             <?php if ( $data['ordersheduletype'] == 'orderlater'): ?>
                 @ <?php echo htmlspecialchars($data['sheduletime']); ?>
             <?php endif; ?>
@@ -588,7 +588,7 @@ body {
         
     <?php if($data['payment_type'] != ''){ ?>
     <h3 >
-      Zahlungsmodus: <?php echo $data['payment_type'] === 'cash' ? "Cash" : 'Online' ?> </div>
+      Payment: <?php echo $data['payment_type'] === 'cash' ? "Cash" : 'Online' ?> </div>
      <?php } ?>    
     <?php endif; ?>
 </h3>
@@ -602,9 +602,9 @@ body {
   <table style="width: 100%; border-collapse: collapse;">
     <thead>
       <tr>
-        <th style="text-align: left;">Menge</th>
-        <th style="text-align: left; width: 60%;">Artikel</th>
-        <th style="text-align: right;">Preis</th>
+        <th style="text-align: left;">QTY</th>
+        <th style="text-align: left; width: 60%;">Article</th>
+        <th style="text-align: right;">Price</th>
       </tr>
     </thead>
     <tbody>
@@ -849,29 +849,29 @@ $updated_tax_19 = $shippingTax + $tax_19 ;
 
 <div class="footer-totals">
   <ul>
-    <li><span>Tatsächlicher Preis:</span><span><?php echo formatCurrency($subtotal, $currency_sign, $currency_position); ?></span></li>
-    <li><span>Rabatt:</span><span>-<?php echo formatCurrency($discount, $currency_sign, $currency_position); ?></span></li>
-    <li><span>Lieferung:</span><span><?php echo formatCurrency($shipping, $currency_sign, $currency_position); ?></span></li>
+       <li><span>Total Price:</span><span><?php echo formatCurrency($subtotal, $currency_sign, $currency_position); ?></span></li>
+    <li><span>Total Discount:</span><span>-<?php echo formatCurrency($discount, $currency_sign, $currency_position); ?></span></li>
+    <li><span>Delivery Charges:</span><span><?php echo formatCurrency($shipping, $currency_sign, $currency_position); ?></span></li>
     
 <?php if (!empty($reservation_id)) { ?>
   <li>
-    <span>Reservierungsgebühren:</span>
+    <span>Reservation fees:</span>
     <span>-<?php echo formatCurrency($reservation_fees, $currency_sign, $currency_position); ?></span>
   </li>
 <?php } ?>
 
 
 
-    <li><span>MwSt. (7%):</span><span><?php echo formatCurrency($tax_7, $currency_sign, $currency_position); ?></span></li>
-    <li><span>MwSt. (19%):</span><span><?php echo formatCurrency($updated_tax_19, $currency_sign, $currency_position); ?></span></li>
-    <li><span>Gesamt:</span><span><?php echo formatCurrency($grand_total, $currency_sign, $currency_position); ?></span></li>
+    <!--<li><span>MwSt. (7%):</span><span><?php echo formatCurrency($tax_7, $currency_sign, $currency_position); ?></span></li>-->
+    <!--<li><span>MwSt. (19%):</span><span><?php echo formatCurrency($updated_tax_19, $currency_sign, $currency_position); ?></span></li>-->
+    <li><span>Grand Total:</span><span><?php echo formatCurrency($grand_total, $currency_sign, $currency_position); ?></span></li>
     
   </ul>
     
 </div>
    
      <div class="footer-message">
-      <p>Vielen Dank für Ihren Einkauf!</p>
+           <p>Thank you for the order</p>
     </div>
     
     
