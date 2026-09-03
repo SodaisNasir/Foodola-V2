@@ -9,9 +9,10 @@ if (!$reservation_id) {
 
 // Fetch reservation with table name
 $sql = "
-    SELECT r.*, t.table_name
+    SELECT r.*, t.table_name, u.name AS user_name, u.phone AS user_phone
     FROM reservations r
     LEFT JOIN tables t ON t.id = r.table_id
+    LEFT JOIN users u ON u.id = r.user_id
     WHERE r.id = $reservation_id
 ";
 $res = mysqli_query($conn, $sql);
@@ -27,7 +28,7 @@ $APP_NAME = $APP_NAME ?? 'Restaurant';
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Reservierungsbeleg</title>
+<title>Reservation confirmation</title>
 
 <style>
 /* --- PRINT STYLES --- */
@@ -133,28 +134,42 @@ body {
     <h2><?php echo $APP_NAME; ?></h2>
 
     <div class="big-order">
-      RESERVIERUNG #<?php echo $reservation['id']; ?>
+      RESERVATION #<?php echo $reservation['id']; ?>
     </div>
   </div>
 
   <div class="details">
-    <p><strong>Tisch:</strong> <?php echo $reservation['table_name'] ?? 'Kein Tisch'; ?></p>
+    <p><strong>Table:</strong> <?php echo $reservation['table_name'] ?? 'Kein Tisch'; ?></p>
     <p><strong>Status:</strong> <?php echo ucfirst($reservation['status']); ?></p>
-    <p><strong>Erstellt:</strong>
+    <p><strong>Created:</strong>
       <?php echo date('d.m.Y H:i', strtotime($reservation['created_at'])); ?>
     </p>
   </div>
 
-  <div class="order-details-header">RESERVIERUNGSDETAILS</div>
+  <div class="order-details-header">RESERVATION DETAILS</div>
 
   <table >
     <tbody>
+        <?php if (!empty($reservation['user_name'])): ?>
       <tr>
-        <td class="label">Datum</td>
+        <td class="label">Name</td>
+        <td><strong><?php echo htmlspecialchars($reservation['user_name']); ?></strong></td>
+      </tr>
+      <?php endif; ?>
+
+      <?php if (!empty($reservation['user_phone'])): ?>
+      <tr>
+        <td class="label">Phone</td>
+        <td><strong><?php echo htmlspecialchars($reservation['user_phone']); ?></strong></td>
+      </tr>
+      <?php endif; ?>
+
+      <tr>
+        <td class="label">Date</td>
         <td><?php echo date('d.m.Y', strtotime($reservation['reservation_date'])); ?></td>
       </tr>
       <tr>
-        <td class="label">Uhrzeit</td>
+        <td class="label">Time</td>
         <td>
           <?php echo date('H:i', strtotime($reservation['start_time'])); ?>
           –
@@ -162,22 +177,22 @@ body {
         </td>
       </tr>
       <tr>
-        <td class="label">Dauer</td>
-        <td><?php echo $reservation['duration_minutes']; ?> Minutennn</td>
+        <td class="label">Length of time</td>
+        <td><?php echo $reservation['duration_minutes']; ?> Minutes</td>
       </tr>
       <tr>
-        <td class="label">Personen</td>
+        <td class="label">Persons</td>
         <td><?php echo $reservation['people']; ?></td>
       </tr>
       <tr>
-        <td class="label">Gebühr</td>
+        <td class="label">Fee</td>
         <td>€<?php echo number_format($reservation['reservation_fees'], 2); ?></td>
       </tr>
     </tbody>
   </table>
 
   <div class="footer">
-    <p>Vielen Dank für Ihre Reservierung!</p>
+    <p>Thank you for your reservation!</p>
   </div>
 
 </div>
