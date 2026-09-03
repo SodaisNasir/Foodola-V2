@@ -309,61 +309,57 @@ if(isset($_POST['btn_delete_depart'])){
     }
 
 }
+
 if (isset($_POST['btn_update_depart'])) {
-//     error_reporting(E_ALL);
-// ini_set('display_errors', 1);
     include('../connection.php');
 
-$dpt_id = intval($_POST['dpt_id']);
+    $dpt_id = intval($_POST['dpt_id']);
     $department_name = mysqli_real_escape_string($conn, $_POST['department_name']);
     $status = mysqli_real_escape_string($conn, $_POST['status']);
 
-    // --- SAFE SUBCATEGORY HANDLING ---
-if (isset($_POST['sub_category_ids']) && is_array($_POST['sub_category_ids'])) {
+    // Subcategory handling as Integers
+    if (isset($_POST['sub_category_ids']) && is_array($_POST['sub_category_ids'])) {
+        $subcategory_ids = array_map('intval', $_POST['sub_category_ids']);
+    } else {
+        $subcategory_ids = [];
+    }
 
-    $subcategory_ids = array_map(function($id) {
-        return (string)$id;
-    }, $_POST['sub_category_ids']);
-
-} else {
-
-    $subcategory_ids = [];
-}
-
-    $encoded_ids =  json_encode($subcategory_ids);
+    $encoded_ids = json_encode($subcategory_ids);
 
     // Update SQL
-    $sql = "UPDATE `departments` SET `department_name` = '$department_name',`sub_category_ids` = '$encoded_ids',`status` = '$status'WHERE `id` = $dpt_id
-    ";
-   $result = mysqli_query($conn, $sql);
+    $sql = "UPDATE `departments` SET `department_name` = '$department_name', `sub_category_ids` = '$encoded_ids', `status` = '$status' WHERE `id` = $dpt_id";
+    $result = mysqli_query($conn, $sql);
+
     if ($result) {
-     echo "<script>alert('Updated successfully');window.location.href='../manage_departments.php'</script>";
+        echo "<script>alert('Updated successfully');window.location.href='../manage_departments.php'</script>";
     } else {
         echo "<script>alert('Error updating table: " . mysqli_error($conn) . "');window.location.href='../manage_departments.php'</script>";
     }
 }
+
 if (isset($_POST['btn_insert_depart'])) {
+    include('../connection.php');
 
-  include('../connection.php');
-  $department_name = $_POST['department_name'];
+    $department_name = mysqli_real_escape_string($conn, $_POST['department_name']);
 
-  
-  $subcategory_ids = array_map(function($id) {
-    return (string)$id;
-}, $_POST['sub_category_ids']);
-  $decoded_ids =  json_encode($subcategory_ids);
+    // Subcategory handling as Integers with Safe Check
+    if (isset($_POST['sub_category_ids']) && is_array($_POST['sub_category_ids'])) {
+        $subcategory_ids = array_map('intval', $_POST['sub_category_ids']);
+    } else {
+        $subcategory_ids = [];
+    }
 
-    $sql = "INSERT INTO `departments`(`department_name`, `sub_category_ids`,`status`, `created_at`) VALUES ('$department_name', '$decoded_ids', 'active', NOW())";
-    
-      $result = mysqli_query($conn, $sql);
-      if ($result) {
-          
+    $encoded_ids = json_encode($subcategory_ids);
+
+    $sql = "INSERT INTO `departments` (`department_name`, `sub_category_ids`, `status`, `created_at`) VALUES ('$department_name', '$encoded_ids', 'active', NOW())";
+    $result = mysqli_query($conn, $sql);
+
+    if ($result) {
         header("Location:../manage_departments.php?Massage=Sucessfully Inserted");
-      }else {
-        echo "<script>alert('Sorry, there was an error uploading your file.');window.location.href='../manage_departments.php'</script>";
-      }
+    } else {
+        echo "<script>alert('Sorry, there was an error inserting data.');window.location.href='../manage_departments.php'</script>";
+    }
 }
-
 
 if (isset($_POST['btn_delete_holiday'])) {
     include('../connection.php'); // Include DB connection
