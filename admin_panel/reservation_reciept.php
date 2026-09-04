@@ -6,7 +6,7 @@
 
 include_once('connection.php');
 
-date_default_timezone_set('Europe/Berlin');
+date_default_timezone_set('Asia/Karachi');
 
 // Get and sanitize table_id
 $order_id = isset($_GET['table_id']) ? intval($_GET['table_id']) : 0;
@@ -53,7 +53,7 @@ if ($exec_table_order && mysqli_num_rows($exec_table_order) > 0) {
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Küchen-Bon</title>
+<title>Kitchen ticket</title>
 <style>
 @media print {
   .button { display: none; }
@@ -93,14 +93,14 @@ body { font-family: Arial, sans-serif; font-size: 16px; }
         <img src="images/logo.png" alt="Firmenlogo">
         <h2><?php echo $APP_NAME ?> </h2>
         
-        <div class="big-order">Tischnummer: <?php echo $order_id; ?></div>
+        <div class="big-order">Table number: <?php echo $order_id; ?></div>
     </div>
 
     <div class="details">
-        <p><strong>Datum:</strong> <?php echo date('d.m.Y H:i'); ?></p>
+        <p><strong>Date:</strong> <?php echo date('d.m.Y H:i'); ?></p>
         
         <?php if (!empty($user_data)): ?>
-            <p><strong>Kunde:</strong> <?php echo htmlspecialchars($user_data['name']); ?></p>
+            <p><strong>customer:</strong> <?php echo htmlspecialchars($user_data['name']); ?></p>
             <?php if (!empty($user_data['phone'])): ?>
                 <p><strong>Tel:</strong> <?php echo htmlspecialchars($user_data['phone']); ?></p>
             <?php endif; ?>
@@ -124,7 +124,7 @@ body { font-family: Arial, sans-serif; font-size: 16px; }
                         <td>
                             <div class="item-name"><?php echo htmlspecialchars($item['deal_name']); ?></div>
                             <?php if (!empty($item['deal_description'])): ?>
-                                <div class="notes">Beschreibung: <?php echo htmlspecialchars($item['deal_description']); ?></div>
+                                <div class="notes">Description: <?php echo htmlspecialchars($item['deal_description']); ?></div>
                             <?php endif; ?>
 
                             <?php
@@ -142,7 +142,7 @@ body { font-family: Arial, sans-serif; font-size: 16px; }
                                                     <?php $addons_data = is_string($product['addons']) ? json_decode($product['addons'], true) : $product['addons']; ?>
                                                     <?php if (is_array($addons_data) && count($addons_data) > 0): ?>
                                                         <div class="notes addons-highlight">
-                                                            <strong>Zusätze:</strong>
+                                                            <strong>Additives:</strong>
                                                             <?php
                                                             $addon_list = [];
                                                             foreach ($addons_data as $addon) {
@@ -162,7 +162,7 @@ body { font-family: Arial, sans-serif; font-size: 16px; }
                                                     <?php $types_data = is_string($product['types']) ? json_decode($product['types'], true) : $product['types']; ?>
                                                     <?php if (is_array($types_data) && count($types_data) > 0): ?>
                                                         <div class="notes addons-highlight">
-                                                            <strong>Typen:</strong>
+                                                            <strong>Types:</strong>
                                                             <?php
                                                             $type_list = [];
                                                             foreach ($types_data as $type) {
@@ -222,7 +222,7 @@ body { font-family: Arial, sans-serif; font-size: 16px; }
                                 <?php $addons_data = is_string($item['addons']) ? json_decode($item['addons'], true) : $item['addons']; ?>
                                 <?php if (is_array($addons_data) && count($addons_data) > 0): ?>
                                     <div class="notes addons-highlight">
-                                        <strong>Zusätze:</strong>
+                                        <strong>Additives:</strong>
                                         <?php
                                         $addon_list = [];
                                         foreach ($addons_data as $addon) {
@@ -242,7 +242,7 @@ body { font-family: Arial, sans-serif; font-size: 16px; }
                                 <?php $types_data = is_string($item['types']) ? json_decode($item['types'], true) : $item['types']; ?>
                                 <?php if (is_array($types_data) && count($types_data) > 0): ?>
                                     <div class="notes addons-highlight">
-                                        <strong>Typen:</strong>
+                                        <strong>Types:</strong>
                                         <?php
                                         $type_list = [];
                                         foreach ($types_data as $type) {
@@ -282,15 +282,15 @@ body { font-family: Arial, sans-serif; font-size: 16px; }
                 }
             }
         } else {
-            echo '<tr><td colspan="2">Keine Bestelldaten gefunden</td></tr>';
+            echo '<tr><td colspan="2">No order data found</td></tr>';
         }
         ?>
         </table>
     </div>
 
     <div class="footer">
-        <p>Gesamtanzahl Artikel: <?php echo $total_items; ?></p>
-        <p>*** Vielen Dank! ***</p>
+        <p>Total number of items: <?php echo $total_items; ?></p>
+        <p>*** Thank you! ***</p>
     </div>
 </div>
 

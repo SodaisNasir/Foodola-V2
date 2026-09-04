@@ -1,6 +1,6 @@
 <?php
 include_once('connection.php');
-date_default_timezone_set('Europe/Berlin');
+date_default_timezone_set('Asia/Karachi');
 
 $table_id = intval($_GET['table_id'] ?? 0);
 $dept_id  = intval($_GET['department_id'] ?? 0);
@@ -48,7 +48,7 @@ $total_items = 0;
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Küchenbon — <?php echo htmlspecialchars($dept_name); ?></title>
+<title>Kitchen ticket — <?php echo htmlspecialchars($dept_name); ?></title>
 <style>
 
 @media print {
@@ -116,7 +116,7 @@ thead td{font-weight:bold;text-align:left;padding:3px;font-size:13px;}
         <!--<img src="images/logo.png" width="50">-->
         <!--<h2><?php echo $APP_NAME?></h2>-->
      <div class="big-order" style="display:flex; justify-content:space-between; padding-right:10px;">
-        <div>Tisch: <?php echo $table_id ?></div>
+        <div>Table: <?php echo $table_id ?></div>
         <div style="text-align:right;">
             <?php echo htmlspecialchars($dept_name); ?>
         </div>
@@ -139,8 +139,8 @@ thead td{font-weight:bold;text-align:left;padding:3px;font-size:13px;}
     <table>
     <thead>
         <tr>
-            <td>Artikel</td>
-            <td style="text-align:right;">Menge</td>
+            <td>Article</td>
+            <td style="text-align:right;">Crowd</td>
         </tr>
     </thead>
     <tbody>
@@ -227,7 +227,7 @@ thead td{font-weight:bold;text-align:left;padding:3px;font-size:13px;}
         endforeach;
     else:
     ?>
-        <tr><td colspan="2">Keine Bestelldaten gefunden</td></tr>
+        <tr><td colspan="2">No order data found</td></tr>
     <?php endif; ?>
     </tbody>
     </table>

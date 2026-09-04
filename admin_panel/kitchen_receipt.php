@@ -43,7 +43,7 @@ function getTableName($conn, $table_id) {
     $query = "SELECT table_name FROM tables WHERE id = $table_id";
     $result = mysqli_query($conn, $query);
     $table = mysqli_fetch_assoc($result);
-    return $table ? $table['table_name'] : "Tisch $table_id";
+    return $table ? $table['table_name'] : "Table $table_id";
 }
 
 $order_data_results = getOrderData($conn, $order_id);
@@ -87,7 +87,7 @@ if ($result_deal && mysqli_num_rows($result_deal) > 0) {
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Küchenbon</title>
+  <title>Kitchen ticket</title>
   
   <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
@@ -180,7 +180,7 @@ if ($result_deal && mysqli_num_rows($result_deal) > 0) {
      <div class="details">
       <h5>Type: <?php echo $order_type=="Lieferung" ? "Delivery" : "Pickup"; ?></h5>
       <?php if ($check_data['order_type'] === 'table_order'): ?>
-        <p><strong>Tisch:</strong> <?php echo $table_name; ?></p>
+        <p><strong>Table:</strong> <?php echo $table_name; ?></p>
       <?php endif; ?>
       <p><strong>Date Time:</strong> <?php echo date('d.m.Y H:i'); ?></p>
     </div>
@@ -209,7 +209,7 @@ if ($result_deal && mysqli_num_rows($result_deal) > 0) {
           <td>
             <div class="item-name"><?php echo htmlspecialchars($value['name']); ?></div>
             <?php if (!empty($value['additional_notes'])): ?>
-              <div class="item-notes">Notiz: <?php echo htmlspecialchars($value['additional_notes']); ?></div>
+              <div class="item-notes">note: <?php echo htmlspecialchars($value['additional_notes']); ?></div>
             <?php endif; ?>
             <div class="item-options">
               <?php if (!empty($addons)) foreach ($addons as $addon) echo "x{$addon->quantity} " . htmlspecialchars($addon->as_name) . "<br>"; ?>

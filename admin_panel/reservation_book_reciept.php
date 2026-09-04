@@ -1,6 +1,6 @@
 <?php
 include_once('connection.php');
-date_default_timezone_set('Europe/Berlin');
+date_default_timezone_set('Asia/Karachi');
 
 $reservation_id = intval($_GET['reservation_id'] ?? 0);
 if (!$reservation_id) {

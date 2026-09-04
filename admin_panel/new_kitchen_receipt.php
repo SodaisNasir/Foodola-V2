@@ -1,6 +1,6 @@
 <?php
 include_once('connection.php');
-date_default_timezone_set('Europe/Berlin');
+date_default_timezone_set('Asia/Karachi');
 
 $order_id = intval($_GET['order_id'] ?? 0);
 $dept_id  = intval($_GET['department_id'] ?? 0);
@@ -51,7 +51,7 @@ function getTableName($conn, $table_id) {
     $query = "SELECT table_name FROM tables WHERE id = $table_id";
     $result = mysqli_query($conn, $query);
     $table = mysqli_fetch_assoc($result);
-    return $table ? $table['table_name'] : "Tisch $table_id";
+    return $table ? $table['table_name'] : "Table $table_id";
 }
 
 $table_name = getTableName($conn, $check_data['table_id']);
@@ -68,7 +68,7 @@ function isDeptProduct($sub_ids, $sub_category_id) {
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Küchenbon — <?php echo htmlspecialchars($dept_name); ?></title>
+<title>Kitchen ticket — <?php echo htmlspecialchars($dept_name); ?></title>
 <style>
 @media print {
   .button {
@@ -134,23 +134,23 @@ td{padding:3px;font-size:13px;vertical-align:top;}
     <div class="header">
         <!--<img src="images/logo.png" width="50">-->
         <h2><?php echo $APP_NAME ?></h2>
-        <div class="big-order">BESTELL-NR: <?php echo $order_id; ?></div>
+        <div class="big-order">Order-NR: <?php echo $order_id; ?></div>
     </div>
 
     <div class="dept-title"><?php echo htmlspecialchars($dept_name); ?></div>
 
     <div class="details">
-        <p><strong>Auftragsart:</strong> <?php echo $order_type; ?></p>
-        <p><strong>Datum:</strong> <?php echo date('d.m.Y H:i'); ?></p>
+        <p><strong>Order Type:</strong> <?php echo $order_type; ?></p>
+        <p><strong>Date:</strong> <?php echo date('d.m.Y H:i'); ?></p>
     </div>
 
-    <div class="order-details-header">KÜCHENBESTELLUNG</div>
+    <div class="order-details-header">Order Details</div>
 
     <table>
         <thead>
             <tr>
-                <td>Artikel</td>
-                <td style="text-align:right;">Menge</td>
+                <td>Item</td>
+                <td style="text-align:right;">QTY</td>
             </tr>
         </thead>
         <tbody>
@@ -231,8 +231,8 @@ td{padding:3px;font-size:13px;vertical-align:top;}
     </table>
 
     <div class="footer">
-        <p>Gesamtanzahl Artikel: <?php echo $total_items; ?></p>
-        <p>Vielen Dank!</p>
+        <p>Total Items: <?php echo $total_items; ?></p>
+        <p>Thank You!</p>
     </div>
 </div>
 <script>window.onload = () => window.print();</script>

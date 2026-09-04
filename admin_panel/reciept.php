@@ -5,7 +5,7 @@ include_once('connection.php');
 
 include_once('phpfiles/function.php');
 
-date_default_timezone_set('Europe/Berlin');
+date_default_timezone_set('Asia/Karachi');
 $order_id = intval($_GET['order_id']); // Sanitize input
 $minutes_to_add = 0;
 
@@ -568,7 +568,7 @@ body {
         </h3>
          
         <h3>
-        Klingeln name: <?= !empty($data['Shipping_area']) ? $data['Shipping_area'] : ($data['Shipping_city'] ?? '') ?>
+        Name on the doorbell: <?= !empty($data['Shipping_area']) ? $data['Shipping_area'] : ($data['Shipping_city'] ?? '') ?>
         </h3>
     
         <h3><?php echo (($data['Shipping_state']  != ''? "Info: ".$data['Shipping_state']: ''))?></h3>  
