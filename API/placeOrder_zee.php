@@ -34,7 +34,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
     $order_total_price = number_format(($_POST['order_total_price'] + $Shipping_cost), 2);
     $order_datails  = json_decode($_POST['order_datails']);
     $total_netto_tax = $_POST['total_netto_tax'];
-    $total_metto_tax = $_POST['$total_metto_tax'] ?? 0.00;
+    $total_metto_tax = $_POST['total_metto_tax'] ?? 0.00;
     $branch_id = $_POST['branch_id'];
     $taskid = $_POST['task_id'] ?? 0;
     $platform = $_POST['platform'];
