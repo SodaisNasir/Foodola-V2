@@ -1,6 +1,12 @@
 <?php
 include("connection.php");
-
+if (empty($_REQUEST['date']) && empty($_REQUEST['month']) && empty($_REQUEST['year']) && (empty($_REQUEST['start_date']) || empty($_REQUEST['end_date']))) {
+http_response_code(403);
+    die("<div style='text-align:center; margin-top:50px; font-family:Arial, sans-serif;'>
+            <h1 style='color:#d9534f; font-size: 36px;'>Access Denied</h1>
+            <p style='font-size:18px; color:#555;'>You have no access to view this report directly.</p>
+         </div>");
+}
 $postData = [
     "token" => "as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC"
 ];
