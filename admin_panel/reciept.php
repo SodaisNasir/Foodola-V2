@@ -837,8 +837,8 @@ if (!empty($reservation_id)) {
 }
 
 
-$shippingTax = $shipping - $shipping/1.19;
-$updated_tax_19 = $shippingTax + $tax_19 ;
+// $shippingTax = $shipping - $shipping/1.19;
+// $updated_tax_19 = $shippingTax + $tax_19 ;
 
 
 
@@ -863,7 +863,7 @@ $updated_tax_19 = $shippingTax + $tax_19 ;
 
 
     <li><span>MwSt. (7%):</span><span><?php echo formatCurrency($tax_7, $currency_sign, $currency_position); ?></span></li>
-    <li><span>MwSt. (19%):</span><span><?php echo formatCurrency($updated_tax_19, $currency_sign, $currency_position); ?></span></li>
+    <li><span>MwSt. (19%):</span><span><?php echo formatCurrency($tax_19, $currency_sign, $currency_position); ?></span></li>
     <li><span>Gesamt:</span><span><?php echo formatCurrency($grand_total, $currency_sign, $currency_position); ?></span></li>
     
   </ul>
