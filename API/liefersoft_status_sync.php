@@ -264,19 +264,41 @@ while ($dbOrder = mysqli_fetch_assoc($query)) {
 
     $updatedOrders[] = ["order_id"   => $order_id,"old_status" => $currentStatus,"new_status" => $liveStatus];
 
+    // /*
+    // |--------------------------------------------------------------------------
+    // | Fetch user
+    // |--------------------------------------------------------------------------
+    // */
+
+    // $userQuery = mysqli_query($conn, "SELECT email,name,notification_token FROM users WHERE id='{$user_id}'LIMIT 1");
+
+    // $user = mysqli_fetch_assoc($userQuery);
+
+    // $email         = $user['email'] ?? '';
+    // $name          = $user['name'] ?? 'Customer';
+    // $notif_token   = $user['notification_token'] ?? '';
+
     /*
     |--------------------------------------------------------------------------
-    | Fetch user
+    | Fetch Customer Details (Registered User OR Guest)
     |--------------------------------------------------------------------------
     */
+    $email       = '';
+    $name        = 'Customer';
+    $notif_token = '';
 
-    $userQuery = mysqli_query($conn, "SELECT email,name,notification_token FROM users WHERE id='{$user_id}'LIMIT 1");
-
-    $user = mysqli_fetch_assoc($userQuery);
-
-    $email         = $user['email'] ?? '';
-    $name          = $user['name'] ?? 'Customer';
-    $notif_token   = $user['notification_token'] ?? '';
+    if ($user_id > 0) {
+        $userQuery = mysqli_query($conn, "SELECT email, name, notification_token FROM users WHERE id='{$user_id}' LIMIT 1");
+        if ($userQuery && mysqli_num_rows($userQuery) > 0) {
+            $user        = mysqli_fetch_assoc($userQuery);
+            $email       = !empty($user['email']) ? $user['email'] : $dbOrder['user_email'];
+            $name        = !empty($user['name']) ? $user['name'] : (!empty($dbOrder['user_name']) ? $dbOrder['user_name'] : 'Customer');
+            $notif_token = $user['notification_token'] ?? '';
+        }
+    } else {
+        $email = $dbOrder['user_email'] ?? '';
+        $name  = !empty($dbOrder['user_name']) ? $dbOrder['user_name'] : 'Customer';
+    }
 
     /*
     |--------------------------------------------------------------------------
