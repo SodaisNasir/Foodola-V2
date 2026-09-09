@@ -1,6 +1,7 @@
 <?php
 require 'connection.php';
-
+// error_reporting(E_ALL);
+// ini_set('display_errors', '1');
 // Get environment variables
 $sql = "SELECT key_name, key_value FROM enviroments";
 $result = mysqli_query($conn, $sql);
@@ -44,7 +45,14 @@ function getTaxType($itemType) {
 // Fetch new orders only
 $sql_pending = "SELECT * FROM orders_zee WHERE  sent_to_liefersoft = 0  AND `platform` != 'pos'  ORDER BY id ASC LIMIT 10";
 $res_pending = mysqli_query($conn, $sql_pending);
-if (mysqli_num_rows($res_pending) == 0) exit;
+if (mysqli_num_rows($res_pending) == 0) {
+    header('Content-Type: application/json');
+    echo json_encode([
+        "status" => true,
+        "message" => "No new pending orders found to process for Liefersoft."
+    ], JSON_PRETTY_PRINT);
+    exit;
+}
 
 // Login to Liefersoft
  $login_payload = [
@@ -69,9 +77,17 @@ $output = [];
 
 while ($order = mysqli_fetch_assoc($res_pending)) {
     $order_id = $order['id'];
-    $user_res = mysqli_query($conn, "SELECT * FROM users WHERE id='".$order['user_id']."'");
-    if (mysqli_num_rows($user_res) == 0) continue;
-    $user = mysqli_fetch_assoc($user_res);
+    
+    $user = null;
+    if (!empty($order['user_id'])) {
+        $user_res = mysqli_query($conn, "SELECT * FROM users WHERE id='".$order['user_id']."'");
+        if ($user_res && mysqli_num_rows($user_res) > 0) {
+            $user = mysqli_fetch_assoc($user_res);
+        }
+    }
+
+    $customerName  = !empty($user['name'])  ? $user['name']  : ($order['user_name']  ?? 'Guest Customer');
+    $customerPhone = !empty($user['phone']) ? $user['phone'] : ($order['user_phone'] ?? '0000000000');
 
     $res_items = mysqli_query($conn, "SELECT * FROM order_details_zee WHERE order_id='$order_id'");
     $items = [];
@@ -307,11 +323,18 @@ $finalPrice = round(max(0, $originalPrice - $discountAmount - $additionalDiscoun
     
         $orderType = strtoupper(trim($order['order_type'] ?? 'DELIVERY'));
         
+        // $customerData = [
+        //     "companyName" => $order['company_name'] ?: ".",
+        //     "name" => $user['name'] ?: ".",
+        //     "phoneNumber" => $user['phone'] ?: "0000000000",
+        //     "remark" => $order['customer_remark'] ?: "."
+        // ];
+        
         $customerData = [
-            "companyName" => $order['company_name'] ?: ".",
-            "name" => $user['name'] ?: ".",
-            "phoneNumber" => $user['phone'] ?: "0000000000",
-            "remark" => $order['customer_remark'] ?: "."
+        "companyName" => $order['company_name'] ?: ".",
+        "name"        => $customerName,
+        "phoneNumber" => $customerPhone,
+        "remark"      => $order['customer_remark'] ?: "."
         ];
         
         // Only send address if NOT pickup
