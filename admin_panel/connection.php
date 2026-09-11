@@ -13,7 +13,7 @@ $company_phone   = "0725326560-61";
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "csptxytwkopsdeht";
-$FROM_EMAIL = "support@foodola.de";
+$FROM_EMAIL = "support@pizzablitz.de";
 
 
 
