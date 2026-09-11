@@ -12,7 +12,23 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 use Pusher\Pusher;
+// Helper Function for Form-Data POST Request
+function sendToPlaceOrderG($payload, $baseUrl)
+{
 
+    $fullUrl = rtrim($baseUrl, '/') . '/API/place_order_g.php';
+
+    $ch = curl_init($fullUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+    $response = curl_exec($ch);
+    curl_close($ch);
+    return $response;
+}
 if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC') {
 
     include('connection.php');
@@ -130,8 +146,8 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                 $no_of_deal = 1;
                 $department_list = [];
                 $addedDepartments = []; // track added department IDs
+                $clean_order_details = [];
 
-    
 
 
                 foreach ($order_datails as $details) {
@@ -139,108 +155,163 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     $deal_id =  $details->deal_id;
                     $isDeal = $details->is_deal;
                     $deal_items_array = $details->deal_items;
+                    $deal_qty = $details->quantity ?? 1;
                     $additionalNotes = mysqli_real_escape_string($conn, $details->additionalNotes);
                     $no_of_deal++;
-                
-                    
-                    
+
+
+
                     if ($isDeal == "yes") {
+
                         $sql_getitems = "SELECT `deal_cost`, `deal_price` FROM `deals` WHERE `deal_id` = $deal_id";
                         $ex_get_items = mysqli_query($conn, $sql_getitems);
                         $Data = mysqli_fetch_array($ex_get_items);
-                        $cost = $Data['deal_cost'];
-                        $price = $Data['deal_price'];
+                        $cost = $Data['deal_cost'] ?? 0;
+                        $price = $Data['deal_price'] ?? 0;
                         $discount = 0;
-                        
+
                         $additional_discount = 0;
-                                    
-                          if (!empty($wallet_balance) && $order_total_price > 0) {
-            
+
+                        if (!empty($wallet_balance) && $order_total_price > 0) {
+
                             $product_total_price = $price;
-                            foreach ($details->deal_items as $dealItem) {
+                            foreach ($deal_items_array as $dealItem) {
+                                $items_products = $dealItem->items_products ?? [];
+                                foreach ($items_products as $itemsOfProducts) {
+                                    $addons_array = $itemsOfProducts->addons ?? [];
+                                    foreach ($addons_array as $addons) {
+                                        $addonprice = isset($addons->as_price) ? (float)$addons->as_price : 0;
+                                        $addonqty   = isset($addons->quantity) ? (int)$addons->quantity : 1;
 
-                                     foreach ($dealItem->items_products as $itemsOfProducts) {
-
-                                         foreach ($itemsOfProducts->addons as $addons) {
-                                             
-                                                $product_total_price += $addons->as_price *$addons->quantity ;
-                                            }
-                      
+                                        $product_total_price += ($addonprice * $addonqty * $deal_qty);
                                     }
-                   
-                              }
-                           
+                                }
+                            }
+
                             $totalinitial = ($order_total_price + $wallet_balance) - $Shipping_cost;
-                            $ratio = $product_total_price / $totalinitial;
-                            $additional_discount = round(($wallet_balance * $ratio), 2);
-                        }  
+                            if ($totalinitial > 0) {
+                                $ratio = $product_total_price / $totalinitial;
+                                $additional_discount = round(($wallet_balance * $ratio), 2);
+                            }
+                        }
+
                         $additional_discount_inserted = 0;
+                        $primary_ext_dept_id = null;
+
                         foreach ($deal_items_array as $itemsOfDeals) {
                             $item_id = $itemsOfDeals->item_id;
-                            $items_products = $itemsOfDeals->items_products;
-                            foreach ($items_products as $itemsOfProducts) {
-                                $product_id = $itemsOfProducts->prod_id;
-                                $addons_array = $itemsOfProducts->addons;
-                                $types_array = $itemsOfProducts->types;
-                                $dressing_array = $itemsOfProducts->dressing;
-                                 $is_free = $itemsOfProducts->is_free;
+                            $items_products = $itemsOfDeals->items_products ?? [];
 
-                            
+                            foreach ($items_products as &$itemsOfProducts) {
+                                $product_id = $itemsOfProducts->prod_id;
+                                $addons_array = $itemsOfProducts->addons ?? [];
+                                $types_array = $itemsOfProducts->types ?? [];
+                                $dressing_array = $itemsOfProducts->dressing ?? [];
+                                $is_free = $itemsOfProducts->is_free ?? 0;
 
                                 $tyy_pes = mysqli_real_escape_string($conn, json_encode($types_array, JSON_UNESCAPED_UNICODE));
                                 $dress_ing = mysqli_real_escape_string($conn, json_encode($dressing_array, JSON_UNESCAPED_UNICODE));
                                 $add_oon = mysqli_real_escape_string($conn, json_encode($addons_array, JSON_UNESCAPED_UNICODE));
 
-
                                 $sql_getpro = "SELECT * FROM `products` WHERE `id` = '$product_id'";
                                 $ex_get_pro = mysqli_query($conn, $sql_getpro);
                                 $product = mysqli_fetch_array($ex_get_pro);
-                                $pro_name = mysqli_real_escape_string($conn, $product['name']);
-                                $pro_decs = mysqli_real_escape_string($conn, $product['description']);
-                                $pro_price = mysqli_real_escape_string($conn, $product['price']);
+
+                                $pro_name = mysqli_real_escape_string($conn, $product['name'] ?? '');
+                                $pro_decs = mysqli_real_escape_string($conn, $product['description'] ?? '');
+                                $pro_price = mysqli_real_escape_string($conn, $product['price'] ?? 0);
                                 $pro_discount = 0;
 
-                               
-                                //adding this to not add value in DB multiple times to make the calcuation easy for reporting.
-                                if($additional_discount_inserted === 1){
-                                  $additional_discount = 0;
-                                  $price = 0;
-                                  $cost = 0;
+                                if ($additional_discount_inserted === 1) {
+                                    $additional_discount = 0;
+                                    $price = 0;
+                                    $cost = 0;
                                 }
-                        
 
-
-
-                                //print_r($tyy_pes); 
-                                $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`,`product_description`,`additional_notes`, `addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`, `additional_discount`,`is_free`, `qty`)
-                                                  VALUES ('$last_id','$deal_id','$item_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$add_oon','$tyy_pes','$dress_ing' , '$cost' , '$price', '$pro_discount', '$no_of_deal', '$datetime', '$additional_discount', '$is_free', 1 )";
+                                $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`,`product_description`,`additional_notes`, `addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`,`additional_discount`,`is_free`, `qty` )
+                         VALUES ('$last_id','$deal_id','$item_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$add_oon','$tyy_pes','$dress_ing' , '$cost', '$price', '$pro_discount','$no_of_deal', '$datetime', '$additional_discount', '$is_free', 1)";
                                 $exec_sql_deal = mysqli_query($conn, $sql_deal);
+
                                 $additional_discount_inserted = 1;
 
+                                // Deduct stock for deal products
+                                deductStock($conn, $product_id, $deal_qty, $last_id);
+
                                 // Fetch departments for this product
-                                $sub_category_id = intval($product['sub_category_id']);
-                                $sql_department = "SELECT id, department_name FROM departments WHERE JSON_CONTAINS(sub_category_ids, $sub_category_id )";
+                                $sub_category_id = intval($product['sub_category_id'] ?? 0);
+                                $sql_department = "SELECT id, department_name, external_department_id FROM departments WHERE status = 'active' 
+                                    AND sub_category_ids REGEXP '(^|[^0-9])" . $sub_category_id . "([^0-9]|$)';";
                                 $res_dep = mysqli_query($conn, $sql_department);
+
+                                $current_ext_dept_id = null;
 
                                 if ($res_dep && mysqli_num_rows($res_dep) > 0) {
                                     while ($dep = mysqli_fetch_assoc($res_dep)) {
+                                        if (!$current_ext_dept_id) {
+                                            $current_ext_dept_id = $dep['external_department_id'];
+                                            if (!$primary_ext_dept_id) {
+                                                $primary_ext_dept_id = $current_ext_dept_id;
+                                            }
+                                        }
 
-                                        // Skip if this department_id already exists
                                         if (in_array($dep['id'], $addedDepartments)) {
                                             continue;
                                         }
 
-                                        // Add the record
                                         $department_list[] = [
                                             "department_id" => $dep['id'],
-                                            "department_name" => $dep['department_name']
+                                            "department_name" => $dep['department_name'],
+                                            "external_department_id" => $dep['external_department_id']
                                         ];
-
-                                        // Mark as added
                                         $addedDepartments[] = $dep['id'];
                                     }
                                 }
+
+                                // Fetch Recipe Details
+                                $sql_getrecipe = "SELECT `id`, `external_recipe_id` FROM `recipes` WHERE `product_id` = '$product_id'";
+                                $exec_sql_getrecipe = mysqli_query($conn, $sql_getrecipe);
+                                $recipe = mysqli_fetch_array($exec_sql_getrecipe);
+
+                                // Enrich product info inside deal_items array
+                                $itemsOfProducts->product_name        = $product['name'] ?? '';
+                                $itemsOfProducts->product_description = $product['description'] ?? '';
+                                $itemsOfProducts->external_recipe_id  = $recipe['external_recipe_id'] ?? null;
+                                $itemsOfProducts->department_id       = $current_ext_dept_id;
+                                $itemsOfProducts->sub_category_id    = $sub_category_id;
                             }
+                            unset($itemsOfProducts);
+                        }
+
+                        // PARENT API PAYLOAD BUILD
+                        $envQuery = mysqli_query($conn, "SELECT `key_name`, `key_value` FROM `enviroments` WHERE `key_name` IN ('parent_shop_url', 'shop_access_token')");
+                        $envData = [];
+                        while ($row = mysqli_fetch_assoc($envQuery)) {
+                            $envData[$row['key_name']] = $row['key_value'];
+                        }
+
+                        $base_url     = $envData['parent_shop_url'] ?? '';
+                        $access_token = $envData['shop_access_token'] ?? '';
+
+                        if (!empty($base_url) && !empty($access_token)) {
+                            $clean_order_details[] = [
+                                "id"              => $deal_id,
+                                "recipe_id"       => null,
+                                "department_id"   => $primary_ext_dept_id,
+                                "sub_category_id" => null,
+                                "name"            => $details->name ?? 'Deal',
+                                "description"     => $details->description ?? '',
+                                "price"           => $details->deal_price ?? $Data['deal_price'] ?? 0,
+                                "cost"            => $details->deal_cost ?? $Data['deal_cost'] ?? 0,
+                                "quantity"        => $deal_qty,
+                                "is_deal"         => "yes",
+                                "deal_id"         => $deal_id,
+                                "deal_items"      => $deal_items_array,
+                                "additionalNotes" => $additionalNotes,
+                                "is_free"         => 0,
+                                "addons"          => $details->addons ?? [],
+                                "types"           => $details->types ?? [],
+                                "dressing"        => $details->dressing ?? [],
+                            ];
                         }
                     } else {
 
@@ -263,7 +334,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         $addons_array = $details->addons;
                         $types_array = $details->types;
                         $dressing_array = $details->dressing;
-                         $is_free = $details->is_free;
+                        $is_free = $details->is_free;
                         $additionalNotes = mysqli_real_escape_string($conn, $details->additionalNotes);
 
                         $add_oons = (json_encode(($addons_array)));
@@ -275,12 +346,12 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                             mysqli_set_charset($conn, "utf8");
                             $r = mysqli_query($conn, $sql_fetch_name);
                             $data_addon = mysqli_fetch_array($r);
-                            
+
                             $addonprice = (float)($ao->as_price ?? 0);
                             $addonqty   = (int)($ao->quantity ?? 0);
-                            
+
                             $addonsTotal += $addonprice * $addonqty;
-                            
+
                             $temp = [
                                 "as_id" => $ao->as_id,
                                 "as_name" =>  trim($data_addon['as_name']),
@@ -298,61 +369,141 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
 
 
 
-                        
+
                         $additional_discount = 0;
-                    
+
                         if (!empty($wallet_balance) && $order_total_price > 0) {
-            
+
                             $quantity = $details->quantity;
-                            
-                            $product_total_price = ($price * $quantity  - ($discount/100 * ($price * $quantity)))+ $addonsTotal;
-                            
-                                 
-                           
+
+                            $product_total_price = ($price * $quantity  - ($discount / 100 * ($price * $quantity))) + $addonsTotal;
+
+
+
                             $totalinitial = ($order_total_price + $wallet_balance) - $Shipping_cost;
                             $ratio = $product_total_price / $totalinitial;
                             $additional_discount = round(($wallet_balance * $ratio), 2);
-                        }  
+                        }
 
                         $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`, `product_description`,`additional_notes`, `qty` ,`addons`,`types`, `dressing` , `cost` , `price` , `discount_percent`,`additional_discount`,`is_free`)
                                 VALUES ('$last_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$quantity','$add_oon','$tyy_pes','$dress_ing' , '$cost' , '$price' , '$discount', '$additional_discount', '$is_free' )";
                         $exec_sql_deal = mysqli_query($conn, $sql_deal);
-                        
-                        
-                        
-                        
-                                     
-                                  // run deduct stock function
-                            deductStock($conn, $product_id, $quantity, $last_id);
 
 
-                        // Fetch departments for this product
 
-                        $sql_department = "SELECT id, department_name FROM departments WHERE JSON_CONTAINS(sub_category_ids, $pro_subcategory_id )";
+
+
+                        // Deduct stock
+                        deductStock($conn, $product_id, $quantity, $last_id);
+
+
+                        $sql_department = "SELECT id, department_name, external_department_id 
+                   FROM departments 
+                   WHERE status = 'active' 
+                     AND sub_category_ids REGEXP '(^|[^0-9])" . intval($pro_subcategory_id) . "([^0-9]|$)';";
                         $res_dep = mysqli_query($conn, $sql_department);
 
+                        $current_ext_dept_id = null;
 
                         if ($res_dep && mysqli_num_rows($res_dep) > 0) {
                             while ($dep = mysqli_fetch_assoc($res_dep)) {
+                                if (!$current_ext_dept_id) {
+                                    $current_ext_dept_id = $dep['external_department_id'];
+                                }
 
-                                // Skip if this department_id already exists
                                 if (in_array($dep['id'], $addedDepartments)) {
                                     continue;
                                 }
 
-                                // Add the record
                                 $department_list[] = [
                                     "department_id" => $dep['id'],
-                                    "department_name" => $dep['department_name']
+                                    "department_name" => $dep['department_name'],
+                                    "external_department_id" => $dep['external_department_id']
                                 ];
-
-                                // Mark as added
                                 $addedDepartments[] = $dep['id'];
                             }
                         }
+
+                        $envQuery = mysqli_query($conn, "SELECT `key_name`, `key_value` FROM `enviroments` WHERE `key_name` IN ('parent_shop_url', 'shop_access_token')");
+
+                        $envData = [];
+                        while ($row = mysqli_fetch_assoc($envQuery)) {
+                            $envData[$row['key_name']] = $row['key_value'];
+                        }
+
+                        $base_url = $envData['parent_shop_url'] ?? '';
+                        $access_token = $envData['shop_access_token'] ?? '';
+
+                        // External API payload uses raw arrays
+                        if (!empty($base_url) && !empty($access_token)) {
+                            $sql_getrecipe = "SELECT `id`, `external_recipe_id` FROM `recipes` WHERE `product_id` = '$product_id'";
+                            $exec_sql_getrecipe = mysqli_query($conn, $sql_getrecipe);
+                            $recipe = mysqli_fetch_array($exec_sql_getrecipe);
+
+
+                            $clean_order_details[] = [
+                                "id"              => $product_id,
+                                "recipe_id"       => $recipe['external_recipe_id'] ?? null,
+                                "department_id"   => $current_ext_dept_id ?? null,
+                                "sub_category_id" => $pro_subcategory_id,
+                                "name"            => $Data['name'] ?? '',
+                                "description"     => $Data['description'] ?? '',
+                                "price"           => $price,
+                                "cost"            => $cost,
+                                "quantity"        => $quantity,
+                                "is_deal"         => $isDeal,
+                                "deal_id"         => $details->deal_id ?? null,
+                                "deal_items"      => $details->deal_items ?? [],
+                                "additionalNotes" => $details->additionalNotes ?? '',
+                                "is_free"         => $is_free,
+                                "addons"          => $details->addons ?? [],
+                                "types"           => $details->types ?? [],
+                                "dressing"        => $details->dressing ?? [],
+                            ];
+                        }
                     }
                 }
+                // 5. Send External cURL Payload (Once Per Order)
+                if (!empty($base_url) && !empty($access_token) && !empty($clean_order_details)) {
+                    if ($user_id) {
+                        $sql_u = "SELECT `name`, `email`, `phone` FROM `users` WHERE `id` = '$user_id'";
+                        $res_u = mysqli_query($conn, $sql_u);
+                        $user_data = mysqli_fetch_assoc($res_u);
+                    } else {
+                        $user_data = [
+                            'name' => $user_name,
+                            'email' => $user_email,
+                            'phone' => $user_phone
+                        ];
+                    }
 
+                    $external_payload = [
+                        'access_token'         => $access_token,
+                        'user_name'            => $user_data['name'] ?? '',
+                        'user_email'           => $user_data['email'] ?? '',
+                        'user_phone'           => $user_data['phone'] ?? '',
+                        'Shipping_address_2'   => $Shipping_address_2,
+                        'Shipping_city'        => $Shipping_city,
+                        'Shipping_area'        => $Shipping_area,
+                        'Shipping_postal_code' => $Shipping_postal_code,
+                        'Shipping_cost'        => $Shipping_cost,
+                        'payment_method'       => $payment_method,
+                        'order_type'           => $order_type,
+                        'payment_status'       => $payment_status,
+                        'payment_type'         => $payment_type,
+                        'addtional_notes'      => $addtional_notes,
+                        'order_datails'        => json_encode($clean_order_details, JSON_UNESCAPED_UNICODE),
+                        'total_netto_tax'      => $total_netto_tax,
+                        'total_metto_tax'      => $total_metto_tax,
+                        'branch_id'            => $branch_id,
+                        'order_total_price'    => $_POST['order_total_price'] ?? '',
+                        'total_discount'       => $total_discount,
+                        'platform'             => $platform,
+                        'child_order_id'       => $child_order_id
+                    ];
+
+                    sendToPlaceOrderG($external_payload, $base_url);
+                }
 
                 if ($exec_sql_deal) {
                     // Send notification to user (already done)
@@ -380,72 +531,71 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     array_push($data_array, $data);
                     echo json_encode($data_array);
 
-                            if($user_id){
-                        
-                                      // Insert into notifications table
-                                $insert_noti_details = "INSERT INTO `notification`( `user_id`, `content`, `purpose`) VALUES ('$user_id','Ihre Bestellung wurde erfolgreich aufgegeben','order')";
-                                mysqli_query($conn, $insert_noti_details);
-            
-                                // Fetch user notification token
-                                $sqltaskMembers = "SELECT orders.id , users.name, users.notification_token FROM `orders_zee` AS orders INNER JOIN users AS users On users.id = orders.user_id WHERE orders.id = $last_id";
-                                $taskMembers = mysqli_query($conn, $sqltaskMembers);
-                                $playerId = [];
-                                $user_name = "";
-            
-                                while ($row = mysqli_fetch_array($taskMembers)) {
-                                    $order_id =  $row['id'];
-                                    $user_name = $row['name'];
-                                    if (!empty($row['notification_token'])) {
-                                        $playerId[] = $row['notification_token'];
-                                    }
-                                }
-            
-                                // ✅ Fetch admin notification tokens
-                                $adminTokens = [];
-                                $select_admin_sql = "SELECT `notification_token` FROM `users` WHERE `role_id` = '1'";
-                                $admin_result = mysqli_query($conn, $select_admin_sql);
-            
-                                while ($admin_row = mysqli_fetch_assoc($admin_result)) {
-                                    if (!empty($admin_row['notification_token'])) {
-                                        $adminTokens[] = $admin_row['notification_token'];
-                                    }
-                                }
-            
-                                // ✅ Merge user and admin tokens
-                                $allRecipients = array_merge($playerId, $adminTokens);
-            
-                                // ✅ Build OneSignal payload
-                                $content = array(
-                                    "en" => 'Ihre Bestellnummer: ' . $last_id . ' im Wert von ' . ($order_total_price + $Shipping_cost) . '€ wurde erfolgreich aufgegeben und wird in den nächsten 45 bis 60 Minuten geliefert.'
-                                );
-            
-                                $fields = array(
-                                    'app_id' => $ONE_SIGNAL_APP_ID,
-                                    'include_player_ids' => $allRecipients,
-                                    'data' => array("foo" => "NewMassage", "Id" => $taskid),
-                                    'large_icon' => "ic_launcher_round.png",
-                                    'contents' => $content
-                                );
-            
-                                $fields = json_encode($fields);
-            
-                                // Send notification using cURL
-                                $ch = curl_init();
-                                curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
-                                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                                    'Content-Type: application/json; charset=utf-8',
-                                    "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
-                                ));
-                                curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-                                curl_setopt($ch, CURLOPT_HEADER, FALSE);
-                                curl_setopt($ch, CURLOPT_POST, TRUE);
-                                curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-                                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-            
-                                $response = curl_exec($ch);
-                                curl_close($ch);
-                                    
+                    if ($user_id) {
+
+                        // Insert into notifications table
+                        $insert_noti_details = "INSERT INTO `notification`( `user_id`, `content`, `purpose`) VALUES ('$user_id','Ihre Bestellung wurde erfolgreich aufgegeben','order')";
+                        mysqli_query($conn, $insert_noti_details);
+
+                        // Fetch user notification token
+                        $sqltaskMembers = "SELECT orders.id , users.name, users.notification_token FROM `orders_zee` AS orders INNER JOIN users AS users On users.id = orders.user_id WHERE orders.id = $last_id";
+                        $taskMembers = mysqli_query($conn, $sqltaskMembers);
+                        $playerId = [];
+                        $user_name = "";
+
+                        while ($row = mysqli_fetch_array($taskMembers)) {
+                            $order_id =  $row['id'];
+                            $user_name = $row['name'];
+                            if (!empty($row['notification_token'])) {
+                                $playerId[] = $row['notification_token'];
+                            }
                         }
+
+                        // ✅ Fetch admin notification tokens
+                        $adminTokens = [];
+                        $select_admin_sql = "SELECT `notification_token` FROM `users` WHERE `role_id` = '1'";
+                        $admin_result = mysqli_query($conn, $select_admin_sql);
+
+                        while ($admin_row = mysqli_fetch_assoc($admin_result)) {
+                            if (!empty($admin_row['notification_token'])) {
+                                $adminTokens[] = $admin_row['notification_token'];
+                            }
+                        }
+
+                        // ✅ Merge user and admin tokens
+                        $allRecipients = array_merge($playerId, $adminTokens);
+
+                        // ✅ Build OneSignal payload
+                        $content = array(
+                            "en" => 'Ihre Bestellnummer: ' . $last_id . ' im Wert von ' . ($order_total_price + $Shipping_cost) . '€ wurde erfolgreich aufgegeben und wird in den nächsten 45 bis 60 Minuten geliefert.'
+                        );
+
+                        $fields = array(
+                            'app_id' => $ONE_SIGNAL_APP_ID,
+                            'include_player_ids' => $allRecipients,
+                            'data' => array("foo" => "NewMassage", "Id" => $taskid),
+                            'large_icon' => "ic_launcher_round.png",
+                            'contents' => $content
+                        );
+
+                        $fields = json_encode($fields);
+
+                        // Send notification using cURL
+                        $ch = curl_init();
+                        curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                            'Content-Type: application/json; charset=utf-8',
+                            "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
+                        ));
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+                        curl_setopt($ch, CURLOPT_HEADER, FALSE);
+                        curl_setopt($ch, CURLOPT_POST, TRUE);
+                        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+                        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+
+                        $response = curl_exec($ch);
+                        curl_close($ch);
+                    }
 
 
 
@@ -523,14 +673,14 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         $mail->addAddress($ADMIN_EMAIL);
 
                         $mail->isHTML(true);
-                        
-                        
+
+
 
                         $mail->Subject = "New Order Received #{$last_id} – " . htmlspecialchars($APP_NAME);
-                        
-                    $total_amount= $order_total_price - $Shipping_cost;
-                         $user_name = $user_name ?? $_POST['user_name'];
-                    $mail->Body = newOrderEmailTemplate($APP_NAME,$BASE_URL,$last_id,$user_name,$address,$total_amount,$Shipping_cost,$payment_type,$additionalNotes,$datetime,$LANG);
+
+                        $total_amount = $order_total_price - $Shipping_cost;
+                        $user_name = $user_name ?? $_POST['user_name'];
+                        $mail->Body = newOrderEmailTemplate($APP_NAME, $BASE_URL, $last_id, $user_name, $address, $total_amount, $Shipping_cost, $payment_type, $additionalNotes, $datetime, $LANG);
 
                         $mail->send();
                     } catch (Exception $e) {
@@ -629,7 +779,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
             $no_of_deal = 1;
             $department_list = [];
             $addedDepartments = []; // track added department IDs
-
+            $clean_order_details = [];
 
 
             $total_products_price = 0;
@@ -675,117 +825,164 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                 $deal_id =  $details->deal_id;
                 $isDeal = $details->is_deal;
                 $deal_items_array = $details->deal_items;
+                $deal_qty = $details->quantity ?? 1;
                 $additionalNotes = mysqli_real_escape_string($conn, $details->additionalNotes);
-                
-                
+
+
 
 
                 $no_of_deal++;
                 if ($isDeal == "yes") {
-                    
+
                     $sql_getitems = "SELECT `deal_cost`, `deal_price` FROM `deals` WHERE `deal_id` = $deal_id";
                     $ex_get_items = mysqli_query($conn, $sql_getitems);
                     $Data = mysqli_fetch_array($ex_get_items);
-                    $cost = $Data['deal_cost'];
-                    $price = $Data['deal_price'];
+                    $cost = $Data['deal_cost'] ?? 0;
+                    $price = $Data['deal_price'] ?? 0;
                     $discount = 0;
-                    
-                    
-                     $additional_discount = 0;
-                                
-                      if (!empty($wallet_balance) && $order_total_price > 0) {
-        
+
+                    $additional_discount = 0;
+
+                    if (!empty($wallet_balance) && $order_total_price > 0) {
+
                         $product_total_price = $price;
                         foreach ($deal_items_array as $dealItem) {
-                             $items_products = $dealItem->items_products;
-                                foreach ($items_products as $itemsOfProducts) {
-                                    $addons_array = $itemsOfProducts->addons;
-                                     foreach ($addons_array as $addons) {
-                                            $addonprice = isset($addons->as_price) ? (float)$addons->as_price : 0;
-                                            $addonqty   = isset($addons->quantity) ? (int)$addons->quantity : 0;
-                    
-                                            $product_total_price += ($addonprice * $qty);
-                                        }
-                  
-                                 }
-               
-                          }
-                       
+                            $items_products = $dealItem->items_products ?? [];
+                            foreach ($items_products as $itemsOfProducts) {
+                                $addons_array = $itemsOfProducts->addons ?? [];
+                                foreach ($addons_array as $addons) {
+                                    $addonprice = isset($addons->as_price) ? (float)$addons->as_price : 0;
+                                    $addonqty   = isset($addons->quantity) ? (int)$addons->quantity : 1;
+
+                                    $product_total_price += ($addonprice * $addonqty * $deal_qty);
+                                }
+                            }
+                        }
+
                         $totalinitial = ($order_total_price + $wallet_balance) - $Shipping_cost;
-                        $ratio = $product_total_price / $totalinitial;
-                        $additional_discount = round(($wallet_balance * $ratio), 2);
-                    }  
-                    
-                    
-                    
+                        if ($totalinitial > 0) {
+                            $ratio = $product_total_price / $totalinitial;
+                            $additional_discount = round(($wallet_balance * $ratio), 2);
+                        }
+                    }
+
                     $additional_discount_inserted = 0;
+                    $primary_ext_dept_id = null;
+
                     foreach ($deal_items_array as $itemsOfDeals) {
                         $item_id = $itemsOfDeals->item_id;
-                        $items_products = $itemsOfDeals->items_products;
-                        foreach ($items_products as $itemsOfProducts) {
-                            $product_id = $itemsOfProducts->prod_id;
-                            $addons_array = $itemsOfProducts->addons;
-                            $types_array = $itemsOfProducts->types;
-                            $dressing_array = $itemsOfProducts->dressing;
-                            $is_free = $itemsOfProducts->is_free;
+                        $items_products = $itemsOfDeals->items_products ?? [];
 
+                        foreach ($items_products as &$itemsOfProducts) {
+                            $product_id = $itemsOfProducts->prod_id;
+                            $addons_array = $itemsOfProducts->addons ?? [];
+                            $types_array = $itemsOfProducts->types ?? [];
+                            $dressing_array = $itemsOfProducts->dressing ?? [];
+                            $is_free = $itemsOfProducts->is_free ?? 0;
 
                             $tyy_pes = mysqli_real_escape_string($conn, json_encode($types_array, JSON_UNESCAPED_UNICODE));
                             $dress_ing = mysqli_real_escape_string($conn, json_encode($dressing_array, JSON_UNESCAPED_UNICODE));
                             $add_oon = mysqli_real_escape_string($conn, json_encode($addons_array, JSON_UNESCAPED_UNICODE));
 
-
                             $sql_getpro = "SELECT * FROM `products` WHERE `id` = '$product_id'";
                             $ex_get_pro = mysqli_query($conn, $sql_getpro);
                             $product = mysqli_fetch_array($ex_get_pro);
-                            $pro_name = mysqli_real_escape_string($conn, $product['name']);
-                            $pro_decs = mysqli_real_escape_string($conn, $product['description']);
-                            $pro_price = mysqli_real_escape_string($conn, $product['price']);
+
+                            $pro_name = mysqli_real_escape_string($conn, $product['name'] ?? '');
+                            $pro_decs = mysqli_real_escape_string($conn, $product['description'] ?? '');
+                            $pro_price = mysqli_real_escape_string($conn, $product['price'] ?? 0);
                             $pro_discount = 0;
-                            
-                            
-                            //adding this to not add value in DB multiple times to make the calcuation easy for reporting.
-                            if($additional_discount_inserted === 1){
-                              $additional_discount = 0;
-                              $price = 0;
-                              $cost = 0;
+
+                            if ($additional_discount_inserted === 1) {
+                                $additional_discount = 0;
+                                $price = 0;
+                                $cost = 0;
                             }
 
-                           
-                            $additional_discount_inserted = 1;
-                        
-                     
-                            //print_r($tyy_pes); 
                             $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `deal_id`, `deal_item_id`, `product_id`,`product_name`,`product_description`,`additional_notes`, `addons`,`types`, `dressing` , `cost` , `price` , `discount_percent` , `no_of_deal` , `created_at`,`additional_discount`,`is_free`, `qty` )
-                                                  VALUES ('$last_id','$deal_id','$item_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$add_oon','$tyy_pes','$dress_ing' , '$cost', '$price', '$pro_discount','$no_of_deal', '$datetime', '$additional_discount', '$is_free', 1)";
+                         VALUES ('$last_id','$deal_id','$item_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$add_oon','$tyy_pes','$dress_ing' , '$cost', '$price', '$pro_discount','$no_of_deal', '$datetime', '$additional_discount', '$is_free', 1)";
                             $exec_sql_deal = mysqli_query($conn, $sql_deal);
 
+                            $additional_discount_inserted = 1;
+
+                            // Deduct stock for deal products
+                            deductStock($conn, $product_id, $deal_qty, $last_id);
 
                             // Fetch departments for this product
-                            $sub_category_id = intval($product['sub_category_id']);
-                            $sql_department = "SELECT id, department_name FROM departments WHERE JSON_CONTAINS(sub_category_ids, $sub_category_id )";
+                            $sub_category_id = intval($product['sub_category_id'] ?? 0);
+                            $sql_department = "SELECT id, department_name, external_department_id FROM departments WHERE status = 'active' 
+            AND sub_category_ids REGEXP '(^|[^0-9])" . $sub_category_id . "([^0-9]|$)';";
                             $res_dep = mysqli_query($conn, $sql_department);
 
+                            $current_ext_dept_id = null;
 
                             if ($res_dep && mysqli_num_rows($res_dep) > 0) {
                                 while ($dep = mysqli_fetch_assoc($res_dep)) {
+                                    if (!$current_ext_dept_id) {
+                                        $current_ext_dept_id = $dep['external_department_id'];
+                                        if (!$primary_ext_dept_id) {
+                                            $primary_ext_dept_id = $current_ext_dept_id;
+                                        }
+                                    }
 
-                                    // Skip if this department_id already exists
                                     if (in_array($dep['id'], $addedDepartments)) {
                                         continue;
                                     }
 
-                                    // Add the record
                                     $department_list[] = [
                                         "department_id" => $dep['id'],
-                                        "department_name" => $dep['department_name']
+                                        "department_name" => $dep['department_name'],
+                                        "external_department_id" => $dep['external_department_id']
                                     ];
-
-                                    // Mark as added
                                     $addedDepartments[] = $dep['id'];
                                 }
                             }
+
+                            // Fetch Recipe Details
+                            $sql_getrecipe = "SELECT `id`, `external_recipe_id` FROM `recipes` WHERE `product_id` = '$product_id'";
+                            $exec_sql_getrecipe = mysqli_query($conn, $sql_getrecipe);
+                            $recipe = mysqli_fetch_array($exec_sql_getrecipe);
+
+                            // Enrich product info inside deal_items array
+                            $itemsOfProducts->product_name        = $product['name'] ?? '';
+                            $itemsOfProducts->product_description = $product['description'] ?? '';
+                            $itemsOfProducts->external_recipe_id  = $recipe['external_recipe_id'] ?? null;
+                            $itemsOfProducts->department_id       = $current_ext_dept_id;
+                            $itemsOfProducts->sub_category_id    = $sub_category_id;
                         }
+                        unset($itemsOfProducts);
+                    }
+
+                    // PARENT API PAYLOAD BUILD
+                    $envQuery = mysqli_query($conn, "SELECT `key_name`, `key_value` FROM `enviroments` WHERE `key_name` IN ('parent_shop_url', 'shop_access_token')");
+                    $envData = [];
+                    while ($row = mysqli_fetch_assoc($envQuery)) {
+                        $envData[$row['key_name']] = $row['key_value'];
+                    }
+
+                    $base_url     = $envData['parent_shop_url'] ?? '';
+                    $access_token = $envData['shop_access_token'] ?? '';
+
+                    if (!empty($base_url) && !empty($access_token)) {
+                        $clean_order_details[] = [
+                            "id"              => $deal_id,
+                            "recipe_id"       => null,
+                            "department_id"   => $primary_ext_dept_id,
+                            "sub_category_id" => null,
+                            "name"            => $details->name ?? 'Deal',
+                            "description"     => $details->description ?? '',
+                            "price"           => $details->deal_price ?? $Data['deal_price'] ?? 0,
+                            "cost"            => $details->deal_cost ?? $Data['deal_cost'] ?? 0,
+                            "quantity"        => $deal_qty,
+                            "is_deal"         => "yes",
+                            "deal_id"         => $deal_id,
+                            "deal_items"      => $deal_items_array,
+                            "additionalNotes" => $additionalNotes,
+                            "is_free"         => 0,
+                            "addons"          => $details->addons ?? [],
+                            "types"           => $details->types ?? [],
+                            "dressing"        => $details->dressing ?? [],
+                        ];
                     }
                 } else {
                     $product_id = $details->id;
@@ -817,14 +1014,14 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                         mysqli_set_charset($conn, "utf8");
                         $r = mysqli_query($conn, $sql_fetch_name);
                         $data_addon = mysqli_fetch_array($r);
-                        
-                         $addonprice = (float)($ao->as_price ?? 0);
+
+                        $addonprice = (float)($ao->as_price ?? 0);
                         $addonqty   = (int)($ao->quantity ?? 0);
-                            
+
                         $addonsTotal += $addonprice * $addonqty;
-                        
-                        
-                        
+
+
+
                         $temp = [
                             "as_id" => $ao->as_id,
                             "as_name" =>  trim($data_addon['as_name']),
@@ -842,53 +1039,129 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
 
                     $additional_discount = 0;
 
-                   
-                    
+
+
                     if (!empty($wallet_balance) && $order_total_price > 0) {
-        
                         $quantity = $details->quantity;
-                        
-                        $product_total_price = ($price * $quantity  - ($discount/100 * ($price * $quantity)))+ $addonsTotal;
-                        
-                             
-                       
+                        $product_total_price = ($price * $quantity  - ($discount / 100 * ($price * $quantity))) + $addonsTotal;
                         $totalinitial = ($order_total_price + $wallet_balance) - $Shipping_cost;
                         $ratio = $product_total_price / $totalinitial;
                         $additional_discount = round(($wallet_balance * $ratio), 2);
-                    }  
+                    }
 
                     $sql_deal = "INSERT INTO `order_details_zee`(`order_id`, `product_id`,`product_name`, `product_description`,`additional_notes`, `qty` ,`addons`,`types`, `dressing` , `cost` , `price` , `discount_percent`, `additional_discount`, `is_free`)
                                 VALUES ('$last_id','$product_id','$pro_name', '$pro_decs','$additionalNotes','$quantity','$add_oon','$tyy_pes','$dress_ing' , '$cost' , '$price' , '$discount', '$additional_discount','$is_free' )";
                     $exec_sql_deal = mysqli_query($conn, $sql_deal);
-                    
-                
-                    
-                                // run deduct stock function
-                            deductStock($conn, $product_id, $quantity,$last_id);
 
 
-                    $sql_department = "SELECT id, department_name FROM departments WHERE JSON_CONTAINS(sub_category_ids, $pro_subcategory_id )";
+
+                    // run deduct stock function
+                    deductStock($conn, $product_id, $quantity, $last_id);
+
+
+                    $sql_department = "SELECT id, department_name, external_department_id 
+                   FROM departments 
+                   WHERE status = 'active' 
+                     AND sub_category_ids REGEXP '(^|[^0-9])" . intval($pro_subcategory_id) . "([^0-9]|$)';";
                     $res_dep = mysqli_query($conn, $sql_department);
+
+                    $current_ext_dept_id = null;
 
                     if ($res_dep && mysqli_num_rows($res_dep) > 0) {
                         while ($dep = mysqli_fetch_assoc($res_dep)) {
+                            if (!$current_ext_dept_id) {
+                                $current_ext_dept_id = $dep['external_department_id'];
+                            }
 
-                            // Skip if this department_id already exists
                             if (in_array($dep['id'], $addedDepartments)) {
                                 continue;
                             }
 
-                            // Add the record
                             $department_list[] = [
                                 "department_id" => $dep['id'],
-                                "department_name" => $dep['department_name']
+                                "department_name" => $dep['department_name'],
+                                "external_department_id" => $dep['external_department_id']
                             ];
-
-                            // Mark as added
                             $addedDepartments[] = $dep['id'];
                         }
                     }
+
+                    $envQuery = mysqli_query($conn, "SELECT `key_name`, `key_value` FROM `enviroments` WHERE `key_name` IN ('parent_shop_url', 'shop_access_token')");
+                    $envData = [];
+                    while ($row = mysqli_fetch_assoc($envQuery)) {
+                        $envData[$row['key_name']] = $row['key_value'];
+                    }
+                    $base_url = $envData['parent_shop_url'] ?? '';
+                    $access_token = $envData['shop_access_token'] ?? '';
+                    // Build payload for external API
+                    if (!empty($base_url) && !empty($access_token)) {
+                        $sql_getrecipe = "SELECT `id`, `external_recipe_id` FROM `recipes` WHERE `product_id` = '$product_id'";
+                        $exec_sql_getrecipe = mysqli_query($conn, $sql_getrecipe);
+                        $recipe = mysqli_fetch_array($exec_sql_getrecipe);
+                        $clean_order_details[] = [
+                            "id"              => $product_id,
+                            "recipe_id"       => $recipe['external_recipe_id'] ?? null,
+                            "department_id"   => $current_ext_dept_id ?? null,
+                            "sub_category_id" => $pro_subcategory_id,
+                            "name"            => $pro_name,
+                            "description"     => $pro_decs,
+                            "price"           => $price,
+                            "cost"            => $cost,
+                            "quantity"        => $quantity,
+                            "is_deal"         => $isDeal,
+                            "deal_id"         => $details->deal_id ?? null,
+                            "deal_items"      => $details->deal_items ?? [],
+                            "additionalNotes" => $additionalNotes,
+                            "is_free"         => $is_free,
+                            "addons"          => $details->addons ?? [],
+                            "types"           => $details->types ?? [],
+                            "dressing"        => $details->dressing ?? []
+                        ];
+                    }
                 }
+            }
+
+
+            // 5. Send External cURL Payload (Once Per Order)
+            if (!empty($base_url) && !empty($access_token) && !empty($clean_order_details)) {
+                if ($user_id) {
+                    $sql_u = "SELECT `name`, `email`, `phone` FROM `users` WHERE `id` = '$user_id'";
+                    $res_u = mysqli_query($conn, $sql_u);
+                    $user_data = mysqli_fetch_assoc($res_u);
+                } else {
+                    $user_data = [
+                        'name' => $user_name,
+                        'email' => $user_email,
+                        'phone' => $user_phone
+                    ];
+                }
+
+                $external_payload = [
+                    'access_token'         => $access_token,
+                    'user_name'            => $user_data['name'] ?? '',
+                    'user_email'           => $user_data['email'] ?? '',
+                    'user_phone'           => $user_data['phone'] ?? '',
+                    'Shipping_address_2'   => $Shipping_address_2,
+                    'Shipping_city'        => $Shipping_city,
+                    'Shipping_area'        => $Shipping_area,
+                    'Shipping_postal_code' => $Shipping_postal_code,
+                    'Shipping_cost'        => $Shipping_cost,
+                    'payment_method'       => $payment_method,
+                    'order_type'           => $order_type,
+                    'payment_status'       => $payment_status,
+                    'payment_type'         => $payment_type,
+                    'addtional_notes'      => $addtional_notes,
+                    'order_datails'        => json_encode($clean_order_details, JSON_UNESCAPED_UNICODE),
+                    'total_netto_tax'      => $total_netto_tax,
+                    'total_metto_tax'      => $total_metto_tax,
+                    'branch_id'            => $branch_id,
+                    'order_total_price'    => $_POST['order_total_price'] ?? '',
+                    'total_discount'       => $total_discount,
+                    'platform'             => $platform,
+                    'child_order_id'       => $child_order_id
+                ];
+
+                sendToPlaceOrderG($external_payload, $base_url);
             }
 
 
@@ -922,70 +1195,70 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                 array_push($data_array, $data);
                 echo json_encode($data_array);
 
-                 if($user_id){
-                    
-                            // Insert into notifications table
-                        $insert_noti_details = "INSERT INTO `notification`( `user_id`, `content`, `purpose`) VALUES ('$user_id','Ihre Bestellung wurde erfolgreich aufgegeben','order')";
-                        mysqli_query($conn, $insert_noti_details);
-        
-                        // Fetch user notification token
-                        $sqltaskMembers = "SELECT orders.id , users.name, users.notification_token FROM `orders_zee` AS orders INNER JOIN users AS users On users.id = orders.user_id WHERE orders.id = $last_id";
-                        $taskMembers = mysqli_query($conn, $sqltaskMembers);
-                        $playerId = [];
-                        $user_name = "";
-        
-                        while ($row = mysqli_fetch_array($taskMembers)) {
-                            $order_id =  $row['id'];
-                            $user_name = $row['name'];
-                            if (!empty($row['notification_token'])) {
-                                $playerId[] = $row['notification_token'];
-                            }
+                if ($user_id) {
+
+                    // Insert into notifications table
+                    $insert_noti_details = "INSERT INTO `notification`( `user_id`, `content`, `purpose`) VALUES ('$user_id','Ihre Bestellung wurde erfolgreich aufgegeben','order')";
+                    mysqli_query($conn, $insert_noti_details);
+
+                    // Fetch user notification token
+                    $sqltaskMembers = "SELECT orders.id , users.name, users.notification_token FROM `orders_zee` AS orders INNER JOIN users AS users On users.id = orders.user_id WHERE orders.id = $last_id";
+                    $taskMembers = mysqli_query($conn, $sqltaskMembers);
+                    $playerId = [];
+                    $user_name = "";
+
+                    while ($row = mysqli_fetch_array($taskMembers)) {
+                        $order_id =  $row['id'];
+                        $user_name = $row['name'];
+                        if (!empty($row['notification_token'])) {
+                            $playerId[] = $row['notification_token'];
                         }
-        
-                        // ✅ Fetch admin notification tokens
-                        $adminTokens = [];
-                        $select_admin_sql = "SELECT `notification_token` FROM `users` WHERE `role_id` = '1' AND `notification_token` IS NOT NULL";
-                        $admin_result = mysqli_query($conn, $select_admin_sql);
-        
-                        while ($admin_row = mysqli_fetch_assoc($admin_result)) {
-                            if (!empty($admin_row['notification_token'])) {
-                                $adminTokens[] = $admin_row['notification_token'];
-                            }
+                    }
+
+                    // ✅ Fetch admin notification tokens
+                    $adminTokens = [];
+                    $select_admin_sql = "SELECT `notification_token` FROM `users` WHERE `role_id` = '1' AND `notification_token` IS NOT NULL";
+                    $admin_result = mysqli_query($conn, $select_admin_sql);
+
+                    while ($admin_row = mysqli_fetch_assoc($admin_result)) {
+                        if (!empty($admin_row['notification_token'])) {
+                            $adminTokens[] = $admin_row['notification_token'];
                         }
-        
-                        // ✅ Merge user and admin tokens
-                        $allRecipients = array_merge($playerId, $adminTokens);
-        
-                        // ✅ Build OneSignal payload
-                        $content = array(
-                            "en" => 'Ihre Bestellnummer: ' . $last_id . ' im Wert von ' . ($order_total_price + $Shipping_cost) . '€ wurde erfolgreich aufgegeben und wird in den nächsten 45 bis 60 Minuten geliefert.'
-                        );
-        
-                        $fields = array(
-                            'app_id' => $ONE_SIGNAL_APP_ID,
-                            'include_player_ids' => $allRecipients,
-                            'data' => array("foo" => "NewMassage", "Id" => $taskid),
-                            'large_icon' => "ic_launcher_round.png",
-                            'contents' => $content
-                        );
-        
-                        $fields = json_encode($fields);
-        
-                        // Send notification using cURL
-                        $ch = curl_init();
-                        curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
-                        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                            'Content-Type: application/json; charset=utf-8',
-                            "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
-                        ));
-                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-                        curl_setopt($ch, CURLOPT_HEADER, FALSE);
-                        curl_setopt($ch, CURLOPT_POST, TRUE);
-                        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-                        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-        
-                        $response = curl_exec($ch);
-                        curl_close($ch);
+                    }
+
+                    // ✅ Merge user and admin tokens
+                    $allRecipients = array_merge($playerId, $adminTokens);
+
+                    // ✅ Build OneSignal payload
+                    $content = array(
+                        "en" => 'Ihre Bestellnummer: ' . $last_id . ' im Wert von ' . ($order_total_price + $Shipping_cost) . '€ wurde erfolgreich aufgegeben und wird in den nächsten 45 bis 60 Minuten geliefert.'
+                    );
+
+                    $fields = array(
+                        'app_id' => $ONE_SIGNAL_APP_ID,
+                        'include_player_ids' => $allRecipients,
+                        'data' => array("foo" => "NewMassage", "Id" => $taskid),
+                        'large_icon' => "ic_launcher_round.png",
+                        'contents' => $content
+                    );
+
+                    $fields = json_encode($fields);
+
+                    // Send notification using cURL
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                        'Content-Type: application/json; charset=utf-8',
+                        "Authorization: Basic $ONE_SIGNAL_AUTH_KEY"
+                    ));
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+                    curl_setopt($ch, CURLOPT_HEADER, FALSE);
+                    curl_setopt($ch, CURLOPT_POST, TRUE);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+
+                    $response = curl_exec($ch);
+                    curl_close($ch);
                 }
 
 
@@ -1002,7 +1275,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     'payment_type' => $payment_type,
                     'status' => "neworder",
                     'created_at' => $datetime,
-                   'name' => $user_name ?? $_POST['user_name'],
+                    'name' => $user_name ?? $_POST['user_name'],
                     'order_type' => $order_type,
                     'departments' => $department_list
                 ];
@@ -1064,9 +1337,9 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
 
                     $mail->isHTML(true);
                     $mail->Subject = "New Order Received #{$last_id} – " . htmlspecialchars($APP_NAME);
-                    $total_amount= $order_total_price - $Shipping_cost;
-                      $user_name = $user_name ?? $_POST['user_name'];
-                    $mail->Body = newOrderEmailTemplate($APP_NAME,$BASE_URL,$last_id,$user_name,$address,$total_amount,$Shipping_cost,$payment_type,$additionalNotes,$datetime,$LANG);
+                    $total_amount = $order_total_price - $Shipping_cost;
+                    $user_name = $user_name ?? $_POST['user_name'];
+                    $mail->Body = newOrderEmailTemplate($APP_NAME, $BASE_URL, $last_id, $user_name, $address, $total_amount, $Shipping_cost, $payment_type, $additionalNotes, $datetime, $LANG);
                     $mail->send();
                 } catch (Exception $e) {
                     $data = [

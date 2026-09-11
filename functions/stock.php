@@ -1,8 +1,18 @@
 <?php
 
-function deductStock($conn, $product_id, $product_qty, $order_id = null){
+function deductStock($conn, $product_id = 0, $product_qty = 1, $order_id = null, $recipe_id = null) {
 
-    $get_recipe = "SELECT ingredients FROM recipes WHERE product_id = '$product_id'";
+    // Sanitization for SQL Injection Prevention
+    $product_id_safe = mysqli_real_escape_string($conn, $product_id);
+    $recipe_id_safe  = mysqli_real_escape_string($conn, $recipe_id);
+
+ 
+    if (!empty($recipe_id)) {
+        $get_recipe = "SELECT ingredients FROM recipes WHERE `id` = '$recipe_id_safe'";
+    } else {
+        $get_recipe = "SELECT ingredients FROM recipes WHERE `product_id` = '$product_id_safe'";
+    }
+
     $run_recipe = mysqli_query($conn, $get_recipe);
 
     if ($run_recipe && mysqli_num_rows($run_recipe) > 0) {
@@ -14,50 +24,39 @@ function deductStock($conn, $product_id, $product_qty, $order_id = null){
 
             foreach ($ingredients as $ing) {
 
-                $raw_id = $ing['raw_product_id'];
-                $qty = floatval($ing['qty']);
-                $unit = strtolower(trim($ing['unit']));
+                $raw_id = mysqli_real_escape_string($conn, $ing['raw_product_id'] ?? 0);
+                $qty    = floatval($ing['qty'] ?? 0);
+                $unit   = strtolower(trim($ing['unit'] ?? ''));
 
-                // =========================
-                // YOUR LOGIC (DIVIDE SYSTEM)
-                // =========================
-                if ($unit == 'gram' || $unit == 'g') {
+                // Unit Conversion
+                if (in_array($unit, ['gram', 'g', 'milliliter', 'ml'])) {
                     $converted_qty = $qty / 1000;
-                }
-                elseif ($unit == 'kilogram' || $unit == 'kg') {
-                    $converted_qty = $qty;
-                }
-                elseif ($unit == 'milliliter' || $unit == 'ml') {
-                    $converted_qty = $qty / 1000;
-                }
-                elseif ($unit == 'liter' || $unit == 'l') {
-                    $converted_qty = $qty;
-                }
-                elseif ($unit == 'pieces' || $unit == 'pcs' || $unit == 'piece') {
-                    $converted_qty = $qty;
-                }
-                else {
+                } else {
                     $converted_qty = $qty;
                 }
 
-                // total deduction
-                $total_deduct_qty = $converted_qty * intval($product_qty);
+                // Total deduction (floatval for precision)
+                $total_deduct_qty = $converted_qty * floatval($product_qty);
 
-                // =========================
-                // UPDATE STOCK
-                // =========================
-                $update_stock = "
-                    UPDATE raw_products 
-                    SET current_stock = current_stock - $total_deduct_qty 
-                    WHERE id = '$raw_id'
-                ";
-                mysqli_query($conn, $update_stock);
+                if ($total_deduct_qty > 0 && !empty($raw_id)) {
+                    // Update Stock
+                    $update_stock = "
+                        UPDATE raw_products 
+                        SET current_stock = current_stock - $total_deduct_qty 
+                        WHERE id = '$raw_id'
+                    ";
+                    mysqli_query($conn, $update_stock);
 
-                // =========================
-                // LOG
-                // =========================
-                $insert_log = "INSERT INTO qr_scan_logs (raw_product_id, quantity, action,order_id, created_at, updated_at)VALUES ('$raw_id', '$total_deduct_qty', 'minus','$order_id', NOW(), NOW())";
-                mysqli_query($conn, $insert_log);
+                    // Order ID Safe Formatting
+                    $order_id_sql = !empty($order_id) ? "'" . mysqli_real_escape_string($conn, $order_id) . "'" : "NULL";
+
+                    // Log
+                    $insert_log = "
+                        INSERT INTO qr_scan_logs (raw_product_id, quantity, action, order_id, created_at, updated_at) 
+                        VALUES ('$raw_id', '$total_deduct_qty', 'minus', $order_id_sql, NOW(), NOW())
+                    ";
+                    mysqli_query($conn, $insert_log);
+                }
             }
         }
     }
