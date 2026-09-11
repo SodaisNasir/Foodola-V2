@@ -13,7 +13,7 @@ $company_phone   = "070449098020";
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "csptxytwkopsdeht";
-$FROM_EMAIL = "support@foodola.de";
+$FROM_EMAIL = "support@ovenking.de";
 
 
 
