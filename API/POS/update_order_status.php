@@ -414,6 +414,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($update) {
+        
+        
+        // ============================================================
+// CHILD URL API SYNC LOGIC (FIXED)
+// ============================================================
+$child_query = "SELECT s.child_url, o.child_order_id 
+                FROM orders_zee o 
+                INNER JOIN shops s ON o.access_token = s.access_token 
+                WHERE o.id = " . intval($order_id) . " 
+                AND s.child_url IS NOT NULL 
+                AND s.child_url != '' 
+                LIMIT 1";
+
+$child_res = mysqli_query($conn, $child_query);
+
+if ($child_res && mysqli_num_rows($child_res) > 0) {
+    $child_row = mysqli_fetch_assoc($child_res);
+    $child_base_url = rtrim(trim($child_row['child_url']), '/'); 
+    
+    // Fix: Agar child_order_id empty hai to order_id bhej de taake API block na ho
+    $child_order_id = !empty($child_row['child_order_id']) ? $child_row['child_order_id'] : $order_id;
+
+    if (!empty($child_base_url)) {
+
+        // AAPKA DIYA HUA EXACT URL
+        $full_child_api_url = $child_base_url . '/API/POS/update_order_status.php';
+
+        $payload = [
+            'order_id'    => $child_order_id,
+            'action'      => $status,
+            'status'      => $status
+        ];
+
+        $ch = curl_init($full_child_api_url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($payload));
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10); // Timeout thora barha diya hai
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        
+        $child_api_response = curl_exec($ch);
+        $curl_error = curl_error($ch);
+        curl_close($ch);
+
+        // Debugging Variables: (API hit check karne ke liye Postman/Network tab mein response check karein)
+        $response["child_api_debug"] = [
+            "url_hit" => $full_child_api_url,
+            "payload" => $payload,
+            "response" => $child_api_response,
+            "curl_error" => $curl_error
+        ];
+    }
+}
+// ============================================================
 
         $response = ["status" => "success", "message" => "Order updated successfully", "order_id" => $order_id];
 
