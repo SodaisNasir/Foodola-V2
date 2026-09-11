@@ -1,7 +1,7 @@
 <?php
 // Enable full error reporting
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
 
 include_once('connection.php');
 date_default_timezone_set('Europe/Berlin');
@@ -31,18 +31,18 @@ $table_name = getTableName($conn, $table_id);
 
 // Fetch order items with product details
 $sql_items = "
-    SELECT 
-        p.id AS product_id,
-        p.name AS product_name,
-        p.sub_category_id,
-        od.qty,
-        od.addons,
-        od.types,
-        od.dressing,
-        od.additional_notes 
-    FROM order_details_zee od 
-    JOIN products p ON p.id = od.product_id 
-    WHERE od.order_id = $order_id
+SELECT 
+    COALESCE(p.id, od.product_id) AS product_id,
+    COALESCE(p.name, od.product_name) AS product_name,
+    COALESCE(p.sub_category_id, od.department_id, 0) AS sub_category_id,
+    od.qty,
+    od.addons,
+    od.types,
+    od.dressing,
+    od.additional_notes 
+FROM order_details_zee od 
+LEFT JOIN products p ON p.id = od.product_id 
+WHERE od.order_id = $order_id
 ";
 $result = mysqli_query($conn, $sql_items);
 
@@ -54,7 +54,7 @@ if (!$result || mysqli_num_rows($result) === 0) {
 $departments = [];
 while ($row = mysqli_fetch_assoc($result)) {
     $sub_id = $row['sub_category_id'];
-    $dept_query = "SELECT id, department_name FROM departments WHERE JSON_CONTAINS(sub_category_ids, '$sub_id') LIMIT 1";
+$dept_query = "SELECT id, department_name FROM departments WHERE sub_category_ids REGEXP '(^|[^0-9])" . intval($sub_id) . "([^0-9]|$)' LIMIT 1";
     $dept_result = mysqli_query($conn, $dept_query);
     $dept = mysqli_fetch_assoc($dept_result);
 
@@ -189,7 +189,7 @@ while ($row = mysqli_fetch_assoc($result)) {
   <div class="receipt-container">
     <div class="header">
       <img src="images/logo.png" alt="Logo">
-      <h2>Pizzablitzöstringen.de</h2>
+<h2><?php echo $APP_NAME?></h2>
       <div class="big-order">BESTELL-NR: <?php echo $order_id; ?></div>
     </div>
 
