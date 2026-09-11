@@ -14,7 +14,7 @@ $company_phone   = "0721 95975992";
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "csptxytwkopsdeht";
-$FROM_EMAIL = "support@foodola.de";
+$FROM_EMAIL = "support@burgerpoint.de";
 
 
 
