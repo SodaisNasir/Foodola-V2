@@ -329,8 +329,7 @@ if (isset($_GET['Massage'])) {
           
           
           
-          
-    <section id="basic-datatable">
+<section id="basic-datatable">
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -340,38 +339,37 @@ if (isset($_GET['Massage'])) {
 
                 <?php
                 include_once('connection.php');
-                $order_id = $_GET['order_id'];
+                
+                $order_id = isset($_GET['order_id']) ? intval($_GET['order_id']) : 0;
 
+                // Select cost directly from order_details_zee (od.cost)
                 $sql = "SELECT o.id, o.order_total_price, od.additional_notes, od.id AS order_detail_id, od.order_id, od.deal_id, od.deal_item_id,
-                        od.product_id, od.qty, od.addons, od.types, od.dressing, od.product_name, od.price, p.description,od.is_free, p.cost, p.img  
+                               od.product_id, od.qty, od.addons, od.types, od.dressing, od.product_name, 
+                               od.price, od.cost, od.is_free,
+                               p.description, p.img  
                         FROM `orders_zee` o 
                         INNER JOIN `order_details_zee` od ON od.order_id = o.id 
-                        INNER JOIN `products` p ON p.id = od.product_id 
+                        LEFT JOIN `products` p ON p.id = od.product_id 
                         WHERE o.id = $order_id";
+
                 $result = mysqli_query($conn, $sql);
 
                 if (!$result) {
                     die("Query Failed: " . mysqli_error($conn));
                 }
 
-                // Check if any rows were returned
                 if (mysqli_num_rows($result) > 0) {
                     
-                
-                    // Initialize arrays to hold orders and deals
                     $orders = [];
                     $deals = [];
-                    $combined_total_price = 0; // Combined total for orders and deals
+                    $combined_total_price = 0;
 
-                    // Loop through results and separate orders and deals
                     while ($row = mysqli_fetch_assoc($result)) {
-                        
-                        // var_dump($row);
                         if (!empty($row['deal_id'])) {
-                            $deals[] = $row; // Add to deals array
+                            $deals[] = $row;
                         } else {
-                            $orders[] = $row; // Add to orders array
-                            $combined_total_price += $row['price']; // Calculate combined total price
+                            $orders[] = $row;
+                            $combined_total_price += $row['price'];
                         }
                     }
 
@@ -399,19 +397,13 @@ if (isset($_GET['Massage'])) {
 
                         $index = 1;
                         foreach ($orders as $row) {
-                            $addons = json_decode($row['addons']);
-                            $types = json_decode($row['types']);
-                            $dressings = json_decode($row['dressing']);
-
-                            if (json_last_error() !== JSON_ERROR_NONE) {
-                                echo "Error decoding JSON for row ID: " . $row['id'];
-                                continue;
-                            }
+                            $addons = json_decode($row['addons'] ?? '[]');
+                            $types = json_decode($row['types'] ?? '[]');
+                            $dressings = json_decode($row['dressing'] ?? '[]');
 
                             if (!is_array($addons)) {
                                 $addons = [];
                             }
-                            
                             
                             $price = $row['price'];
                             if ($row['is_free']) {
@@ -420,18 +412,18 @@ if (isset($_GET['Massage'])) {
 
                             echo "<tr>
                                     <td>" . $index++ . "</td>
-                                    <td>" . htmlspecialchars($row['product_name']) . "</td>
+                                    <td>" . htmlspecialchars($row['product_name'] ?? 'N/A') . "</td>
                                     <td>" . (!empty($row['additional_notes']) ? htmlspecialchars($row['additional_notes']) : '-') . "</td>
                                     <td>" . htmlspecialchars($row['qty']) . "</td>
-                                    <td>" . formatCurrency($row['cost']) . "</td>
-                                    <td>" . formatCurrency($price, $currency_sign, $currency_position) . "</td>
+                                    <td>" . formatCurrency($row['cost'] ?? 0) . "</td>
+                                    <td>" . formatCurrency($price, $currency_sign ?? '', $currency_position ?? '') . "</td>
                                     <td>";
 
-                             if (count($addons) > 0 && !empty($addons)) {
+                            if (count($addons) > 0) {
                                 foreach ($addons as $addon) {
                                     echo htmlspecialchars($addon->as_name) 
                                         . " X " . htmlspecialchars($addon->quantity) 
-                                        . " " . formatCurrency($addon->as_price) 
+                                        . " " . formatCurrency($addon->as_price ?? 0) 
                                         . "<br>";
                                 }
                             } else {
@@ -442,26 +434,26 @@ if (isset($_GET['Massage'])) {
 
                             $total_addon = 0;
                             foreach ($addons as $addon) {
-                                $total_addon += $addon->as_price * $addon->quantity;
+                                $total_addon += ($addon->as_price ?? 0) * ($addon->quantity ?? 1);
                             }
                             
                             echo formatCurrency($total_addon) . "</td><td>";
 
-                                 if (is_array($types) && !empty($types)) {
-                                    $hasValidType = false;
-                                    foreach ($types as $type) {
-                                        if (!empty($type->ts_name)) {
-                                            echo htmlspecialchars($type->ts_name) . " ";
-                                            $hasValidType = true;
-                                        }
+                            if (is_array($types) && !empty($types)) {
+                                $hasValidType = false;
+                                foreach ($types as $type) {
+                                    if (!empty($type->ts_name)) {
+                                        echo htmlspecialchars($type->ts_name) . " ";
+                                        $hasValidType = true;
                                     }
+                                }
                                 
-                                    if (!$hasValidType) {
-                                        echo "No types available.";
-                                    }
-                                } else {
+                                if (!$hasValidType) {
                                     echo "No types available.";
                                 }
+                            } else {
+                                echo "No types available.";
+                            }
 
                             echo "</td><td>";
 
@@ -503,57 +495,54 @@ if (isset($_GET['Massage'])) {
                                             <tbody>";
 
                         $index = 1;
-                        $total_deal_price = 0;
                         foreach ($deals as $row) {
-                            $addons = json_decode($row['addons']);
-                            $types = json_decode($row['types']);
-                            $dressings = json_decode($row['dressing']);
+                            $addons = json_decode($row['addons'] ?? '[]');
+                            $types = json_decode($row['types'] ?? '[]');
+                            $dressings = json_decode($row['dressing'] ?? '[]');
 
                             $sql_deal_name = "SELECT `deal_id`, `deal_name`, `deal_description`, `deal_cost`, `deal_price`
-                                              FROM `deals` WHERE `deal_id` = " . $row['deal_id'];
+                                              FROM `deals` WHERE `deal_id` = " . intval($row['deal_id']);
                             $sql_exec_deal_name = mysqli_query($conn, $sql_deal_name);
                             $deal_d = mysqli_fetch_array($sql_exec_deal_name);
 
-                            $sql_deal_item_name = "SELECT `di_id`, `deal_id`, `di_title` FROM `deal_items` WHERE `di_id` = " . $row['deal_item_id'];
+                            $sql_deal_item_name = "SELECT `di_id`, `deal_id`, `di_title` FROM `deal_items` WHERE `di_id` = " . intval($row['deal_item_id']);
                             $sql_exec_deal_item_name = mysqli_query($conn, $sql_deal_item_name);
                             $deal_item = mysqli_fetch_array($sql_exec_deal_item_name);
 
                             echo "<tr>
                                     <td>" . $index++ . "</td>
-                                    <td>" . htmlspecialchars($deal_d['deal_name']) . "</td>
+                                    <td>" . htmlspecialchars($deal_d['deal_name'] ?? '-') . "</td>
                                     <td>" . (!empty($row['additional_notes']) ? htmlspecialchars($row['additional_notes']) : '-') . "</td>
-                                    <td>" . htmlspecialchars($deal_item['di_title']) . "</td>
-                                    <td>" . htmlspecialchars($row['product_name']) . "</td>
-                                    <td>" . formatCurrency($deal_d['deal_cost']) . "</td>
-                                    <td>" . formatCurrency($deal_d['deal_price']) . "</td>
+                                    <td>" . htmlspecialchars($deal_item['di_title'] ?? '-') . "</td>
+                                    <td>" . htmlspecialchars($row['product_name'] ?? 'N/A') . "</td>
+                                    <td>" . formatCurrency($row['cost'] ?? $deal_d['deal_cost'] ?? 0) . "</td>
+                                    <td>" . formatCurrency($row['price'] ?? $deal_d['deal_price'] ?? 0) . "</td>
                                     <td>";
 
-                        if (is_array($addons) && !empty($addons)) {
-                            foreach ($addons as $addon) {
-                                echo htmlspecialchars($addon->as_name) 
-                                    . " X " . htmlspecialchars($addon->quantity) . " " 
-                                    . formatCurrency($addon->price) 
-                                    . "<br>";
+                            if (is_array($addons) && !empty($addons)) {
+                                foreach ($addons as $addon) {
+                                    echo htmlspecialchars($addon->as_name) 
+                                        . " X " . htmlspecialchars($addon->quantity) . " " 
+                                        . formatCurrency($addon->as_price ?? $addon->price ?? 0) 
+                                        . "<br>";
+                                }
+                            } else {
+                                echo "No addons.";
                             }
-                        } else {
-                            echo "No addons.";
-                        }
-
 
                             echo "</td><td>";
 
                             $val_addon_total = 0;
                             if (is_array($addons)) {
                                 foreach ($addons as $addon) {
-                                    $total_addon = $addon->as_price * $addon->quantity;
-                                    $val_addon_total += $total_addon;
+                                    $val_addon_total += ($addon->as_price ?? 0) * ($addon->quantity ?? 1);
                                 }
                             }
                             echo formatCurrency($val_addon_total) . "</td><td>";
 
                             if (is_array($types) && !empty($types)) {
                                 foreach ($types as $type) {
-                                    echo htmlspecialchars($type->ts_name);
+                                    echo htmlspecialchars($type->ts_name ?? '');
                                 }
                             } else {
                                 echo "No types.";
@@ -563,7 +552,7 @@ if (isset($_GET['Massage'])) {
 
                             if (is_array($dressings) && !empty($dressings)) {
                                 foreach ($dressings as $dressing) {
-                                    echo htmlspecialchars($dressing->dressing_name);
+                                    echo htmlspecialchars($dressing->dressing_name ?? '');
                                 }
                             } else {
                                 echo "No dressings.";
@@ -571,30 +560,27 @@ if (isset($_GET['Massage'])) {
 
                             echo "</td></tr>";
 
-                            $combined_total_price += $deal_d['deal_price'];
+                            $combined_total_price += ($row['price'] ?? $deal_d['deal_price'] ?? 0);
                         }
 
                         echo "</tbody></table></div></div></div>";
                     }
 
-
-            $final_total = (float)$order_total;
-                
-                echo "<div class='card-content'>
-                        <div class='card-body'>
-                            <table class='table'>
-                                <tr>
-                                    <th class='text-center' colspan='9' style='font-weight:bold; font-size:16px'>Subtotal</th>
-                            <td style='font-weight:bold; font-size:16px'>" . formatCurrency($final_total) . "</td>
-
-                                </tr>
-                            </table>
-                        </div>
-                      </div>";
-
+                    $final_total = (float)$combined_total_price;
+                        
+                    echo "<div class='card-content'>
+                            <div class='card-body'>
+                                <table class='table'>
+                                    <tr>
+                                        <th class='text-center' colspan='9' style='font-weight:bold; font-size:16px'>Subtotal</th>
+                                        <td style='font-weight:bold; font-size:16px'>" . formatCurrency($final_total) . "</td>
+                                    </tr>
+                                </table>
+                            </div>
+                          </div>";
 
                 } else {
-                    echo "<p>No order details found.</p>";
+                    echo "<p class='p-2'>No order details found.</p>";
                 }
 
                 mysqli_close($conn);
