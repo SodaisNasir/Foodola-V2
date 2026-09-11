@@ -22,7 +22,7 @@ $CHANNEL_2 = "margaritaburger_reservations";
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
-$MAIL_PASSWORD = "elliakydnklqykpv";
+$MAIL_PASSWORD = "csptxytwkopsdeht";
 // $MAIL_PASSWORD = "crzeqyvqnffeuhzw";
 $FROM_EMAIL = "support@margaritaburger.de";
 $ADMIN_EMAIL = "boundedsocial@gmail.com";
@@ -30,7 +30,7 @@ $ADMIN_EMAIL = "boundedsocial@gmail.com";
 
 // ONESIGNAL CONFIGRUATION
 $ONE_SIGNAL_APP_ID = "04869310-bf7c-4e9d-9ec9-faf58aac8168";
-$ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebndv4tpuahlbusgva3p6eutn2x652nleaiuwtlm27le3ugia7aaeb3ikpob2alnlj2pqawjlsb7g2x3q";
+$ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebndiq52c4ny3uutezaubd6wxzbxrmp2htgn2hpfz5l2x3oam3tigexikgr4ykr46n6twh6ustvrg5wwa";
 
 
 //LIEFERSOFT CONFIGRUATION
