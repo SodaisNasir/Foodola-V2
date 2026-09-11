@@ -1,16 +1,12 @@
 <?php include('assets/header.php');
 
-error_reporting(E_ALL); 
-ini_set('display_errors', 1);
+// error_reporting(E_ALL); 
+// ini_set('display_errors', 1);
 
 if (isset($_GET['Massage'])) {
     $message = $_GET['Massage'];
     echo "<script>alert('$message')</script>";
 }
-
-
-
-
 
 // Get all subcategories assigned to departments
 $subAssigned = [];
@@ -23,8 +19,6 @@ while ($row = mysqli_fetch_assoc($res)) {
         }
     }
 }
-
-
 ?>
 <!DOCTYPE html>
 <html class="loading" lang="en" data-textdirection="ltr">
@@ -33,13 +27,7 @@ while ($row = mysqli_fetch_assoc($res)) {
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
-    <meta name="description" content="Vuexy admin is super flexible, powerful, clean &amp; modern responsive bootstrap 4 admin template with unlimited possibilities.">
-    <meta name="keywords" content="admin template, Vuexy admin template, dashboard template, flat admin template, responsive admin template, web app">
-    <meta name="author" content="PIXINVENT">
-    <title><?php
-            include('title.php');
-            echo $pageTitle
-            ?></title>
+    <title><?php include('title.php'); echo $pageTitle; ?></title>
     <link rel="apple-touch-icon" href="app-assets/images/ico/apple-icon-120.html">
     <link rel="shortcut icon" type="image/x-icon" href="app-assets/images/ico/favicon.ico">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600" rel="stylesheet">
@@ -73,7 +61,7 @@ while ($row = mysqli_fetch_assoc($res)) {
 </style>
 </head>
 
-<body class="vertical-layout vertical-menu-modern semi-dark-layout 12-columns  navbar-floating footer-static  " data-open="click" data-menu="vertical-menu-modern" data-col="12-columns" data-layout="semi-dark-layout">
+<body class="vertical-layout vertical-menu-modern semi-dark-layout 12-columns navbar-floating footer-static" data-open="click" data-menu="vertical-menu-modern" data-col="12-columns" data-layout="semi-dark-layout">
 
     <!-- BEGIN: Main Menu-->
     <?php include('assets/Site_Bar.php') ?>
@@ -91,10 +79,8 @@ while ($row = mysqli_fetch_assoc($res)) {
                             <h2 class="content-header-title float-left mb-0">Manage Tables</h2>
                             <div class="breadcrumb-wrapper col-12">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="index.php">Home</a>
-                                    </li>
-                                    <li class="breadcrumb-item active">Manage Departments
-                                    </li>
+                                    <li class="breadcrumb-item"><a href="index.php">Home</a></li>
+                                    <li class="breadcrumb-item active">Manage Departments</li>
                                 </ol>
                             </div>
                         </div>
@@ -102,74 +88,72 @@ while ($row = mysqli_fetch_assoc($res)) {
                 </div>
             </div>
             <div class="content-body">
-                <!-- Zero configuration table -->
                 <section id="basic-datatable">
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="card">
                                 <div class="card-header">
                                     <h4 class="card-title">Manage Departments</h4>
-                                    <button class="btn btn-primary" data-toggle="modal" data-target="#addTableModal">Add Department</button>
+                                    <button class="btn btn-primary" data-toggle="modal" data-target="#AddTableModal">Add Department</button>
                                 </div>
 
                                 <div class="card-content">
                                     <div class="card-body card-dashboard">
                                         <div class="table-responsive">
-                                                <table id="example" class="table">
-                                        <thead class="text-center">
-                                            <tr>
-                                                <th>Sno</th>
-                                                <th>Department Name</th>
-                                                <th>Sub Categories</th>
-                                                <th>Status</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="text-center">
-                                            <?php
-                                            include_once('connection.php');
-                                    
-                                            $sql = "SELECT `id`, `department_name`, `sub_category_ids`, `status`, `created_at` FROM `departments`";
-                                            $result = mysqli_query($conn, $sql);
-                                            $index = 0;
-                                    
-                                            while ($row = mysqli_fetch_array($result)) {
-                                                $sn = $index + 1;
-                                                $departmentName = $row['department_name'];
-                                                $status = $row['status'];
-                                                $subCategoryBadges = '';
-                                    
-                                                $sub_categoryids = json_decode($row['sub_category_ids']);
-                                                if (!empty($sub_categoryids)) {
-                                                    $ids = implode(',', array_map('intval', $sub_categoryids));
-                                    
-                                                    // Fetch subcategory names
-                                                    $fetch_subcategories = "SELECT `name` FROM `sub_categories` WHERE `id` IN ($ids)";
-                                                    $subResult = mysqli_query($conn, $fetch_subcategories);
-                                    
-                                                    $badges = [];
-                                                    while ($subRow = mysqli_fetch_assoc($subResult)) {
-                                                        // Bootstrap badge style
-                                                        $badges[] = "<span class='badge bg-primary me-1 mb-1'>{$subRow['name']}</span>";
-                                                    }
-                                    
-                                                    $subCategoryBadges = implode(' ', $badges);
-                                                } else {
-                                                    $subCategoryBadges = "<span class='badge bg-secondary'>No Subcategories</span>";
-                                                }
-                                                
-                                                 $dataSubs = $row['sub_category_ids']; 
-                                                $departmentNameSafe = htmlspecialchars($departmentName, ENT_QUOTES);
-                                                $statusSafe = htmlspecialchars($status, ENT_QUOTES);
-                                               
-                                                echo "<tr>";
-                                                echo "<td>{$sn}</td>";
-                                                echo "<td name='tittlename'>{$departmentName}</td>";
-                                                echo "<td name='subname'>{$subCategoryBadges}</td>";
-                                                echo "<td>{$status}</td>";
-                                                echo "<td class='text-center'>
-                                                        <div class='d-flex justify-content-center gap-2'>
+                                            <table id="example" class="table">
+                                                <thead class="text-center">
+                                                    <tr>
+                                                        <th>Sno</th>
+                                                        <th>Department Name</th>
+                                                        <th>Sub Categories</th>
+                                                        <th>External Dept ID</th>
+                                                        <th>Status</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="text-center">
+                                                    <?php
+                                                    include_once('connection.php');
+                                                    
+                                                    $sql = "SELECT `id`, `department_name`, `sub_category_ids`, `status`, `external_department_id`, `created_at` FROM `departments`";
+                                                    $result = mysqli_query($conn, $sql);
+                                                    $index = 0;
+                                                    
+                                                    while ($row = mysqli_fetch_array($result)) {
+                                                        $sn = $index + 1;
+                                                        $departmentName = $row['department_name'];
+                                                        $status = $row['status'];
+                                                        $extDeptId = $row['external_department_id'] ? $row['external_department_id'] : '<span class="badge badge-light-secondary">Not Mapped</span>';
+                                                        $subCategoryBadges = '';
                                                         
+                                                        $sub_categoryids = json_decode($row['sub_category_ids']);
+                                                        if (!empty($sub_categoryids)) {
+                                                            $ids = implode(',', array_map('intval', $sub_categoryids));
+                                                            $fetch_subcategories = "SELECT `name` FROM `sub_categories` WHERE `id` IN ($ids)";
+                                                            $subResult = mysqli_query($conn, $fetch_subcategories);
+                                                            
+                                                            $badges = [];
+                                                            while ($subRow = mysqli_fetch_assoc($subResult)) {
+                                                                $badges[] = "<span class='badge bg-primary me-1 mb-1'>{$subRow['name']}</span>";
+                                                            }
+                                                            $subCategoryBadges = implode(' ', $badges);
+                                                        } else {
+                                                            $subCategoryBadges = "<span class='badge bg-secondary'>No Subcategories</span>";
+                                                        }
+                                                        
+                                                        $dataSubs = $row['sub_category_ids']; 
+                                                        $departmentNameSafe = htmlspecialchars($departmentName, ENT_QUOTES);
+                                                        $statusSafe = htmlspecialchars($status, ENT_QUOTES);
+                                                        $extDeptSafe = htmlspecialchars($row['external_department_id'] ?? '', ENT_QUOTES);
+                                                        
+                                                        echo "<tr>";
+                                                        echo "<td>{$sn}</td>";
+                                                        echo "<td name='tittlename'>{$departmentName}</td>";
+                                                        echo "<td name='subname'>{$subCategoryBadges}</td>";
+                                                        echo "<td>{$extDeptId}</td>";
+                                                        echo "<td>{$status}</td>";
+                                                        echo "<td class='text-center'>
+                                                                <div class='d-flex justify-content-center gap-2'>
                                                                     <button class='btn btn-primary'
                                                                     data-toggle='modal'
                                                                     data-target='#updateTableModal'
@@ -177,39 +161,36 @@ while ($row = mysqli_fetch_assoc($res)) {
                                                                     data-name='{$departmentNameSafe}'
                                                                     data-status='{$statusSafe}'
                                                                     data-subs='{$dataSubs}'
+                                                                    data-external_dept_id='{$extDeptSafe}'
                                                                     onclick='openUpdateModalFromBtn(this)'>
                                                                     Update
                                                                 </button>
 
-
-                                    
-                                                            <form action='phpfiles/insertions.php' method='POST' class='m-0 p-0'>
-                                                                <input type='hidden' name='dpt_id' value='{$row['id']}'>
-                                                                <button type='submit' name='btn_delete_depart' class='btn btn-danger'
-                                                                    onclick='return confirm(\"Are you sure you want to delete this Department?\")'>
-                                                                    Delete
-                                                                </button>
-                                                            </form>
-                                                        </div>
-                                                    </td>";
-                                                echo "</tr>";
-                                    
-                                                $index++;
-                                            }
-                                            ?>
-                                        </tbody>
-                                    
-                                        <tfoot>
-                                            <tr>
-                                                <th>Sno</th>
-                                                <th>Department Name</th>
-                                                <th>Sub Categories</th>
-                                                <th>Status</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-
+                                                                    <form action='phpfiles/insertions.php' method='POST' class='m-0 p-0'>
+                                                                        <input type='hidden' name='dpt_id' value='{$row['id']}'>
+                                                                        <button type='submit' name='btn_delete_depart' class='btn btn-danger'
+                                                                            onclick='return confirm(\"Are you sure you want to delete this Department?\")'>
+                                                                            Delete
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </td>";
+                                                        echo "</tr>";
+                                                        $index++;
+                                                    }
+                                                    ?>
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <th>Sno</th>
+                                                        <th>Department Name</th>
+                                                        <th>Sub Categories</th>
+                                                        <th>External Dept ID</th>
+                                                        <th>Status</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
@@ -219,7 +200,7 @@ while ($row = mysqli_fetch_assoc($res)) {
                 </section>
 
                 <!-- Update Table Modal -->
-              <div class="modal fade" id="updateTableModal" tabindex="-1" role="dialog" aria-labelledby="updateDealModalLabel" aria-hidden="true">
+                <div class="modal fade" id="updateTableModal" tabindex="-1" role="dialog" aria-labelledby="updateDealModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -231,31 +212,36 @@ while ($row = mysqli_fetch_assoc($res)) {
                             <div class="modal-body">
                                 <form action="phpfiles/insertions.php" method="POST" enctype="multipart/form-data">
                                     <input type="hidden" class="form-control" name="dpt_id" id="dpt_id">
-                                   
+                                    
                                     <div class="form-group">
                                         <label for="DepartmentName">Department Name</label>
                                         <input type="text" class="form-control" id="DepartmentName" name="department_name" required>
                                     </div>
-                                    
-                                    
-                                 <div class="form-group">
-                                    <label for="SubCategories">Choose Sub Categories</label>
-                                    <div class="border p-2 rounded" style="max-height: 250px; overflow-y: auto;">
-                                        <?php
-                                        $allSubs = mysqli_query($conn, "SELECT id, name FROM sub_categories");
-                                        while ($sub = mysqli_fetch_assoc($allSubs)) {
-                                            echo '
-                                            <div class="form-check" id="subwrap_'.$sub['id'].'">
-                                                <input class="form-check-input" type="checkbox" name="sub_category_ids[]" value="'.$sub['id'].'" id="subcat_'.$sub['id'].'">
-                                                <label class="form-check-label" for="subcat_'.$sub['id'].'">'.htmlspecialchars($sub['name']).'</label>
-                                            </div>';
-                                        }
-                                        ?>
+
+                                    <!-- External Department Select -->
+                                    <div class="form-group">
+                                        <label for="update_external_department_id">External Department</label>
+                                        <select class="form-control" id="update_external_department_id" name="external_department_id">
+                                            <option value="">Select External Department</option>
+                                        </select>
                                     </div>
-                                </div>
 
+                                    <div class="form-group">
+                                        <label for="SubCategories">Choose Sub Categories</label>
+                                        <div class="border p-2 rounded" style="max-height: 250px; overflow-y: auto;">
+                                            <?php
+                                            $allSubs = mysqli_query($conn, "SELECT id, name FROM sub_categories");
+                                            while ($sub = mysqli_fetch_assoc($allSubs)) {
+                                                echo '
+                                                <div class="form-check" id="subwrap_'.$sub['id'].'">
+                                                    <input class="form-check-input" type="checkbox" name="sub_category_ids[]" value="'.$sub['id'].'" id="subcat_'.$sub['id'].'">
+                                                    <label class="form-check-label" for="subcat_'.$sub['id'].'">'.htmlspecialchars($sub['name']).'</label>
+                                                </div>';
+                                            }
+                                            ?>
+                                        </div>
+                                    </div>
 
-                                    
                                     <div class="form-group">
                                         <label for="status">Status</label>
                                         <select class="form-control" id="status" name="status">
@@ -263,7 +249,6 @@ while ($row = mysqli_fetch_assoc($res)) {
                                             <option value="inactive">Inactive</option>
                                         </select>
                                     </div>
-                           
                                     
                                     <button type="submit" name="btn_update_depart" class="btn btn-primary w-100">Update</button>
                                 </form>
@@ -273,82 +258,75 @@ while ($row = mysqli_fetch_assoc($res)) {
                 </div>
 
                 <!-- Add Table Modal -->
-                <div class="modal fade" id="AddTableModal" tabindex="-1" role="dialog" aria-labelledby="updateDealModalLabel" aria-hidden="true">
+                <div class="modal fade" id="AddTableModal" tabindex="-1" role="dialog" aria-labelledby="addDealModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="AddTableModal">Add Department</h5>
+                                <h5 class="modal-title" id="addDealModalLabel">Add Department</h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <form action="phpfiles/insertions.php" id="" method="POST" enctype="multipart/form-data">
+                                <form action="phpfiles/insertions.php" method="POST" enctype="multipart/form-data">
                                     
                                     <div class="form-group">
-                                        <label for="DepartmentName">Department Name</label>
-                                        <input type="text" class="form-control" id="DepartmentName" name="department_name" required>
+                                        <label for="add_DepartmentName">Department Name</label>
+                                        <input type="text" class="form-control" id="add_DepartmentName" name="department_name" required>
+                                    </div>
+
+                                    <!-- External Department Select -->
+                                    <div class="form-group">
+                                        <label for="add_external_department_id">External Department</label>
+                                        <select class="form-control" id="add_external_department_id" name="external_department_id">
+                                            <option value="">Select External Department</option>
+                                        </select>
                                     </div>
                                     
-                                    
                                     <div class="form-group">
-                                        <label for="SubCategories">Choose Sub Categories</label>
+                                        <label>Choose Sub Categories</label>
                                         <div class="border p-2 rounded" style="max-height: 250px; overflow-y: auto;">
-                                                <?php
-                                                include_once('connection.php');
-                                                
-                                                $query = "
-                                                    SELECT id, name 
-                                                    FROM sub_categories 
-                                                    WHERE id NOT IN (
-                                                        SELECT CAST(j.value AS UNSIGNED)
-                                                        FROM departments d,
-                                                        JSON_TABLE(d.sub_category_ids, '$[*]' COLUMNS (value INT PATH '$')) AS j
-                                                    )
-                                                ";
-                                                
-                                                $result = mysqli_query($conn, $query);
-                                                
-                                                if (mysqli_num_rows($result) > 0) {
-                                                    while ($row = mysqli_fetch_assoc($result)) {
-                                                        echo '
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" name="sub_category_ids[]" value="' . $row['id'] . '" id="subcat_' . $row['id'] . '">
-                                                            <label class="form-check-label" for="subcat_' . $row['id'] . '">' . htmlspecialchars($row['name']) . '</label>
-                                                        </div>';
-                                                    }
-                                                } else {
-                                                    echo "<p class='text-muted mb-0'>No subcategories available.</p>";
+                                            <?php
+                                            $query = "
+                                                SELECT id, name 
+                                                FROM sub_categories 
+                                                WHERE id NOT IN (
+                                                    SELECT CAST(j.value AS UNSIGNED)
+                                                    FROM departments d,
+                                                    JSON_TABLE(d.sub_category_ids, '$[*]' COLUMNS (value INT PATH '$')) AS j
+                                                )
+                                            ";
+                                            $result = mysqli_query($conn, $query);
+                                            if (mysqli_num_rows($result) > 0) {
+                                                while ($row = mysqli_fetch_assoc($result)) {
+                                                    echo '
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="sub_category_ids[]" value="' . $row['id'] . '" id="add_subcat_' . $row['id'] . '">
+                                                        <label class="form-check-label" for="add_subcat_' . $row['id'] . '">' . htmlspecialchars($row['name']) . '</label>
+                                                    </div>';
                                                 }
-                                                ?>
-
+                                            } else {
+                                                echo "<p class='text-muted mb-0'>No subcategories available.</p>";
+                                            }
+                                            ?>
                                         </div>
                                         <small class="text-muted">Select one or more subcategories.</small>
                                     </div>
 
-
-                                    
-                                    
-                                    <button type="submit" name="btn_insert_depart" class="btn btn-primary w-100 " >Add Department</button>
-                                    
+                                    <button type="submit" name="btn_insert_depart" class="btn btn-primary w-100">Add Department</button>
                                 </form>
-
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
-
         </div>
-
-
     </div>
     <!-- END: Content-->
 
     <div class="sidenav-overlay"></div>
     <div class="drag-target"></div>
-
-
 
     <!-- BEGIN: Vendor JS-->
     <script src="app-assets/vendors/js/vendors.min.js"></script>
@@ -375,15 +353,44 @@ while ($row = mysqli_fetch_assoc($res)) {
 
     <!-- BEGIN: Page JS-->
     <script src="app-assets/js/scripts/datatables/datatable.min.js"></script>
-    
-<script>
-function openUpdateModalFromBtn(button) {
 
+<script>
+// Load External Departments
+function loadExternalDepartments(targetSelect, selectedValue = '') {
+    let $select = $(targetSelect);
+    $select.html('<option value="">Loading...</option>');
+
+    $.ajax({
+        url: 'get_external_departments.php',
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            $select.empty().append('<option value="">Select External Department</option>');
+            
+            let data = response.data || response;
+            if (Array.isArray(data) && data.length > 0) {
+                data.forEach(function(dept) {
+                    let id = dept.id || dept.department_id;
+                    let name = dept.name || dept.department_name;
+                    let isSelected = (id == selectedValue) ? 'selected' : '';
+                    $select.append('<option value="' + id + '" ' + isSelected + '>' + name + ' (ID: ' + id + ')</option>');
+                });
+            } else {
+                $select.append('<option value="">No departments found</option>');
+            }
+        },
+        error: function() {
+            $select.html('<option value="">Failed to fetch external departments</option>');
+        }
+    });
+}
+
+function openUpdateModalFromBtn(button) {
     let id = $(button).data('id');
     let name = $(button).data('name');
     let status = $(button).data('status');
+    let extDeptId = $(button).data('external_dept_id');
 
-    // VERY IMPORTANT — read raw JSON string
     let subsRaw = $(button).attr('data-subs');
     let currentSubs = [];
 
@@ -391,10 +398,12 @@ function openUpdateModalFromBtn(button) {
         currentSubs = JSON.parse(subsRaw);
     } catch (e) { currentSubs = []; }
 
-
     $('#dpt_id').val(id);
     $('#DepartmentName').val(name);
     $('#status').val(status);
+
+    // Load external departments and set active item
+    loadExternalDepartments('#update_external_department_id', extDeptId);
 
     // STEP 1: Show all subcategories again
     $('input[name="sub_category_ids[]"]').prop('checked', false);
@@ -407,7 +416,7 @@ function openUpdateModalFromBtn(button) {
 
     $('button[data-subs]').each(function(){
         let otherId = $(this).data('id');
-        if (otherId == id) return; // ignore current department
+        if (otherId == id) return;
 
         let raw = $(this).attr('data-subs');
         try {
@@ -429,26 +438,23 @@ function openUpdateModalFromBtn(button) {
     });
 }
 
+$(document).ready(function() {
+    $('#example').DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            'copyHtml5',
+            'excelHtml5',
+            'csvHtml5',
+            'pdfHtml5'
+        ]
+    });
 
-
-
-
+    // Add modal khulne par external departments load karne ke liye
+    $('#AddTableModal').on('show.bs.modal', function () {
+        loadExternalDepartments('#add_external_department_id');
+    });
+});
 </script>
-<script>
-        $(document).ready(function() {
-            $('#example').DataTable({
-                dom: 'Bfrtip',
-                buttons: [
-                    'copyHtml5',
-                    'excelHtml5',
-                    'csvHtml5',
-                    'pdfHtml5'
-                ]
-            });
-        });
-    </script>
-
 
 </body>
-
 </html>

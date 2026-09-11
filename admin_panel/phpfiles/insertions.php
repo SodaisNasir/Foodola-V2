@@ -84,6 +84,7 @@ if (isset($_POST['btn_update_recipe'])) {
   include('../connection.php');
     $recipe_id = $_POST['recipe_id'];
     $product_id = $_POST['product_id'];
+    $external_recipe_id = $_POST['external_recipe_id'];
 
     $ingredients = $_POST['ingredients'] ?? [];
 
@@ -110,7 +111,8 @@ if (isset($_POST['btn_update_recipe'])) {
 
     $sql = "UPDATE recipes 
             SET product_id = '$product_id',
-                ingredients = '$jsonIngredients'
+                ingredients = '$jsonIngredients',
+                external_recipe_id = '$external_recipe_id'
             WHERE id = '$recipe_id'";
 
     $run = mysqli_query($conn, $sql);
@@ -143,10 +145,11 @@ if(isset($_POST['btn_insert_recipe'])){
   include('../connection.php');
     $product_id = $_POST['product_id'];
     $ingredients = array_values($_POST['ingredients']);
+       $external_recipe_id = $_POST['external_recipe_id'];
 
     $json = json_encode($ingredients, JSON_UNESCAPED_UNICODE);
 
-    $sql = "INSERT INTO recipes (product_id, ingredients) VALUES ('$product_id', '$json')";
+    $sql = "INSERT INTO recipes (product_id, ingredients, external_recipe_id) VALUES ('$product_id', '$json', '$external_recipe_id')";
     $result = mysqli_query($conn,$sql );
 
     if ($result) {
@@ -309,15 +312,15 @@ if(isset($_POST['btn_delete_depart'])){
     }
 
 }
-
 if (isset($_POST['btn_update_depart'])) {
     include('../connection.php');
 
     $dpt_id = intval($_POST['dpt_id']);
     $department_name = mysqli_real_escape_string($conn, $_POST['department_name']);
     $status = mysqli_real_escape_string($conn, $_POST['status']);
+    $external_department_id = mysqli_real_escape_string($conn, $_POST['external_department_id']);
 
-    // Subcategory handling as Integers
+    // --- SAFE SUBCATEGORY HANDLING (INTEGER CASTING) ---
     if (isset($_POST['sub_category_ids']) && is_array($_POST['sub_category_ids'])) {
         $subcategory_ids = array_map('intval', $_POST['sub_category_ids']);
     } else {
@@ -326,14 +329,19 @@ if (isset($_POST['btn_update_depart'])) {
 
     $encoded_ids = json_encode($subcategory_ids);
 
-    // Update SQL
-    $sql = "UPDATE `departments` SET `department_name` = '$department_name', `sub_category_ids` = '$encoded_ids', `status` = '$status' WHERE `id` = $dpt_id";
-    $result = mysqli_query($conn, $sql);
+    // Update Query
+    $sql = "UPDATE `departments` 
+            SET `department_name` = '$department_name',
+                `sub_category_ids` = '$encoded_ids',
+                `status` = '$status', 
+                `external_department_id` = '$external_department_id' 
+            WHERE `id` = $dpt_id";
 
+    $result = mysqli_query($conn, $sql);
     if ($result) {
-        echo "<script>alert('Updated successfully');window.location.href='../manage_departments.php'</script>";
+        echo "<script>alert('Updated successfully');window.location.href='../manage_departments.php';</script>";
     } else {
-        echo "<script>alert('Error updating table: " . mysqli_error($conn) . "');window.location.href='../manage_departments.php'</script>";
+        echo "<script>alert('Error updating table: " . mysqli_error($conn) . "');window.location.href='../manage_departments.php';</script>";
     }
 }
 
@@ -341,8 +349,9 @@ if (isset($_POST['btn_insert_depart'])) {
     include('../connection.php');
 
     $department_name = mysqli_real_escape_string($conn, $_POST['department_name']);
+    $external_department_id = mysqli_real_escape_string($conn, $_POST['external_department_id']);
 
-    // Subcategory handling as Integers with Safe Check
+    // --- SAFE SUBCATEGORY HANDLING (INTEGER CASTING) ---
     if (isset($_POST['sub_category_ids']) && is_array($_POST['sub_category_ids'])) {
         $subcategory_ids = array_map('intval', $_POST['sub_category_ids']);
     } else {
@@ -351,15 +360,19 @@ if (isset($_POST['btn_insert_depart'])) {
 
     $encoded_ids = json_encode($subcategory_ids);
 
-    $sql = "INSERT INTO `departments` (`department_name`, `sub_category_ids`, `status`, `created_at`) VALUES ('$department_name', '$encoded_ids', 'active', NOW())";
-    $result = mysqli_query($conn, $sql);
+    // Insert Query
+    $sql = "INSERT INTO `departments` (`department_name`, `sub_category_ids`, `status`, `external_department_id`, `created_at`) 
+            VALUES ('$department_name', '$encoded_ids', 'active', '$external_department_id', NOW())";
 
+    $result = mysqli_query($conn, $sql);
     if ($result) {
-        header("Location:../manage_departments.php?Massage=Sucessfully Inserted");
+        header("Location: ../manage_departments.php?Massage=Sucessfully Inserted");
+        exit();
     } else {
-        echo "<script>alert('Sorry, there was an error inserting data.');window.location.href='../manage_departments.php'</script>";
+        echo "<script>alert('Error inserting department: " . mysqli_error($conn) . "');window.location.href='../manage_departments.php';</script>";
     }
 }
+
 
 if (isset($_POST['btn_delete_holiday'])) {
     include('../connection.php'); // Include DB connection
@@ -3476,6 +3489,51 @@ if (isset($_POST['btnSubmit_Action'])) {
     }
 
     if ($update){ 
+        
+        
+        
+        // ============================================================
+        // CHILD URL API SYNC LOGIC 
+        // ============================================================
+        $child_query = "SELECT s.child_url, o.child_order_id 
+                        FROM orders_zee o 
+                        INNER JOIN shops s ON o.access_token = s.access_token 
+                        WHERE o.id = " . intval($order_id) . " 
+                        AND s.child_url IS NOT NULL 
+                        AND s.child_url != '' 
+                        LIMIT 1";
+
+        $child_res = mysqli_query($conn, $child_query);
+
+        if ($child_res && mysqli_num_rows($child_res) > 0) {
+            $child_row = mysqli_fetch_assoc($child_res);
+            $child_base_url = rtrim(trim($child_row['child_url']), '/'); 
+            
+            // Agar child_order_id empty hai to default DB ka order_id bhejega
+            $child_order_id = !empty($child_row['child_order_id']) ? $child_row['child_order_id'] : $order_id;
+
+            if (!empty($child_base_url)) {
+                $full_child_api_url = $child_base_url . '/API/POS/update_order_status.php';
+
+                $payload = [
+                    'order_id'    => $child_order_id,
+                    'action'      => $status,
+                    'status'      => $status
+                ];
+                $ch_api = curl_init($full_child_api_url);
+                curl_setopt($ch_api, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch_api, CURLOPT_POST, true);
+                curl_setopt($ch_api, CURLOPT_POSTFIELDS, http_build_query($payload));
+                curl_setopt($ch_api, CURLOPT_TIMEOUT, 10);
+                curl_setopt($ch_api, CURLOPT_SSL_VERIFYPEER, false);
+                
+                curl_exec($ch_api);
+                curl_close($ch_api);
+            }
+        }
+        // ============================================================
+        
+        
         header("Location: ../order_details.php?order_id=$order_id&Massage=Sucessfully updated order.");
         
     }
