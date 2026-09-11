@@ -22,15 +22,15 @@ $CHANNEL_2 = "burgerpoint_reservations";
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
-$MAIL_PASSWORD = "elliakydnklqykpv";
+$MAIL_PASSWORD = "csptxytwkopsdeht";
 // $MAIL_PASSWORD = "crzeqyvqnffeuhzw";
 $FROM_EMAIL = "support@burgerpoint.de";
 $ADMIN_EMAIL = "Ejaz8156@gmail.com";
 
 
 // ONESIGNAL CONFIGRUATION
-$ONE_SIGNAL_APP_ID = "2de883ec-be41-4820-a517-558beee8b0ac";
-$ONE_SIGNAL_AUTH_KEY = "os_v2_app_fxuih3f6ifecbjixkwf652fqvth5cvjs6zyu6x45bxrdyqx6thsko5tkpievvqngjhhkpn6l3n53whqh5xextgwkut3dbjnai26xili";
+$ONE_SIGNAL_APP_ID = "04869310-bf7c-4e9d-9ec9-faf58aac8168";
+$ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebndiq52c4ny3uutezaubd6wxzbxrmp2htgn2hpfz5l2x3oam3tigexikgr4ykr46n6twh6ustvrg5wwa";
 
 
 //LIEFERSOFT CONFIGRUATION
