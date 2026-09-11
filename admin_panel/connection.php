@@ -13,7 +13,7 @@ $company_phone   = "07255 3969621";
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "csptxytwkopsdeht";
-$FROM_EMAIL = "support@foodola.de";
+$FROM_EMAIL = "support@burgerpointgraben.de";
 
 
 
