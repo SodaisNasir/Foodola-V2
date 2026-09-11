@@ -12,14 +12,14 @@ $company_phone   = "07253 880905";
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
-$MAIL_PASSWORD = "elliakydnklqykpv";
+$MAIL_PASSWORD = "csptxytwkopsdeht";
 $FROM_EMAIL = "support@chickpom.de";
 
 
 
 // ONESIGNAL CONFIGRUATION
 $ONE_SIGNAL_APP_ID = "04869310-bf7c-4e9d-9ec9-faf58aac8168";
-$ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebnchqsvtsgb4evjfpfzagsmdn5yuxigm3as7xaoppeh5oeykcahuojhfx52v4m62lhjs27ucgspue5ci";
+$ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebndiq52c4ny3uutezaubd6wxzbxrmp2htgn2hpfz5l2x3oam3tigexikgr4ykr46n6twh6ustvrg5wwa";
 
 
 
