@@ -22,8 +22,12 @@ if ($dept_id > 0) {
 
 // Fetch all products for this order
 $sql_products = "
-    SELECT od.qty, od.addons, od.types, od.dressing, od.additional_notes, p.name, p.sub_category_id
+    SELECT od.qty, od.addons, od.types, od.dressing, 
+           od.additional_notes AS item_notes,
+           o.addtional_notes AS order_notes,
+           p.name, p.sub_category_id
     FROM order_details_zee od
+    INNER JOIN orders_zee o ON o.id = od.order_id
     INNER JOIN products p ON p.id = od.product_id
     WHERE od.order_id = $order_id 
       AND od.deal_id = 0
@@ -176,6 +180,13 @@ td{padding:3px;font-size:13px;vertical-align:top;}
                         <?php if ($addons) foreach ($addons as $a) echo "x{$a->quantity} {$a->as_name}<br>"; ?>
                         <?php if ($types) foreach ($types as $t) echo "{$t->ts_name}<br>"; ?>
                         <?php if ($dressing) foreach ($dressing as $d) echo "{$d->dressing_name}<br>"; ?>
+                        <?php if (!empty($p['item_notes'])): ?>
+                            <div class="item-notes">Item Notiz: <?php echo htmlspecialchars($p['item_notes']); ?></div>
+                        <?php endif; ?>
+                        
+                        <?php if (!empty($p['order_notes'])): ?>
+                            <div class="item-notes">Order Notiz: <?php echo htmlspecialchars($p['order_notes']); ?></div>
+                        <?php endif; ?>
                     </div>
                 </td>
                 <td class="qty">x<?php echo $p['qty']; ?></td>
@@ -189,9 +200,13 @@ td{padding:3px;font-size:13px;vertical-align:top;}
         if ($result_deals && mysqli_num_rows($result_deals) > 0):
             while ($d = mysqli_fetch_assoc($result_deals)):
                 $no = $d['no_of_deal'];
-                $sql_sub_products = "
-                    SELECT p.name, od.qty, od.addons, od.types, od.dressing, p.sub_category_id
+               $sql_sub_products = "
+                    SELECT p.name, od.qty, od.addons, od.types, od.dressing, 
+                           od.additional_notes AS item_notes,
+                           o.addtional_notes AS order_notes,
+                           p.sub_category_id
                     FROM order_details_zee od
+                    INNER JOIN orders_zee o ON o.id = od.order_id
                     INNER JOIN products p ON p.id = od.product_id
                     WHERE od.order_id = $order_id AND od.deal_id = {$d['deal_id']} AND od.no_of_deal = $no
                 ";
@@ -217,6 +232,14 @@ td{padding:3px;font-size:13px;vertical-align:top;}
                             <?php if ($addons) foreach ($addons as $a) echo "x{$a->quantity} {$a->as_name}<br>"; ?>
                             <?php if ($types) foreach ($types as $t) echo "{$t->ts_name}<br>"; ?>
                             <?php if ($dressing) foreach ($dressing as $dr) echo "{$dr->dressing_name}<br>"; ?>
+                            
+                            <?php if (!empty($sp['item_notes'])): ?>
+                            <div class="item-notes">Item Notiz: <?php echo htmlspecialchars($sp['item_notes']); ?></div>
+                        <?php endif; ?>
+                        
+                        <?php if (!empty($sp['order_notes'])): ?>
+                            <div class="item-notes">Order Notiz: <?php echo htmlspecialchars($sp['order_notes']); ?></div>
+                        <?php endif; ?>
                         </div>
                     </td>
                     <td class="qty">x<?php echo $sp['qty']; ?></td>
