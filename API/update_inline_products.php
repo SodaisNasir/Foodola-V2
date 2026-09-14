@@ -6,7 +6,7 @@ header('Content-Type: application/json');
 
 include('connection.php');
 
-$id = $_POST['id'] ?? '';
+$id = isset($_POST['id']) ? mysqli_real_escape_string($conn, $_POST['id']) : '';
 
 if (empty($id)) {
     echo json_encode([
@@ -86,6 +86,37 @@ $for_deal_only = mysqli_real_escape_string($conn, $_POST['for_deal_only'] ?? '')
 $allergy_desc = mysqli_real_escape_string($conn, $_POST['allergy_description'] ?? '');
 $time_id = mysqli_real_escape_string($conn, $_POST['time_id'] ?? '');
 $free_addon_limit = mysqli_real_escape_string($conn, $_POST['free_addon_limit'] ?? '');
+
+/*
+|--------------------------------------------------------------------------
+| CART DISCOUNTS VALIDATION (ONLY FOR FREE -> REGULAR PRODUCT)
+|--------------------------------------------------------------------------
+*/
+
+
+$curr_res = mysqli_query($conn, "SELECT for_deal_only FROM products WHERE id = '$id'");
+$curr_row = mysqli_fetch_assoc($curr_res);
+$current_visibility = $curr_row['for_deal_only'] ?? '';
+
+if ($current_visibility == '3' && $for_deal_only == '0') {
+
+    $check_discount_sql = "SELECT id FROM cart_discounts 
+                          WHERE status = 'active' 
+                          AND (
+                              JSON_CONTAINS(product_ids, '\"$id\"') 
+                              OR product_ids LIKE '%\"$id\"%'
+                          ) LIMIT 1";
+
+    $check_discount_res = mysqli_query($conn, $check_discount_sql);
+
+    if ($check_discount_res && mysqli_num_rows($check_discount_res) > 0) {
+        echo json_encode([
+            'status' => false,
+            'message' => 'This product is currently active in cart discounts. Please remove it from cart discounts to set it as a Regular Product.'
+        ]);
+        exit; 
+    }
+}
 
 $sql = "UPDATE products SET
             name='$pro_name',
