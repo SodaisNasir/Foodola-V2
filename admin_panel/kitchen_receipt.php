@@ -18,7 +18,8 @@ function getOrderData($conn, $order_id) {
     $check_data = mysqli_fetch_assoc($result_check);
 
     $sql_products = "SELECT od.qty, od.addons, od.types, od.dressing, 
-                            od.additional_notes, p.name
+                                        od.additional_notes AS item_notes, 
+                                 o.addtional_notes AS order_notes, p.name
                      FROM orders_zee o
                      INNER JOIN order_details_zee od ON od.order_id = o.id
                      INNER JOIN products p ON p.id = od.product_id
@@ -208,9 +209,13 @@ if ($result_deal && mysqli_num_rows($result_deal) > 0) {
         <tr>
           <td>
             <div class="item-name"><?php echo htmlspecialchars($value['name']); ?></div>
-            <?php if (!empty($value['additional_notes'])): ?>
-              <div class="item-notes">Notiz: <?php echo htmlspecialchars($value['additional_notes']); ?></div>
-            <?php endif; ?>
+     <?php if (!empty($value['item_notes'])): ?>
+    <div class="item-notes">Item Notiz: <?php echo htmlspecialchars($value['item_notes']); ?></div>
+  <?php endif; ?>
+  
+  <?php if (!empty($value['order_notes'])): ?>
+    <div class="item-notes">Order Notiz: <?php echo htmlspecialchars($value['order_notes']); ?></div>
+  <?php endif; ?>
             <div class="item-options">
               <?php if (!empty($addons)) foreach ($addons as $addon) echo "x{$addon->quantity} " . htmlspecialchars($addon->as_name) . "<br>"; ?>
               <?php if (!empty($types)) foreach ($types as $type) echo htmlspecialchars($type->ts_name) . "<br>"; ?>
@@ -236,7 +241,9 @@ if ($result_deal && mysqli_num_rows($result_deal) > 0) {
             <div class="item-name"><?php echo htmlspecialchars($value['deal_name']); ?></div>
             <div class="item-options">
               <?php
-              $sql_sub = "SELECT od.addons, od.types, od.dressing, p.name, od.additional_notes
+            $sql_sub = "SELECT od.addons, od.types, od.dressing, p.name, 
+                                 od.additional_notes AS item_notes, 
+                                 o.addtional_notes AS order_notes
                           FROM orders_zee o
                           INNER JOIN order_details_zee od ON od.order_id = o.id
                           INNER JOIN products p ON p.id = od.product_id
@@ -251,7 +258,13 @@ if ($result_deal && mysqli_num_rows($result_deal) > 0) {
                   if (!empty($addons)) foreach ($addons as $addon) echo "x{$addon->quantity} " . htmlspecialchars($addon->as_name) . "<br>";
                   if (!empty($types)) foreach ($types as $type) echo htmlspecialchars($type->ts_name) . "<br>";
                   if (!empty($dressing)) foreach ($dressing as $dress) echo htmlspecialchars($dress->dressing_name) . "<br>";
-                  if (!empty($row['additional_notes'])) echo "<div class='item-notes'>Notiz: " . htmlspecialchars($row['additional_notes']) . "</div>";
+                    if (!empty($row['item_notes'])) {
+                        echo "<div class='item-notes'>Item Notiz: " . htmlspecialchars($row['item_notes']) . "</div>";
+                    }
+                    // Order Note
+                    if (!empty($row['order_notes'])) {
+                        echo "<div class='item-notes'>Order Notiz: " . htmlspecialchars($row['order_notes']) . "</div>";
+                    }
                   echo "<br>";
                 }
                 mysqli_free_result($result_sub);
