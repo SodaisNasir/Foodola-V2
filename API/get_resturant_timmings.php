@@ -16,22 +16,19 @@ $token = isset($_POST['token']) ? $_POST['token'] : '';
 if ($token === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC') {
     include('connection.php');
     
-    $sql = "SELECT * FROM `tbl_working_hours`";
+    $sql = "SELECT `openning_hours` FROM `system_setting` LIMIT 1";
     $execute = mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($execute) > 0) {
-        $data = array();
+        $row = mysqli_fetch_assoc($execute);
         
-
-        while ($row = mysqli_fetch_assoc($execute)) {
-            $data[] = $row;
-        }
-
+        // Directly decode opening_hours string into array
+        $opening_hours = json_decode($row['openning_hours'], true);
 
         echo json_encode([
             "status" => true,
             "Response_code" => 200,
-            "data" => $data
+            "data" => $opening_hours
         ]); 
     } else {
         echo json_encode([
