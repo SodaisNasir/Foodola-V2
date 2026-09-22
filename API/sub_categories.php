@@ -2,10 +2,35 @@
 
 
 if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC'){
-
-     $main_category_id = $_POST['main_category_id'];
-     $sql = "SELECT `id`, `category_id`, `name`, `img`, `created_at`, `updated_at` FROM `sub_categories` WHERE `category_id`=$main_category_id ORDER BY `sort_order` ASC ";
      include('connection.php');
+
+    $main_category_id = mysqli_real_escape_string($conn, $_POST['main_category_id']);
+
+    $sql = "
+    SELECT DISTINCT
+        sc.id,
+        sc.category_id,
+        sc.name,
+        sc.img,
+        sc.created_at,
+        sc.updated_at,
+        sc.banner_image
+    FROM sub_categories sc
+    WHERE sc.category_id = '$main_category_id'
+      AND EXISTS (
+        SELECT 1
+        FROM products p
+        LEFT JOIN variation_with_product vp
+            ON vp.product_id = p.id
+        WHERE p.sub_category_id = sc.id
+          AND p.status = 'Active'
+          AND (
+                vp.product_id IS NULL
+                OR vp.is_primary = 1
+          )
+    )
+    ORDER BY sc.sort_order ASC
+    ";
      $execute = mysqli_query($conn,$sql);
      if(mysqli_num_rows($execute) > 0){
          $product_array = array();
