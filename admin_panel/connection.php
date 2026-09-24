@@ -2,18 +2,18 @@
 
 
 // APP CONFIGRUATION
-$LANG = 'en';
-$APP_NAME = "Foodola";
-$BASE_URL = "https://foodola.foodola.shop/";
-$company_address = "Kuhngasse 1, 76684 Östringen";
-$company_city    = "Östringen";
-$company_phone   = "07253 26560-61";
+$LANG = 'de';
+$APP_NAME = "Namaste India Karlsruhe";
+$BASE_URL = "https://namasteindia-karlsruhe.de/";
+$company_address = "Industriestraße 11, 76189 Karlsruhe";
+$company_city    = "Karlsruhe";
+$company_phone   = "721 95784694";
 
 
 // MAIL CONFIGRUATION
 $MAIL_USERNAME = "boundedsocial@gmail.com";
 $MAIL_PASSWORD = "csptxytwkopsdeht";
-$FROM_EMAIL = "support@foodola.de";
+$FROM_EMAIL = "support@namasteindia-karlsruhe.de";
 
 
 
@@ -25,9 +25,9 @@ $ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebndiq52c4ny3uutezaubd6w
 
 // DATABASE CONFIGRUATION
 $Host = 'localhost';
-$DB_DATABASE='u772850971_foodola';
-$DB_USERNAME='u772850971_foodola';
-$DB_PASSWORD=']f0Hy^78Uf0s';
+$DB_DATABASE='u772850971_namasteindia_';
+$DB_USERNAME='u772850971_namasteindia_';
+$DB_PASSWORD='d>8Ldrga';
 
 $conn = mysqli_connect($Host, $DB_USERNAME,$DB_PASSWORD,$DB_DATABASE);
 
