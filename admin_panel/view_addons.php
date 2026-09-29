@@ -2,7 +2,6 @@
 <!DOCTYPE html>
 
 <?php
-
   if(isset($_GET['Massage'])){
       if($_GET['Massage'] == 'Sucessfully updated Addon.'){
          echo "<script>alert('Sucessfully updated Addon.')</script>";
@@ -10,49 +9,34 @@
        }else{
           echo "<script>alert('changes made to data successfully!')</script>";
        }
-     
   }   
 ?>
-
 
 <html class="loading" lang="en" data-textdirection="ltr">
 
 <style>
-
 .modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  padding-top: 100px; /* Location of the box */
+  display: none; 
+  position: fixed; 
+  z-index: 1000; 
+  padding-top: 100px; 
   left: 0;
   top: 0;
-  width:50%;
-  height:'auto';
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  width: 100%;
+  height: 100%;
+  overflow: auto; 
+  background-color: rgba(0,0,0,0.5); 
 }
 
 /* Modal Content */
-
 .modal-content-Updated {
   background-color: #fefefe;
   margin: auto;
   padding: 20px;
   border: 1px solid #888;
-  width: 50%;
-  height:300px;
-  border-radius:10px;
-}
-
-.modal-content-Updated2 {
-  background-color: #fefefe;
-  margin: auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 50%;
-  height:250px;
-  border-radius:10px;
+  width: 40%;
+  height: auto;
+  border-radius: 10px;
 }
 
 /* The Close Button */
@@ -68,60 +52,30 @@
   color: #000;
   text-decoration: none;
   cursor: pointer;
-
 }
 </style>  
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
-    <meta name="description" content="Vuexy admin is super flexible, powerful, clean &amp; modern responsive bootstrap 4 admin template with unlimited possibilities.">
-    <meta name="keywords" content="admin template, Vuexy admin template, dashboard template, flat admin template, responsive admin template, web app">
-    <meta name="author" content="PIXINVENT">
-    <title><?php
-       include('title.php');
-       echo $pageTitle
+    <title><?php include('title.php'); echo $pageTitle; ?></title>
     
-    ?></title>
-    <link rel="apple-touch-icon" href="app-assets/images/ico/apple-icon-120.html">
     <link rel="shortcut icon" type="image/x-icon" href="app-assets/images/ico/favicon.ico">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600" rel="stylesheet">
 
     <!-- BEGIN: Vendor CSS-->
     <link rel="stylesheet" type="text/css" href="app-assets/vendors/css/vendors.min.css">
-    <!-- END: Vendor CSS-->
-
-    <!-- BEGIN: Theme CSS-->
     <link rel="stylesheet" type="text/css" href="app-assets/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="app-assets/css/bootstrap-extended.min.css">
     <link rel="stylesheet" type="text/css" href="app-assets/css/colors.min.css">
     <link rel="stylesheet" type="text/css" href="app-assets/css/components.min.css">
     <link rel="stylesheet" type="text/css" href="app-assets/css/themes/dark-layout.min.css">
     <link rel="stylesheet" type="text/css" href="app-assets/css/themes/semi-dark-layout.min.css">
-
-    <!-- BEGIN: Page CSS-->
     <link rel="stylesheet" type="text/css" href="app-assets/css/core/menu/menu-types/vertical-menu.min.css">
-    <link rel="stylesheet" type="text/css" href="app-assets/css/core/colors/palette-gradient.min.css">
-    <link rel="stylesheet" type="text/css" href="app-assets/css/plugins/forms/validation/form-validation.css">
-    <!-- END: Page CSS-->
-
-    <!-- BEGIN: Custom CSS-->
     <link rel="stylesheet" type="text/css" href="assets/css/style.css">
-    <!-- END: Custom CSS-->
-
   </head>
-  
-  <!-- END: Head-->
 
-  <!-- BEGIN: Body-->
-  <body class="vertical-layout vertical-menu-modern semi-dark-layout 2-columns  navbar-floating footer-static  " data-open="click" data-menu="vertical-menu-modern" data-col="2-columns" data-layout="semi-dark-layout">
-
-    <!-- BEGIN: Header-->
-  
-    
-
-    <!-- END: Header-->
-
+  <body class="vertical-layout vertical-menu-modern semi-dark-layout 2-columns navbar-floating footer-static" data-open="click" data-menu="vertical-menu-modern" data-col="2-columns" data-layout="semi-dark-layout">
 
     <!-- BEGIN: Main Menu-->
     <?php include('assets/Site_Bar.php') ?>
@@ -139,199 +93,132 @@
                 <h2 class="content-header-title float-left mb-0">View Addon</h2>
                 <div class="breadcrumb-wrapper col-12">
                   <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.php">Home</a>
-                    </li>
-                    <li class="breadcrumb-item active">View Addon
-                    </li>
+                    <li class="breadcrumb-item"><a href="index.php">Home</a></li>
+                    <li class="breadcrumb-item active">View Addon</li>
                   </ol>
                 </div>
               </div>
             </div>
           </div>
-          <!--<div class="content-header-right text-md-right col-md-3 col-12 d-md-block d-none">-->
-          <!--  <div class="form-group breadcrum-right">-->
-          <!--    <div class="dropdown">-->
-          <!--      <button class="btn-icon btn btn-primary btn-round btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="feather icon-settings"></i></button>-->
-          <!--      <div class="dropdown-menu dropdown-menu-right"><a class="dropdown-item" href="#">Chat</a><a class="dropdown-item" href="#">Email</a><a class="dropdown-item" href="#">Calendar</a></div>-->
-          <!--    </div>-->
-          <!--  </div>-->
-          <!--</div>-->
         </div>
-        <div class="content-body"><div class="row">
-  <!--<div class="col-12">-->
-  <!--    <p>Read full documnetation <a href="../../../../../../external.html?link=https://datatables.net/" target="_blank">here</a></p>-->
-  <!--</div>-->
-</div>
-<!-- Zero configuration table -->
-<section id="basic-datatable">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">View Addon</h4>
-                </div>
         
-                <div class="card-content">
-                    <div class="card-body card-dashboard">
-                        <p class="card-text"></p>
-                        <div class="table-responsive">
-                            <table id="example" class="table">
-                                <thead>
-                                    <tr>
-                                        <th>S no.</th>
-                                       
-                                        <th>Addon Title ID</th>
-                                        <!--<th>Addon Title</th>-->
-                                        <th>Addon Name</th>
-                                        <!--<th>Addon Price</th>-->
-                                        <!--<th>Price</th>-->
-                                        <!--<th>Discount</th>-->
-                                        <!--<th>Description</th>-->
-                                        <!--<th>Featured</th>-->
-                                        <th>Update</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                      <?php
-                                      include_once('connection.php');
-                                      $sql="SELECT `ao_id`, `ao_title` FROM `addon_list` ";
-                                      $result = mysqli_query($conn,$sql);
-                                      $index = 0;
-                                      while($row = mysqli_fetch_array($result)){
-                                          $sn = $index+1;
-                                          echo "<tr>";
-                                            echo "<td>{$sn}</td>";
-                                  
-                                             echo "<td name='tittlename'>{$row['ao_id']}</td>";
-                                           
-                                            echo "<td name='subname'>{$row['ao_title']}</td>";
-                                            // echo "<td name='cost'>{$row['as_name']}</td>";
-                                            // echo "<td name='price'>€ {$row['as_price']}</td>";
-                                            // echo "<td name='discount'>{$row['discount']}</td>";
-                                            // echo "<td name='product_description'>{$row['description']}</td>";
-                                            // echo "<td name='features'>{$row['features']}</td>";
-                                            echo '<td><button class="btn btn-primary" onclick="openAddMore(\''. $row['ao_id'] .'\' ,\''.$row['ao_title'].'\')">Update</button></td>';
-                                          echo "<td><a href='update_addons.php?id={$row['ao_id']}' ><button class='btn btn-primary'>View</button></a></td>";
-                                      
-                                          echo "</tr>";
-                                          $index++;
-                                      }
-                                      
-                                      ?>
-                                    
-                                </tbody>
-                                <tfoot>
-                                     <tr>
-                                        <th>S no.</th>
-                                       
-                                        <th>Addon Title ID</th>
-                                        <!--<th>Addon Title</th>-->
-                                        <th>Addon Name</th>
-                                        <!--<th>Addon Price</th>-->
-                                        <!--<th>Price</th>-->
-                                        <!--<th>Discount</th>-->
-                                        <!--<th>Description</th>-->
-                                        <!--<th>Featured</th>-->
-                                        <th>Action</th>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-<!--/ Zero configuration table -->
-<div id="myModal" class="modal">
+        <div class="content-body">
+          <section id="basic-datatable">
+              <div class="row">
+                  <div class="col-12">
+                      <div class="card">
+                          <div class="card-header">
+                              <h4 class="card-title">View Addon</h4>
+                          </div>
+                  
+                          <div class="card-content">
+                              <div class="card-body card-dashboard">
+                                  <div class="table-responsive">
+                                      <table id="example" class="table">
+                                          <thead>
+                                              <tr>
+                                                  <th>S no.</th>
+                                                  <th>Addon Name</th>
+                                                  <th>Front End Addon Title</th>
+                                                  <th>Update</th>
+                                                  <th>Action</th>
+                                              </tr>
+                                          </thead>
+                                          <tbody>
+                                          <?php
+                                          include_once('connection.php');
 
-      <!-- Modal content -->
-      <div class="modal-content-Updated2">
+                                          $sql = "SELECT `ao_id`, `ao_title` FROM `addon_list` ";
+                                          $result = mysqli_query($conn, $sql);$index = 0;
 
-        <span  onclick="closeModel(1)" class="close">&times;</span>
-        <h2>Update Image</h2>
-         <br>
+                                          if ($result && mysqli_num_rows($result) > 0) {
+                                              while ($row = mysqli_fetch_assoc($result)) {
+                                                  $ao_id =$row['ao_id'];
+                                                  
+                                                  // addon_sublist se title fetch karna
+                                                  $sqlfetch_subaddon = "SELECT `ao_title` FROM `addon_sublist` WHERE `ao_id` = '$ao_id' LIMIT 1";
+                                                  $exec_sqlfetch_subaddon = mysqli_query($conn, $sqlfetch_subaddon);$frontend_title = '-';
+                                                  if ($exec_sqlfetch_subaddon && $subaddon = mysqli_fetch_assoc($exec_sqlfetch_subaddon)) {
+                                                      $frontend_title =$subaddon['ao_title'];
+                                                  }
+                                                  
+                                                  $sn =$index + 1;
 
-         <form method="POST" action="phpfiles/insertions.php" enctype="multipart/form-data">
-         <input hidden type="text" id="ProID" name="ProID">  
-             <div class="col-sm-12">
-                
-                 <!--  <div class="form-group">
+                                                  echo "<tr>";
+                                                  echo "<td>{$sn}</td>";
+                                                  echo "<td name='subname'>" . htmlspecialchars($row['ao_title']) . "</td>";
+                                                  echo "<td name='subname'>" . htmlspecialchars($frontend_title) . "</td>";
+                                                  // Button me system title aur frontend title dono pass kiye gaye hain
+                                                  echo '<td><button class="btn btn-primary" onclick="openAddMore(\''. $row['ao_id'] .'\' ,\''. htmlspecialchars($row['ao_title'], ENT_QUOTES) .'\', \''. htmlspecialchars($frontend_title, ENT_QUOTES) .'\')">Update</button></td>';
+                                                  echo "<td><a href='update_addons.php?id={$row['ao_id']}'><button class='btn btn-primary'>View</button></a></td>";
+                                                  echo "</tr>";
+                                                  
+                                                  $index++;
+                                              }
+                                          }
+                                          ?>
+                                          </tbody>
+                                          <tfoot>
+                                               <tr>
+                                                  <th>S no.</th>
+                                                  <th>Addon Name</th>
+                                                  <th>Front End Addon Title</th>
+                                                  <th>Update</th>
+                                                  <th>Action</th>
+                                              </tr>
+                                          </tfoot>
+                                      </table>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </section>
+
+          <!-- Update Modal -->
+          <div id="myModal_Add" class="modal">
+            <div class="modal-content-Updated">
+              <span onclick="closeModel(2)" class="close">&times;</span>
+              <h2>Update Addons Title</h2>
+              <br>
+              <form method="POST" action="phpfiles/insertions.php" enctype="multipart/form-data">
+                <div class="col-sm-12">
+                  <!-- Hidden ID Field -->
+                  <input class="form-control" value="" type="hidden" name="ao_id" id="ao_id"> 
+                  
+                  <!-- System Addon Title (addon_list) -->
+                  <div class="form-group mb-2">
+                    <label>System Addon Title (Backend)</label>
                     <div class="controls">
-                        <input class="form-control"  type="text" name="tracking" placeholder="Tracking Number (Optional)"> 
-                    </div>
-                  </div> -->
-                  <div class="form-group">
-                    <div class="controls">
-                      <input  type="file" name="updatedImage" class="form-control"/>
+                      <input class="form-control" value="" type="text" name="ao_title" id="ao_title" placeholder="Enter System Addon Title" required> 
                     </div>
                   </div>
-                </div>
-        
-       <button type="submit" name="btnUpdateProdImage" class="btn btn-primary">Submit</button>
-       </form>
-      </div>
-    
-    </div>
 
-
-
-    <div id="myModal_Add" class="modal">
-
-      <!-- Modal content -->
-      <div class="modal-content-Updated">
-
-        <span onclick="closeModel(2)" class="close">&times;</span>
-        <h2>Update Addons Title</h2>
-         <br>
-         <br>
-         <form method="POST" action="phpfiles/insertions.php" enctype="multipart/form-data">
-        
-             <div class="col-sm-12">
-                 <input class="form-control"  value="" type="text" name="ao_id" id="ao_id" placeholder="Enter user name" hidden> 
-                  
-                <div class="form-group">
+                  <!-- Frontend Addon Title (addon_sublist) -->
+                  <div class="form-group mb-2">
+                    <label>Frontend Addon Title (User Show)</label>
                     <div class="controls">
-                        <input class="form-control"  value="" type="text" name="ao_title" id="ao_title" placeholder="Enter Addon Title" > 
+                      <input class="form-control" value="" type="text" name="frontend_ao_title" id="frontend_ao_title" placeholder="Enter Frontend Addon Title" required> 
                     </div>
-                 </div>
-            
-        
-                <button type="submit" name="updateAddonTitle" class="btn btn-primary">Save</button>
+                  </div>
+
+                  <button type="submit" name="updateAddonTitle" class="btn btn-primary mt-1">Save Changes</button>
+                </div>
+              </form>
             </div>
-       </form>
-      </div>
-    
-    </div>
-
-
-
-<!--/ Scroll - horizontal and vertical table -->
+          </div>
 
         </div>
       </div>
     </div>
     <!-- END: Content-->
 
-
-    <!-- End: Customizer-->
-  
-    <!-- Buynow Button-->
-    <!--<div class="buy-now"><a href="../../../../../../external.html?link=https://1.envato.market/vuexy_admin" target="_blank" class="btn btn-danger">Buy Now</a>-->
-
-    <!--</div>-->
     <div class="sidenav-overlay"></div>
     <div class="drag-target"></div>
 
-
-
     <!-- BEGIN: Vendor JS-->
     <script src="app-assets/vendors/js/vendors.min.js"></script>
-    <!-- BEGIN Vendor JS-->
-
-    <!-- BEGIN: Page Vendor JS-->
     <script src="app-assets/vendors/js/tables/datatable/pdfmake.min.js"></script>
     <script src="app-assets/vendors/js/tables/datatable/vfs_fonts.js"></script>
     <script src="app-assets/vendors/js/tables/datatable/datatables.min.js"></script>
@@ -340,118 +227,40 @@
     <script src="app-assets/vendors/js/tables/datatable/buttons.print.min.js"></script>
     <script src="app-assets/vendors/js/tables/datatable/buttons.bootstrap.min.js"></script>
     <script src="app-assets/vendors/js/tables/datatable/datatables.bootstrap4.min.js"></script>
-    <!-- END: Page Vendor JS-->
 
     <!-- BEGIN: Theme JS-->
     <script src="app-assets/js/core/app-menu.min.js"></script>
     <script src="app-assets/js/core/app.min.js"></script>
     <script src="app-assets/js/scripts/components.min.js"></script>
-    <script src="app-assets/js/scripts/customizer.min.js"></script>
     <script src="app-assets/js/scripts/footer.min.js"></script>
-    <!-- END: Theme JS-->
 
-    <!-- BEGIN: Page JS-->
-    <script src="app-assets/js/scripts/datatables/datatable.min.js"></script>
-    <!-- END: Page JS-->
-    
-<script>
+    <script>
+    var modal_Add = document.getElementById("myModal_Add");
 
+    // Modal mein values load hone ka function
+    function openAddMore(id, systemTitle, frontendTitle){
+        document.getElementById('ao_id').value = id;
+        document.getElementById('ao_title').value = systemTitle;
+        document.getElementById('frontend_ao_title').value = (frontendTitle === '-') ? '' : frontendTitle;
+        
+        modal_Add.style.display = "block";
+    }
 
-$(document).ready(function() {
-  var i = 1;
-  $('#add').click(function() {
-   
-      $('#dynamic_fields').append('<div class="row"><div class="col-sm-6" ><div class="form-group"><input type="text" name="addon_name[]" class="form-control" placeholder="Add On" required ></div></div><div class="col-sm-6" ><div class="form-group"><input type="number" step="0.01" name="addon_price[]" class="form-control" placeholder="Add On Price" required ></div></div></div>')
-      i++;
+    function closeModel(id) {
+        modal_Add.style.display = "none";
+    }
 
-  });
-  $(document).on('click', '.btn_remove', function() {
-    var button_id = $(this).attr("id");
-    i--;
-    $('#row' + button_id + '').remove();
-  });
-});
+    window.onclick = function(event) {
+        if (event.target == modal_Add) {
+            modal_Add.style.display = "none";
+        }
+    }
 
-var modal = document.getElementById("myModal");
-var modal_Add = document.getElementById("myModal_Add");
- function openModal(id){
-        document.getElementsByName('userID')[0].value = id;
-        modal.style.display = "block";
- }
-function openAddMore(id,title){
-
-      document.getElementById('ao_title').value = title;
-       document.getElementById('ao_id').value = id;
-    
-      modal_Add.style.display = "block";
-     
-
- }
-  function openimagemodel(id,index){
-     
-
-      modal.style.display = "block";
-      document.getElementById('ProID').value = id;
-     
-
- }
- var span = document.getElementsByClassName("close")[0];
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
-    
-  }else if(event.target == modal_Add){
-     modal_Add.style.display = "none";
-  }
-}
- function closeModel(id) {
-  if(id == 1){
-      modal.style.display = "none";
-  }else{
-      modal_Add.style.display = "none";
-  }
-  
-}
-
-function deleteRow(id){
-    var req = new XMLHttpRequest();
-      req.open("get","assets/Actions.php?FunctionName=DeleteCampaignPro&id="+id,true);
-      req.send();
-      req.onreadystatechange = function(){
-          if(req.readyState==4 && req.status==200){
-             alert('Row has been deleted!');
-             location.reload();
-              
-          }
-      };
-}
-
-function toggle(status,id){
-      var req = new XMLHttpRequest();
-      req.open("get","assets/Actions.php?FunctionName=ToggleCampaignPro&id="+id+"&status="+status,true);
-      req.send();
-      req.onreadystatechange = function(){
-          if(req.readyState==4 && req.status==200){
-             alert('Status has been updated!');
-             location.reload();
-              
-          }
-      };
-}
-</script>    
-<script>$(document).ready(function() {
-    $('#example').DataTable( {
-        dom: 'Bfrtip',
-        buttons: [
-            'copyHtml5',
-            'excelHtml5',
-            'csvHtml5',
-            'pdfHtml5'
-        ]
-    } );
-} );</script>
+    $(document).ready(function() {$('#example').DataTable({
+            dom: 'Bfrtip',
+            buttons: ['copyHtml5', 'excelHtml5', 'csvHtml5', 'pdfHtml5']
+        });
+    });
+    </script>    
   </body>
-  <!-- END: Body-->
-
-<!-- Mirrored from pixinvent.com/demo/vuexy-html-bootstrap-admin-template/html/ltr/vertical-menu-template-semi-dark/table-datatable.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 16 Apr 2020 21:22:58 GMT -->
 </html>
