@@ -247,9 +247,9 @@
                                         <th>Select</th>
                                         <th>S no.</th>
                                         <th>Dressing ID</th>
-                                        <th>Dressing Title</th>
+                                        <!--<th>Dressing Title</th>-->
                                         <th>Dressing Name</th>
-                                        <th>Dressing Name for users</th>
+                                        <!--<th>Dressing Name for users</th>-->
                                         <th>Dressing Price</th>
                                         <th>Save</th>
                                         <th>Delete</th>
@@ -290,9 +290,9 @@
                                             echo "<td><input type='checkbox' name='selected_dressing[]' value='{$row['ds_id']}'></td>";
                                             echo "<td>{$sn}</td>";
                                             echo "<td>{$row['ds_id']}</td>";
-                                            echo "<td class='editable' contenteditable='false' name='dressing_title' data-field='dressing_title' >{$row['dressing_title']}</td>";
+                                            // echo "<td class='editable' contenteditable='false' name='dressing_title' data-field='dressing_title' >{$row['dressing_title']}</td>";
                                             echo "<td class='editable' contenteditable='true' ts_name='dressing_name' data-field='dressing_name'>{$row['dressing_name']}</td>";
-                                            echo "<td class='editable' contenteditable='true' name='dressing_title_user' data-field='dressing_title_user'>{$row['dressing_title_user']}</td>";
+                                            // echo "<td class='editable' contenteditable='true' name='dressing_title_user' data-field='dressing_title_user'>{$row['dressing_title_user']}</td>";
                                             // echo "<td class='editable' contenteditable='true' name='dressing_price' data-field='price'>{$row['price']}</td>";
                                                  echo "<td class='editable' contenteditable='true' data-field='price' name='dressing_price'>"
     . formatCurrency($row['price'], $currency_sign, $currency_position)
@@ -314,9 +314,9 @@
     <th>Select</th>
     <th>S no.</th>
     <th>Dressing ID</th>
-    <th>Dressing Title</th>
+    <!--<th>Dressing Title</th>-->
     <th>Dressing Name</th>
-    <th>Dressing Name for users</th>
+    <!--<th>Dressing Name for users</th>-->
     <th>Dressing Price</th>
     <th>Save</th>
     <th>Delete</th>
