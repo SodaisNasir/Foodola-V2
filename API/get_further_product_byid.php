@@ -31,38 +31,41 @@ if($_POST['token'] = 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqa
                   
                   
                       // ADDONS
-                     $select_addon_title = 'SELECT * FROM `addon_list` WHERE `ao_id` ='.$rows['addon_id'];
-                    $execute_addon_title  = mysqli_query($conn,$select_addon_title);   
-                     if(mysqli_num_rows($execute_addon_title) > 0){
-                      $addon = array();
-                       while($row1 = mysqli_fetch_array($execute_addon_title)){
-                           
-                        $select_addon_sublist = 'SELECT `as_id`, `ao_title`, `as_name`, `as_price`, `isFreeInDeal` FROM `addon_sublist` WHERE `ao_id` ='.$row1['ao_id'];
-                        $execute_addon_sublist   = mysqli_query($conn,$select_addon_sublist);   
-                           if(mysqli_num_rows($execute_addon_sublist) > 0){
-                                $addon_data = array();
-                                while($row1a = mysqli_fetch_array($execute_addon_sublist)){
-                                       $temp1a = [
-                                               "as_id"=>$row1a['as_id'],
-                                               "as_name"=>$row1a['as_name'],
-                                               "as_price"=>$row1a['as_price'],
-                                               "isFreeInDeal"=>$row1a['isFreeInDeal'],
-                                           ];
-                                           array_push($addon_data,$temp1a); 
-                                }
-                           }
-                           
-                           
-                           $temp1 = [
-                               "ao_id"=>$row1['ao_id'],
-                               "ao_title"=>$row1['ao_title'],
-                               "ao_data"=>$addon_data,
-                               ];
-                               array_push($addon,$temp1); 
-                               
-                       }
-                  }
-                  
+                  $select_addon_title = 'SELECT * FROM `addon_list` WHERE `ao_id` =' . $rows['addon_id'];$execute_addon_title = mysqli_query($conn,$select_addon_title);   
+
+if (mysqli_num_rows($execute_addon_title) > 0) {$addon = array();
+    
+    while ($row1 = mysqli_fetch_array($execute_addon_title)) {$select_addon_sublist = 'SELECT `as_id`, `ao_title`, `as_name`, `as_price`, `isFreeInDeal` FROM `addon_sublist` WHERE `ao_id` =' . $row1['ao_id'];
+        $execute_addon_sublist = mysqli_query($conn, $select_addon_sublist);$addon_data = array();
+        $main_ao_title =$row1['ao_title']; 
+        
+        if (mysqli_num_rows($execute_addon_sublist) > 0) {
+            while ($row1a = mysqli_fetch_array($execute_addon_sublist)) {
+                
+                if (!empty($row1a['ao_title'])) {
+                    $main_ao_title =$row1a['ao_title'];
+                }
+
+                $temp1a = [
+                    "as_id"        => $row1a['as_id'],
+                    "ao_title"     => $row1a['ao_title'],
+                    "as_name"      => $row1a['as_name'],
+                    "as_price"     => $row1a['as_price'],
+                    "isFreeInDeal" => $row1a['isFreeInDeal'],
+                ];
+                array_push($addon_data,$temp1a); 
+            }
+        }
+        
+        $temp1 = [
+            "ao_id"    => $row1['ao_id'],
+            "ao_title" => $main_ao_title, 
+            "ao_data"  => $addon_data,
+        ];
+        array_push($addon,$temp1); 
+        
+    }
+}
                     // ADDONS
                     
                     

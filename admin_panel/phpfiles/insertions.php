@@ -1250,17 +1250,25 @@ $sql = "INSERT INTO `tables`(`table_name`, `seats`, `table_image`, `branch_id`,`
               </script>";
     }
 }
-if(isset($_POST['updateAddonTitle'])){
-      include('../connection.php');
+if (isset($_POST['updateAddonTitle'])) {
+    include('../connection.php');
 
-     $ao_id = $_POST['ao_id'];
-    
-    $ao_title = mysqli_real_escape_string($conn,$_POST['ao_title']);
-   
-    echo $sql = "UPDATE `addon_list` SET `ao_title`= '$ao_title' WHERE `ao_id` = $ao_id";
-    $update = mysqli_query($conn,$sql);
-    if($update){
-         header("Location:../view_addons.php?&Massage=Sucessfully updated Addons.");
+    $ao_id = intval($_POST['ao_id']);
+    $ao_title = mysqli_real_escape_string($conn, $_POST['ao_title']);$frontend_ao_title = mysqli_real_escape_string($conn,$_POST['frontend_ao_title']);
+
+    // 1. addon_list table update
+    $sql_main = "UPDATE `addon_list` SET `ao_title` = '$ao_title' WHERE `ao_id` = $ao_id";
+    $update_main = mysqli_query($conn,$sql_main);
+
+    // 2. addon_sublist table ki sabhi matching rows me frontend title update
+    $sql_sub = "UPDATE `addon_sublist` SET `ao_title` = '$frontend_ao_title' WHERE `ao_id` = $ao_id";
+    $update_sub = mysqli_query($conn,$sql_sub);
+
+    if ($update_main &&$update_sub) {
+        header("Location: ../view_addons.php?Massage=Sucessfully updated Addon.");
+        exit();
+    } else {
+        echo "Error updating record: " . mysqli_error($conn);
     }
 }
 
@@ -2694,41 +2702,43 @@ if (isset($_POST['btnSubmit_insertMoreAddonDressing'])) {
 
 
 
-if(isset($_POST['btnSubmit_insertAddon']))
-{
-include('../connection.php');
-  session_start();
-  $addon_name = $_POST['addon_name'];
-  $addon_price = $_POST['addon_price'];
-  $addon_title = mysqli_real_escape_string($conn,$_POST['addon_title']);
-  
-        if($addon_title){
-        $sql = "INSERT INTO `addon_list`(`ao_title`) VALUES ('$addon_title')";
-        $result = mysqli_query($conn,$sql);
-        
-        $last_inserted_id = $conn->insert_id;
-        if($result){
-           $combined = array_combine($addon_name, $addon_price);
-           
-           foreach($combined as $addon_name => $addon_price) {
-               $addon_NAME  = mysqli_real_escape_string($conn,$addon_name);
-                $insert_addon = "INSERT INTO `addon_sublist`(`ao_id`,`ao_title`, `as_name`, `as_price`) VALUES ('$last_inserted_id','$addon_title','$addon_NAME','$addon_price')";
-                $result_addon = mysqli_query($conn,$insert_addon);
-            } 
-            
-            header("Location:../addAddons.php?Massage=Sucessfully added new Addon.");
-            
-            
-            
-        }else{
-            echo "<script>alert('Sorry, there was an error while adding addon.')</script>";
-        }
-        }else{
-             echo "<script>alert('Please insert addon title.')</script>";
-        }
+if (isset($_POST['btnSubmit_insertAddon'])) {
+    include('../connection.php');
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 
+    $addon_name = isset($_POST['addon_name']) ? $_POST['addon_name'] : array();$addon_price = isset($_POST['addon_price']) ?$_POST['addon_price'] : array();
+    
+    $addon_title = isset($_POST['addon_title']) ? mysqli_real_escape_string($conn,$_POST['addon_title']) : '';
+    $frontend_addon_title = isset($_POST['frontend_addon_title']) ? mysqli_real_escape_string($conn,$_POST['frontend_addon_title']) : '';
+
+    if (!empty($addon_title)) {$insert_main_sql = "INSERT INTO `addon_list` (`ao_title`) VALUES ('$addon_title')";
+        $result = mysqli_query($conn,$insert_main_sql);
+
+        if ($result) {
+            $last_inserted_id = mysqli_insert_id($conn);
+
+            if (!empty($addon_name) && is_array($addon_name)) {
+                foreach ($addon_name as$key => $val) {$sub_name = mysqli_real_escape_string($conn,$val);
+                    $sub_price = mysqli_real_escape_string($conn, $addon_price[$key]);
+
+                    $insert_addon = "INSERT INTO `addon_sublist` (`ao_id`, `ao_title`, `as_name`, `as_price`) 
+                                     VALUES ('$last_inserted_id', '$frontend_addon_title', '$sub_name', '$sub_price')";
+                    mysqli_query($conn,$insert_addon);
+                }
+            }
+
+            header("Location: ../addAddons.php?Massage=Sucessfully added new Addon.");
+            exit();
+        } else {
+            echo "<script>alert('Error adding addon: " . mysqli_error($conn) . "')</script>";
+        }
+    } else {
+        echo "<script>alert('Please insert addon title.'); window.history.back();</script>";
+        exit();
+    }
 }
-
 
 // add variations
 
@@ -2854,82 +2864,109 @@ if(isset($_POST['btnSubmit_Variation']))
 
 
 
+if (isset($_POST['btnSubmit_insertType'])) {
+    include('../connection.php');
+    
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 
-if(isset($_POST['btnSubmit_insertType'])){
-include('../connection.php');
-  session_start();
-  $type_title = mysqli_real_escape_string($conn,$_POST['type_title']);
-    // $type_title_user = mysqli_real_escape_string($conn,$_POST['type_title_user']);
-  $add_type = $_POST['add_type'];
-  $add_price = $_POST['add_price'];
+    // 1. Inputs Sanitize kijiye (Correct string fetching)
+    $type_title = isset($_POST['type_title']) ? mysqli_real_escape_string($conn, trim($_POST['type_title'])) : '';$type_title_user_input = isset($_POST['type_title_user']) ? trim($_POST['type_title_user']) : '';
+    $type_title_user = !empty($type_title_user_input) 
+                        ? mysqli_real_escape_string($conn,$type_title_user_input) 
+                        : $type_title;
 
-  
-        if($type_title ){
-        $sql = "INSERT INTO `types_list` (`type_title`, `type_title_user`) VALUES ('$type_title','$type_title')";
-        $result = mysqli_query($conn,$sql);
-        
-        $last_inserted_id = $conn->insert_id;
-        if($result){
-          // $combined = array_combine($add_type);
-           
-           foreach($add_type as $index => $at) {
-                   $price = $add_price[$index];
-               $add_TYPE_NAME =  mysqli_real_escape_string($conn,$at);
-                $insert_types = "INSERT INTO `types_sublist`(`type_id`, `type_title`, `type_title_user`, `ts_name`,`price`) VALUES ('$last_inserted_id','$type_title','$type_title','$add_TYPE_NAME', '$price')";
-                $result_types = mysqli_query($conn,$insert_types);
-            } 
-            
-            header("Location:../addTypes.php?Massage=Sucessfully added new Type.");
-            
-            
-            
-        }else{
-            echo "<script>alert('Sorry, there was an error while adding type.')</script>";
+    $add_type =$_POST['add_type'] ?? array();
+    $add_price =$_POST['add_price'] ?? array();
+
+    if (!empty($type_title)) {
+        // 2. DEFINE MAIN QUERY (Fixes Argument #2 cannot be empty error)
+        $sql_main = "INSERT INTO `types_list` (`type_title`, `type_title_user`) VALUES ('$type_title', '$type_title_user')";
+        $result_main = mysqli_query($conn,$sql_main);
+
+        if ($result_main) {
+            $last_inserted_id = mysqli_insert_id($conn);
+
+            // 3. Loop over dynamic sublist options
+            if (!empty($add_type) && is_array($add_type)) {
+                foreach ($add_type as$index => $at) {$add_TYPE_NAME = mysqli_real_escape_string($conn, trim($at));
+                    
+                    // Skip blank options
+                    if ($add_TYPE_NAME === '') {
+                        continue;
+                    }
+
+                    // Sanitize price input
+                    $raw_price = $add_price[$index] ?? 0;
+                    $price = (is_numeric($raw_price) &&$raw_price !== '') 
+                             ? mysqli_real_escape_string($conn, trim($raw_price)) 
+                             : '0.00';
+
+                    // DEFINE SUBLIST QUERY
+                    $sql_sub = "INSERT INTO `types_sublist` (`type_id`, `type_title`, `type_title_user`, `ts_name`, `price`) 
+                                VALUES ('$last_inserted_id', '$type_title', '$type_title_user', '$add_TYPE_NAME', '$price')";
+
+                    mysqli_query($conn,$sql_sub);
+                }
+            }
+
+            header("Location: ../addTypes.php?Massage=Sucessfully added new Type.");
+            exit();
+
+        } else {
+            echo "<script>alert('Error while adding type: " . addslashes(mysqli_error($conn)) . "'); window.history.back();</script>";
+            exit();
         }
-        }else{
-             echo "<script>alert('Please insert type title or title for user.')</script>";
-        }
-
+    } else {
+        echo "<script>alert('Please insert type title.'); window.history.back();</script>";
+        exit();
+    }
 }
+
 
 //btnSubmit_insertDressing
 
 
-if(isset($_POST['btnSubmit_insertDressing'])){
-include('../connection.php');
-  session_start();
-  $type_title = mysqli_real_escape_string($conn,$_POST['dressing_title']);
-//   $type_title_user = mysqli_real_escape_string($conn,$_POST['dressing_title_user']);
-  $add_type = $_POST['add_dressing'];
-  $add_price = $_POST['add_price'];
+if (isset($_POST['btnSubmit_insertDressing'])) {
+    include('../connection.php');
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
 
-  
-        if($type_title ){
-        $sql = "INSERT INTO `dressing_list`(`dressing_title`, `dressing_title_user`) VALUES ('$type_title','$type_title')";
-        $result = mysqli_query($conn,$sql);
-        
-        $last_inserted_id = $conn->insert_id;
-        if($result){
-          // $combined = array_combine($add_type);
-           
-           foreach($add_type as $index =>  $at) {
-                   $price = $add_price[$index];
-               $dressing_NAME = mysqli_real_escape_string($conn,$at);
-                $insert_types = "INSERT INTO `dressing_sublist`(`dressing_id`, `dressing_title`, `dressing_title_user`, `dressing_name`, `price`) VALUES ('$last_inserted_id','$type_title','$type_title','$dressing_NAME', '$price')";
-                $result_types = mysqli_query($conn,$insert_types);
-            } 
-            
-               header("Location:../addDressing.php?Massage=Sucessfully added new Dressing.");
-            
-            
-            
-        }else{
-            echo "<script>alert('Sorry, there was an error while adding Dressing.')</script>";
-        }
-        }else{
-             echo "<script>alert('Please insert Dressing title or title for user.')</script>";
-        }
+    $type_title = isset($_POST['dressing_title']) ? mysqli_real_escape_string($conn, trim($_POST['dressing_title'])) : '';
+    $type_title_user = isset($_POST['dressing_title_user']) ? mysqli_real_escape_string($conn, trim($_POST['dressing_title_user'])) : '';
+    
+    $add_type = isset($_POST['add_dressing']) ? $_POST['add_dressing'] : array();$add_price = isset($_POST['add_price']) ?$_POST['add_price'] : array();
 
+    if (!empty($type_title)) {
+        // Query ka naam unique rakha hai taake kisi aur variable se conflict na ho
+        $dressing_main_query = "INSERT INTO `dressing_list` (`dressing_title`, `dressing_title_user`) VALUES ('$type_title', '$type_title_user')";
+        $result = mysqli_query($conn,$dressing_main_query);
+
+        if ($result) {
+            $last_inserted_id = mysqli_insert_id($conn);
+
+            if (!empty($add_type) && is_array($add_type)) {
+                foreach ($add_type as$index => $at) {$dressing_NAME = mysqli_real_escape_string($conn, trim($at));
+                    $price = isset($add_price[$index]) ? mysqli_real_escape_string($conn, trim($add_price[$index])) : '0.00';
+
+                    $insert_types = "INSERT INTO `dressing_sublist` (`dressing_id`, `dressing_title`, `dressing_title_user`, `dressing_name`, `price`) 
+                                     VALUES ('$last_inserted_id', '$type_title', '$type_title_user', '$dressing_NAME', '$price')";
+                    mysqli_query($conn,$insert_types);
+                }
+            }
+
+            header("Location: ../addDressing.php?Massage=Sucessfully added new Dressing.");
+            exit();
+        } else {
+            echo "<script>alert('Error: " . mysqli_error($conn) . "'); window.history.back();</script>";
+            exit();
+        }
+    } else {
+        echo "<script>alert('Please insert Dressing title.'); window.history.back();</script>";
+        exit();
+    }
 }
 
 

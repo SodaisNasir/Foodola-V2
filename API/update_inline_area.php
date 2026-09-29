@@ -1,4 +1,7 @@
 <?php
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
 header('Content-Type: application/json');
 include('connection.php');
 
@@ -30,6 +33,14 @@ $sql = "UPDATE `tbl_areas`
         WHERE `id` = '$id'";
 
 if (mysqli_query($conn, $sql)) {
+    
+$sql2 = "UPDATE `user_addresses` 
+             SET `min_order_price` = '$min_order_amount' 
+             WHERE `area_id` = '$id'";
+             
+    mysqli_query($conn,$sql2);
+             
+             
     echo json_encode(['status' => true, 'message' => 'Area updated successfully']);
 } else {
     http_response_code(500); // Internal Server Error
