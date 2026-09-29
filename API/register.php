@@ -24,6 +24,7 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
     $user_referal =  $_POST['user_referal'];
     $notification_token = $_POST['notification_token'];
     $country_code =  $_POST['country_code'];
+    $social_id =  $_POST['social_id'];
 
     include('connection.php');
     
@@ -54,9 +55,9 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
         
         if (mysqli_num_rows($execute) == 0) {
             if (empty($user_referal)) {
-                $sql = "INSERT INTO `users`(`role_id`, `name`, `phone`, `notification_token`, `email`, `referal_code`, `password`, `country_code`, `status`) VALUES ('$role','$name','$phone','$notification_token','$email','$referal_code','$password', '$country_code', 'active')";
+                $sql = "INSERT INTO `users`(`role_id`, `name`, `phone`, `notification_token`, `email`, `referal_code`, `password`, `country_code`, `status`, `social_id`) VALUES ('$role','$name','$phone','$notification_token','$email','$referal_code','$password', '$country_code', 'active', '$social_id')";
             } else {
-                $sql = "INSERT INTO `users`(`role_id`, `name`, `phone`, `notification_token`, `email`, `referal_code`, `user_referal`, `password`, `country_code` ,`status`) VALUES ('$role','$name','$phone','$notification_token','$email','$referal_code','$user_referal','$password', '$country_code', 'active')";
+                $sql = "INSERT INTO `users`(`role_id`, `name`, `phone`, `notification_token`, `email`, `referal_code`, `user_referal`, `password`, `country_code` ,`status`, `social_id`) VALUES ('$role','$name','$phone','$notification_token','$email','$referal_code','$user_referal','$password', '$country_code', 'active', '$social_id')";
             }
 
             $result = mysqli_query($conn, $sql);
@@ -64,7 +65,7 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
             if ($result) {
                 $last_id = $conn->insert_id;
 
-                $sql_getdata = "SELECT `id`, `role_id`, `name`, `phone`, `email`, `referal_code`, `profilepic`, `email_verified_at`, `notification_token`, `rewards_token`, `card_number`, `cvc_code`, `amount`, `created_at`, `updated_at`, `country_code`, `status` FROM `users` WHERE `id` = $last_id"; 
+                $sql_getdata = "SELECT `id`, `role_id`, `name`, `phone`, `email`, `referal_code`, `profilepic`, `email_verified_at`, `notification_token`, `rewards_token`, `card_number`, `cvc_code`, `amount`, `created_at`, `updated_at`, `country_code`, `status`, `social_id` FROM `users` WHERE `id` = $last_id"; 
                 $ex_getdata = mysqli_query($conn, $sql_getdata);
                 
                 if ($ex_getdata) {
@@ -86,6 +87,7 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                         "created_at" => $Data['created_at'],
                         "country_code" => $Data['country_code'],
                         "status" => $Data['status']
+                        "social_id" => $Data['social_id']
                     ];
 
                     $data = [
