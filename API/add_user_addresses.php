@@ -24,17 +24,18 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
     if ($row['address_count'] > 0) {
         echo json_encode(["status" => false, "Message" => "Adresse existiert bereits", "english_message" => "Address already exists"]);
     } else {
-        $area_sql = "SELECT `min_order_amount` FROM `tbl_areas` WHERE `area_name` = '$Shipping_postal_code'";
+        $area_sql = "SELECT `id`,`min_order_amount` FROM `tbl_areas` WHERE `area_name` = '$Shipping_postal_code'";
         $area_result = mysqli_query($conn, $area_sql);
         
         if ($area_row = mysqli_fetch_assoc($area_result)) {
+            $area_id = $area_row['id'];
             $min_order_amount = $area_row['min_order_amount'];
         } else {
             $min_order_amount = 0;
         }
 
-        $insert_sql = "INSERT INTO `user_addresses`(`user_id`, `Shipping_address`, `Shipping_address_2`, `Shipping_city`, `Shipping_area`, `Shipping_postal_code`, `Shipping_state`, 
-            `min_order_price`, `created_at`, `updated_at`) VALUES ('$user_id', '$Shipping_address', '$Shipping_address_2', '$Shipping_city', '$Shipping_area', '$Shipping_postal_code', 
+        $insert_sql = "INSERT INTO `user_addresses`(`user_id`,`area_id`, `Shipping_address`, `Shipping_address_2`, `Shipping_city`, `Shipping_area`, `Shipping_postal_code`, `Shipping_state`, 
+            `min_order_price`, `created_at`, `updated_at`) VALUES ('$user_id','$area_id', '$Shipping_address', '$Shipping_address_2', '$Shipping_city', '$Shipping_area', '$Shipping_postal_code', 
             '$Shipping_state', '$min_order_amount', NOW(), NOW())";
 
         if (mysqli_query($conn, $insert_sql)) {
