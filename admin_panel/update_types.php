@@ -252,8 +252,8 @@
                                         <th>S no.</th>
                                         <th>Type ID</th>
                                         <th>Type Name</th>
-                                        <th>Type Title</th>
-                                        <th>Type Title User</th>
+                                        <!--<th>Type Title</th>-->
+                                        <!--<th>Type Title User</th>-->
                                         <th>Type price</th>
                                         <th>Save</th>
                                         <th>Delete</th>
@@ -297,8 +297,8 @@
                                           echo "<td>{$sn}</td>";
                                           echo "<td>{$row['ts_id']}</td>";
                                           echo "<td class='editable' contenteditable='true' data-field='ts_name' ts_name='cost'>{$row['ts_name']}</td>";
-                                          echo "<td class='editable' contenteditable='false' data-field='type_title' ts_name='cost'>{$row['type_title']}</td>";
-                                          echo "<td class='editable' contenteditable='true' data-field='type_title_user' ts_name='cost'>{$row['type_title_user']}</td>";
+                                        //   echo "<td class='editable' contenteditable='false' data-field='type_title' ts_name='cost'>{$row['type_title']}</td>";
+                                        //   echo "<td class='editable' contenteditable='true' data-field='type_title_user' ts_name='cost'>{$row['type_title_user']}</td>";
                                         //   echo "<td class='editable' contenteditable='true' data-field='price' ts_name='price'>{$row['price']}</td>";
                                           
                                                echo "<td class='editable' contenteditable='true' data-field='price' ts_name='price'>"
