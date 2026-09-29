@@ -16,17 +16,18 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
     $Shipping_state = str_replace("undefined", "", $_POST['Shipping_state']);
 
 
-    $area_sql = "SELECT `min_order_amount` FROM `tbl_areas` WHERE `area_name` = '$Shipping_postal_code'";
+    $area_sql = "SELECT `id`, `min_order_amount` FROM `tbl_areas` WHERE `area_name` = '$Shipping_postal_code'";
     $area_result = mysqli_query($conn, $area_sql);
 
     if ($area_row = mysqli_fetch_assoc($area_result)) {
+        $area_id = $area_row['id'];
         $min_order_amount = $area_row['min_order_amount'];
     } else {
         $min_order_amount = 0;
     }
 
 
-    $upd_sql = "UPDATE `user_addresses` SET `Shipping_address` = '$Shipping_address',`Shipping_address_2` = '$Shipping_address_2',`Shipping_city` = '$Shipping_city',`Shipping_area` = '$Shipping_area',`Shipping_postal_code` = '$Shipping_postal_code',`Shipping_state` = '$Shipping_state',`min_order_price` = '$min_order_amount',`updated_at` = NOW() 
+    $upd_sql = "UPDATE `user_addresses` SET `area_id` = '$area_id', `Shipping_address` = '$Shipping_address',`Shipping_address_2` = '$Shipping_address_2',`Shipping_city` = '$Shipping_city',`Shipping_area` = '$Shipping_area',`Shipping_postal_code` = '$Shipping_postal_code',`Shipping_state` = '$Shipping_state',`min_order_price` = '$min_order_amount',`updated_at` = NOW() 
         WHERE `id` = '$id'";
 
     $exec_query = mysqli_query($conn, $upd_sql);
