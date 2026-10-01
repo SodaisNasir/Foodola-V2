@@ -7,7 +7,7 @@ $APP_NAME = "Margarita Burger Östringen";
 $BASE_URL = "https://margheritaburgerostringen.de/";
 $company_address = "Hauptstraße 4576684 Östringen";
 $company_city    = "Östringen";
-$company_phone   = "07253 26560-61";
+$company_phone   = "07253 26192";
 
 
 // MAIL CONFIGRUATION

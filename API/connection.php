@@ -9,7 +9,7 @@ $INSTAGRAM_URL  = "https://instagram.com/margaritaburger";
 $TWITTER_URL  = "https://twitter.com/margaritaburger";
 $company_address = "Hauptstraße 4576684 Östringen";
 $company_city    = "Östringen";
-$company_phone   = "07253 26560-61";
+$company_phone   = "07253 26192";
 
 
 // PUSHER CONFIGRUATION
