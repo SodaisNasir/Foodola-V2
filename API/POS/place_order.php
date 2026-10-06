@@ -824,9 +824,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               'user_name'            => $user_data['name'] ?? $user_name,
               'user_email'           => $user_data['email'] ?? $user_email,
               'user_phone'           => $user_data['phone'] ?? $user_phone,
-              'Shipping_address'     => $street,
-              'Shipping_address_2'   => $House_number,
-              'Shipping_city'        => $name,
+              'Shipping_address_2'   => $Shipping_address_2,
+              'Shipping_city'        => $Shipping_city,
+              'Shipping_area'        => $Shipping_area,
               'Shipping_postal_code' => $Shipping_postal_code,
               'Shipping_cost'        => $shipping_cost,
               'payment_method'       => $payment_method,
@@ -1029,7 +1029,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }
     }
   } else {
-
+        if ($payment_type == 'online') {
+            $sql_check = "SELECT `id` FROM `orders_zee` WHERE `transaction_id` = '$transaction_id' AND `transaction_id` != ''";
+            $r_check = mysqli_query($conn,$sql_check);
+        
+            if ($r_check && mysqli_num_rows($r_check) > 0) {
+                
+                $response = ["status" => false,"message" => "Duplicate transaction ID. This payment has already been processed."];
+                echo json_encode($response);
+                exit;
+            }
+        }
 
     if ($user_id) {
 
@@ -1130,8 +1140,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
 
-    $sql = "INSERT INTO `orders_zee`(`user_id`, `status`, `payment_type`, `order_total_price`, `payment_status`, `Shipping_address`, `Shipping_address_2`, `Shipping_city`, `Shipping_postal_code`, `Shipping_Cost`,`branch_id`, `addtional_notes`, `total_netto_tax`, `total_metto_tax`, `order_type`, `total_discount`, `payment_method`, `transaction_id`, `platform`, `ordersheduletype`, `sheduletime`, `created_at`,`user_name`, `user_email`, `user_phone`) 
-            VALUES ($user_id, '$order_status', '$payment_type', '$total_amount', '$paymentstatus', '$street', '$House_number', 
+    $sql = "INSERT INTO `orders_zee`(`user_id`, `status`, `payment_type`, `order_total_price`, 
+                    `payment_status`, `Shipping_address`, `Shipping_address_2`, 
+                    `Shipping_city`, `Shipping_postal_code`, `Shipping_Cost`,`branch_id`, `addtional_notes`, `total_netto_tax`, `total_metto_tax`, `order_type`, `total_discount`, `payment_method`, `transaction_id`, `platform`, `ordersheduletype`, `sheduletime`, `created_at`,`user_name`, `user_email`, `user_phone`) 
+            VALUES ($user_id, '$order_status', '$payment_type', '$total_amount', 
+                    '$paymentstatus', '$street', '$House_number', 
                     '$name', '$Shipping_postal_code', '$shipping_cost', '$branch_id', '$additional_notes', '$total_netto_tax', '$total_metto_tax', '$order_type', '$total_discount', '$payment_method', '$transaction_id', '$platform','$ordersheduletype', '$sheduletime', '$datetime', '$user_name', '$user_email', '$user_phone')";
 
     $result = mysqli_query($conn, $sql);
@@ -1489,9 +1502,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           'user_name'            => $user_data['name'] ?? $user_name ?? '',
           'user_email'           => $user_data['email'] ?? $user_email ?? '',
           'user_phone'           => $user_data['phone'] ?? $user_phone ?? '',
-          'Shipping_address'     => $street,
-          'Shipping_address_2'   => $House_number,
-          'Shipping_city'        => $name,
+          'Shipping_address_2'   => $Shipping_address_2,
+          'Shipping_city'        => $Shipping_city,
+          'Shipping_area'        => $Shipping_area,
           'Shipping_postal_code' => $Shipping_postal_code,
           'Shipping_cost'        => $shipping_cost,
           'payment_method'       => $payment_method,
