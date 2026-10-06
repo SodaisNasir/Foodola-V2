@@ -525,7 +525,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                     $message_de = str_replace(array_keys($replacements), array_values($replacements), $data['message_de']);
 
 
-                    $data = ["status" => true, "Response_code" => 200, "message_en" => $message_en, "message_de" => $message_de];
+                    $data = ["status" => true, "Response_code" => 200, "message_en" => $message_en, "message_de" => $message_de, "order_id" => $last_id];
 
 
                     array_push($data_array, $data);
@@ -1185,7 +1185,7 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                 $message_de = str_replace(array_keys($replacements), array_values($replacements), $data['message_de']);
 
 
-                $data = ["status" => true, "Response_code" => 200, "message_en" => $message_en, "message_de" => $message_de];
+                $data = ["status" => true, "Response_code" => 200, "message_en" => $message_en, "message_de" => $message_de, "order_id" => $last_id];
 
 
 
