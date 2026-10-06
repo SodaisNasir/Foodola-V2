@@ -5,6 +5,8 @@ require '../PHPMailer-master/src/PHPMailer.php';
 require '../PHPMailer-master/src/SMTP.php';
 require '../PHPMailer-master/src/Exception.php';
 include('../../functions/email_templates.php');
+require __DIR__ . '/../vendor/autoload.php';
+use Pusher\Pusher;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -433,12 +435,11 @@ if ($child_res && mysqli_num_rows($child_res) > 0) {
     $child_row = mysqli_fetch_assoc($child_res);
     $child_base_url = rtrim(trim($child_row['child_url']), '/'); 
     
-    // Fix: Agar child_order_id empty hai to order_id bhej de taake API block na ho
     $child_order_id = !empty($child_row['child_order_id']) ? $child_row['child_order_id'] : $order_id;
 
     if (!empty($child_base_url)) {
 
-        // AAPKA DIYA HUA EXACT URL
+
         $full_child_api_url = $child_base_url . '/API/POS/update_order_status.php';
 
         $payload = [
@@ -451,14 +452,14 @@ if ($child_res && mysqli_num_rows($child_res) > 0) {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($payload));
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10); // Timeout thora barha diya hai
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10); 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         
         $child_api_response = curl_exec($ch);
         $curl_error = curl_error($ch);
         curl_close($ch);
 
-        // Debugging Variables: (API hit check karne ke liye Postman/Network tab mein response check karein)
+
         $response["child_api_debug"] = [
             "url_hit" => $full_child_api_url,
             "payload" => $payload,
@@ -468,6 +469,55 @@ if ($child_res && mysqli_num_rows($child_res) > 0) {
     }
 }
 // ============================================================
+
+
+// send pusher
+
+          $order_info = [
+            'id' => $order_id,
+            'status' => $status,
+          ];
+
+
+          try {
+            // configure Pusher
+            $options = [
+              'cluster' => 'mt1',  // e.g. 'mt1'
+              'useTLS'  => true
+            ];
+
+            $pusher = new Pusher(
+              $PUSHER_APP_KEY,    // App key 
+              $PUSHER_SECRET_KEY, // App secret 
+              $PUSHER_APP_ID,     // App ID 
+              $options
+            );
+
+            // prepare notification
+            $channel = $CHANNEL_1; // Channel name dynamically based on user ID
+            $event   = 'change_order_status';
+            $data    = [
+              'order_id' => $order_id,
+              'order_data'  => $order_info,
+            ];
+
+            // trigger the event
+            $response = $pusher->trigger($channel, $event, $data);
+
+            // if ($response) {
+            //     echo "Notification triggered successfully!";
+            // } else {
+            //     echo "Failed to trigger notification.";
+            // }
+
+          } catch (Exception $e) {
+            // Handle Pusher error
+            error_log("Pusher error: " . $e->getMessage());
+            echo "Error triggering notification: " . $e->getMessage();
+          }
+
+
+
 
         $response = ["status" => "success", "message" => "Order updated successfully", "order_id" => $order_id];
 
