@@ -1,11 +1,11 @@
 <?php
 define('BASE_DIRECTORY', __DIR__ . '/../../API/');
 require_once __DIR__ . '/../../functions/email_templates.php';
-
 require BASE_DIRECTORY . 'PHPMailer-master/src/PHPMailer.php';
 require BASE_DIRECTORY . 'PHPMailer-master/src/SMTP.php';
 require BASE_DIRECTORY . 'PHPMailer-master/src/Exception.php';
-
+require_once BASE_DIRECTORY . 'vendor/autoload.php';
+use Pusher\Pusher;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -3250,6 +3250,7 @@ if (isset($_POST['btnSubmit_Action'])) {
     $status = $_POST['Action'];
     $order_id = $_POST['order_id'];
     include('../connection.php');
+include_once BASE_DIRECTORY . 'connection.php';
 
     if ($status == 'shipped') {
         $sql = "UPDATE `orders_zee` SET `status` = '$status' WHERE `id` = $order_id";
@@ -3523,6 +3524,53 @@ if (isset($_POST['btnSubmit_Action'])) {
     }
 
     if ($update){ 
+        
+        
+        // send pusher
+
+          $order_info = [
+            'id' => $order_id,
+            'status' => $status,
+          ];
+
+
+          try {
+            // configure Pusher
+            $options = [
+              'cluster' => 'mt1',  // e.g. 'mt1'
+              'useTLS'  => true
+            ];
+
+            $pusher = new Pusher(
+              $PUSHER_APP_KEY,    // App key 
+              $PUSHER_SECRET_KEY, // App secret 
+              $PUSHER_APP_ID,     // App ID 
+              $options
+            );
+
+            // prepare notification
+            $channel = $CHANNEL_1; // Channel name dynamically based on user ID
+            $event   = 'change_order_status';
+            $data    = [
+              'order_id' => $order_id,
+              'order_data'  => $order_info,
+            ];
+
+            // trigger the event
+            $response = $pusher->trigger($channel, $event, $data);
+
+            // if ($response) {
+            //     echo "Notification triggered successfully!";
+            // } else {
+            //     echo "Failed to trigger notification.";
+            // }
+
+          } catch (Exception $e) {
+            // Handle Pusher error
+            error_log("Pusher error: " . $e->getMessage());
+            echo "Error triggering notification: " . $e->getMessage();
+          }
+
         
         
         
