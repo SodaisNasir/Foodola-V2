@@ -86,7 +86,7 @@ if ($_POST['token'] === 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavg
                         "amount" => $Data['amount'],
                         "created_at" => $Data['created_at'],
                         "country_code" => $Data['country_code'],
-                        "status" => $Data['status']
+                        "status" => $Data['status'],
                         "social_id" => $Data['social_id']
                     ];
 
