@@ -281,14 +281,13 @@ if (isset($_GET['Massage'])) {
             $where_sql = "WHERE " . implode(" AND ", $where_clauses);
         }
 
-        $sql = "SELECT orders.id, orders.user_id, orders.user_name, orders.user_email, orders.user_phone, orders.Shipping_address, 
+       $sql = "SELECT orders.id, orders.user_id, orders.user_name, orders.user_email, orders.user_phone, orders.Shipping_address, 
                        orders.status, orders.Shipping_address_2, orders.Shipping_city, orders.Shipping_area, orders.payment_type, 
                        orders.Shipping_state, orders.Shipping_postal_code, orders.order_total_price, orders.Shipping_Cost, 
                        orders.created_at, orders.addtional_notes, orders.branch_id, orders.table_id, orders.order_type, orders.platform
                 FROM `orders_zee` AS orders 
                 $where_sql 
                 ORDER BY orders.id DESC";
-
         $result = mysqli_query($conn,$sql);
         ?>
 
@@ -502,7 +501,7 @@ if (isset($_GET['Massage'])) {
   <script src="app-assets/js/scripts/customizer.min.js"></script>
   <script src="app-assets/js/scripts/footer.min.js"></script>
 
-  <script>
+<script>
     $(document).ready(function() {
       // Auto-submit form on filter change
       $('#filterForm select, #filterForm input[type="date"]').on('change', function() {
@@ -510,7 +509,7 @@ if (isset($_GET['Massage'])) {
       });
 
       // DataTables initialization
-      $('#example').DataTable({
+$('#example').DataTable({
         dom: '<"d-flex justify-content-between align-items-center mb-3"lBf>rt<"d-flex justify-content-between align-items-center mt-3"ip>',
         buttons: [
           { extend: 'copyHtml5', className: 'btn btn-sm btn-outline-secondary me-1' },
@@ -518,8 +517,11 @@ if (isset($_GET['Massage'])) {
           { extend: 'csvHtml5', className: 'btn btn-sm btn-outline-info me-1' },
           { extend: 'pdfHtml5', className: 'btn btn-sm btn-outline-danger' }
         ],
-        pageLength: 10,
-        order: [[1, 'desc']],
+        pageLength: 25,
+        order: [[1, 'desc']], 
+        columnDefs: [
+          { type: 'num', targets: 1 } 
+        ],
         stateSave: false,
         language: {
           search: "_INPUT_",
