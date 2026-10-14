@@ -3328,6 +3328,8 @@ include_once BASE_DIRECTORY . 'connection.php';
                 $order_status_row = mysqli_fetch_assoc($execute_status);
             
                if ($order_status_row['cashback_status'] == 1) {
+                $sql = "UPDATE `orders_zee` SET `status` = '$status' WHERE `id` = $order_id";
+                $update = mysqli_query($conn, $sql);
                     // Cashback already given, no need to proceed
                     header("Location: ../order_details.php?order_id=$order_id");
                     exit;
