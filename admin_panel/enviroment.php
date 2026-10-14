@@ -30,7 +30,7 @@ function ensureKeysExist($conn, array $keys, $defaultMode = 1, $paypalSandboxVal
    --------------------------------------------------------- */
 if (isset($_POST['ajax_toggle_section'])) {
     $section = $_POST['section_name'];
-    $status  = intval($_POST['status']); // 1 = Enable (Add Rows), 0 = Disable
+    $status  = intval($_POST['status']); // 1 = Enable (Add Rows), 0 = Disable (Delete Rows)
 
     $response = ['status' => 'success'];
 
@@ -45,9 +45,12 @@ if (isset($_POST['ajax_toggle_section'])) {
 
     if (isset($keysMap[$section])) {
         if ($status === 1) {
-            // Enable hone par mode = 1 aur PayPal sandbox URL insert hoga
+
             $defaultSandbox = ($section === 'paypal') ? 'https://api-m.sandbox.paypal.com' : null;
             ensureKeysExist($conn, $keysMap[$section], 1, $defaultSandbox);
+        } else {
+            $keysList = "'" . implode("', '", array_map([$conn, 'real_escape_string'], $keysMap[$section])) . "'";
+            mysqli_query($conn, "DELETE FROM enviroments WHERE key_name IN ($keysList)");
         }
     }
 
@@ -380,8 +383,8 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
                               <div class="row">
                                 <?php foreach ($apiKeys as $apiKey):
                                   if (!in_array($apiKey['key_name'], $paypalKeys)) continue;
-                                  $keyName = $apiKey['key_name'];
-                                  $keyValue = $apiKey['key_value'];
+                                  $keyName =$apiKey['key_name'];
+                                  $keyValue =$apiKey['key_value'];
                                 ?>
                                   <div class="col-md-6 mb-2">
                                     <div class="form-group">
@@ -418,8 +421,8 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
                               <div class="row">
                                 <?php 
                                   $pixelVal = '';
-                                  foreach ($apiKeys as $k) { 
-                                      if ($k['key_name'] === 'pixel_key') { $pixelVal = $k['key_value']; break; } 
+                                  foreach ($apiKeys as$k) { 
+                                      if ($k['key_name'] === 'pixel_key') { $pixelVal =$k['key_value']; break; } 
                                   }
                                 ?>
                                 <div class="col-md-6 mb-2">
@@ -455,13 +458,12 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
                               <?php $fiskaly_keys = 0; ?> 
                               <div>
                                 <div class="row mb-2">
-                                    <?php foreach ($fiskalyKeys as $fKey): 
-                                        $val = '';
-                                        foreach ($apiKeys as $k) { 
-                                            if ($k['key_name'] === $fKey) { 
-                                                $val = $k['key_value']; 
-                                                if ($fKey == 'fiskaly_api_key' || $fKey == 'fiskaly_api_secret') {
-                                                    if ($val) { $fiskaly_keys++; }
+                                    <?php foreach ($fiskalyKeys as $fKey):$val = '';
+                                        foreach ($apiKeys as$k) { 
+                                            if ($k['key_name'] ===$fKey) { 
+                                                $val =$k['key_value']; 
+                                                if ($fKey == 'fiskaly_api_key' ||$fKey == 'fiskaly_api_secret') {
+                                                    if ($val) {$fiskaly_keys++; }
                                                 }
                                                 break; 
                                             } 
@@ -503,7 +505,7 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
                                       <input type="text" class="form-control" name="liefersoft_company_key" 
                                              value="<?php
                                                  $val = '';
-                                                 foreach ($apiKeys as $k) { if($k['key_name'] == 'liefersoft_company_key') { $val = $k['key_value']; break; } }
+                                                 foreach ($apiKeys as $k) { if($k['key_name'] == 'liefersoft_company_key') { $val =$k['key_value']; break; } }
                                                  echo htmlspecialchars($val);
                                              ?>" 
                                              placeholder="Enter Company Key">
@@ -517,7 +519,7 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
                                       <input type="text" class="form-control" name="liefersoft_login_key" 
                                              value="<?php
                                                  $val = '';
-                                                 foreach ($apiKeys as $k) { if($k['key_name'] == 'liefersoft_login_key') { $val = $k['key_value']; break; } }
+                                                 foreach ($apiKeys as $k) { if($k['key_name'] == 'liefersoft_login_key') { $val =$k['key_value']; break; } }
                                                  echo htmlspecialchars($val);
                                              ?>" 
                                              placeholder="Enter Login Key">
@@ -528,7 +530,7 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
                                       <input type="text" class="form-control" name="liefersoft_password_key" 
                                              value="<?php
                                                  $val = '';
-                                                 foreach ($apiKeys as $k) { if($k['key_name'] == 'liefersoft_password_key') { $val = $k['key_value']; break; } }
+                                                 foreach ($apiKeys as $k) { if($k['key_name'] == 'liefersoft_password_key') { $val =$k['key_value']; break; } }
                                                  echo htmlspecialchars($val);
                                              ?>" 
                                              placeholder="Enter Password Key">
@@ -550,9 +552,8 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
 
                               <?php if ($hasSocial): ?>
                               <div class="row mb-2">
-                                <?php foreach ($socialKeys as $sKey): 
-                                    $val = '';
-                                    foreach ($apiKeys as $k) { if($k['key_name'] === $sKey) { $val = $k['key_value']; break; } }
+                                <?php foreach ($socialKeys as $sKey):$val = '';
+                                    foreach ($apiKeys as$k) { if($k['key_name'] ===$sKey) { $val =$k['key_value']; break; } }
                                 ?>
                                   <div class="col-md-6 mb-2">
                                     <div class="form-group">
