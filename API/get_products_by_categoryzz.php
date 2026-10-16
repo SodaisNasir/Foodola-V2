@@ -117,7 +117,7 @@ if (mysqli_num_rows($execute_addon_title) > 0) {$addon = array();
                                   $type = array();
                                    while($row2 = mysqli_fetch_array($execute_type_title)){
                                        
-                                                $select_type_sublist = 'SELECT `ts_id`, `type_title`, `type_title_user`, `ts_name` FROM `types_sublist` WHERE `type_id` ='.$row2['type_id'];
+                                                $select_type_sublist = 'SELECT `ts_id`, `type_title`, `type_title_user`, `ts_name`, `price` FROM `types_sublist` WHERE `type_id` ='.$row2['type_id'];
                                                 $execute_type_sublist   = mysqli_query($conn,$select_type_sublist);   
                                                if(mysqli_num_rows($execute_type_sublist) > 0){
                                                     $type_data = array();
@@ -126,6 +126,7 @@ if (mysqli_num_rows($execute_addon_title) > 0) {$addon = array();
                                                                    "ts_id"=>$row2a['ts_id'],
                                                                    "type_title"=>$row2a['type_title_user'],
                                                                    "ts_name"=>$row2a['ts_name'],
+                                                                   "price"=>$row2a['price'],
                                                                ];
                                                                array_push($type_data,$temp2a); 
                                                     }
@@ -151,7 +152,7 @@ if (mysqli_num_rows($execute_addon_title) > 0) {$addon = array();
                                   $dressing = array();
                                    while($row3 = mysqli_fetch_array($execute_dressing_title)){
                                        
-                                                $select_dressing_sublist = 'SELECT `ds_id`, `dressing_id`, `dressing_title`, `dressing_title_user`, `dressing_name` FROM `dressing_sublist`
+                                                $select_dressing_sublist = 'SELECT `ds_id`, `dressing_id`, `dressing_title`, `dressing_title_user`, `dressing_name`, `price` FROM `dressing_sublist`
                                                 WHERE `dressing_id` ='.$row3['dressing_id'];
                                                 
                                                 $execute_dressing_sublist   = mysqli_query($conn,$select_dressing_sublist);   
@@ -162,6 +163,7 @@ if (mysqli_num_rows($execute_addon_title) > 0) {$addon = array();
                                                                    "ds_id"=>$row3a['ds_id'],
                                                                    "dressing_title"=>$row3a['dressing_title_user'],
                                                                    "dressing_name"=>$row3a['dressing_name'],
+                                                                   "price"=>$row3a['price'],
                                                                ];
                                                                array_push($dressing_data,$temp3a); 
                                                     }
