@@ -174,6 +174,7 @@ function active($file, $currentFile) {
         <li class="<?php echo active('marketing_tool.php',$currentFile); ?>"><a href="marketing_tool.php"><i class="feather icon-bar-chart"></i> Marketing</a></li>
         <li class="<?php echo active('manage_product_timmings.php',$currentFile); ?>"><a href="manage_product_timmings.php"><i class="feather icon-clock"></i> Product Timings</a></li>
         <li class="<?php echo active('resturant_orders_summary.php',$currentFile); ?>"><a href="resturant_orders_summary.php"><i class="feather icon-clipboard"></i> Order Summary</a></li>
+                <li class="<?php echo active('manage_accounts.php',$currentFile); ?>"><a href="manage_accounts.php"><i class="feather icon-user"></i> Accounts</a></li>
         <li class="<?php echo active('manage_cashback.php',$currentFile); ?>"><a href="manage_cashback.php"><i class="feather icon-percent"></i> Cashback</a></li>
         <li class="<?php echo active('manage_promocode.php',$currentFile); ?>"><a href="manage_promocode.php"><i class="feather icon-tag"></i> Promo Codes</a></li>
         <li class="<?php echo active('enviroment.php',$currentFile); ?>"><a href="enviroment.php"><i class="feather icon-cloud"></i> Environment</a></li>
