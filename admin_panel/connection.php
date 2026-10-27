@@ -19,7 +19,7 @@ $FROM_EMAIL = "support@pizzatime.de";
 
 // ONESIGNAL CONFIGRUATION
 $ONE_SIGNAL_APP_ID = "04869310-bf7c-4e9d-9ec9-faf58aac8168";
-$ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebnd5ldaflgq3uuketggsmtcaalxlesejexfzmant5f3xlvpkus7fz75dgkuztxaewfhgjopduwnban6y";
+$ONE_SIGNAL_AUTH_KEY = "os_v2_app_asdjgef7prhj3hwj7l2yvlebncy6ou5dyvoejmnhkejjcqhcfcjj356xlwtucbgmer2kyz4zvfw77yiol4igug6coctgjgwmj5y7dpq";
 
 
 
