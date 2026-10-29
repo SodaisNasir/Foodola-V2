@@ -357,33 +357,53 @@ if ($has_table_id && !empty($check_data['reservation_id'])) {
                   <?php endif; ?>
 
                   <div class="item-options">
-                    <?php if (!empty($addons)) : ?>
-                        <?php foreach ($addons as $addon) : ?>
-                            x<?php echo htmlspecialchars($addon->quantity ?? 1); ?>
-                            <?php echo htmlspecialchars($addon->as_name ?? ''); ?><br>
-                            <?php
-                            $paidQty = ($addon->quantity ?? 1) - ($addon->freeQTY ?? 0);
-                            if ($paidQty < 0) { $paidQty = 0; }
-                            $addonTotal = ($addon->as_price ?? 0) * $paidQty;
-                            $addonforinner += $addonTotal;
-                            $Addons_Price += $addonTotal;
-                            ?>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+<?php if (!empty($addons)) : ?>
+    <?php foreach ($addons as $addon) : ?>
+        <?php 
+        $totalQty = intval($addon->quantity ?? 1);
+        $freeQty = intval($addon->freeQTY ?? 0);
+        $paidQty = $totalQty - $freeQty;
+        if ($paidQty < 0) { $paidQty = 0; }
+        
+        $unitPrice = floatval($addon->as_price ?? 0);
 
-                    <?php if (!empty($types)) : ?>
-                      <?php foreach ($types as $type) : ?>
-                        <?php echo htmlspecialchars($type->ts_name ?? ''); ?><br>
-                        <?php $addonforinner += ($type->price ?? 0); ?>
-                      <?php endforeach; ?>
-                    <?php endif; ?>
+        if ($freeQty > 0 && $paidQty == 0) {
+            echo 'x' . $freeQty . ' (' . formatCurrency(0, $currency_sign, $currency_position) . ') ' . htmlspecialchars($addon->as_name ?? '') . '<br>';
+        } elseif ($freeQty > 0 && $paidQty > 0) {
+            $paidTotal = $unitPrice * $paidQty;
+            echo 'x' . $paidQty . ' (' . formatCurrency($paidTotal, $currency_sign, $currency_position) . ') ' . htmlspecialchars($addon->as_name ?? '') . '<br>';
+            echo 'x' . $freeQty . ' (' . formatCurrency(0, $currency_sign, $currency_position) . ') ' . htmlspecialchars($addon->as_name ?? '') . '<br>';
+        } else {
+            $totalPrice = $unitPrice * $totalQty;
+            echo 'x' . $totalQty . ' (' . formatCurrency($totalPrice, $currency_sign, $currency_position) . ') ' . htmlspecialchars($addon->as_name ?? '') . '<br>';
+        }
 
-                    <?php if (!empty($dressing)) : ?>
-                      <?php foreach ($dressing as $dressings) : ?>
-                        <?php echo htmlspecialchars($dressings->dressing_name ?? ''); ?><br>
-                        <?php $addonforinner += ($dressings->price ?? 0); ?>
-                      <?php endforeach; ?>
-                    <?php endif; ?>
+        $addonTotal = $unitPrice * $paidQty;
+        $addonforinner += $addonTotal;
+        $Addons_Price += $addonTotal;
+        ?>
+    <?php endforeach; ?>
+<?php endif; ?>
+
+<?php if (!empty($types)) : ?>
+    <?php foreach ($types as $type) : ?>
+        <?php 
+        $typePrice = floatval($type->price ?? 0);
+        echo 'x1 (' . formatCurrency($typePrice, $currency_sign, $currency_position) . ') ' . htmlspecialchars($type->ts_name ?? '') . '<br>';
+        $addonforinner += $typePrice;
+        ?>
+    <?php endforeach; ?>
+<?php endif; ?>
+
+<?php if (!empty($dressing)) : ?>
+    <?php foreach ($dressing as $dressings) : ?>
+        <?php 
+        $dressPrice = floatval($dressings->price ?? 0);
+        echo 'x1 (' . formatCurrency($dressPrice, $currency_sign, $currency_position) . ') ' . htmlspecialchars($dressings->dressing_name ?? '') . '<br>';
+        $addonforinner += $dressPrice;
+        ?>
+    <?php endforeach; ?>
+<?php endif; ?>
                   </div>
                 </td>
                 <td class="total-price">
@@ -435,37 +455,57 @@ if ($has_table_id && !empty($check_data['reservation_id'])) {
                           <div class="mb-2">
                             <strong><?php echo htmlspecialchars($row['name']); ?></strong>
 
-                            <?php if (!empty($addons)) : ?>
-                              <?php foreach ($addons as $addon) : ?>
-                                <br>x<?php echo htmlspecialchars($addon->quantity ?? 1); ?>
-                                <?php echo htmlspecialchars($addon->as_name ?? ''); ?>
-                                <?php
-                                $paidQty = ($addon->quantity ?? 1) - ($addon->freeQTY ?? 0);
-                                if ($paidQty < 0) { $paidQty = 0; }
-                                $addonTotal = ($addon->as_price ?? 0) * $paidQty;
-                                $addonforinner += $addonTotal;
-                                $Addons_Price += $addonTotal;
-                                ?>
-                              <?php endforeach; ?>
-                            <?php endif; ?>
+                           <?php if (!empty($addons)) : ?>
+  <?php foreach ($addons as $addon) : ?>
+    <?php 
+    $totalQty = intval($addon->quantity ?? 1);
+    $freeQty = intval($addon->freeQTY ?? 0);
+    $paidQty = $totalQty - $freeQty;
+    if ($paidQty < 0) { $paidQty = 0; }
+    
+    $unitPrice = floatval($addon->as_price ?? 0);
 
-                            <?php if (!empty($types)) : ?>
-                              <div>
-                                <?php foreach ($types as $type) : ?>
-                                  <?php echo htmlspecialchars($type->ts_name ?? ''); ?>
-                                  <?php $addonforinner += ($type->price ?? 0); ?>
-                                <?php endforeach; ?>
-                              </div>
-                            <?php endif; ?>
+    if ($freeQty > 0 && $paidQty == 0) {
+        echo '<br>x' . $freeQty . ' (' . formatCurrency(0, $currency_sign, $currency_position) . ') ' . htmlspecialchars($addon->as_name ?? '');
+    } elseif ($freeQty > 0 && $paidQty > 0) {
+        $paidTotal = $unitPrice * $paidQty;
+        echo '<br>x' . $paidQty . ' (' . formatCurrency($paidTotal, $currency_sign, $currency_position) . ') ' . htmlspecialchars($addon->as_name ?? '');
+        echo '<br>x' . $freeQty . ' (' . formatCurrency(0, $currency_sign, $currency_position) . ') ' . htmlspecialchars($addon->as_name ?? '');
+    } else {
+        $totalPrice = $unitPrice * $totalQty;
+        echo '<br>x' . $totalQty . ' (' . formatCurrency($totalPrice, $currency_sign, $currency_position) . ') ' . htmlspecialchars($addon->as_name ?? '');
+    }
 
-                            <?php if (!empty($dressing)) : ?>
-                              <div>Dressing:
-                                <?php foreach ($dressing as $dressings) : ?>
-                                  <?php echo htmlspecialchars($dressings->dressing_name ?? ''); ?>
-                                  <?php $addonforinner += ($dressings->price ?? 0); ?>
-                                <?php endforeach; ?>
-                              </div>
-                            <?php endif; ?>
+    $addonTotal = $unitPrice * $paidQty;
+    $addonforinner += $addonTotal;
+    $Addons_Price += $addonTotal;
+    ?>
+  <?php endforeach; ?>
+<?php endif; ?>
+
+<?php if (!empty($types)) : ?>
+    <div>
+        <?php foreach ($types as $type) : ?>
+            <?php 
+            $typePrice = floatval($type->price ?? 0);
+            echo '<br>x1 (' . formatCurrency($typePrice, $currency_sign, $currency_position) . ') ' . htmlspecialchars($type->ts_name ?? '');
+            $addonforinner += $typePrice;
+            ?>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+
+<?php if (!empty($dressing)) : ?>
+    <div>
+        <?php foreach ($dressing as $dressings) : ?>
+            <?php 
+            $dressPrice = floatval($dressings->price ?? 0);
+            echo '<br>x1 (' . formatCurrency($dressPrice, $currency_sign, $currency_position) . ') Dressing: ' . htmlspecialchars($dressings->dressing_name ?? '');
+            $addonforinner += $dressPrice;
+            ?>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
 
                             <?php if (!empty($row['additional_notes'])) : ?>
                               <div class="item-notes mt-1">Notiz: <?php echo htmlspecialchars($row['additional_notes']); ?></div>
