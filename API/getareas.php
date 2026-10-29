@@ -2,7 +2,7 @@
 
 
 if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbqaerbVEWDSC'){
-     $sql = "SELECT `id`, `area_name`,`min_order_amount`, `branch_id`, `is_disable`,`created_at` FROM `tbl_areas` where `is_disable` = 0";
+     $sql = "SELECT `id`, `area_name`,`min_order_amount`, `branch_id`,`discounted_delivery_amount`, `is_disable`,`created_at` FROM `tbl_areas` where `is_disable` = 0";
      include('connection.php');
      $execute = mysqli_query($conn,$sql);
      if(mysqli_num_rows($execute) > 0){
@@ -12,6 +12,7 @@ if($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgbq
                         "id"=>$row['id'],
                         "postal_code"=>$row['area_name'],
                         "min_order_price"=>$row['min_order_amount'],
+                        "discounted_delivery_amount"=>$row['discounted_delivery_amount'],
                         "created_at"=>$row['created_at'],
                         "branch_id" => $row['branch_id'],
                         "is_disable" => $row['is_disable'],

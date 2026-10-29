@@ -73,7 +73,7 @@ $execute_addon_title = mysqli_query($conn,$select_addon_title);
 
 if (mysqli_num_rows($execute_addon_title) > 0) {$addon = array();
     
-    while ($row1 = mysqli_fetch_array($execute_addon_title)) {$select_addon_sublist = 'SELECT `as_id`, `ao_title`, `as_name`, `as_price` FROM `addon_sublist` WHERE `ao_id` =' . $row1['ao_id'];
+    while ($row1 = mysqli_fetch_array($execute_addon_title)) {$select_addon_sublist = 'SELECT `as_id`, `ao_title`, `as_name`, `as_price`, `isFreeInDeal` FROM `addon_sublist` WHERE `ao_id` =' . $row1['ao_id'];
         $execute_addon_sublist = mysqli_query($conn, $select_addon_sublist);$addon_data = array();
         $main_ao_title =$row1['ao_title']; 
         
@@ -90,6 +90,7 @@ if (mysqli_num_rows($execute_addon_title) > 0) {$addon = array();
                     "ao_title" => $row1a['ao_title'], 
                     "as_name"  => $row1a['as_name'],
                     "as_price" => $row1a['as_price'],
+                    "isFreeInDeal" =>  $row1a['isFreeInDeal'] 
                 ];
                 array_push($addon_data,$temp1a); 
             }
