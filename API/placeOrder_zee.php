@@ -179,15 +179,27 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                                 $items_products = $dealItem->items_products ?? [];
                                 foreach ($items_products as $itemsOfProducts) {
                                     $addons_array = $itemsOfProducts->addons ?? [];
+                                    $types_array = $itemsOfProducts->types ?? [];
+                                    $dressing_array = $itemsOfProducts->dressing ?? [];
                                     foreach ($addons_array as $addons) {
                                         $addonprice = isset($addons->as_price) ? (float)$addons->as_price : 0;
                                         $addonqty   = isset($addons->quantity) ? (int)$addons->quantity : 1;
-
-                                        $product_total_price += ($addonprice * $addonqty * $deal_qty);
+                                        $isFreeInDeal = isset($addons->isFreeInDeal) ? (int)$addons->isFreeInDeal : 0;
+                                        $freeQTY      = $isFreeInDeal == 1 ? (isset($addons->freeQTY) ? (int)$addons->freeQTY : 0) : 0;
+                                        $product_total_price += ($addonprice * ($addonqty - $freeQTY));
+                                    }
+                                    foreach ($types_array as $types) {
+                                            $types_price  = isset($types->price) ? (float)$types->price : 0;
+                                            $product_total_price += $types_price;
+                                    }
+                                    foreach ($dressing_array as $dressing) {
+                                            $dressing_price  = isset($dressing->price) ? (float)$dressing->price : 0;
+                                            $product_total_price += $dressing_price;
                                     }
                                 }
+                                    
                             }
-
+    
                             $totalinitial = ($order_total_price + $wallet_balance) - $Shipping_cost;
                             if ($totalinitial > 0) {
                                 $ratio = $product_total_price / $totalinitial;
@@ -349,18 +361,33 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
 
                             $addonprice = (float)($ao->as_price ?? 0);
                             $addonqty   = (int)($ao->quantity ?? 0);
-
+                            $isFreeInDeal = isset($ao->isFreeInDeal) ? (int)$ao->isFreeInDeal : 0;
+                            $freeQTY      = $isFreeInDeal == 1 ? (isset($ao->freeQTY) ? (int)$ao->freeQTY : 0) : 0;
                             $addonsTotal += $addonprice * $addonqty;
 
                             $temp = [
-                                "as_id" => $ao->as_id,
-                                "as_name" =>  trim($data_addon['as_name']),
-                                "as_price" =>  $ao->as_price,
-                                "sum" => $ao->sum,
-                                "quantity" => $ao->quantity
+                            "ao_id" => $ao->ao_id,
+                            "ao_title" => $ao->ao_title,
+                            "as_id" => $ao->as_id,
+                            "as_name" =>  trim($data_addon['as_name']),
+                            "as_price" =>  $ao->as_price,
+                            "sum" => $ao->sum,
+                            "quantity" => $ao->quantity,
+                            "freeQTY" => $ao->freeQTY,
+                            "isFreeInDeal" => $ao->isFreeInDeal,
+                            "is_free" => $ao->is_free
 
                             ];
                             array_push($addonarray, $temp);
+                        }
+                        
+                        foreach ($types_array as $types) {
+                                        $types_price  = isset($types->price) ? (float)$types->price : 0;
+                                        $addonsTotal += $types_price;
+                        }
+                        foreach ($dressing_array as $dressing) {
+                                $dressing_price  = isset($dressing->price) ? (float)$dressing->price : 0;
+                                $addonsTotal += $dressing_price;
                         }
 
                         $tyy_pes = mysqli_real_escape_string($conn, json_encode($types_array, JSON_UNESCAPED_UNICODE));
@@ -850,13 +877,25 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
                             $items_products = $dealItem->items_products ?? [];
                             foreach ($items_products as $itemsOfProducts) {
                                 $addons_array = $itemsOfProducts->addons ?? [];
+                                $types_array = $itemsOfProducts->types ?? [];
+                                $dressing_array = $itemsOfProducts->dressing ?? [];
                                 foreach ($addons_array as $addons) {
                                     $addonprice = isset($addons->as_price) ? (float)$addons->as_price : 0;
                                     $addonqty   = isset($addons->quantity) ? (int)$addons->quantity : 1;
-
-                                    $product_total_price += ($addonprice * $addonqty * $deal_qty);
+                                    $isFreeInDeal = isset($addons->isFreeInDeal) ? (int)$addons->isFreeInDeal : 0;
+                                    $freeQTY      = $isFreeInDeal == 1 ? (isset($addons->freeQTY) ? (int)$addons->freeQTY : 0) : 0;
+                                    $product_total_price += ($addonprice * ($addonqty - $freeQTY));
+                                }
+                                foreach ($types_array as $types) {
+                                        $types_price  = isset($types->price) ? (float)$types->price : 0;
+                                        $product_total_price += $types_price;
+                                }
+                                foreach ($dressing_array as $dressing) {
+                                        $dressing_price  = isset($dressing->price) ? (float)$dressing->price : 0;
+                                        $product_total_price += $dressing_price;
                                 }
                             }
+                                
                         }
 
                         $totalinitial = ($order_total_price + $wallet_balance) - $Shipping_cost;
@@ -1017,21 +1056,40 @@ if ($_POST['token'] == 'as23rlkjadsnlkcj23qkjnfsDKJcnzdfb3353ads54vd3favaeveavgb
 
                         $addonprice = (float)($ao->as_price ?? 0);
                         $addonqty   = (int)($ao->quantity ?? 0);
-
-                        $addonsTotal += $addonprice * $addonqty;
+                        $isFreeInDeal = isset($ao->isFreeInDeal) ? (int)$ao->isFreeInDeal : 0;
+                        $freeQTY      = $isFreeInDeal == 1 ? (isset($ao->freeQTY) ? (int)$ao->freeQTY : 0) : 0;
+                        $addonsTotal += $addonprice * ($addonqty - $freeQTY);
 
 
 
                         $temp = [
+                            "ao_id" => $ao->ao_id,
+                            "ao_title" => $ao->ao_title,
                             "as_id" => $ao->as_id,
                             "as_name" =>  trim($data_addon['as_name']),
                             "as_price" =>  $ao->as_price,
                             "sum" => $ao->sum,
-                            "quantity" => $ao->quantity
+                            "quantity" => $ao->quantity,
+                            "freeQTY" => $ao->freeQTY,
+                            "isFreeInDeal" => $ao->isFreeInDeal,
+                            "is_free" => $ao->is_free
+                            
 
                         ];
                         array_push($addonarray, $temp);
                     }
+                    foreach ($types_array as $types) {
+                                        $types_price  = isset($types->price) ? (float)$types->price : 0;
+                                        $addonsTotal += $types_price;
+                    }
+                    foreach ($dressing_array as $dressing) {
+                            $dressing_price  = isset($dressing->price) ? (float)$dressing->price : 0;
+                            $addonsTotal += $dressing_price;
+                    }
+                    
+                
+                                
+                    
 
                     $tyy_pes = mysqli_real_escape_string($conn, json_encode($types_array, JSON_UNESCAPED_UNICODE));
                     $dress_ing = mysqli_real_escape_string($conn, json_encode($dressing_array, JSON_UNESCAPED_UNICODE));
