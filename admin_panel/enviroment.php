@@ -35,17 +35,16 @@ if (isset($_POST['ajax_toggle_section'])) {
     $response = ['status' => 'success'];
 
     $keysMap = [
-        'stripe'     => ['stripe_client_key', 'stripe_secret_key'],
+        'stripe'     => ['stripe_client_key', 'stripe_secret_key', 'stripe_mode'],
         'paypal'     => ['paypal_client_key', 'paypal_secret_key'],
         'pixel'      => ['pixel_key', 'pixel_mode'],
         'liefersoft' => ['liefersoft_company_key', 'liefersoft_login_key', 'liefersoft_password_key'],
-        'fiskaly'    => ['fiskaly_api_key', 'fiskaly_api_secret', 'fiskaly_tss_id', 'fiskaly_client_id', 'fiskaly_admin_pin', 'fiskaly_admin_punk'],
+        'fiskaly'    => ['fiskaly_api_key', 'fiskaly_api_secret', 'fiskaly_tss_id', 'fiskaly_client_id', 'fiskaly_admin_pin', 'fiskaly_admin_punk', 'fiskaly_mode'],
         'social'     => ['facebook_url', 'instagram_url', 'linkedin_url', 'x_url', 'parent_shop_url', 'access_token', 'shop_access_token']
     ];
 
     if (isset($keysMap[$section])) {
         if ($status === 1) {
-
             $defaultSandbox = ($section === 'paypal') ? 'https://api-m.sandbox.paypal.com' : null;
             ensureKeysExist($conn, $keysMap[$section], 1, $defaultSandbox);
         } else {
@@ -80,22 +79,32 @@ if (isset($_POST['update_auth_token'])) {
    --------------------------------------------------------- */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['update_auth_token']) && !isset($_POST['ajax_toggle_section'])) {
 
-    $paypalMode = isset($_POST['paypal_mode']) && $_POST['paypal_mode'] === '1' ? 1 : 0;
-    $pixelMode  = isset($_POST['pixel_mode']) && $_POST['pixel_mode'] === '1' ? 1 : 0;
+    $stripeMode  = isset($_POST['stripe_mode']) && $_POST['stripe_mode'] === '1' ? 1 : 0;
+    $paypalMode  = isset($_POST['paypal_mode']) && $_POST['paypal_mode'] === '1' ? 1 : 0;
+    $pixelMode   = isset($_POST['pixel_mode']) && $_POST['pixel_mode'] === '1' ? 1 : 0;
+    $fiskalyMode = isset($_POST['fiskaly_mode']) && $_POST['fiskaly_mode'] === '1' ? 1 : 0;
 
-    // 1) Update PayPal keys' mode and paypal_sandbox URL accordingly
+    // 1) Update Stripe mode across all stripe keys
+    $stripeMode = intval($stripeMode);
+    mysqli_query($conn, "UPDATE enviroments SET mode = $stripeMode WHERE key_name LIKE 'stripe_%'");
+
+    // 2) Update PayPal keys' mode and paypal_sandbox URL accordingly
     $paypalMode = intval($paypalMode);
     $paypalSandboxUrl = ($paypalMode === 1) ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
     mysqli_query($conn, "UPDATE enviroments SET mode = $paypalMode, paypal_sandbox = '$paypalSandboxUrl' WHERE key_name LIKE 'paypal_%'");
 
-    // 2) Update Pixel key's mode
+    // 3) Update Pixel key's mode
     $pixelMode = intval($pixelMode);
     mysqli_query($conn, "UPDATE enviroments SET mode = $pixelMode WHERE key_name = 'pixel_key'");
     mysqli_query($conn, "UPDATE enviroments SET mode = $pixelMode WHERE key_name = 'pixel_mode'");
 
-    // 3) Update key_value for all posted keys
+    // 4) Update Fiskaly mode across all fiskaly keys
+    $fiskalyMode = intval($fiskalyMode);
+    mysqli_query($conn, "UPDATE enviroments SET mode = $fiskalyMode WHERE key_name LIKE 'fiskaly_%'");
+
+    // 5) Update key_value for all posted keys
     foreach ($_POST as $key => $value) {
-        if (in_array($key, ['startOtpProcess','entered_otp','actual_otp','api_data','paypal_mode','pixel_mode','update_auth_token','auth_token','auth_token_id'])) continue;
+        if (in_array($key, ['stripe_mode','paypal_mode','pixel_mode','fiskaly_mode','update_auth_token','auth_token','auth_token_id'])) continue;
 
         $safeKey = $conn->real_escape_string($key);
         $safeValue = $conn->real_escape_string($value);
@@ -115,13 +124,25 @@ $sql = "SELECT id, key_name, key_value, mode, paypal_sandbox FROM enviroments OR
 $result = mysqli_query($conn, $sql);
 
 $apiKeys = [];
+$stripeMode = 0;
 $paypalMode = 0;
 $pixelMode = 0;
+$fiskalyMode = 0;
 
 if ($result && mysqli_num_rows($result) > 0) {
     while ($row = mysqli_fetch_assoc($result)) {
         $apiKeys[] = $row;
 
+        if ($row['key_name'] === 'stripe_client_key' && isset($row['mode'])) {
+            $stripeMode = intval($row['mode']);
+        }
+        if ($row['key_name'] === 'stripe_mode') {
+            if ($row['key_value'] !== null && $row['key_value'] !== '') {
+                $stripeMode = intval($row['key_value']);
+            } elseif (isset($row['mode'])) {
+                $stripeMode = intval($row['mode']);
+            }
+        }
         if ($row['key_name'] === 'paypal_client_key' && isset($row['mode'])) {
             $paypalMode = intval($row['mode']);
         }
@@ -135,18 +156,30 @@ if ($result && mysqli_num_rows($result) > 0) {
                 $pixelMode = intval($row['mode']);
             }
         }
+        if ($row['key_name'] === 'fiskaly_api_key' && isset($row['mode'])) {
+            $fiskalyMode = intval($row['mode']);
+        }
+        if ($row['key_name'] === 'fiskaly_mode') {
+            if ($row['key_value'] !== null && $row['key_value'] !== '') {
+                $fiskalyMode = intval($row['key_value']);
+            } elseif (isset($row['mode'])) {
+                $fiskalyMode = intval($row['mode']);
+            }
+        }
     }
 }
 
-$paypalMode = intval($paypalMode);
-$pixelMode  = intval($pixelMode);
+$stripeMode  = intval($stripeMode);
+$paypalMode  = intval($paypalMode);
+$pixelMode   = intval($pixelMode);
+$fiskalyMode = intval($fiskalyMode);
 
 // Group Keys Definitions
 $paypalKeys    = ['paypal_client_key','paypal_secret_key'];
 $pixelKeys     = ['pixel_key','pixel_mode'];
-$stripeKeys    = ['stripe_client_key','stripe_secret_key'];
+$stripeKeys    = ['stripe_client_key','stripe_secret_key','stripe_mode'];
 $liefersoftKeys= ['liefersoft_company_key', 'liefersoft_login_key', 'liefersoft_password_key'];
-$fiskalyKeys   = ['fiskaly_api_key', 'fiskaly_api_secret', 'fiskaly_tss_id', 'fiskaly_client_id', 'fiskaly_admin_pin', 'fiskaly_admin_punk'];
+$fiskalyKeys   = ['fiskaly_api_key', 'fiskaly_api_secret', 'fiskaly_tss_id', 'fiskaly_client_id', 'fiskaly_admin_pin', 'fiskaly_admin_punk', 'fiskaly_mode'];
 $socialKeys    = ['facebook_url', 'instagram_url', 'linkedin_url', 'x_url', 'parent_shop_url', 'access_token', 'shop_access_token'];
 
 function hasSectionKeys($apiKeys, $keysSet) {
@@ -183,6 +216,7 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
     <link rel="stylesheet" type="text/css" href="app-assets/css/core/menu/menu-types/vertical-menu.min.css">
     <link rel="stylesheet" type="text/css" href="app-assets/css/core/colors/palette-gradient.min.css">
     <link rel="stylesheet" type="text/css" href="app-assets/css/plugins/forms/validation/form-validation.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="assets/css/style.css">
 
 <style>
@@ -230,8 +264,10 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
     }
 
     .mode-label {
-        margin-left: 15px;
+        margin-left: 10px;
+        margin-right: 15px;
         font-weight: 500;
+        font-size: 13px;
     }
 
     .section-header-box {
@@ -244,6 +280,17 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
         margin-top: 20px;
         margin-bottom: 15px;
         border-left: 4px solid #7367f0;
+    }
+
+    /* Page Lock Overlay styling */
+    #pageLockOverlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 </style>
 </head>
@@ -306,7 +353,12 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
                                   }
                                 ?>
                                 <input type="hidden" name="auth_token_id" value="<?php echo $authTokenId; ?>">
-                                <input type="text" class="form-control w-50" id="auth_token" name="auth_token" value="<?php echo htmlspecialchars($authToken); ?>" required>
+                                <div class="input-group w-50">
+                                    <input type="password" class="form-control" id="auth_token" name="auth_token" value="<?php echo htmlspecialchars($authToken); ?>" required>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary toggle-password" type="button" data-target="auth_token"><i class="fa fa-eye"></i></button>
+                                    </div>
+                                </div>
                                 <button type="button" onclick="generatePassword()" class="btn btn-outline-primary ml-2">Generate Password</button>
                               </div>
                               <button type="submit" name="update_auth_token" class="btn btn-primary">Update Auth Token</button>
@@ -318,7 +370,7 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
                               <!-- OTHER / UNGROUPED KEYS -->
                               <div class="row">
                                 <?php 
-                                foreach ($apiKeys as $apiKey):
+                                foreach ($apiKeys as $index => $apiKey):
                                     if (in_array($apiKey['key_name'], $paypalKeys)) continue;
                                     if (in_array($apiKey['key_name'], $pixelKeys)) continue;
                                     if (in_array($apiKey['key_name'], $stripeKeys)) continue;
@@ -328,11 +380,17 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
 
                                     $keyName = $apiKey['key_name'];
                                     $keyValue = $apiKey['key_value'];
+                                    $fieldId = "field_" . $index;
                                 ?>
                                   <div class="col-md-6 mb-2">
                                     <div class="form-group">
                                       <label><?= ucwords(str_replace('_',' ', $keyName)) ?></label>
-                                      <input type="text" class="form-control" name="<?= htmlspecialchars($keyName) ?>" value="<?= htmlspecialchars($keyValue) ?>">
+                                      <div class="input-group">
+                                        <input type="password" class="form-control" id="<?= $fieldId ?>" name="<?= htmlspecialchars($keyName) ?>" value="<?= htmlspecialchars($keyValue) ?>">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary toggle-password" type="button" data-target="<?= $fieldId ?>"><i class="fa fa-eye"></i></button>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
                                 <?php endforeach; ?>
@@ -342,25 +400,39 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
                               <div class="section-header-box">
                                 <h5 class="m-0">Stripe Integration</h5>
                                 <div class="d-flex align-items-center">
+                                  <?php if ($hasStripe): ?>
+                                  <label class="switch-toggle mb-0 mr-2">
+                                    <input type="checkbox" id="stripeMode" name="stripe_mode" value="1" <?= $stripeMode == 1 ? 'checked' : '' ?>>
+                                    <span class="slider"></span>
+                                  </label>
+                                  <span class="mode-label" id="stripeLabel"><?= $stripeMode == 1 ? 'Live Mode' : 'Test Mode' ?></span>
+                                  <?php endif; ?>
+
+                                  <span class="mode-label"><?= $hasStripe ? 'Enabled' : 'Disabled' ?></span>
                                   <label class="switch-toggle mb-0">
                                     <input type="checkbox" class="section-master-toggle" data-section="stripe" <?= $hasStripe ? 'checked' : '' ?>>
                                     <span class="slider"></span>
                                   </label>
-                                  <span class="mode-label"><?= $hasStripe ? 'Enabled' : 'Disabled' ?></span>
                                 </div>
                               </div>
 
                               <?php if ($hasStripe): ?>
                               <div class="row">
-                                <?php foreach ($apiKeys as $apiKey):
+                                <?php foreach ($apiKeys as $sIdx => $apiKey):
                                   if (!in_array($apiKey['key_name'], $stripeKeys)) continue;
                                   $keyName = $apiKey['key_name'];
                                   $keyValue = $apiKey['key_value'];
+                                  $fieldId = "stripe_" . $sIdx;
                                 ?>
                                   <div class="col-md-6 mb-2">
                                     <div class="form-group">
                                       <label><?= ucwords(str_replace('_',' ', $keyName)) ?></label>
-                                      <input type="text" class="form-control" name="<?= htmlspecialchars($keyName) ?>" value="<?= htmlspecialchars($keyValue) ?>">
+                                      <div class="input-group">
+                                        <input type="password" class="form-control" id="<?= $fieldId ?>" name="<?= htmlspecialchars($keyName) ?>" value="<?= htmlspecialchars($keyValue) ?>">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary toggle-password" type="button" data-target="<?= $fieldId ?>"><i class="fa fa-eye"></i></button>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
                                 <?php endforeach; ?>
@@ -371,37 +443,42 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
                               <div class="section-header-box">
                                 <h5 class="m-0">PayPal Integration</h5>
                                 <div class="d-flex align-items-center">
+                                  <?php if ($hasPaypal): ?>
+                                  <label class="switch-toggle mb-0 mr-2">
+                                    <input type="checkbox" id="paypalMode" name="paypal_mode" value="1" <?= $paypalMode == 1 ? 'checked' : '' ?>>
+                                    <span class="slider"></span>
+                                  </label>
+                                  <span class="mode-label" id="paypalLabel"><?= $paypalMode == 1 ? 'Live Mode' : 'Sandbox Mode' ?></span>
+                                  <?php endif; ?>
+                                  
+                                  <span class="mode-label"><?= $hasPaypal ? 'Enabled' : 'Disabled' ?></span>
                                   <label class="switch-toggle mb-0">
                                     <input type="checkbox" class="section-master-toggle" data-section="paypal" <?= $hasPaypal ? 'checked' : '' ?>>
                                     <span class="slider"></span>
                                   </label>
-                                  <span class="mode-label"><?= $hasPaypal ? 'Enabled' : 'Disabled' ?></span>
                                 </div>
                               </div>
 
                               <?php if ($hasPaypal): ?>
                               <div class="row">
-                                <?php foreach ($apiKeys as $apiKey):
+                                <?php foreach ($apiKeys as $pIdx => $apiKey):
                                   if (!in_array($apiKey['key_name'], $paypalKeys)) continue;
-                                  $keyName =$apiKey['key_name'];
-                                  $keyValue =$apiKey['key_value'];
+                                  $keyName = $apiKey['key_name'];
+                                  $keyValue = $apiKey['key_value'];
+                                  $fieldId = "paypal_" . $pIdx;
                                 ?>
                                   <div class="col-md-6 mb-2">
                                     <div class="form-group">
                                       <label><?= ucwords(str_replace('_',' ', $keyName)) ?></label>
-                                      <input type="text" class="form-control" name="<?= htmlspecialchars($keyName) ?>" value="<?= htmlspecialchars($keyValue) ?>">
+                                      <div class="input-group">
+                                        <input type="password" class="form-control" id="<?= $fieldId ?>" name="<?= htmlspecialchars($keyName) ?>" value="<?= htmlspecialchars($keyValue) ?>">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary toggle-password" type="button" data-target="<?= $fieldId ?>"><i class="fa fa-eye"></i></button>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
                                 <?php endforeach; ?>
-                              </div>
-
-                              <!-- PayPal Mode Toggle -->
-                              <div class="d-flex align-items-center mb-2">
-                                <label class="switch-toggle">
-                                  <input type="checkbox" id="paypalMode" name="paypal_mode" value="1" <?= $paypalMode == 1 ? 'checked' : '' ?>>
-                                  <span class="slider"></span>
-                                </label>
-                                <span class="mode-label" id="paypalLabel"><?= $paypalMode == 1 ? 'Live Mode' : 'Sandbox Mode' ?></span>
                               </div>
                               <?php endif; ?>
 
@@ -409,11 +486,19 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
                               <div class="section-header-box">
                                 <h5 class="m-0">Pixel</h5>
                                 <div class="d-flex align-items-center">
+                                  <?php if ($hasPixel): ?>
+                                  <label class="switch-toggle mb-0 mr-2">
+                                    <input type="checkbox" id="pixelMode" name="pixel_mode" value="1" <?= $pixelMode == 1 ? 'checked' : '' ?>>
+                                    <span class="slider"></span>
+                                  </label>
+                                  <span class="mode-label" id="pixelLabel"><?= $pixelMode == 1 ? 'Live Mode' : 'Test Mode' ?></span>
+                                  <?php endif; ?>
+
+                                  <span class="mode-label"><?= $hasPixel ? 'Enabled' : 'Disabled' ?></span>
                                   <label class="switch-toggle mb-0">
                                     <input type="checkbox" class="section-master-toggle" data-section="pixel" <?= $hasPixel ? 'checked' : '' ?>>
                                     <span class="slider"></span>
                                   </label>
-                                  <span class="mode-label"><?= $hasPixel ? 'Enabled' : 'Disabled' ?></span>
                                 </div>
                               </div>
 
@@ -421,66 +506,96 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
                               <div class="row">
                                 <?php 
                                   $pixelVal = '';
-                                  foreach ($apiKeys as$k) { 
-                                      if ($k['key_name'] === 'pixel_key') { $pixelVal =$k['key_value']; break; } 
+                                  foreach ($apiKeys as $k) { 
+                                      if ($k['key_name'] === 'pixel_key') { $pixelVal = $k['key_value']; break; } 
                                   }
                                 ?>
                                 <div class="col-md-6 mb-2">
                                   <div class="form-group">
                                     <label>Pixel Key</label>
-                                    <input type="text" class="form-control" name="pixel_key" value="<?= htmlspecialchars($pixelVal) ?>" placeholder="Enter Pixel Key">
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="pixel_key_field" name="pixel_key" value="<?= htmlspecialchars($pixelVal) ?>" placeholder="Enter Pixel Key">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary toggle-password" type="button" data-target="pixel_key_field"><i class="fa fa-eye"></i></button>
+                                        </div>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-
-                              <div class="mb-3 d-flex align-items-center">
-                                <label class="switch-toggle">
-                                  <input type="checkbox" id="pixelMode" name="pixel_mode" value="1" <?= $pixelMode == 1 ? 'checked' : '' ?>>
-                                  <span class="slider"></span>
-                                </label>
-                                <span class="mode-label" id="pixelLabel"><?= $pixelMode == 1 ? 'Live Mode' : 'Test Mode' ?></span>
                               </div>
                               <?php endif; ?>
 
                               <!-- ---------------- FISKALY SECTION ---------------- -->
+                              <?php 
+                                $fiskaly_keys = 0; 
+                                $fiskalyApiKeyVal = '';
+                                $fiskalyApiSecretVal = '';
+                                if ($hasFiskaly) {
+                                    foreach ($apiKeys as $k) {
+                                        if ($k['key_name'] === 'fiskaly_api_key') $fiskalyApiKeyVal = $k['key_value'];
+                                        if ($k['key_name'] === 'fiskaly_api_secret') $fiskalyApiSecretVal = $k['key_value'];
+                                    }
+                                    if (!empty($fiskalyApiKeyVal)) $fiskaly_keys++;
+                                    if (!empty($fiskalyApiSecretVal)) $fiskaly_keys++;
+                                }
+                                $isFiskalyFilled = (!empty($fiskalyApiKeyVal) && !empty($fiskalyApiSecretVal));
+                              ?>
                               <div class="section-header-box">
-                                <h5 class="m-0">Fiskaly Integration</h5>
                                 <div class="d-flex align-items-center">
+                                  <h5 class="m-0 mr-3">Fiskaly Integration</h5>
+                                  <?php if ($hasFiskaly && $fiskaly_keys === 2): ?>
+                                  <button type="button" id="startFiskaly" class="btn btn-primary btn-sm">Authenticate Fiskaly</button>
+                                  <?php endif; ?>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                  <?php if ($hasFiskaly): ?>
+                                  <label class="switch-toggle mb-0 mr-2">
+                                    <input type="checkbox" id="fiskalyMode" name="fiskaly_mode" value="1" <?= $fiskalyMode == 1 ? 'checked' : '' ?>>
+                                    <span class="slider"></span>
+                                  </label>
+                                  <span class="mode-label" id="fiskalyLabel"><?= $fiskalyMode == 1 ? 'Online' : 'Offline' ?></span>
+                                  <?php endif; ?>
+
+                                  <span class="mode-label"><?= $hasFiskaly ? 'Enabled' : 'Disabled' ?></span>
                                   <label class="switch-toggle mb-0">
                                     <input type="checkbox" class="section-master-toggle" data-section="fiskaly" <?= $hasFiskaly ? 'checked' : '' ?>>
                                     <span class="slider"></span>
                                   </label>
-                                  <span class="mode-label"><?= $hasFiskaly ? 'Enabled' : 'Disabled' ?></span>
                                 </div>
                               </div>
 
                               <?php if ($hasFiskaly): ?>
-                              <?php $fiskaly_keys = 0; ?> 
                               <div>
                                 <div class="row mb-2">
-                                    <?php foreach ($fiskalyKeys as $fKey):$val = '';
-                                        foreach ($apiKeys as$k) { 
-                                            if ($k['key_name'] ===$fKey) { 
-                                                $val =$k['key_value']; 
-                                                if ($fKey == 'fiskaly_api_key' ||$fKey == 'fiskaly_api_secret') {
-                                                    if ($val) {$fiskaly_keys++; }
-                                                }
+                                    <?php foreach ($fiskalyKeys as $fIdx => $fKey):
+                                        if($fKey === 'fiskaly_mode') continue;
+                                        $val = '';
+                                        foreach ($apiKeys as $k) { 
+                                            if ($k['key_name'] === $fKey) { 
+                                                $val = $k['key_value']; 
                                                 break; 
                                             } 
                                         }
+                                        
+                                        $isBottomInput = in_array($fKey, ['fiskaly_tss_id', 'fiskaly_client_id', 'fiskaly_admin_pin', 'fiskaly_admin_punk']);
+                                        $isDisabled = ($isBottomInput && $isFiskalyFilled) ? 'disabled' : '';
+                                        $fieldId = "fiskaly_" . $fIdx;
                                     ?>
                                       <div class="col-md-6 mb-2">
                                         <div class="form-group">
                                           <label><?= ucwords(str_replace('_',' ', $fKey)) ?></label>
-                                          <input type="text" class="form-control" name="<?= htmlspecialchars($fKey) ?>" value="<?= htmlspecialchars($val) ?>" placeholder="Enter <?= ucwords(str_replace('_',' ', $fKey)) ?>">
+                                          <div class="input-group">
+                                            <input type="password" class="form-control" id="<?= $fieldId ?>" name="<?= htmlspecialchars($fKey) ?>" value="<?= htmlspecialchars($val) ?>" placeholder="Enter <?= ucwords(str_replace('_',' ', $fKey)) ?>" <?= $isDisabled ?>>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="<?= $fieldId ?>"><i class="fa fa-eye"></i></button>
+                                            </div>
+                                          </div>
+                                          <?php if($isDisabled): ?>
+                                              <input type="hidden" name="<?= htmlspecialchars($fKey) ?>" value="<?= htmlspecialchars($val) ?>">
+                                          <?php endif; ?>
                                         </div>
                                       </div>
                                     <?php endforeach; ?>
                                 </div>
-
-                                <?php if($fiskaly_keys === 2){ ?>
-                                <button type="button" id="startFiskaly" class="btn btn-primary mb-2">Authenticate Fiskaly</button>
-                                <?php } ?>
                               </div>
                               <br>
                               <?php endif; ?>
@@ -489,11 +604,11 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
                               <div class="section-header-box">
                                 <h5 class="m-0">Liefersoft Integration</h5>
                                 <div class="d-flex align-items-center">
+                                  <span class="mode-label"><?= $hasLiefersoft ? 'Enabled' : 'Disabled' ?></span>
                                   <label class="switch-toggle mb-0">
                                     <input type="checkbox" class="section-master-toggle" data-section="liefersoft" <?= $hasLiefersoft ? 'checked' : '' ?>>
                                     <span class="slider"></span>
                                   </label>
-                                  <span class="mode-label"><?= $hasLiefersoft ? 'Enabled' : 'Disabled' ?></span>
                                 </div>
                               </div>
 
@@ -502,13 +617,18 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
                               <div class="row mb-2">
                                   <div class="col-md-6">
                                       <label>Company Id</label>
-                                      <input type="text" class="form-control" name="liefersoft_company_key" 
-                                             value="<?php
-                                                 $val = '';
-                                                 foreach ($apiKeys as $k) { if($k['key_name'] == 'liefersoft_company_key') { $val =$k['key_value']; break; } }
-                                                 echo htmlspecialchars($val);
-                                             ?>" 
-                                             placeholder="Enter Company Key">
+                                      <div class="input-group">
+                                          <input type="password" class="form-control" id="liefersoft_company" name="liefersoft_company_key" 
+                                                 value="<?php
+                                                     $val = '';
+                                                     foreach ($apiKeys as $k) { if($k['key_name'] == 'liefersoft_company_key') { $val = $k['key_value']; break; } }
+                                                     echo htmlspecialchars($val);
+                                                 ?>" 
+                                                 placeholder="Enter Company Key">
+                                          <div class="input-group-append">
+                                              <button class="btn btn-outline-secondary toggle-password" type="button" data-target="liefersoft_company"><i class="fa fa-eye"></i></button>
+                                          </div>
+                                      </div>
                                   </div>
                               </div>
 
@@ -516,24 +636,34 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
                               <div class="row mb-2">
                                   <div class="col-md-6">
                                       <label>Login</label>
-                                      <input type="text" class="form-control" name="liefersoft_login_key" 
-                                             value="<?php
-                                                 $val = '';
-                                                 foreach ($apiKeys as $k) { if($k['key_name'] == 'liefersoft_login_key') { $val =$k['key_value']; break; } }
-                                                 echo htmlspecialchars($val);
-                                             ?>" 
-                                             placeholder="Enter Login Key">
+                                      <div class="input-group">
+                                          <input type="password" class="form-control" id="liefersoft_login" name="liefersoft_login_key" 
+                                                 value="<?php
+                                                     $val = '';
+                                                     foreach ($apiKeys as $k) { if($k['key_name'] == 'liefersoft_login_key') { $val = $k['key_value']; break; } }
+                                                     echo htmlspecialchars($val);
+                                                 ?>" 
+                                                 placeholder="Enter Login Key">
+                                          <div class="input-group-append">
+                                              <button class="btn btn-outline-secondary toggle-password" type="button" data-target="liefersoft_login"><i class="fa fa-eye"></i></button>
+                                          </div>
+                                      </div>
                                   </div>
 
                                   <div class="col-md-6">
                                       <label>Password</label>
-                                      <input type="text" class="form-control" name="liefersoft_password_key" 
-                                             value="<?php
-                                                 $val = '';
-                                                 foreach ($apiKeys as $k) { if($k['key_name'] == 'liefersoft_password_key') { $val =$k['key_value']; break; } }
-                                                 echo htmlspecialchars($val);
-                                             ?>" 
-                                             placeholder="Enter Password Key">
+                                      <div class="input-group">
+                                          <input type="password" class="form-control" id="liefersoft_pass" name="liefersoft_password_key" 
+                                                 value="<?php
+                                                     $val = '';
+                                                     foreach ($apiKeys as $k) { if($k['key_name'] == 'liefersoft_password_key') { $val = $k['key_value']; break; } }
+                                                     echo htmlspecialchars($val);
+                                                 ?>" 
+                                                 placeholder="Enter Password Key">
+                                          <div class="input-group-append">
+                                              <button class="btn btn-outline-secondary toggle-password" type="button" data-target="liefersoft_pass"><i class="fa fa-eye"></i></button>
+                                          </div>
+                                      </div>
                                   </div>
                               </div>
                               <?php endif; ?>
@@ -542,31 +672,37 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
                               <div class="section-header-box">
                                 <h5 class="m-0">Social & Store Links</h5>
                                 <div class="d-flex align-items-center">
+                                  <span class="mode-label"><?= $hasSocial ? 'Enabled' : 'Disabled' ?></span>
                                   <label class="switch-toggle mb-0">
                                     <input type="checkbox" class="section-master-toggle" data-section="social" <?= $hasSocial ? 'checked' : '' ?>>
                                     <span class="slider"></span>
                                   </label>
-                                  <span class="mode-label"><?= $hasSocial ? 'Enabled' : 'Disabled' ?></span>
                                 </div>
                               </div>
 
                               <?php if ($hasSocial): ?>
                               <div class="row mb-2">
-                                <?php foreach ($socialKeys as $sKey):$val = '';
-                                    foreach ($apiKeys as$k) { if($k['key_name'] ===$sKey) { $val =$k['key_value']; break; } }
+                                <?php foreach ($socialKeys as $socIdx => $sKey): $val = '';
+                                    foreach ($apiKeys as $k) { if($k['key_name'] === $sKey) { $val = $k['key_value']; break; } }
+                                    $fieldId = "social_" . $socIdx;
                                 ?>
                                   <div class="col-md-6 mb-2">
                                     <div class="form-group">
                                       <label><?= ucwords(str_replace('_',' ', $sKey)) ?></label>
-                                      <input type="text" class="form-control" name="<?= htmlspecialchars($sKey) ?>" value="<?= htmlspecialchars($val) ?>" placeholder="Enter Link/Key">
+                                      <div class="input-group">
+                                        <input type="password" class="form-control" id="<?= $fieldId ?>" name="<?= htmlspecialchars($sKey) ?>" value="<?= htmlspecialchars($val) ?>" placeholder="Enter Link/Key">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary toggle-password" type="button" data-target="<?= $fieldId ?>"><i class="fa fa-eye"></i></button>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
                                 <?php endforeach; ?>
                               </div>
                               <?php endif; ?>
 
-                              <!-- Update button triggers OTP flow -->
-                              <button type="button" id="startOtpProcess" class="btn btn-primary mt-2">Update</button>
+                              <!-- Update button direct submission (OTP removed) -->
+                              <button type="submit" class="btn btn-primary mt-2">Update</button>
 
                             </form>
 
@@ -583,28 +719,20 @@ $hasSocial     = hasSectionKeys($apiKeys, $socialKeys);
         </div>
       </section>
 
-<!-- OTP Modal -->
-<div class="modal fade" id="otpModal" tabindex="-1" role="dialog" aria-labelledby="otpModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <form id="otpForm">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Enter OTP</h5>
+    <!-- Fullscreen Dedicated Custom Lock Screen Overlay Modal -->
+    <div id="pageLockOverlay">
+      <div class="card shadow-lg" style="width: 400px; border-radius: 8px;">
+        <div class="card-header bg-primary white text-center">
+          <h4 class="card-title white m-0">Admin Authentication Required</h4>
         </div>
-        <div class="modal-body">
-          <p>An OTP has been sent to the admin's email.</p>
-          <input type="text" class="form-control" name="entered_otp" id="entered_otp" placeholder="Enter OTP" required>
-          <input type="hidden" name="actual_otp" id="actual_otp">
-          <input type="hidden" name="api_data" id="api_data">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary">Verify & Update</button>
+        <div class="card-body text-center p-4">
+          <p class="mb-3">Security verification required. An OTP has been sent to the admin email.</p>
+          <input type="text" class="form-control text-center font-medium-3 mb-2" id="initial_entered_otp" placeholder="Enter OTP" required>
+          <input type="hidden" id="initial_actual_otp">
+          <button type="button" id="verifyInitialOtp" class="btn btn-primary btn-block mt-2">Verify & Unlock</button>
         </div>
       </div>
-    </form>
-  </div>
-</div>
+    </div>
 
     <div class="sidenav-overlay"></div>
     <div class="drag-target"></div>
@@ -655,11 +783,75 @@ function generateSerial() {
     return crypto.randomUUID().replace(/-/g, '');
 }
 
-// Master Toggle Click Listener (AJAX Row Insertion & Auto Refresh UI)
+// Page Load par automatic OTP send aur Lock Screen show karna
+document.addEventListener("DOMContentLoaded", function () {
+    // Trigger OTP sending on load
+    const formData = new FormData();
+    formData.append('send_initial_otp', '1');
+
+    fetch('../API/send_otp.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data && data.success) {
+            document.getElementById('initial_actual_otp').value = data.otp;
+        } else {
+            console.error("Failed to send initial OTP");
+        }
+    })
+    .catch(err => {
+        console.error("Error sending initial OTP:", err);
+    });
+
+    // Eye button toggle listener
+    document.querySelectorAll('.toggle-password').forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const inputField = document.getElementById(targetId);
+            const icon = this.querySelector('i');
+            
+            if (inputField.type === "password") {
+                inputField.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                inputField.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        });
+    });
+});
+
+// Verify Initial OTP Button Click to Unlock Page
+document.getElementById('verifyInitialOtp').addEventListener('click', function() {
+    const entered = document.getElementById('initial_entered_otp').value.trim();
+    const actual = document.getElementById('initial_actual_otp').value.trim();
+
+    if (entered === actual && entered !== "") {
+        document.getElementById('pageLockOverlay').style.display = 'none';
+    } else {
+        alert("Invalid OTP! Please enter correct OTP.");
+    }
+});
+
+// Master Toggle Click Listener with Delete Confirmation Alert
 document.querySelectorAll('.section-master-toggle').forEach(toggle => {
-    toggle.addEventListener('change', function() {
+    toggle.addEventListener('change', function(e) {
+        const isChecked = this.checked;
+        
+        if (!isChecked) {
+            const confirmDelete = confirm("Are you sure you want to delete the keys?");
+            if (!confirmDelete) {
+                this.checked = true;
+                return;
+            }
+        }
+
         const section = this.getAttribute('data-section');
-        const status = this.checked ? 1 : 0;
+        const status = isChecked ? 1 : 0;
         
         const formData = new FormData();
         formData.append('ajax_toggle_section', '1');
@@ -683,8 +875,15 @@ document.querySelectorAll('.section-master-toggle').forEach(toggle => {
     });
 });
 
-// PayPal & Pixel Toggle Listeners 
+// Mode Toggle Listeners (Stripe, PayPal, Pixel, Fiskaly)
 document.addEventListener("DOMContentLoaded", function () {
+    const stripeMode = document.getElementById('stripeMode');
+    if (stripeMode) {
+        stripeMode.addEventListener('change', function () {
+            document.getElementById('stripeLabel').textContent = this.checked ? 'Live Mode' : 'Test Mode';
+        });
+    }
+
     const paypalMode = document.getElementById('paypalMode');
     if (paypalMode) {
         paypalMode.addEventListener('change', function () {
@@ -696,6 +895,13 @@ document.addEventListener("DOMContentLoaded", function () {
     if (pixelMode) {
         pixelMode.addEventListener('change', function () {
             document.getElementById('pixelLabel').textContent = this.checked ? 'Live Mode' : 'Test Mode';
+        });
+    }
+
+    const fiskalyMode = document.getElementById('fiskalyMode');
+    if (fiskalyMode) {
+        fiskalyMode.addEventListener('change', function () {
+            document.getElementById('fiskalyLabel').textContent = this.checked ? 'Online' : 'Offline';
         });
     }
 });
@@ -747,6 +953,7 @@ if (startFiskalyBtn) {
             });
 
             await response.json();
+            
             const admin_pin = generateAdminPin();
 
             response = await fetch(`https://kassensichv-middleware.fiskaly.com/api/v2/tss/${tssid}/admin`, {
@@ -761,7 +968,7 @@ if (startFiskalyBtn) {
             await response.json();
             await updateFiskaly("fiskaly_admin_pin", admin_pin);
 
-            response = await fetch(`https://kassensichv-middleware.fiskaly.com/api/v2/tss/${tssid}/admin/auth`, {
+            response = await fetch(`https://kassensichv-middleware.fiskaly.com/api/query/v2/tss/${tssid}/admin/auth`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -786,6 +993,22 @@ if (startFiskalyBtn) {
 
             await response.json();
             await updateFiskaly("fiskaly_client_id", client_id);
+            
+            
+            response = await fetch(`https://kassensichv-middleware.fiskaly.com/api/v2/tss/${tssid}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${access_token}`
+                },
+                body: JSON.stringify({
+                    description: "Taking this permission for our setup",
+                    state: "INITIALIZED"
+                })
+            });
+
+            await response.json();
+            
             alert("Fiskaly Authenticated Successfully!");
 
         } catch (error) {
@@ -794,71 +1017,6 @@ if (startFiskalyBtn) {
         }
     });
 }
-
-// OTP Process Trigger
-document.getElementById('startOtpProcess').addEventListener('click', function () {
-    const form = document.getElementById('apiKeyForm');
-    const formData = new FormData(form);
-
-    fetch('../API/send_otp.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(async response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log("OTP Response:", data);
-        
-        if (data && data.success) {
-            document.getElementById('actual_otp').value = data.otp;
-            document.getElementById('api_data').value = JSON.stringify(Object.fromEntries(formData));
-            
-            // Modal Open Call
-            if (typeof $!== 'undefined' &&$.fn.modal) {
-                $('#otpModal').modal('show');
-            } else {
-                alert("Bootstrap/jQuery load nahi hua hai!");
-            }
-        } else {
-            alert(data.message || 'Failed to send OTP.');
-        }
-    })
-    .catch(error => {
-        console.error('OTP Error:', error);
-        alert('Error sending OTP request: ' + error.message + '\nBrowser Console (F12) check karein.');
-    });
-});
-
-// OTP Submit
-document.getElementById('otpForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    const enteredOtp = document.getElementById('entered_otp').value;
-    const actualOtp = document.getElementById('actual_otp').value;
-    const formDataJson = JSON.parse(document.getElementById('api_data').value);
-
-    if (enteredOtp === actualOtp) {
-        const tempForm = document.createElement('form');
-        tempForm.method = 'POST';
-
-        for (const key in formDataJson) {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = key;
-            input.value = formDataJson[key];
-            tempForm.appendChild(input);
-        }
-
-        document.body.appendChild(tempForm);
-        tempForm.submit();
-    } else {
-        alert('Invalid OTP. Please try again.');
-    }
-});
 
 async function updateFiskaly(keyName, keyValue) {
     const formdata = new FormData();
