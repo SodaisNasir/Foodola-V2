@@ -123,10 +123,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   $addon_qty   = isset($addon['quantity']) ? (int)$addon['quantity'] : 1;
                   $product_total_price += ($addon_price * $addon_qty);
                 }
+                foreach ($product['types'] as $types) {
+                        $types_price  = isset($types['price']) ? (float)$types['price'] : 0;
+                        $product_total_price += $types_price;
+                }
+                foreach ($product['dressing'] as $dressing) {
+                        $dressing_price  = isset($dressing['price']) ? (float)$dressing['price'] : 0;
+                        $product_total_price += $dressing_price;
+                }
               }
             }
-
-            $totalinitial = ($total_amount + $additional_pos_discount) - $shipping_cost;
+            // in pos total comes without shipping
+            $totalinitial = ($total_amount + $additional_pos_discount);
             $ratio = $product_total_price / $totalinitial;
             $additional_discount = round(($additional_pos_discount * $ratio), 2);
           }
@@ -240,8 +248,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $addon_qty   = isset($addon['quantity']) ? (int)$addon['quantity'] : 1;
                 $product_total_price += ($addon_price * $addon_qty);
               }
-
-              $totalinitial = ($total_amount + $additional_pos_discount) - $shipping_cost;
+              foreach ($details['types'] as $types) {
+                        $types_price  = isset($types['price']) ? (float)$types['price'] : 0;
+                        $product_total_price += $types_price;
+              }
+              foreach ($details['dressing'] as $dressing) {
+                        $dressing_price  = isset($dressing['price']) ? (float)$dressing['price'] : 0;
+                        $product_total_price += $dressing_price;
+              }
+              // in pos total is coming wihtout shipping
+              $totalinitial = ($total_amount + $additional_pos_discount);
               $ratio = $product_total_price / $totalinitial;
 
               $additional_discount = round(($additional_pos_discount * $ratio), 2);
@@ -523,6 +539,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                       $freeQTY      = $isFreeInDeal == 1 ? (isset($addon['freeQTY']) ? (int)$addon['freeQTY'] : 0) : 0;
                       $product_total_price += ($addon_price * ($addon_qty - $freeQTY));
                     }
+                    foreach ($product['types'] as $types) {
+                        $types_price  = isset($types['price']) ? (float)$types['price'] : 0;
+                        $product_total_price += $types_price;
+                    }
+                    foreach ($product['dressing'] as $dressing) {
+                            $dressing_price  = isset($dressing['price']) ? (float)$dressing['price'] : 0;
+                            $product_total_price += $dressing_price;
+                    }
                   }
                 }
                 $totalinitial = ($total_amount + $wallet_balance) - $shipping_cost;
@@ -538,9 +562,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                       $freeQTY     = isset($addon['freeQTY']) ? (int)$addon['freeQTY'] : 0;
                       $product_total_price += ($addon_price * ($addon_qty - $freeQTY));
                     }
+                    foreach ($product['types'] as $types) {
+                        $types_price  = isset($types['price']) ? (float)$types['price'] : 0;
+                        $product_total_price += $types_price;
+                    }
+                    foreach ($product['dressing'] as $dressing) {
+                            $dressing_price  = isset($dressing['price']) ? (float)$dressing['price'] : 0;
+                            $product_total_price += $dressing_price;
+                    }
                   }
                 }
-                $totalinitial = ($total_amount + $additional_pos_discount) - $shipping_cost;
+                // in pos total comes without shipping
+                $totalinitial = ($total_amount + $additional_pos_discount);
                 $ratio = $product_total_price / $totalinitial;
                 $additional_discount = round(($additional_pos_discount * $ratio), 2);
               }
@@ -1161,7 +1194,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($details['is_deal'] == "yes") {
           $deal_id  = $details['deal_id'];
           $deal_qty = $details['deal_qty'];
-          $deal_cost = $details['deal_cost'];
+          $deal_cost = $details['deal_price'];
           $notes    = mysqli_real_escape_string($conn, $details['additionalNotes']);
           $no_of_deal++;
 
@@ -1180,8 +1213,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   $freeQTY      = $isFreeInDeal == 1 ? (isset($addon['freeQTY']) ? (int)$addon['freeQTY'] : 0) : 0;
                   $product_total_price += ($addon_price * ($addon_qty - $freeQTY));
                 }
+                foreach ($product['types'] as $types) {
+                        $types_price  = isset($types['price']) ? (float)$types['price'] : 0;
+                        $product_total_price += $types_price;
+                }
+                foreach ($product['dressing'] as $dressing) {
+                        $dressing_price  = isset($dressing['price']) ? (float)$dressing['price'] : 0;
+                        $product_total_price += $dressing_price;
+                }
               }
             }
+            // in Web total is coming with shipping
             $totalinitial = ($total_amount + $wallet_balance) - $shipping_cost;
             $ratio = $product_total_price / $totalinitial;
             $additional_discount = round(($wallet_balance * $ratio), 2);
@@ -1195,9 +1237,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   $freeQTY     = isset($addon['freeQTY']) ? (int)$addon['freeQTY'] : 0;
                   $product_total_price += ($addon_price * ($addon_qty - $freeQTY));
                 }
+                foreach ($product['types'] as $types) {
+                        $types_price  = isset($types['price']) ? (float)$types['price'] : 0;
+                        $product_total_price += $types_price;
+                }
+                foreach ($product['dressing'] as $dressing) {
+                        $dressing_price  = isset($dressing['price']) ? (float)$dressing['price'] : 0;
+                        $product_total_price += $dressing_price;
+                }
               }
             }
-            $totalinitial = ($total_amount + $additional_pos_discount) - $shipping_cost;
+            // in PO total is coming without shipping
+            $totalinitial = ($total_amount + $additional_pos_discount);
             $ratio = $product_total_price / $totalinitial;
             $additional_discount = round(($additional_pos_discount * $ratio), 2);
           }
@@ -1368,12 +1419,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!empty($wallet_balance) && $total_amount > 0) {
 
               $product_total_price = $price * $details['qty']  - ($pro_discount / 100 * ($price * $details['qty']));
-
+            
+            
+             
+               
+            
 
               foreach ($details['addons'] as $addon) {
-                $addon_price = isset($addon['as_price']) ? (float)$addon['as_price'] : 0;
-                $addon_qty   = isset($addon['quantity']) ? (int)$addon['quantity'] : 1;
-                $product_total_price += ($addon_price * $addon_qty);
+                  $addon_price = isset($addon['as_price']) ? (float)$addon['as_price'] : 0;
+                  $addon_qty   = isset($addon['quantity']) ? (int)$addon['quantity'] : 1;
+                  $freeQTY     = isset($addon['freeQTY']) ? (int)$addon['freeQTY'] : 0;
+                  $product_total_price += ($addon_price * ($addon_qty - $freeQTY));
+              }
+              foreach ($details['types'] as $types) {
+                        $types_price  = isset($types['price']) ? (float)$types['price'] : 0;
+                        $product_total_price += $types_price;
+              }
+              foreach ($details['dressing'] as $dressing) {
+                        $dressing_price  = isset($dressing['price']) ? (float)$dressing['price'] : 0;
+                        $product_total_price += $dressing_price;
               }
 
               $totalinitial = ($total_amount + $wallet_balance) - $shipping_cost;
@@ -1386,12 +1450,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
               foreach ($details['addons'] as $addon) {
-                $addon_price = isset($addon['as_price']) ? (float)$addon['as_price'] : 0;
-                $addon_qty   = isset($addon['quantity']) ? (int)$addon['quantity'] : 1;
-                $product_total_price += ($addon_price * $addon_qty);
+                  $addon_price = isset($addon['as_price']) ? (float)$addon['as_price'] : 0;
+                  $addon_qty   = isset($addon['quantity']) ? (int)$addon['quantity'] : 1;
+                  $freeQTY     = isset($addon['freeQTY']) ? (int)$addon['freeQTY'] : 0;
+                  $product_total_price += ($addon_price * ($addon_qty - $freeQTY));
               }
-
-              $totalinitial = ($total_amount + $additional_pos_discount) - $shipping_cost;
+              foreach ($details['types'] as $types) {
+                        $types_price  = isset($types['price']) ? (float)$types['price'] : 0;
+                        $product_total_price += $types_price;
+              }
+              foreach ($details['dressing'] as $dressing) {
+                        $dressing_price  = isset($dressing['price']) ? (float)$dressing['price'] : 0;
+                        $product_total_price += $dressing_price;
+              }
+               // in POS total is coming without shipping
+              $totalinitial = ($total_amount + $additional_pos_discount);
               $ratio = $product_total_price / $totalinitial;
 
               $additional_discount = round(($additional_pos_discount * $ratio), 2);
