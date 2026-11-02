@@ -18,6 +18,7 @@ if (isset($_POST['update'])) {
 
     $ios_link = mysqli_real_escape_string($conn, $_POST['ios_link']);
     $android_link = mysqli_real_escape_string($conn, $_POST['android_link']);
+    $web_link = mysqli_real_escape_string($conn, $_POST['web_link']); // Added web_link
     $report_lang = mysqli_real_escape_string($conn, $_POST['report_lang']);
     $duration_minutes = intval($_POST['duration_minutes']);
     $currency = json_encode([
@@ -30,6 +31,7 @@ if (isset($_POST['update'])) {
                 currency='$currency',
                 ios_link='$ios_link',
                 android_link='$android_link',
+                web_link='$web_link',
                 report_lang='$report_lang',
                 duration_minutes='$duration_minutes'
             WHERE id=" . intval($settings['id']);
@@ -239,6 +241,11 @@ $shops_result = mysqli_query($conn, "SELECT * FROM shops ORDER BY id DESC");
                         <label class="form-label fw-bold">Android App Link</label>
                         <input type="url" name="android_link" class="form-control" value="<?php echo htmlspecialchars($settings['android_link']); ?>" placeholder="https://play.google.com/store/apps/...">
                     </div>
+                    
+                    <div class="col-md-6">
+    <label class="form-label fw-bold">Web Link (Desktop Redirect)</label>
+    <input type="url" name="web_link" class="form-control" value="<?php echo htmlspecialchars($settings['web_link'] ?? ''); ?>" placeholder="https://domain.com/website">
+</div>
                     <div class="col-md-6">
                         <label class="form-label fw-bold">Duration (Minutes)</label>
                         <input type="number" name="duration_minutes" class="form-control" min="1" value="<?php echo htmlspecialchars($settings['duration_minutes']); ?>" placeholder="e.g. 30">

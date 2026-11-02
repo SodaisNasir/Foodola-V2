@@ -102,6 +102,9 @@ if (isset($_GET['Massage'])) {
                                                         <th>Sno</th>
                                                         <th>Resturant</th>
                                                         <th>Products</th>
+                                                        <th>iOS Clicks</th>
+                                                        <th>Android Clicks</th>
+                                                        <th>Web Clicks</th>
                                                         <th>Total Orders</th>
                                                         <th>Total Amount</th>
                                                         <th>Savings</th>
@@ -115,14 +118,16 @@ if (isset($_GET['Massage'])) {
                                                         <th>Sno</th>
                                                         <th>Resturant</th>
                                                         <th>Products</th>
+                                                        <th>iOS Clicks</th>
+                                                        <th>Android Clicks</th>
+                                                        <th>Web Clicks</th>
                                                         <th>Total Orders</th>
                                                         <th>Total Amount</th>
                                                         <th>Savings</th>
                                                     </tr>
-                                                </tfoot>
-                                            </table>
+                                            </tfoot>
+                                        </table>
 
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -246,6 +251,9 @@ $(document).ready(function () {
                     i++,
                     nameHtml,
                     productsHtml,
+                    item.ios_clicks ?? 0,
+                    item.android_clicks ?? 0,
+                    item.web_clicks ?? 0,
                     item.total_orders ?? 0,
                     item.total_amount ?? 0,
                     saving
@@ -257,7 +265,7 @@ $(document).ready(function () {
         },
         error: function () {
             $('#summaryTable tbody').html(
-                '<tr><td colspan="6" class="text-center text-danger">Failed to load summary</td></tr>'
+                '<tr><td colspan="9" class="text-center text-danger">Failed to load summary</td></tr>'
             );
         }
     });
