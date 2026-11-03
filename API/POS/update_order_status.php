@@ -78,8 +78,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         
-        if($keysCount > 6 && $isFiskalyOnline == true){
-             $getitemdetails = "SELECT `deal_id` , `no_of_deal` , `deal_item_id` , `product_id` , od.cost , od.price ,od.discount_percent , `addons` , `types` , `dressing` ,`additional_discount` , products.tax , orders.order_total_price , orders.total_discount , orders.fiskaly_response, orders.Shipping_cost, orders.payment_type FROM `order_details_zee` as od INNER JOIN products ON products.id = od.product_id LEFT JOIN orders_zee as orders ON orders.id = od.order_id WHERE `order_id` =  $order_id; ";
+
+        
+        if($keysCount >= 6 && $isFiskalyOnline === true){
+           $getitemdetails = "SELECT `deal_id` , `no_of_deal` , `deal_item_id` , `product_id` , od.cost , od.price ,od.discount_percent , `addons` , `types` , `dressing` ,`additional_discount` , products.tax , orders.order_total_price , orders.total_discount , orders.fiskaly_response, orders.Shipping_cost, orders.payment_type FROM `order_details_zee` as od INNER JOIN products ON products.id = od.product_id LEFT JOIN orders_zee as orders ON orders.id = od.order_id WHERE `order_id` =  $order_id; ";
             $resultdetails = mysqli_query($conn, $getitemdetails);
             $tax7Amount= 0;
             $tax19Amount= 0;
@@ -169,12 +171,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
               $tax19Amount = $tax19Amount + $shippingCharges;
               $totalAfterTax = $tax7Amount + $tax19Amount;
-        
-                echo $orderTotalCharges." ".$totalAfterTax;
+   
             
              if($orderTotalCharges == $totalAfterTax && $fiskaly_response == false ){
-                
-                echo 'test';
+    
                 
                 $amounts_per_vat_rate = [];
                 if ($tax7Amount > 0) {
@@ -191,19 +191,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ];
                 }
                 
-                
+                $token = generateAccessToken($fiskalyData);
     
-                $transactionData = (StartTransaction($fiskalyData, $amounts_per_vat_rate, $orderTotalCharges, $payment_type));
+                if (!empty($token)) {
+                    $fiskalyData['access_token'] = $token;
+                
+                    $transactionData = StartTransaction(
+                        $fiskalyData,
+                        $amounts_per_vat_rate,
+                        $orderTotalCharges,
+                        $payment_type,
+                        $token
+                    );
+                    
+                   $minutesToAdd = isset($_POST['delivery_at']) ? (int)$_POST['delivery_at'] : 0;
+    
+                    $time = new DateTime();
+                    $time->add(new DateInterval("PT{$minutesToAdd}M"));
+                    $delivered_at = $time->format('Y-m-d g:i A');
+            
+                    $sql = "UPDATE `orders_zee` SET `status` = '" . mysqli_real_escape_string($conn, $status) . "', `delivered_at` = '" . mysqli_real_escape_string($conn, $delivered_at) ."', `fiskaly_response` = '" . mysqli_real_escape_string($conn, $transactionData) . "' WHERE `id` = " . intval($order_id);
+                
+                } else {
+                    echo "Failed to generate access token.";
+                }
                 
          
                 
-                $minutesToAdd = isset($_POST['delivery_at']) ? (int)$_POST['delivery_at'] : 0;
-
-                $time = new DateTime();
-                $time->add(new DateInterval("PT{$minutesToAdd}M"));
-                $delivered_at = $time->format('Y-m-d g:i A');
-        
-                $sql = "UPDATE `orders_zee` SET `status` = '" . mysqli_real_escape_string($conn, $status) . "', `delivered_at` = '" . mysqli_real_escape_string($conn, $delivered_at) ."', `fiskaly_response` = '" . mysqli_real_escape_string($conn, $transactionData) . "' WHERE `id` = " . intval($order_id);
+               
             }else{
                  $minutesToAdd = isset($_POST['delivery_at']) ? (int)$_POST['delivery_at'] : 0;
 
@@ -487,7 +502,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         
-        if($keysCount > 6 && $isFiskalyOnline == true){
+        if($keysCount >=6 && $isFiskalyOnline == true){
              $getitemdetails = "SELECT `deal_id` , `no_of_deal` , `deal_item_id` , `product_id` , od.cost , od.price ,od.discount_percent , `addons` ,`additional_discount` , products.tax , orders.order_total_price , orders.fiskaly_response, orders.Shipping_cost, orders.payment_type, orders.status FROM `order_details_zee` as od INNER JOIN products ON products.id = od.product_id LEFT JOIN orders_zee as orders ON orders.id = od.order_id WHERE `order_id` =  $order_id; ";
             $resultdetails = mysqli_query($conn, $getitemdetails);
             $tax7Amount= 0;
@@ -575,13 +590,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 
                 $orderTotalCharges = -abs($orderTotalCharges);
+                $token = generateAccessToken($fiskalyData);
     
-                $transactionData = (StartTransaction($fiskalyData, $amounts_per_vat_rate, $orderTotalCharges, $payment_type));
-                $fiskaly_response[] = json_decode($transactionData);
+                if (!empty($token)) {
+                    $fiskalyData['access_token'] = $token;
                 
-                $fiskaly_updated = json_encode($fiskaly_response);
-         
-                $sql = "UPDATE `orders_zee` SET `status` = '" . mysqli_real_escape_string($conn, 'canceled') ."', `fiskaly_response` = '" . mysqli_real_escape_string($conn, $fiskaly_updated) . "' WHERE `id` = " . intval($order_id);
+                    $transactionData = StartTransaction(
+                        $fiskalyData,
+                        $amounts_per_vat_rate,
+                        $orderTotalCharges,
+                        $payment_type,
+                        $token
+                    );
+                    $fiskaly_response[] = json_decode($transactionData);
+                
+                    $fiskaly_updated = json_encode($fiskaly_response);
+             
+                    $sql = "UPDATE `orders_zee` SET `status` = '" . mysqli_real_escape_string($conn, 'canceled') ."', `fiskaly_response` = '" . mysqli_real_escape_string($conn, $fiskaly_updated) . "' WHERE `id` = " . intval($order_id);
+                   
+                
+                } else {
+                    echo "Failed to generate access token.";
+                }
+                
             }else{
         
                 $sql = "UPDATE orders_zee
@@ -863,8 +894,8 @@ function getOrderContentMessage($status, $order_id, $delivered_at = null, $ryder
 }
 
 
-function StartTransaction($fiskalyData, $amounts_per_vat_rate, $orderTotalCharges , $payment_type){
-    
+function StartTransaction($fiskalyData, $amounts_per_vat_rate, $orderTotalCharges , $payment_type, $token){
+  
     $fiskaly_tss_id = $fiskalyData['fiskaly_tss_id'];
     $fiskaly_client_id = $fiskalyData['fiskaly_client_id'];
     $access_token = $fiskalyData['access_token'];
@@ -899,12 +930,10 @@ function StartTransaction($fiskalyData, $amounts_per_vat_rate, $orderTotalCharge
     $status_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
     curl_close($curl);
-    
-    if($status_code === 401){
-        generateAccessToken($fiskalyData, $amounts_per_vat_rate, $orderTotalCharges, $payment_type);
-    }else {
-    
-        $dataFinish = [
+
+        
+        if($payment_type === 'CASH'){
+          $dataFinish = [
             "schema" => [
                 "standard_v1" => [
                     "receipt" => [
@@ -912,7 +941,7 @@ function StartTransaction($fiskalyData, $amounts_per_vat_rate, $orderTotalCharge
                         "amounts_per_vat_rate" => $amounts_per_vat_rate,
                         "amounts_per_payment_type" => [
                             [
-                                "payment_type" => $payment_type,
+                                "payment_type" => "CASH",
                                 "amount" => number_format($orderTotalCharges, 2, '.', '')
                             ]
                         ]
@@ -922,6 +951,28 @@ function StartTransaction($fiskalyData, $amounts_per_vat_rate, $orderTotalCharge
             "state" => "FINISHED",
             "client_id" => $fiskaly_client_id
         ];
+        }else{
+            $dataFinish = [
+            "schema" => [
+                "standard_v1" => [
+                    "receipt" => [
+                        "receipt_type" => "RECEIPT",
+                        "amounts_per_vat_rate" => $amounts_per_vat_rate,
+                        "amounts_per_payment_type" => [
+                            [
+                                "payment_type" => "NON_CASH",
+                                "amount" => number_format($orderTotalCharges, 2, '.', '')
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            "state" => "FINISHED",
+            "client_id" => $fiskaly_client_id
+        ];
+        }
+    
+
         
         curl_setopt_array($curl, array(
             CURLOPT_URL => 'https://kassensichv-middleware.fiskaly.com/api/v2/tss/' . $fiskaly_tss_id . '/tx/'.$uuid.'/?tx_revision=2',
@@ -942,12 +993,14 @@ function StartTransaction($fiskalyData, $amounts_per_vat_rate, $orderTotalCharge
         $response2 = curl_exec($curl);
     
         curl_close($curl);
-        return $response2;
-    }
+        
+    
+    
+     return $response2;
 
 }
 
-function generateAccessToken($fiskalyData, $amounts_per_vat_rate, $orderTotalCharges){
+function generateAccessToken($fiskalyData){
     
     $fiskaly_tss_id = $fiskalyData['fiskaly_api_key'];
     $fiskaly_client_id = $fiskalyData['fiskaly_api_secret'];
@@ -982,7 +1035,7 @@ function generateAccessToken($fiskalyData, $amounts_per_vat_rate, $orderTotalCha
     
     updateFiskaly("access_token",$accessToken);
     
-    StartTransaction($fiskalyData, $amounts_per_vat_rate, $orderTotalCharges, $payment_type);
+    return  $accessToken;
     
     
     
