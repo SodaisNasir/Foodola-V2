@@ -968,7 +968,7 @@ if (startFiskalyBtn) {
             await response.json();
             await updateFiskaly("fiskaly_admin_pin", admin_pin);
 
-            response = await fetch(`https://kassensichv-middleware.fiskaly.com/api/query/v2/tss/${tssid}/admin/auth`, {
+            response = await fetch(`https://kassensichv-middleware.fiskaly.com/api/v2/tss/${tssid}/admin/auth`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
